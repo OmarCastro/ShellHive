@@ -1,0 +1,38 @@
+{
+    "nodes": {
+        "1": {
+            "id": 1,
+            "x": 99,
+            "y": 232,
+            "title": "cat",
+            "arguments": [
+                "nodes.txt"
+            ]
+        },
+        "2": {
+            "id": 2,
+            "x": 412,
+            "y": 174,
+            "title": "grep",
+            "arguments": [
+                "cat"
+            ]
+        },
+        "3": {
+            "id": 3,
+            "x": 782,
+            "y": 320,
+            "title": "grep",
+            "arguments": [
+                "cat"
+            ]
+        },
+        "maxid": 3
+    },
+    "edges": [
+        {
+            "start": 1,
+            "end": 2
+        }
+    ]
+}

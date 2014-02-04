@@ -1,0 +1,46 @@
+doctype html
+html
+	head
+		title Chat
+		script(src="/socket.io/socket.io.js")
+		style.
+			body{
+				padding:0;
+				margin:0;
+			}
+			div.content
+			{
+				position:absolute;
+				left:0;top:0;
+				/* basic styling */
+				width: 100%;
+				height: 100%;
+				/* flexbox setup */
+				display: -webkit-flex;
+				-webkit-flex-flow: row wrap;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: center ;
+				align-content: stretch;
+				align-items: stretch;
+			}
+			div.content > div {
+				flex: 1 1 30%;
+				-webkit-flex: 1 1 30%;
+				border: 1px solid #888;
+			}
+			div.commandline {
+				background-color: #ddd;
+				font-weight: bold;
+				font-family: monospace;
+			}
+			div.commandline > span:before {
+				color: #666;
+				content: "command line: "
+			}
+
+	body
+		div.content
+			
+	script(src="js/helper.ls.js")
+

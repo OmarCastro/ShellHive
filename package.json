@@ -1,0 +1,20 @@
+{
+  "name": "tese-mieic-omar-castro",
+  "version": "0.0.1",
+  "dependencies": {
+    "jade": "*",
+    "marked":  "*",
+    "LiveScript": "*",
+    "prelude-ls": "*",
+    "stylus":   "*",
+    "nib":"*",
+    "grunt-cli": "*",
+    "express": "*",
+    "grunt-livescript": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-closure-compiler": "*"
+  },
+  "scripts": { "watch": "grunt watch --verbose" }
+
+}

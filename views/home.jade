@@ -1,0 +1,51 @@
+doctype html
+html(ng-app="drag",touch-action="none")
+	head
+		title Chat
+		script(src="/angular/angular.min.js")
+		script(src="/socket.io/socket.io.js")
+		script(src="pointerevents-polyfill/pointerevents.min.js")
+		link(rel="stylesheet",href="css/style.css")
+	body(ng-controller="Controller")
+		.graph
+			.nodes(ng-repeat="node in dataNodes track by node.id")
+				.component(id="unix-node-{{node.id}}", template="template-cat")
+					.title {{node.title}} 
+					.ports
+						.input
+							span.box
+							span.text &nbsp;input&nbsp;&nbsp;
+						.output
+							span.text &nbsp;&nbsp;output&nbsp;
+							span.box
+					.grep.nodegui(ng-if='node.title == "grep"')
+						br
+						label
+							| pattern:
+							input(type="text")
+						br
+						| type:
+						select
+							option(value="G") basic regexp
+							option(value="F") fixed string
+							option(value="E") extended regexp 
+							option(value="P") perl regexp
+						br
+						label
+							input(type="checkbox", name="ignorecase")
+							| ignorecase
+						br
+						label
+							input(type="checkbox", name="invert")
+							| invert result
+						br
+						label
+							input(type="checkbox", name="filter")
+							| filter
+							select
+								option(value="word") word
+								option(value="line") line
+						
+			svg.edges(height="100%" width="100%" ng-repeat="edge in dataEdges")
+				path(connector)
+	script(src="js/script.ls.js")
