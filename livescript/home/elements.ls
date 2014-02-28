@@ -90,16 +90,21 @@ app
         $document
           ..unbind "pointermove", mousemove
           ..unbind "pointerup", mouseup
-      rect = elem.firstChild.getBoundingClientRect!
-      input = elem.querySelector("div.input .box").getBoundingClientRect!
-      output = elem.querySelector("div.output .box").getBoundingClientRect!
-
+      
+      rect = elem.getBoundingClientRect!
+      elem.style.minWidth = "#{rect.width}px"
+      inputelem = elem.querySelector("div.input .box")
+      input = inputelem.getBoundingClientRect!
+      outputelem = elem.querySelector("div.output .box")
+      output = outputelem.getBoundingClientRect!
       inputX = input.left + input.width/2 - rect.left
       inputY = input.top + input.height/2 - rect.top
       outputX = output.left + output.width/2 - rect.left
       outputY = output.top + output.height/2 - rect.top
       datanode.api = 
-        inputPos : -> {x: x + inputX,   y: y + inputY  }
+        inputPos : -> 
+
+          {x: x + inputX,   y: y + inputY  }
         outputPos: -> {x: x + outputX, y: y + outputY}
         pos: -> {x,y}
         size:{width:rect.width,height:rect.height}

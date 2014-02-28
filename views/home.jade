@@ -8,17 +8,23 @@ html(ng-app="drag",touch-action="none")
 		link(rel="stylesheet",href="css/style.css")
 	body(ng-controller="Controller")
 		.graph
-			.nodes(ng-repeat="node in dataNodes track by node.id")
-				.component(id="unix-node-{{node.id}}", template="template-cat")
+			.nodes
+				.component(id="unix-node-{{node.id}}", template="template-cat", ng-repeat="node in dataNodes track by node.id")
 					.title {{node.title}} 
 					.ports
 						.input
 							span.box
-							span.text &nbsp;input&nbsp;&nbsp;
-						.output
-							span.text &nbsp;&nbsp;output&nbsp;
+							span.text &nbsp;stdin&nbsp;&nbsp;
+						.output(style="text-align: right")
+							span.text &nbsp;&nbsp;stdout&nbsp;
 							span.box
-					.grep.nodegui(ng-if='node.title == "grep"')
+							br
+							span.text &nbsp;&nbsp;stderr&nbsp;
+							span.box
+					br
+					br
+					div(style="text-align: center"). {{node.arguments[0]}}
+					.grep.nodegui(ng-if='node.title == "xgrep"')
 						br
 						label
 							| pattern:
@@ -46,6 +52,6 @@ html(ng-app="drag",touch-action="none")
 								option(value="word") word
 								option(value="line") line
 						
-			svg.edges(height="100%" width="100%" ng-repeat="edge in dataEdges")
-				path(connector)
+			svg.edges(height="100%" width="100%")
+				path(connector,ng-repeat="edge in dataEdges")
 	script(src="js/script.ls.js")

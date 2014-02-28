@@ -1,12 +1,12 @@
 body,.graph,.nodes{margin:0;overflow:hidden}
-.nodes,svg.edges{absolute:top left}
-.graph{fixed:top left;width:100%;height:100%;background-color:#055c4c}
+.nodes,svg.edges{position:absolute;top:0;left:0}
+.graph{fixed:top left;width:100%;height:100%}
 .nodes{width:100%;height:100%}
 svg.edges{z-index:1}
 path{fill:none;stroke:#aaa;stroke-width:5;}
 path.sel{stroke:#00f;stroke-width:5}
-.component{font-size:1em;position:absolute;min-width:80px;min-height:80px;background-color:#fff;border-radius:.3em;border:.2em solid #aaa;z-index:2;}
-.component .title{text-align:center;background-color:#999;height:1.5em;border-top-left-radius:.1em;border-top-right-radius:.1em}
-.component .input{float:left}
-.component .output{float:right}
-.stream-port{display:inline-block;height:.5em;width:.5em;background-color:#aaa;border-radius:.1em}
+.component,.inline-component{font-size:1em;position:absolute;min-width:80px;min-height:80px;background-color:#fff;border-radius:.3em;border:.2em solid #aaa;z-index:2;}
+.component .title,.inline-component .title{text-align:center;background-color:#ddd;height:1.5em;border-top-left-radius:.1em;border-top-right-radius:.1em}
+.component .input,.inline-component .input{float:left}
+.component .output,.inline-component .output{float:right}
+.component .box,.inline-component .box{display:inline-block;height:.5em;width:.5em;background-color:#aaa;border-radius:.1em}

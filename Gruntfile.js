@@ -1,70 +1,102 @@
-var fs = require('fs');
-var path = require('path');
-
-module.exports = function(grunt) {
-  
-  grunt.initConfig({
-    concat: {
-      js: {
-        options: {
-          separator: ';'
+(function(){
+  var fs, path, exec;
+  fs = require('fs');
+  path = require('path');
+  exec = require('child_process').exec;
+  module.exports = function(grunt){
+    var config;
+    config = {
+      jade: {
+        compile: {
+          options: {
+            data: {
+              debug: false
+            }
+          },
+          files: {
+            "public/weeklyReport2.html": ["public/weeklyReport2.jade"]
+          }
+        }
+      },
+      livescript: {
+        home_js: {
+          files: {
+            'public/js/script.ls.js': ['livescript/home/*.ls']
+          }
         },
-        src: [
-          'javascript/*.js'
-        ],
-        dest: 'public/js/main.min.js'
-      },
-    },
-    'closure-compiler': {
-      frontend: {
-        closurePath: 'closure-compiler',
-        js: 'public/js/script.ls.js',
-        jsOutputFile: 'public/js/script.min.js',
-        maxBuffer: 500,
-        options: {
-          compilation_level: 'SIMPLE_OPTIMIZATIONS',
-          language_in: 'ECMASCRIPT5_STRICT'
-        }
-      }
-    },
-    livescript: {
-      home_js: {
-        files: {
-          'public/js/script.ls.js': ['livescript/home/*.ls']
+        helper_js: {
+          files: {
+            'public/js/helper.ls.js': ['livescript/helper/*.ls']
+          }
+        },
+        grunt: {
+          files: {
+            'Gruntfile.js': ['livescript/grunt.ls']
+          }
+        },
+        parser: {
+          files: {
+            'parser/parser.js': ['parser/parser.ls']
+          }
+        },
+        report: {
+          files: {
+            'public/js2/app.js': ['public/js2/play.ls']
+          }
         }
       },
-      helper_js:{
-        files: {
-          'public/js/helper.ls.js': ['livescript/helper/*.ls']
+      shell: {
+        compileLsParser: {
+          options: {
+            stdout: true,
+            stderr: true
+          },
+          command: "ls parser/commands/dev/ | parallel 'find parser/commands/dev/{} -newer parser/commands/v/{.}.js' | parallel 'basename {}' | parallel 'lsc -p -b -c parser/commands/dev/{} > parser/commands/v/{.}.js'"
+        },
+        glueParser: {
+          command: "gluejs --no-cache --global shellParser --main parser/parser.js --include parser/commands/v/ --include parser/parser.js --include parser/ast-builder/ast-builder.js > public/js/parser.js"
+        }
+      },
+      watch: {
+        report_html: {
+          files: ["public/weeklyReport2.jade", "public/component.jade"],
+          tasks: ['jade:compile']
+        },
+        report: {
+          files: ['public/js2/play.ls'],
+          tasks: ['livescript:report']
+        },
+        parserCommands: {
+          files: ['parser/commands/dev/*.ls'],
+          tasks: ['shell:compileLsParser', 'shell:glueParser']
+        },
+        parser: {
+          files: ['parser/parser.ls'],
+          tasks: ['livescript:parser', 'shell:glueParser']
+        },
+        html: {
+          files: ['elements/*.jade'],
+          tasks: ['jade']
+        },
+        home_js: {
+          files: ['livescript/home/*.ls'],
+          tasks: ['livescript:home_js', 'closure-compiler']
+        },
+        helper: {
+          files: ['livescript/helper/*.ls'],
+          tasks: ['livescript:helper_js']
+        },
+        gruntfile: {
+          files: ['livescript/grunt.ls'],
+          tasks: ['livescript:grunt']
         }
       }
-    },
-    watch: {
-      html: {
-        files: ['elements/*.jade'],
-        tasks: ['jade']
-      },
-      home_js: {
-        files: ['livescript/home/*.ls'],
-        tasks: ['livescript:home_js', 'closure-compiler']
-      },
-      helper: {
-        files: ['livescript/helper/*.ls'],
-        tasks: ['livescript:helper_js']
-      },
-      css: {
-        files: ['stylus/*.styl'],
-        tasks: ['stylus:style']
-      }
-    }
-  });
- 
-  grunt.loadNpmTasks('grunt-livescript');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-closure-compiler');
-  grunt.registerTask('default', [ 'watch' ]);
-
- 
-};
- 
+    };
+    grunt.initConfig(config);
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-jade');
+    grunt.loadNpmTasks('grunt-livescript');
+    grunt.loadNpmTasks('grunt-shell');
+    grunt.registerTask('default', ['watch']);
+  };
+}).call(this);

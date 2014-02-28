@@ -1,0 +1,56 @@
+.title {{data.exec}} 
+.ports
+    .input
+        span.box(data-port="input")
+        span.text &nbsp;stdin&nbsp;&nbsp;
+    .output(style="text-align: right")
+        span.text &nbsp;&nbsp;stdout&nbsp;
+        span.box(data-port="output")
+        br
+        span.text &nbsp;&nbsp;stderr&nbsp;
+        span.box(data-port="error")
+        br
+        span.text &nbsp;&nbsp;return&nbsp;
+        span.box(data-port="retcode")
+br
+br
+br
+div(ng-if="data.exec == 'grep'")
+    label
+        | pattern:
+        input(type="text",ng-model="data.pattern")
+    br
+    div(ng-repeat="(name, option) in data.selectors track by name")
+        | {{name}}:
+        select(ng-model='data.selectors[name]',ng-options="c for c in options.grep[name]")
+        br
+    br
+
+div(ng-if="isImplemented(data) && data.files")
+    | files :
+    br(ng-if="data.files.length > 0")
+    label(ng-repeat="file in data.files track by $index") 
+        span.box(data-port="file{{$index}}")
+        input(type="text",ng-model="data.files[$index]")
+        button(ng-click="data.files.splice($index,1)"). -
+        br
+    button(ng-click="data.files.push('')"). +
+    br
+
+div(ng-if="data.exec == 'ls'")
+    | ignore:
+    input(type="text",ng-model='data.parameters.ignore')
+    br
+
+div(ng-if="isImplemented(data) && data.selectors && data.exec != 'grep' ")
+    div(ng-repeat="(name, option) in data.selectors track by name")
+        | {{name}}:
+        select(ng-model='data.selectors[name]',ng-options="c for c in options[data.exec][name]")
+        br
+
+div
+    label(ng-repeat="(nam, val) in data.flags track by nam")
+        input(type="checkbox",ng-model="data.flags[nam]")
+        | {{nam}}
+        br
+

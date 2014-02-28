@@ -62,7 +62,7 @@
     return {
       scope: true,
       link: function(scope, element, attr){
-        var datanode, startX, startY, title, x, y, elem, imstyle, mousemove, moveTo, updatePos, mouseup, rect, input, output, inputX, inputY, outputX, outputY;
+        var datanode, startX, startY, title, x, y, elem, imstyle, mousemove, moveTo, updatePos, mouseup, rect, inputelem, input, outputelem, output, inputX, inputY, outputX, outputY;
         datanode = scope.$parent.node;
         startX = 0;
         startY = 0;
@@ -116,9 +116,12 @@
           x$.unbind("pointerup", mouseup);
           return x$;
         };
-        rect = elem.firstChild.getBoundingClientRect();
-        input = elem.querySelector("div.input .box").getBoundingClientRect();
-        output = elem.querySelector("div.output .box").getBoundingClientRect();
+        rect = elem.getBoundingClientRect();
+        elem.style.minWidth = rect.width + "px";
+        inputelem = elem.querySelector("div.input .box");
+        input = inputelem.getBoundingClientRect();
+        outputelem = elem.querySelector("div.output .box");
+        output = outputelem.getBoundingClientRect();
         inputX = input.left + input.width / 2 - rect.left;
         inputY = input.top + input.height / 2 - rect.top;
         outputX = output.left + output.width / 2 - rect.left;

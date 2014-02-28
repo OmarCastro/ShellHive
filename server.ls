@@ -1,13 +1,4 @@
-require! {
-	express
-	jade
-	fs
-	util
-	spawn: \child_process .spawn
-	stylus
-	nib
-}
-
+require! {express, jade, fs, util, stylus, nib, Datastore: nedb, \child_process .spawn}
 
 /**
  defines a unix commands
@@ -61,6 +52,8 @@ class CommandProcess
 
 /**
 defines a complete unix command line
+
+
 */
 class CommandLine
 	(exec, args, nodeId) ->
@@ -70,7 +63,7 @@ class CommandLine
 		@processes = [new-process]
 
 
-	pipe: (exec, args, nodeId)->
+	cdpipe: (exec, args, nodeId)->
 		lastprocess = @processes[@processes.length-1]
 		new-process = new CommandProcess(exec, args, nodeId)
 			..captureStdout = yes
@@ -88,23 +81,15 @@ class CommandLine
 	commandString: -> [x.commandString! for x in @processes]*' | '
 
 
+
+
+
+
+
 app = express!
-
-file = __dirname + '/flow.json';
-flow = {};
- 
-fs.readFile file, 'utf8', (err, data) ->
-	return console.log('Error: ' + err) if err;
-	flow := JSON.parse data
-
-pendingWrite = false
-
-saveflow = !->
-	fs.writeFile file, JSON.stringify(flow,null,4) , (err) !->
-		if err then console.log err else console.log "The file was saved!"
-		pendingWrite := false
-
-
+db = new Datastore {filename: 'db/basic.db', autoload: true}
+db.ensureIndex({ fieldName: 'name', unique: true })
+db.persistence.setAutocompactionInterval 5000
 
 io = app.listen 8000 |> require \socket.io .listen
 	
@@ -115,7 +100,7 @@ app.set 'view engine' , \jade
 app.set 'view options' , { layout: false }
 app.configure !->
 	app.use(stylus.middleware(
-		src: __dirname + '/views', #.styl files are located in `views/stylesheets`
+		src: __dirname + '/views',   #.styl files are located in `views/stylesheets`
 		dest: __dirname + '/public', # .styl resources are compiled `/stylesheets/*.css`
 		compile: (str, path, fn) -> # optional, but recommended
 			stylus(str) 
@@ -129,22 +114,41 @@ app.configure !->
 app.get \/, (req, res) !-> res.render('home.jade')
 app.get \/helper, (req, res) !-> res.render('helper.jade')
 
+
+
+#for now we're testing with one workflow
+
 io.sockets.on \connection (socket)!->
+
+	/*
+		new user entry event
+	*/
 	socket.on \graph-user (data) !-> 
+		console.log "new user!!"
 		socket.join \graph-users
-		socket.emit \flowData flow
+		#TODO: fix for multiple projects
+		db.find {name:'testWorkflow'}, (err,docs) !->
+			console.log util.inspect(docs)
+			if docs.length > 0
+				socket.emit \flowData docs[0]
+				console.log "sent ${docs[0]}"
+
+
 	socket.on \helper (data) !-> 
 		socket.join \helpers
 
+
+
 	socket.on \run-app (data) !->
+		/*
 		line = new CommandLine(\cat,["nodes.txt"]).pipe("grep",["cat"])
 			..captureProcess 0
 			..run!
+		*/
 
 	socket.on \nodePosChanged (data) !->
-		flow.nodes[data.id]
-			..x = data.x
-			..y = data.y
+		db.update({name:'testWorkflow'},{$set:{
+			"nodes.#{data.id}.x":data.x,
+			"nodes.#{data.id}.y":data.y}},{})
 		socket.broadcast.to \graph-users .emit \nodePosChanged, data
-		pendingWrite := setTimeout saveflow, 1000ms  if not pendingWrite 
 

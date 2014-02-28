@@ -2,19 +2,25 @@
   "name": "tese-mieic-omar-castro",
   "version": "0.0.1",
   "dependencies": {
-    "jade": "*",
-    "marked":  "*",
-    "LiveScript": "*",
-    "prelude-ls": "*",
-    "stylus":   "*",
-    "nib":"*",
-    "grunt-cli": "*",
-    "express": "*",
-    "grunt-livescript": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-closure-compiler": "*"
+    "jade": ">=1.1.4",
+    "LiveScript": ">=1.2.0",
+    "stylus": ">=0.42.0",
+    "nib": "latest",
+    "express": "~3.4.8",
+    "nedb": "~0.10.4"
   },
-  "scripts": { "watch": "grunt watch --verbose" }
-
+  "scripts": {
+    "watch": "grunt watch --verbose"
+  },
+  "devDependencies": {
+    "grunt-shell": "~0.6.4",
+    "grunt-livescript": "*",
+    "grunt-contrib-uglify": "~0.3.2",
+    "grunt-contrib-watch": "*",
+    "grunt-yaml": "*",
+    "jison": "~0.4.13",
+    "grunt-cli": "~0.1.13",
+    "gluejs": "~2.3.2",
+    "grunt-contrib-jade": "~0.10.0"
+  }
 }

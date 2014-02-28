@@ -1,4 +1,3 @@
-vunix
-=====
+# Using Node.js and Websockets to Build a Chat Service
 
-a visual unix shell implementation
+The source code for the Nettuts+ article, "Using Node.js and Websockets to Build a Chat Service" by Guillaume Besson.
