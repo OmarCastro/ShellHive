@@ -1,3 +1,3 @@
-# Using Node.js and Websockets to Build a Chat Service
+# FlowNix
 
-The source code for the Nettuts+ article, "Using Node.js and Websockets to Build a Chat Service" by Guillaume Besson.
+A Visual data-flow programming web application to create Unix Shell workflows
