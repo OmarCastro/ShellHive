@@ -230,7 +230,7 @@ Argumentos mandatórios para opções longas são mandatórios para opções cur
 
 },
 "parser/commands/v/ls.js": function(module, exports, require){
-var $, selectors, sortSelector, formatSelector, indicatorStyleSelector, timeStyleSelector, quotingStyleSelector, showSelector, value, flags, optionsParser, defaultComponentData;
+var $, selectors, sortSelector, formatSelector, indicatorStyleSelector, timeStyleSelector, quotingStyleSelector, showSelector, value, flags, optionsParser, defaultComponentData, commonParseCommand2;
 $ = require("./_init.js");
 selectors = {
   'sort': 'sort',
@@ -429,7 +429,77 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+commonParseCommand2 = function(optionsParser, defaultComponentData, argNodeParsing){
+  return function(argsNode, parser, tracker, previousCommand){
+    var componentData, boundaries, connectionsToPush, result, iter, argNode, subresult, i$, ref$, len$, sub, bbox, x$, c;
+    componentData = defaultComponentData();
+    boundaries = [];
+    if (previousCommand) {
+      if (previousCommand instanceof Array) {
+        boundaries.push(previousCommand[0]);
+      } else {
+        boundaries.push[getBoundaries([previousCommand])];
+      }
+    }
+    connectionsToPush = [];
+    result = {
+      components: [componentData],
+      connections: []
+    };
+    iter = new $.Iterator(argsNode);
+    while (argNode = iter.next()) {
+      switch ($.typeOf(argNode)) {
+      case 'shortOptions':
+        console.log("mimi");
+        $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
+        break;
+      case 'longOption':
+        $.parseLongOptions(optionsParser.longOptions, componentData, iter);
+        break;
+      case 'string':
+        if (argNodeParsing && argNodeParsing.string) {
+          argNodeParsing.string(componentData, argNode);
+        } else {
+          componentData.files.push(argNode);
+        }
+        break;
+      case 'inFromProcess':
+        subresult = parser.parseAST(argNode[1], tracker);
+        boundaries.push($.getBoundaries(subresult.components));
+        for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
+          sub = ref$[i$];
+          result.components.push(sub);
+        }
+        for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
+          sub = ref$[i$];
+          result.connections.push(sub);
+        }
+        componentData.files.push("");
+        connectionsToPush.push({
+          startNode: tracker.id - 1,
+          startPort: 'output',
+          endPort: "file" + (componentData.files.length - 1)
+        });
+      }
+    }
+    bbox = $.arrangeLayout(boundaries);
+    x$ = componentData;
+    x$.position = bbox[1];
+    x$.id = tracker.id;
+    for (i$ = 0, len$ = connectionsToPush.length; i$ < len$; ++i$) {
+      c = connectionsToPush[i$];
+      result.connections.push({
+        startNode: c.startNode,
+        startPort: c.startPort,
+        endNode: tracker.id,
+        endPort: c.endPort
+      });
+    }
+    tracker.id++;
+    return [bbox[0], result];
+  };
+};
+exports.parseCommand = commonParseCommand2(optionsParser, defaultComponentData);
 },
 "parser/commands/v/cat.js": function(module, exports, require){
 var $, selectors, lineNumberSelector, lineNumberSelectorOption, ref$, value, flags, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
@@ -1802,7 +1872,79 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseCommand = function(argsNode, parser, tracker, previousCommand){
+  var x$, componentData, translate, boundaries, result, iter, argNode, arg, subresult, y$, i$, ref$, len$, sub, position;
+  x$ = componentData = defaultComponentData();
+  x$.id = tracker.id;
+  tracker.id++;
+  translate = {
+    x: 0,
+    y: 0
+  };
+  boundaries = {
+    x1: 0,
+    x2: 0,
+    y1: 0,
+    y2: 0
+  };
+  result = {
+    components: [componentData],
+    connections: []
+  };
+  iter = new $.Iterator(argsNode);
+  while (argNode = iter.next()) {
+    switch ($.typeOf(argNode)) {
+    case 'shortOptions':
+      $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
+      break;
+    case 'longOption':
+      arg = optionsParser.longOptions[argNode.slice(2)];
+      if (arg) {
+        arg(componentData);
+      }
+      break;
+    case 'string':
+      componentData.files.push(argNode);
+      break;
+    case 'inFromProcess':
+      subresult = parser.parseAST(argNode[1], tracker);
+      y$ = boundaries;
+      y$.x1 = subresult.components[0].position.x;
+      y$.x2 = boundaries.x1;
+      y$.y1 = subresult.components[0].position.y;
+      y$.y2 = boundaries.y1;
+      for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        position = sub.position;
+        if (translate.x < position.x) {
+          translate.x = position.x;
+        }
+        if (boundaries.y2 < position.y) {
+          boundaries.y2 = position.y;
+        }
+        position.y += translate.y;
+        result.components.push(sub);
+      }
+      for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        result.connections.push(sub);
+      }
+      componentData.files.push("");
+      result.connections.push({
+        startNode: tracker.id - 1,
+        startPort: 'output',
+        endNode: componentData.id,
+        endPort: "file" + index
+      });
+      translate.y += boundaries.y2 + 300;
+    }
+  }
+  componentData.position = {
+    x: translate.x + 300,
+    y: (translate.y - 300) / 2
+  };
+  return result;
+};
 },
 "parser/commands/v/unzip.js": function(module, exports, require){
 
@@ -2453,7 +2595,79 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseCommand = function(argsNode, parser, tracker, previousCommand){
+  var x$, componentData, translate, boundaries, result, iter, argNode, arg, subresult, y$, i$, ref$, len$, sub, position;
+  x$ = componentData = defaultComponentData();
+  x$.id = tracker.id;
+  tracker.id++;
+  translate = {
+    x: 0,
+    y: 0
+  };
+  boundaries = {
+    x1: 0,
+    x2: 0,
+    y1: 0,
+    y2: 0
+  };
+  result = {
+    components: [componentData],
+    connections: []
+  };
+  iter = new $.Iterator(argsNode);
+  while (argNode = iter.next()) {
+    switch ($.typeOf(argNode)) {
+    case 'shortOptions':
+      $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
+      break;
+    case 'longOption':
+      arg = optionsParser.longOptions[argNode.slice(2)];
+      if (arg) {
+        arg(componentData);
+      }
+      break;
+    case 'string':
+      componentData.files.push(argNode);
+      break;
+    case 'inFromProcess':
+      subresult = parser.parseAST(argNode[1], tracker);
+      y$ = boundaries;
+      y$.x1 = subresult.components[0].position.x;
+      y$.x2 = boundaries.x1;
+      y$.y1 = subresult.components[0].position.y;
+      y$.y2 = boundaries.y1;
+      for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        position = sub.position;
+        if (translate.x < position.x) {
+          translate.x = position.x;
+        }
+        if (boundaries.y2 < position.y) {
+          boundaries.y2 = position.y;
+        }
+        position.y += translate.y;
+        result.components.push(sub);
+      }
+      for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        result.connections.push(sub);
+      }
+      componentData.files.push("");
+      result.connections.push({
+        startNode: tracker.id - 1,
+        startPort: 'output',
+        endNode: componentData.id,
+        endPort: "file" + index
+      });
+      translate.y += boundaries.y2 + 300;
+    }
+  }
+  componentData.position = {
+    x: translate.x + 300,
+    y: (translate.y - 300) / 2
+  };
+  return result;
+};
 },
 "parser/commands/v/compress.js": function(module, exports, require){
 /*

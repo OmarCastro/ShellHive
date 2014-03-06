@@ -1802,7 +1802,79 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseCommand = function(argsNode, parser, tracker, previousCommand){
+  var x$, componentData, translate, boundaries, result, iter, argNode, arg, subresult, y$, i$, ref$, len$, sub, position;
+  x$ = componentData = defaultComponentData();
+  x$.id = tracker.id;
+  tracker.id++;
+  translate = {
+    x: 0,
+    y: 0
+  };
+  boundaries = {
+    x1: 0,
+    x2: 0,
+    y1: 0,
+    y2: 0
+  };
+  result = {
+    components: [componentData],
+    connections: []
+  };
+  iter = new $.Iterator(argsNode);
+  while (argNode = iter.next()) {
+    switch ($.typeOf(argNode)) {
+    case 'shortOptions':
+      $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
+      break;
+    case 'longOption':
+      arg = optionsParser.longOptions[argNode.slice(2)];
+      if (arg) {
+        arg(componentData);
+      }
+      break;
+    case 'string':
+      componentData.files.push(argNode);
+      break;
+    case 'inFromProcess':
+      subresult = parser.parseAST(argNode[1], tracker);
+      y$ = boundaries;
+      y$.x1 = subresult.components[0].position.x;
+      y$.x2 = boundaries.x1;
+      y$.y1 = subresult.components[0].position.y;
+      y$.y2 = boundaries.y1;
+      for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        position = sub.position;
+        if (translate.x < position.x) {
+          translate.x = position.x;
+        }
+        if (boundaries.y2 < position.y) {
+          boundaries.y2 = position.y;
+        }
+        position.y += translate.y;
+        result.components.push(sub);
+      }
+      for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        result.connections.push(sub);
+      }
+      componentData.files.push("");
+      result.connections.push({
+        startNode: tracker.id - 1,
+        startPort: 'output',
+        endNode: componentData.id,
+        endPort: "file" + index
+      });
+      translate.y += boundaries.y2 + 300;
+    }
+  }
+  componentData.position = {
+    x: translate.x + 300,
+    y: (translate.y - 300) / 2
+  };
+  return result;
+};
 },
 "parser/commands/v/unzip.js": function(module, exports, require){
 
@@ -2453,7 +2525,79 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseCommand = function(argsNode, parser, tracker, previousCommand){
+  var x$, componentData, translate, boundaries, result, iter, argNode, arg, subresult, y$, i$, ref$, len$, sub, position;
+  x$ = componentData = defaultComponentData();
+  x$.id = tracker.id;
+  tracker.id++;
+  translate = {
+    x: 0,
+    y: 0
+  };
+  boundaries = {
+    x1: 0,
+    x2: 0,
+    y1: 0,
+    y2: 0
+  };
+  result = {
+    components: [componentData],
+    connections: []
+  };
+  iter = new $.Iterator(argsNode);
+  while (argNode = iter.next()) {
+    switch ($.typeOf(argNode)) {
+    case 'shortOptions':
+      $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
+      break;
+    case 'longOption':
+      arg = optionsParser.longOptions[argNode.slice(2)];
+      if (arg) {
+        arg(componentData);
+      }
+      break;
+    case 'string':
+      componentData.files.push(argNode);
+      break;
+    case 'inFromProcess':
+      subresult = parser.parseAST(argNode[1], tracker);
+      y$ = boundaries;
+      y$.x1 = subresult.components[0].position.x;
+      y$.x2 = boundaries.x1;
+      y$.y1 = subresult.components[0].position.y;
+      y$.y2 = boundaries.y1;
+      for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        position = sub.position;
+        if (translate.x < position.x) {
+          translate.x = position.x;
+        }
+        if (boundaries.y2 < position.y) {
+          boundaries.y2 = position.y;
+        }
+        position.y += translate.y;
+        result.components.push(sub);
+      }
+      for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
+        sub = ref$[i$];
+        result.connections.push(sub);
+      }
+      componentData.files.push("");
+      result.connections.push({
+        startNode: tracker.id - 1,
+        startPort: 'output',
+        endNode: componentData.id,
+        endPort: "file" + index
+      });
+      translate.y += boundaries.y2 + 300;
+    }
+  }
+  componentData.position = {
+    x: translate.x + 300,
+    y: (translate.y - 300) / 2
+  };
+  return result;
+};
 },
 "parser/commands/v/compress.js": function(module, exports, require){
 /*

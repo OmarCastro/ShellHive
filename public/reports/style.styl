@@ -1,0 +1,93 @@
+body
+    background-color #eee
+    color #111
+    font-family: Arial
+    overflow: visible
+.asttest
+    position relative
+    background-color: #ddd
+    border solid 1px black
+    border-radius 3px
+    width 100%
+    table-layout fixed
+    .passed,.failed
+        font-weight bold
+        padding-bottom: 0.5em
+    .passed
+        background-color: #86C144
+    .failed
+        background-color: #AC4739
+        color #eee
+
+
+    .command td
+        border-bottom solid 1px gray
+        pre
+            display inline-block
+.center
+    text-align center
+.tab
+    list-style: none
+    padding: 10px
+    background-color: #ccc
+    display inline-block
+    border-top-left-radius: 3px
+    border-top-right-radius: 3px
+    border-top: solid 1px gray
+    border-left: solid 1px gray
+    border-right: solid 1px gray
+    &:hover,&.true
+        background-color: #ddd
+    &.true
+        position relative
+        border-bottom: solid 1px #ddd
+        border-top: solid 1px black
+        border-left: solid 1px black
+        border-right: solid 1px black
+        z-index: 2
+        margin-bottom: -1px
+
+    &:first-child
+        margin-left 1%
+.most
+    width: 30%
+td.top
+    vertical-align top
+
+/*.changeList
+    ul
+        -moz-columns: 30em;
+        -moz-column-gap: 20px;
+        -webkit-columns: 30em;
+        -webkit-column-gap: 20px;
+        columns: 30em;
+        column-gap: 20px;
+        list-style: disc inside none;
+*/
+.inline-component
+    display: inline-block
+    position: relative
+    text-align left
+p, body > li
+    margin-left 3em
+    margin-right 3em
+    text-align justify
+.center p
+    text-align center
+
+.nodes
+    overflow visible
+    z-index 1
+
+div[graph-model]
+    overflow hidden
+    *
+        font-size 12px
+
+.border
+    border solid 1px gray
+
+pre
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
