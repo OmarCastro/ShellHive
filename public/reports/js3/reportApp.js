@@ -176,7 +176,7 @@ app.controller('visual2text', function($scope){
   return $scope.tab = results[0].id;
   function fn$(indx, i, example){
     $scope.$watch("TransformResults[" + indx + "].visualData.components", function(newValue){
-      return results[indx].command = shellParser.parseComponent(newValue[0]);
+      return results[indx].command = shellParser.parseVisualData(results[indx].visualData);
     }, true);
   }
 });
@@ -272,7 +272,7 @@ app.controller('visual-playground', function($scope){
   return startY = 0;
 });
 app.controller('data-flow', function($scope){
-  var emptyresult, connectors, examples, results, res$, i$, len$, index, example, translateX, translateY, startX, startY, parseExample, x$;
+  var emptyresult, connectors, examples, results, i$, len$, index, example, translateX, translateY, startX, startY, parseExample, x$;
   emptyresult = {
     components: [],
     connections: []
@@ -282,6 +282,9 @@ app.controller('data-flow', function($scope){
   examples = [
     {
       title: "single",
+      command: "cat -A"
+    }, {
+      title: "single2",
       command: "ls -IAmACoolGuy"
     }, {
       title: "pipe",
@@ -293,26 +296,33 @@ app.controller('data-flow', function($scope){
       title: "tee",
       command: "cat | tee >(cat) >(cat) | cat"
     }, {
+      title: "tee tree",
+      command: "cat | tee >(cat | tee >(cat) >(cat)) >(cat | tee >(cat) >(cat) | cat) | cat"
+    }, {
       title: "process substitution tree",
-      command: "cat <( cat <(grep \"cat\" cat.cat.txt) <(grep t2 txt.txt) ) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)"
+      command: "cat <(cat <(grep \"cat\" cat.cat.txt) <(grep t2 txt.txt)) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)"
+    }, {
+      title: "p.subst. + tee + pipe",
+      command: "grep 'knights of ni' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt))"
     }, {
       title: "a long workflow",
-      command: "grep 'for test purposes only' <( cat - <(grep 1 txt.txt) <(grep t2 txt2.txt) ) <(grep 2 txt.txt) <(grep 3 txt2.txt) | cat - <(cat <(grep txt) <(grep t2) ) | cat | grep 'its complex alright' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt) ) | tee >(bzip2) >(grep mimi <(cat ni.txt) | cat | tee >(cat | gzip) | bzip2) | grep | tee >(bzip2) | gzip"
+      command: "grep 'for test purposes only' <(cat - <(grep 1 txt.txt) <(grep t2 txt2.txt)) <(grep 2 txt.txt) <(grep 3 txt2.txt) | cat - <(cat <(grep txt) <(grep t2)) | cat | grep 'its complex alright' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt)) | tee >(bzip2) >(grep mimi <(cat ni.txt) | cat | tee >(cat | gzip) | bzip2) | grep | tee >(bzip2) | gzip"
     }
   ];
-  res$ = [];
+  results = [];
   for (i$ = 0, len$ = examples.length; i$ < len$; ++i$) {
     index = i$;
     example = examples[i$];
-    res$.push({
+    results.push({
       id: index,
+      inputCommand: example.command,
       title: example.title,
       command: example.command,
       visualData: emptyresult,
       parsed: false
     });
+    (fn$.call(this, index, index, example));
   }
-  results = res$;
   translateX = 0;
   translateY = 0;
   startX = 0;
@@ -340,8 +350,195 @@ app.controller('data-flow', function($scope){
   };
   x$.isImplemented = isImplemented;
   return parseExample(0);
+  function fn$(indx, index, example){
+    $scope.$watch("TransformResults[" + indx + "].visualData", function(newValue){
+      if (!results[indx].parsed) {
+        return;
+      }
+      return results[indx].command = shellParser.parseVisualData(results[indx].visualData);
+    }, true);
+  }
 });
 var activeDrop;
+app.directive("graphModel", function($document){
+  return {
+    restrict: 'A',
+    replace: false,
+    scope: {
+      visualData: '=graphModel',
+      options: '='
+    },
+    controller: [
+      '$scope', '$element', '$attrs', function(scope, element, attr){
+        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, x$, nodesElem, edgesElem, svgElem, $svgElem, nodesElemStyle, edgesElemStyle, update, mousemove, mouseup, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, y$;
+        pointerId = 0;
+        scale = 1;
+        graphX = 0;
+        graphY = 0;
+        startX = 0;
+        startY = 0;
+        edgeIniX = 0;
+        edgeIniY = 0;
+        elem = element[0];
+        x$ = scope;
+        x$.implementedCommands = listOfImplementedCommands;
+        x$.isImplemented = isImplemented;
+        x$.isArray = angular.isArray;
+        x$.isString = angular.isString;
+        x$.swapPrevious = function(array, index, id){
+          var ref$, i$, len$, connection, results$ = [];
+          if (index === 0) {
+            return;
+          }
+          ref$ = [array[index - 1], array[index]], array[index] = ref$[0], array[index - 1] = ref$[1];
+          for (i$ = 0, len$ = (ref$ = scope.visualData.connections).length; i$ < len$; ++i$) {
+            connection = ref$[i$];
+            if (connection.endNode === id) {
+              if (connection.endPort === "file" + index) {
+                results$.push(connection.endPort = "file" + (index - 1));
+              } else if (connection.endPort === "file" + (index - 1)) {
+                results$.push(connection.endPort = "file" + index);
+              }
+            }
+          }
+          return results$;
+        };
+        elem.style[cssTransform] = "translate3d(0,0,0)";
+        nodesElem = elem.querySelector(".nodes");
+        edgesElem = elem.querySelector(".edges");
+        svgElem = elem.querySelector("svg");
+        $svgElem = $(svgElem);
+        nodesElemStyle = nodesElem.style;
+        edgesElemStyle = edgesElem.style;
+        update = function(){
+          var transform;
+          transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
+          nodesElemStyle[cssTransform] = transform;
+          return edgesElemStyle[cssTransform] = transform;
+        };
+        update();
+        mousemove = function(ev){
+          var event;
+          event = ev.originalEvent;
+          graphX += event.screenX - startX;
+          graphY += event.screenY - startY;
+          startX = event.screenX;
+          startY = event.screenY;
+          update();
+        };
+        mouseup = function(){
+          var x$;
+          pointerId = 0;
+          x$ = $document;
+          x$.unbind("pointermove", mousemove);
+          x$.unbind("pointerup", mouseup);
+          return x$;
+        };
+        element.bind("pointerdown", function(ev){
+          var event, targetTag, x$;
+          event = ev.originalEvent;
+          targetTag = event.target.tagName;
+          if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL')) {
+            return;
+          }
+          pointerId = event.pointerId;
+          x$ = $document;
+          x$.bind("pointermove", mousemove);
+          x$.bind("pointerup", mouseup);
+          startX = event.screenX;
+          startY = event.screenY;
+          event.preventDefault();
+          event.stopPropagation();
+        });
+        mapMouseToScene = function(event){
+          var ref$, x, y;
+          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          return mapPointToScene(x, y);
+        };
+        mapMouseToView = function(event){
+          var offset;
+          offset = $svgElem.offset();
+          return {
+            x: event.pageX - offset.left,
+            y: event.pageY - offset.top
+          };
+        };
+        mapPointToScene = function(x, y){
+          return {
+            x: (x - graphX) / scale,
+            y: (y - graphY) / scale
+          };
+        };
+        scaleFromMouse = function(amount, event){
+          var ref$, x, y, relpointX, relpointY;
+          if ((scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)) {
+            return;
+          }
+          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          relpointX = x - graphX;
+          relpointY = y - graphY;
+          graphX += Math.round(-relpointX * amount + relpointX);
+          graphY += Math.round(-relpointY * amount + relpointY);
+          scale *= amount;
+          update();
+        };
+        MouseWheelHandler = function(event){
+          if (!event.altKey) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          if ((event.wheelDelta || -event.detail) > 0) {
+            return scaleFromMouse(1.1, event);
+          } else {
+            return scaleFromMouse(0.9, event);
+          }
+        };
+        mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+        elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
+        simpleEdge = element.find('.emptyEdge')[0];
+        setEdgePath = function(iniX, iniY, endX, endY){
+          var xpoint;
+          xpoint = (endX - iniX) / 4;
+          return simpleEdge.setAttribute('d', "M " + iniX + " " + iniY + " H " + (iniX + 0.5 * xpoint) + " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY + " H " + endX);
+        };
+        y$ = this;
+        y$.startEdge = function(elem, position, ev){
+          edgeIniX = elem.offsetLeft + position.x;
+          edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
+          return setEdgePath(edgeIniX, edgeIniY, edgeIniX, edgeIniY);
+        };
+        y$.moveEdge = function(event){
+          var ref$, x, y;
+          ref$ = mapMouseToScene(event), x = ref$.x, y = ref$.y;
+          console.log(x, y);
+          return setEdgePath(edgeIniX, edgeIniY, x, y);
+        };
+        y$.endEdge = function(){
+          return simpleEdge.setAttribute('d', "M 0 0");
+        };
+        y$.updateScope = function(){
+          return scope.$digest();
+        };
+        y$.getVisualData = function(){
+          return scope.visualData;
+        };
+        y$.mapPointToScene = mapPointToScene;
+        y$.mapMouseToScene = mapMouseToScene;
+        y$.mapMouseToView = mapMouseToView;
+        y$.translateNode = function(id, position, x, y){
+          var i$, ref$, len$, el;
+          position.x += x / scale;
+          position.y += y / scale;
+          for (i$ = 0, len$ = (ref$ = edgesElem.querySelectorAll("[connector]")).length; i$ < len$; ++i$) {
+            el = ref$[i$];
+            $(el).scope().updateWithId(id);
+          }
+        };
+      }
+    ]
+  };
+});
 app.directive("connector", function($document){
   return {
     scope: true,
@@ -382,8 +579,9 @@ app.directive("connector", function($document){
           update();
         }
       };
-      requestAnimationFrame(function(){
+      scope.reset = function(){
         var Startnode, StartPort, Endnode, EndPort;
+        console.log('mi');
         Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']");
         StartPort = Startnode.querySelector(".box[data-port='" + dataedge.startPort + "']");
         Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']");
@@ -397,6 +595,12 @@ app.directive("connector", function($document){
           left: EndPort.offsetLeft
         };
         return update();
+      };
+      requestAnimationFrame(function(){
+        scope.$watch('edge.endPort', function(){
+          return scope.reset();
+        });
+        return scope.reset();
       });
     }
   };
@@ -405,9 +609,10 @@ app.directive("component", function($document){
   var pointerId;
   pointerId = 0;
   return {
+    require: '^graphModel',
     scope: true,
-    link: function(scope, element, attr){
-      var datanode, startX, startY, title, position, elem, imstyle, resultScope, mousemove, moveTo, mouseup;
+    link: function(scope, element, attr, graphModelController){
+      var datanode, startX, startY, title, position, elem, imstyle, mousemove, moveBy, mouseup;
       scope.transform = cssTransform.replace(/[A-Z]/g, function(v){
         return "-" + v.toLowerCase();
       });
@@ -418,14 +623,6 @@ app.directive("component", function($document){
       position = datanode.position;
       elem = element[0];
       imstyle = elem.style;
-      resultScope = scope;
-      while (!resultScope.hasOwnProperty("visualData") && resultScope !== scope.$root) {
-        resultScope = resultScope.$parent;
-      }
-      scope.moveTo = function(newX, newY){
-        position.x += newX;
-        position.y += newY;
-      };
       element.bind("pointerdown", function(ev){
         var event, targetTag, pointerId, x$;
         event = ev.originalEvent;
@@ -439,18 +636,18 @@ app.directive("component", function($document){
         x$.bind("pointerup", mouseup);
         startX = event.screenX;
         startY = event.screenY;
-        event.preventDefault();
-        event.stopPropagation();
+        return false;
       });
       mousemove = function(ev){
         var event;
         event = ev.originalEvent;
-        moveTo(event.screenX - startX, event.screenY - startY);
+        moveBy(event.screenX - startX, event.screenY - startY);
         startX = event.screenX;
         startY = event.screenY;
       };
-      moveTo = function(newX, newY){
-        resultScope.translateNode(datanode.id, position, newX, newY);
+      moveBy = function(x, y){
+        graphModelController.translateNode(datanode.id, position, x, y);
+        scope.$digest();
       };
       mouseup = function(){
         var pointerId, x$;
@@ -463,173 +660,13 @@ app.directive("component", function($document){
     }
   };
 });
-app.directive("graphModel", function($document){
-  return {
-    restrict: 'A',
-    replace: false,
-    scope: {
-      visualData: '=graphModel',
-      options: '='
-    },
-    controller: [
-      '$scope', '$element', '$attrs', function(scope, element, attr){
-        var pointerId, scale, graphX, graphY, startX, startY, elem, x$, nodesElem, edgesElem, svgElem, $svgElem, nodesElemStyle, edgesElemStyle, mousemove, mouseup, mapPointToScene, multScale, MouseWheelHandler, mousewheelevt, simpleEdge, edgeIniX, edgeIniY, edgeEndX, edgeEndY, setEdgePath, y$;
-        pointerId = 0;
-        scale = 1;
-        graphX = 0;
-        graphY = 0;
-        startX = 0;
-        startY = 0;
-        elem = element[0];
-        x$ = scope;
-        x$.transform = cssTransform.replace(/[A-Z]/g, function(v){
-          return "-" + v.toLowerCase();
-        });
-        x$.implementedCommands = listOfImplementedCommands;
-        x$.graphX = graphX;
-        x$.graphY = graphX;
-        elem.style[cssTransform] = "translate3d(0,0,0)";
-        nodesElem = elem.querySelector(".nodes");
-        edgesElem = elem.querySelector(".edges");
-        svgElem = elem.querySelector("svg");
-        $svgElem = $(svgElem);
-        nodesElemStyle = nodesElem.style;
-        edgesElemStyle = edgesElem.style;
-        function update(){
-          var transform, x$;
-          transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
-          nodesElemStyle[cssTransform] = transform;
-          edgesElemStyle[cssTransform] = transform;
-          x$ = scope;
-          x$.graphX = graphX;
-          x$.graphY = graphX;
-          return x$;
-        }
-        update();
-        mousemove = function(ev){
-          var event;
-          event = ev.originalEvent;
-          graphX += event.screenX - startX;
-          graphY += event.screenY - startY;
-          startX = event.screenX;
-          startY = event.screenY;
-          update();
-        };
-        mouseup = function(){
-          var pointerId, x$;
-          pointerId = 0;
-          x$ = $document;
-          x$.unbind("pointermove", mousemove);
-          x$.unbind("pointerup", mouseup);
-          return x$;
-        };
-        element.bind("pointerdown", function(ev){
-          var event, targetTag, pointerId, x$;
-          event = ev.originalEvent;
-          targetTag = event.target.tagName;
-          if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL')) {
-            return;
-          }
-          pointerId = event.pointerId;
-          x$ = $document;
-          x$.bind("pointermove", mousemove);
-          x$.bind("pointerup", mouseup);
-          startX = event.screenX;
-          startY = event.screenY;
-          event.preventDefault();
-          event.stopPropagation();
-        });
-        mapPointToScene = function(x, y){
-          return {
-            x: x / scale - graphX,
-            y: y / scale - graphY
-          };
-        };
-        multScale = function(sVal, event){
-          var offset, relpointX, relpointY;
-          if ((scale < 0.2 && sVal < 1) || (scale > 20 && sVal > 1)) {
-            return;
-          }
-          offset = $svgElem.offset();
-          relpointX = event.pageX - offset.left - graphX;
-          relpointY = event.pageY - offset.top - graphY;
-          graphX += (-relpointX) * sVal + relpointX;
-          graphY += (-relpointY) * sVal + relpointY;
-          scale *= sVal;
-          update();
-        };
-        MouseWheelHandler = function(event){
-          if (!event.altKey) {
-            return;
-          }
-          event.preventDefault();
-          event.stopPropagation();
-          if ((event.wheelDelta || -event.detail) > 0) {
-            return multScale(1.1, event);
-          } else {
-            return multScale(0.9, event);
-          }
-        };
-        mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
-        elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
-        scope.translateNode = function(id, position, x, y){
-          var i$, ref$, len$, el;
-          position.x += x / scale;
-          position.y += y / scale;
-          scope.$digest();
-          for (i$ = 0, len$ = (ref$ = edgesElem.querySelectorAll("[connector]")).length; i$ < len$; ++i$) {
-            el = ref$[i$];
-            $(el).scope().updateWithId(id);
-          }
-        };
-        scope.isImplemented = isImplemented;
-        simpleEdge = element.find('.emptyEdge')[0];
-        edgeIniX = 0;
-        edgeIniY = 0;
-        edgeEndX = 0;
-        edgeEndY = 0;
-        setEdgePath = function(iniX, iniY, endX, endY){
-          var xpoint;
-          xpoint = (endX - iniX) / 4;
-          return simpleEdge.setAttribute('d', "M " + iniX + " " + iniY + " H " + (iniX + 0.5 * xpoint) + " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY + " H " + endX);
-        };
-        y$ = this;
-        y$.startEdge = function(elem, position, ev){
-          edgeIniX = elem.offsetLeft + position.x;
-          edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
-          edgeEndX = edgeIniX;
-          edgeEndY = edgeIniY;
-          return setEdgePath(edgeIniX, edgeIniY, edgeEndX, edgeEndY);
-        };
-        y$.moveEdge = function(x, y){
-          edgeEndX += x / scale;
-          edgeEndY += y / scale;
-          return setEdgePath(edgeIniX, edgeIniY, edgeEndX, edgeEndY);
-        };
-        y$.endEdge = function(){
-          return simpleEdge.setAttribute('d', "M 0 0");
-        };
-        y$.updateScope = function(){
-          return scope.$digest();
-        };
-        y$.visualData = scope.visualData;
-        y$.mapPointToScene = mapPointToScene;
-      }
-    ]
-  };
-});
 app.directive("port", function($document){
   return {
     require: '^graphModel',
     scope: true,
     link: function(scope, element, attr, graphModelController){
-      var datanode, startX, startY, title, position, elem, imstyle, ref$, ConnectIfOk, mousemove, moveTo, mouseup;
-      scope.transform = cssTransform.replace(/[A-Z]/g, function(v){
-        return "-" + v.toLowerCase();
-      });
+      var datanode, title, position, elem, imstyle, ref$, ConnectIfOk, mousemove, mouseup;
       datanode = scope.$parent.data;
-      startX = 0;
-      startY = 0;
       title = datanode.title;
       position = datanode.position;
       elem = element[0];
@@ -643,22 +680,20 @@ app.directive("port", function($document){
         x$ = $document;
         x$.bind("pointermove", mousemove);
         x$.bind("pointerup", mouseup);
-        startX = event.screenX;
-        startY = event.screenY;
         return false;
       });
       ConnectIfOk = function(startNode, startPort, endNode, endPort){
-        var visualData, existCycle, i$, ref$, len$, x;
-        visualData = graphModelController.visualData;
-        existCycle = false;
+        var visualData, isOk, i$, ref$, len$, x;
+        visualData = graphModelController.getVisualData();
+        isOk = true;
         for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
           x = ref$[i$];
-          if (x.startNode === endNode && x.endNode === startNode) {
-            existCycle = true;
+          if ((x.startNode === endNode && x.endNode === startNode) || (x.startNode === startNode && x.endNode === endNode)) {
+            isOk = false;
             break;
           }
         }
-        if (!existCycle) {
+        if (isOk) {
           visualData.connections.push({
             startNode: startNode,
             startPort: startPort,
@@ -671,12 +706,7 @@ app.directive("port", function($document){
       mousemove = function(ev){
         var event;
         event = ev.originalEvent;
-        moveTo(event.screenX - startX, event.screenY - startY);
-        startX = event.screenX;
-        startY = event.screenY;
-      };
-      moveTo = function(newX, newY){
-        graphModelController.moveEdge(newX, newY);
+        graphModelController.moveEdge(event);
       };
       mouseup = function(ev){
         var event, pointedElem, outAttr, outPortScope, x$;
@@ -704,24 +734,30 @@ app.directive("port", function($document){
 app.directive('sidebar', [
   '$document', function($document){
     return {
-      scope: true,
+      replace: false,
+      scope: {},
       require: '^graphModel',
+      controller: function($scope, $element, $attrs){
+        return $scope.implementedCommands = shellParser.implementedCommands;
+      },
       link: function(scope, element, attr, graphModelCtrl){
         requestAnimationFrame(function(){
           return element.find('li').each(function(index){
             return $(this).bind('click', function(ev){
               var newResult, x$, newComponent;
               ev.stopPropagation();
-              newResult = shellParser.parseCommand(listOfImplementedCommands[index]);
+              newResult = shellParser.parseCommand($(this).attr('data-command'));
               x$ = newComponent = newResult.components[0];
-              x$.id = graphModelCtrl.visualData.components.length;
+              x$.id = graphModelCtrl.getVisualData().components.length;
               x$.position = graphModelCtrl.mapPointToScene(0, 0);
-              graphModelCtrl.visualData.components.push(newComponent);
+              graphModelCtrl.getVisualData().components.push(newComponent);
+              console.log(graphModelCtrl.getVisualData().components);
               return graphModelCtrl.updateScope();
             });
           });
         });
-      }
+      },
+      template: "<ul>\n  <li data-command=\"{{command}}\" ng-repeat=\"command in implementedCommands\">\n      <span ng-bind=\"command\"></span>\n  </li>\n</ul>"
     };
   }
 ]);

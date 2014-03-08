@@ -56,21 +56,5 @@ defaultComponentData = ->
   files: []
 
 
-exports.parseCommand = (argsNode, parser, tracker) ->
-  componentData = defaultComponentData!
-    ..id = tracker.id
-    ..position = {x: tracker.id*200; y: 0}
-  for argNode in argsNode
-    if typeof argNode == 'string'
-      if argNode[0] == \-
-        if argNode[1] == \-
-          arg = optionsParser.longOptions[argNode.slice(2)];
-          arg componentData if arg
-        else
-          {shortOptions} = optionsParser
-          for i in argNode.slice(1)
-            arg = shortOptions[i]
-            arg componentData if arg
-      else
-        componentData.files.push(argNode)
-  {components:[componentData],connections:[]}
+exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
+

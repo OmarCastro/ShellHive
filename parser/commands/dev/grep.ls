@@ -27,6 +27,8 @@ selectors = {
   \match
 }
 
+# PATTERN TYPE SELECTORS
+
 const patternTypeSelector =
   extendedRegex: "extended regexp"
   fixedStrings:  "fixed strings"
@@ -38,6 +40,10 @@ const patternTypeSelectorOption =
   (patternTypeSelector.fixedStrings) : \F
   (patternTypeSelector.basicRegex)   : null
   (patternTypeSelector.perlRegex)    : \P
+
+
+
+
 
 const matchSelector =
   default:    "default"
@@ -104,42 +110,23 @@ defaultComponentData = ->
   files:[]
 
 
-exports.parseCommand = (argsNode, parser, tracker) ->
-  componentData = defaultComponentData!
-    ..id = tracker.id
-    ..position = {x: 0; y: 0}
-  tracker.id++
-  result = {components:[componentData],connections:[]}
-  state = {
-    index : 0
-    argsNode: argsNode
-    numArgs: argsNode.length
-  }
-  iter = new $.Iterator argsNode
-  while argNode = iter.next!
-    switch $.typeOf argNode
-    case \shortOptions
-      $.parseShortOptions(optionsParser.shortOptions,componentData,iter)
-    case \longOption
-      arg = optionsParser.longOptions[argNode.slice(2)];
-      arg componentData if arg
-    case \string
-      if componentData.pattern is null
-        componentData.pattern = argNode
+
+
+exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
+    string: (component, str) ->
+      if component.pattern is null
+        component.pattern = str
       else
-        componentData.files.push(argNode)
-    state.index++
-  componentData.pattern = "" if componentData.pattern is null
+        component.files.push(str)
+    })
 
-  {components:[componentData],connections:[]}
-
-exports.parseComponent = (componentData) ->
+exports.parseComponent = (componentData,visualData,componentIndex,mapOfParsedComponents,parseComponent) ->
   exec  = ["grep"]
+  mapOfParsedComponents[componentData.id] = true
   flags = [flagOptions[key] for key, value of componentData.flags when value is true]
 
   for key, value of componentData.selectors
-    selector = SelectorOptions[key][value]
-    flags.push selector if selector != null
+    flags.push that if SelectorOptions[key][value]?
 
   pattern = componentData.pattern
   if pattern 
@@ -150,5 +137,8 @@ exports.parseComponent = (componentData) ->
 
   flags = "-" + flags * '' if flags.length > 0
   files = for file in componentData.files
-    if file.indexOf(" ") >= 0 then "\"#file\"" else file
+    if file instanceof Array
+      subCommand = parseComponent(componentIndex[file.1],visualData,componentIndex,mapOfParsedComponents)
+      "<(#subCommand)"
+    else if file.indexOf(" ") >= 0 then "\"#file\"" else file
   (exec ++ flags ++ pattern ++ files) * ' '

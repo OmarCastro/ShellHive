@@ -3,22 +3,41 @@ path = require('path')
 exec = require('child_process').exec
 module.exports = (grunt) !->
   config = 
+    stylus:
+      reports:
+        files:
+          'public/reports/style.css':['views/css/style.styl','public/reports/style.styl']
+
     jade:
       compile:
         options:
           data:
             debug: false
         files:
-          "public/weeklyReport2.html": ["public/weeklyReport2.jade"]
+          "public/reports/weeklyReport3.html": ["public/reports/weeklyReport3.jade"]
     livescript:
       home_js:   files: 'public/js/script.ls.js': ['livescript/home/*.ls']
       helper_js: files: 'public/js/helper.ls.js': ['livescript/helper/*.ls']
       grunt:     files: 'Gruntfile.js'          : ['livescript/grunt.ls']
       parser:    files: 'parser/parser.js'      : ['parser/parser.ls']
-      report:    files: 'public/js2/app.js'     : ['public/js2/play.ls']
+      report:
+        options:{+bare}    
+        files: 
+          'public/reports/js3/reportApp.js':
+            'livescript/weeklyReport/init.ls'
+            'livescript/weeklyReport/reportInit.ls'
+            'livescript/weeklyReport/play.ls'
+            'livescript/weeklyReport/directives.ls'
+      demo:
+        options:{+bare}    
+        files: 
+          'public/reports/js3/demoApp.js':
+            'livescript/weeklyReport/init.ls'
+            'livescript/weeklyReport/demoInit.ls'
+            'livescript/weeklyReport/directives.ls'
     shell:
       compileLsParser:
-        options:{+stdout,+stderr}
+        options:{+stdout,+stderr,+failOnError}
         command: "ls parser/commands/dev/ 
                   | parallel 'find parser/commands/dev/{} -newer parser/commands/v/{.}.js' 
                   | parallel 'basename {}' 
@@ -31,15 +50,21 @@ module.exports = (grunt) !->
                  --include parser/commands/v/ 
                  --include parser/parser.js 
                  --include parser/ast-builder/ast-builder.js 
-                 > public/js/parser.js"
+                 | tee public/js/parser.js > public/reports/js3/parser.js"
 
 
     watch:
       report_html:
-        files: ["public/weeklyReport2.jade","public/component.jade"]
-        tasks: ['jade:compile']        
+        files: [
+          "public/reports/weeklyReport3.jade"
+          "public/reports/component.jade"
+          "public/reports/graph.jade"]
+        tasks: ['jade:compile'] 
+      report_css:
+        files:['public/reports/style.styl','views/css/style.styl']
+        tasks:['stylus:reports']
       report:
-        files: ['public/js2/play.ls']
+        files: ['livescript/weeklyReport/*.ls']
         tasks: ['livescript:report']        
       parserCommands:
         files: ['parser/commands/dev/*.ls']
@@ -62,6 +87,7 @@ module.exports = (grunt) !->
       
   grunt.initConfig config
   grunt.loadNpmTasks \grunt-contrib-watch
+  grunt.loadNpmTasks \grunt-contrib-stylus
   grunt.loadNpmTasks \grunt-contrib-jade
   grunt.loadNpmTasks \grunt-livescript
   grunt.loadNpmTasks \grunt-shell

@@ -6,6 +6,13 @@
   module.exports = function(grunt){
     var config;
     config = {
+      stylus: {
+        reports: {
+          files: {
+            'public/reports/style.css': ['views/css/style.styl', 'public/reports/style.styl']
+          }
+        }
+      },
       jade: {
         compile: {
           options: {
@@ -14,7 +21,7 @@
             }
           },
           files: {
-            "public/weeklyReport2.html": ["public/weeklyReport2.jade"]
+            "public/reports/weeklyReport3.html": ["public/reports/weeklyReport3.jade"]
           }
         }
       },
@@ -40,8 +47,19 @@
           }
         },
         report: {
+          options: {
+            bare: true
+          },
           files: {
-            'public/js2/app.js': ['public/js2/play.ls']
+            'public/reports/js3/reportApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/reportInit.ls', 'livescript/weeklyReport/play.ls', 'livescript/weeklyReport/directives.ls']
+          }
+        },
+        demo: {
+          options: {
+            bare: true
+          },
+          files: {
+            'public/reports/js3/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/weeklyReport/directives.ls']
           }
         }
       },
@@ -49,21 +67,26 @@
         compileLsParser: {
           options: {
             stdout: true,
-            stderr: true
+            stderr: true,
+            failOnError: true
           },
           command: "ls parser/commands/dev/ | parallel 'find parser/commands/dev/{} -newer parser/commands/v/{.}.js' | parallel 'basename {}' | parallel 'lsc -p -b -c parser/commands/dev/{} > parser/commands/v/{.}.js'"
         },
         glueParser: {
-          command: "gluejs --no-cache --global shellParser --main parser/parser.js --include parser/commands/v/ --include parser/parser.js --include parser/ast-builder/ast-builder.js > public/js/parser.js"
+          command: "gluejs --no-cache --global shellParser --main parser/parser.js --include parser/commands/v/ --include parser/parser.js --include parser/ast-builder/ast-builder.js | tee public/js/parser.js > public/reports/js3/parser.js"
         }
       },
       watch: {
         report_html: {
-          files: ["public/weeklyReport2.jade", "public/component.jade"],
+          files: ["public/reports/weeklyReport3.jade", "public/reports/component.jade", "public/reports/graph.jade"],
           tasks: ['jade:compile']
         },
+        report_css: {
+          files: ['public/reports/style.styl', 'views/css/style.styl'],
+          tasks: ['stylus:reports']
+        },
         report: {
-          files: ['public/js2/play.ls'],
+          files: ['livescript/weeklyReport/*.ls'],
           tasks: ['livescript:report']
         },
         parserCommands: {
@@ -94,6 +117,7 @@
     };
     grunt.initConfig(config);
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-stylus');
     grunt.loadNpmTasks('grunt-contrib-jade');
     grunt.loadNpmTasks('grunt-livescript');
     grunt.loadNpmTasks('grunt-shell');

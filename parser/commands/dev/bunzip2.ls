@@ -26,6 +26,9 @@ actionSelector = {
   \decompress
 }
 
+const actionSelectorOption =
+  \compress : \z
+  \decompress : null
 
 flags = {
   keepFiles : "keep files"
@@ -36,6 +39,21 @@ flags = {
   verbose: \verbose
   small: \small
 }
+
+const selectorOptions =
+  (selectors.action): actionSelectorOption
+
+exports.VisualSelectorOptions =
+  (selectors.action): [value for ,value of actionSelector]
+
+const flagOptions =
+  "keep files": \k
+  \force      : \f
+  \test       : \test
+  \stdout     : \c
+  \quiet      : \q
+  \verbose    : \v
+  \small      : \s
 
 $.setblocksize = (size) -> (Component) ->
     Component.block-size = size
@@ -79,44 +97,5 @@ defaultComponentData = ->
   files: []
 
 
-exports.parseCommand = (argsNode, parser, tracker, previousCommand) ->
-  componentData = defaultComponentData!
-    ..id = tracker.id
-  tracker.id++ 
-
-  translate = {x:0,y:0}
-  boundaries = {x1:0,x2:0,y1:0,y2:0}
-
-  result = {components:[componentData],connections:[]}
-  iter = new $.Iterator argsNode
-  while argNode = iter.next!
-    switch $.typeOf argNode
-    case \shortOptions
-      $.parseShortOptions(optionsParser.shortOptions,componentData,iter)
-    case \longOption
-      arg = optionsParser.longOptions[argNode.slice(2)];
-      arg componentData if arg
-    case \string
-      componentData.files.push(argNode)
-    case \inFromProcess
-      subresult = parser.parseAST(argNode[1], tracker)
-      boundaries
-        ..x1 = subresult.components[0].position.x
-        ..x2 = boundaries.x1
-        ..y1 = subresult.components[0].position.y
-        ..y2 = boundaries.y1
-      for sub in subresult.components
-        position = sub.position
-        translate.x = position.x if translate.x < position.x
-        boundaries.y2 = position.y if boundaries.y2 < position.y
-        position.y += translate.y
-
-        result.components.push sub
-      for sub in subresult.connections
-        result.connections.push sub
-      componentData.files.push("");
-      result.connections.push({startNode: tracker.id-1, startPort: \output, endNode: componentData.id, endPort: "file#index"})
-      translate.y += boundaries.y2 + 300
-
-  componentData.position = {x: translate.x + 300; y: (translate.y - 300) / 2}
-  result
+exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions)

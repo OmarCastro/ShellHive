@@ -1,22 +1,22 @@
 body,.graph,.nodes{margin:0;overflow:hidden}
-.nodes,div[graph-model] svg{position:absolute;top:0;left:10%;width:90%;height:100%}
-.graph{fixed:top left;width:100%;height:100%}
-div[sidebar]{overflow:auto;display:inline-block;position:absolute;top:0;left:0;bottom:0;width:10%;transition:all .3s linear;-webkit-transition:all .3s linear;background-color:#555;z-index:5}
+.nodes,div[graph-model] svg{position:absolute;top:0;left:10%;width:90%;height:100%;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-o-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}
+.graph{position:fixed;top:0;left:0;width:100%;height:100%}
+div[sidebar]{overflow:auto;display:inline-block;position:absolute;top:0;left:0;bottom:0;width:10%;-webkit-transition:all 0.3s linear;-moz-transition:all 0.3s linear;-o-transition:all 0.3s linear;-ms-transition:all 0.3s linear;transition:all 0.3s linear;background-color:#555;z-index:5}
 div[sidebar] ul{list-style:none;margin:0;padding:0}
 div[sidebar] li{background-color:#999;padding:10px;}
 div[sidebar] li:hover{background-color:#aaa}
 svg.edges{z-index:1}
 path{fill:none;stroke:#aaa;stroke-width:5;}
 path.sel{stroke:#00f;stroke-width:5}
-.component,.inline-component{font-size:1em;position:absolute;min-width:80px;min-height:80px;background-color:#fff;border-radius:.3em;border:.2em solid #aaa;z-index:2;}
+.component,.inline-component{font-size:1em;position:absolute;min-width:80px;min-height:80px;background-color:#fff;-webkit-border-radius:.3em;border-radius:.3em;border:.2em solid #aaa;z-index:2;}
 .component .title,.inline-component .title{text-align:center;background-color:#ddd;height:1.5em;border-top-left-radius:.1em;border-top-right-radius:.1em}
 .component .input,.inline-component .input{float:left}
 .component .output,.inline-component .output{float:right}
-.component .box,.inline-component .box{display:inline-block;margin-top:.2em;height:.7em;width:1em;background-color:#aaa;border-radius:.1em;}
+.component .box,.inline-component .box{display:inline-block;margin-top:.2em;height:.7em;width:1em;background-color:#aaa;-webkit-border-radius:.1em;border-radius:.1em;}
 .component .box:hover,.inline-component .box:hover{background-color:#00f}
 
 body{background-color:#eee;color:#111;font-family:Arial;overflow:visible}
-.asttest{position:relative;background-color:#ddd;border:solid 1px #000;border-radius:3px;width:100%;table-layout:fixed;}
+.asttest{position:relative;background-color:#ddd;border:solid 1px #000;-webkit-border-radius:3px;border-radius:3px;width:100%;table-layout:fixed;}
 .asttest .passed,.asttest .failed{font-weight:bold;padding-bottom:.5em}
 .asttest .passed{background-color:#86c144}
 .asttest .failed{background-color:#ac4739;color:#eee}

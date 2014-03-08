@@ -159,15 +159,23 @@ html
 
 
 
-    .TransformResults(ng-controller="data-flow")
+    .TransformResults(ng-controller="data-flow" ng-init="heMan = false; synthesize = false")
         .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
             | {{result.title}}
         table.asttest(ng-repeat="res in TransformResults track by res.id",ng-show="tab == res.id",style="height:{{screenHeight}}px")
             tr
                 td.top(style="position:relative")
-                    pre. command : {{res.command}}
-                    .visual-builder.border.data-flow(graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:4em;bottom:0;left:0;right:0")
+                    pre(ng-bind-template="command : {{synthesize ? res.command : res.inputCommand}}")
+                    div(style="position:absolute; top:0;right:0")
+                        label
+                            input(type="checkbox",ng-model="$parent.heMan")
+                            | show visualData
+                        label
+                            input(type="checkbox",ng-model="$parent.synthesize")
+                            | synthesize
+                    .visual-builder.border.data-flow(ng-show="$parent.$parent.heMan == false" graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:4em;bottom:0;left:0;right:0")
                         include graph.jade
+                    pre(ng-show="heMan"). data : {{res.visualData | json}}
 
 
     h2  PlayGround
@@ -219,6 +227,6 @@ html
     script(src="js/jquery-2.1.0.min.js")
     script(src="js/angular.min.js")
     script(src="js/angular-dropdown.min.js")
-    script(src="js/pointerevents-polyfill/pointerevents.min.js")
+    script(src="js/pointerevents.min.js")
     script(src="js3/parser.js")  
     script(src="js3/reportApp.js")

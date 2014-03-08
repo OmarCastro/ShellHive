@@ -13,6 +13,10 @@ const lineNumberSelectorOption =
   "print all lines": \n
   "print non-empty lines":\b 
 
+
+const selectorsOptions =
+  (selectors.lineNum): lineNumberSelectorOption
+
 exports.VisualSelectorOptions =
   (selectors.lineNum): [value for ,value of lineNumberSelector]
 
@@ -55,7 +59,6 @@ const optionsParser =
 
 $.generate(optionsParser)
 
-
 defaultComponentData = ->
   exec:"cat"
   flags:
@@ -67,77 +70,8 @@ defaultComponentData = ->
     (selectors.lineNum): lineNumberSelector.none
   files:[] 
 
-exports.parseCommand = (argsNode, parser, tracker, previousCommand) ->
-  componentData = defaultComponentData!
-  translate = {
-    x: if previousCommand
-       then previousCommand.position.x
-       else 0
-    y: if previousCommand
-       then previousCommand.position.y
-       else 0
-  }
-  boundaries = {x1:0,x2:0,y1:0,y2:0}
-  connectionsToPush = []
-
-  result = {components:[componentData],connections:[]}
-  iter = new $.Iterator argsNode
-  while argNode = iter.next!
-    switch $.typeOf argNode
-    case \shortOptions
-      $.parseShortOptions(optionsParser.shortOptions,componentData,iter)
-    case \longOption
-      $.parseLongOptions(optionsParser.longOptions,componentData,iter)
-    case \string
-      componentData.files.push(argNode)
-    case \inFromProcess
-      subresult = parser.parseAST(argNode[1], tracker)
-      boundaries
-        ..x1 = subresult.components[0].position.x
-        ..x2 = boundaries.x1
-        ..y1 = subresult.components[0].position.y
-        ..y2 = boundaries.y1
-      for sub in subresult.components
-        position = sub.position
-        translate.x = position.x if translate.x < position.x
-        boundaries.y2 = position.y if boundaries.y2 < position.y
-        position.y += translate.y
-        result.components.push sub
-      for sub in subresult.connections
-        result.connections.push sub
-      componentData.files.push("");
-      connectionsToPush.push({
-        startNode: tracker.id-1,
-        startPort: \output,
-        endPort: "file#{componentData.files.length - 1}"})
-      translate.y += boundaries.y2 + 300
-    
-
-
-
-  componentData
-    ..position = {x: translate.x + 300; y: (translate.y - 300) / 2}
-    ..id = tracker.id
-
-  for c in connectionsToPush
-    result.connections.push({startNode:c.startNode, startPort:c.startPort
-      ,endNode: tracker.id,endPort:c.endPort}) 
-
-  tracker.id++ 
-  result
-
-
-exports.parseComponent = (componentData) ->
-  exec = ["cat"]
-  flags = []
-  for key, value of componentData.flags 
-    flags.push(flagOptions[key]) if value is true
-  selector = lineNumberSelectorOption[componentData.selectors["print line number"]];
-  flags.push selector if selector != null
-  flags = "-" + flags * '' if flags.length > 0
-  files = for file in componentData.files
-    if file.indexOf(" ") >= 0 then "\"#file\"" else file
-  (exec ++ flags ++ files) * ' '
+exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = $.commonParseComponent(flagOptions,selectorsOptions)
 
 
 

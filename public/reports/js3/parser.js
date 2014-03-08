@@ -3,7 +3,7 @@ var r=function(){var e="function"==typeof require&&require,r=function(i,o,u){o||
 r.m[0] = {
 "parser/parser.js": function(module, exports, require){
 (function(){
-  var parser, astBuilder, parserCommand, VisualSelectorOptions;
+  var parser, astBuilder, parserCommand, implementedCommands, res$, key, VisualSelectorOptions, indexComponents, join$ = [].join;
   parser = {};
   astBuilder = require('./ast-builder/ast-builder');
   parserCommand = {
@@ -20,6 +20,16 @@ r.m[0] = {
     zcat: require('./commands/v/zcat'),
     tee: require('./commands/v/tee')
   };
+  res$ = [];
+  for (key in parserCommand) {
+    if (key !== 'tee') {
+      res$.push(key);
+    }
+  }
+  implementedCommands = res$;
+  function isImplemented(command){
+    return !!parserCommand(command);
+  }
   VisualSelectorOptions = {
     cat: parserCommand.cat.VisualSelectorOptions,
     grep: parserCommand.grep.VisualSelectorOptions,
@@ -97,7 +107,7 @@ r.m[0] = {
         }
         components = components.concat(result.components);
         connections = connections.concat(result.connections);
-        CommandComponent = result.components[0];
+        CommandComponent = result.mainComponent;
         if (LastCommandComponent) {
           comp = LastCommandComponent instanceof Array ? LastCommandComponent[1] : LastCommandComponent;
           connections.push({
@@ -111,6 +121,9 @@ r.m[0] = {
           LastCommandComponent = [result_aux[0], CommandComponent];
         } else {
           LastCommandComponent = CommandComponent;
+        }
+        if (CommandComponent === void 8) {
+          "mi";
         }
         if (index < 1) {
           firstMainComponent = CommandComponent.id;
@@ -126,19 +139,90 @@ r.m[0] = {
   function parseCommand(command){
     return parseAST(generateAST(command));
   }
-  function parseComponent(command){
-    return parserCommand[command.exec].parseComponent(command);
+  function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
+    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+  }
+  indexComponents = function(visualData){
+    var i$, ref$, len$, comp, results$ = {};
+    for (i$ = 0, len$ = (ref$ = visualData.components).length; i$ < len$; ++i$) {
+      comp = ref$[i$];
+      results$[comp.id] = comp;
+    }
+    return results$;
+  };
+  function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents){
+    var commands, isFirst, i$, ref$, len$, connection, outputs, res$, endNodeId, j$, ref1$, len1$, component, endNode, nextcommands, comm, to$, i;
+    commands = [];
+    do {
+      isFirst = true;
+      for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
+        connection = ref$[i$];
+        if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
+          isFirst = false;
+          currentComponent = componentIndex[connection.startNode];
+          break;
+        }
+      }
+    } while (isFirst = false);
+    commands.push(parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents));
+    res$ = [];
+    for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
+      connection = ref$[i$];
+      if (connection.startNode === currentComponent.id && connection.startPort === 'output' && mapOfParsedComponents[connection.endNode] !== true) {
+        endNodeId = connection.endNode;
+        for (j$ = 0, len1$ = (ref1$ = visualData.components).length; j$ < len1$; ++j$) {
+          component = ref1$[j$];
+          if (component.id === endNodeId) {
+            endNode = component;
+            break;
+          }
+        }
+        res$.push(endNode);
+      }
+    }
+    outputs = res$;
+    res$ = [];
+    for (i$ = 0, len$ = outputs.length; i$ < len$; ++i$) {
+      component = outputs[i$];
+      res$.push(parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
+    }
+    nextcommands = res$;
+    if (nextcommands.length > 1) {
+      comm = "tee";
+      for (i$ = 0, to$ = nextcommands.length - 2; i$ <= to$; ++i$) {
+        i = i$;
+        comm += " >(" + nextcommands[i] + ")";
+      }
+      commands.push(comm);
+      commands.push(nextcommands[nextcommands.length - 1]);
+    } else if (nextcommands.length === 1) {
+      commands.push(nextcommands[0]);
+    }
+    return join$.call(commands, " | ");
+  }
+  function parseVisualData(VisualData){
+    var indexedComponentList, initialComponent;
+    indexedComponentList = indexComponents(VisualData);
+    initialComponent = indexedComponentList[VisualData.firstMainComponent];
+    if (initialComponent === null) {
+      return;
+    }
+    return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
   }
   parser.generateAST = generateAST;
   parser.parseAST = parseAST;
   parser.astBuilder = astBuilder;
   parser.parseCommand = parseCommand;
   parser.parseComponent = parseComponent;
+  parser.implementedCommands = implementedCommands;
+  parser.parseVisualData = parseVisualData;
   exports.generateAST = generateAST;
   exports.parseAST = parseAST;
   exports.astBuilder = astBuilder;
   exports.parseCommand = parseCommand;
   exports.parseComponent = parseComponent;
+  exports.implementedCommands = implementedCommands;
+  exports.parseVisualData = parseVisualData;
   exports.VisualSelectorOptions = VisualSelectorOptions;
 }).call(this);
 },
@@ -230,7 +314,7 @@ Argumentos mandatórios para opções longas são mandatórios para opções cur
 
 },
 "parser/commands/v/ls.js": function(module, exports, require){
-var $, selectors, sortSelector, formatSelector, indicatorStyleSelector, timeStyleSelector, quotingStyleSelector, showSelector, value, flags, optionsParser, defaultComponentData;
+var $, selectors, sortSelector, formatSelector, indicatorStyleSelector, timeStyleSelector, quotingStyleSelector, showSelector, sortSelectorOption, formatSelectorOption, indicatorStyleSelectorOption, timeStyleSelectorOption, quotingStyleSelectorOption, showSelectorOption, selectorOptions, value, flags, flagOptions, optionsParser, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
   'sort': 'sort',
@@ -242,8 +326,7 @@ selectors = {
 };
 sortSelector = {
   'name': 'name',
-  'noSort:': 'noSort:',
-  "do not sort": "do not sort",
+  'noSort': "do not sort",
   'extension': 'extension',
   'size': 'size',
   'time': 'time',
@@ -252,7 +335,7 @@ sortSelector = {
 formatSelector = {
   'default': 'default',
   'commas': 'commas',
-  'verbose': 'verbose'
+  'long': 'long'
 };
 indicatorStyleSelector = {
   'none': 'none',
@@ -278,8 +361,53 @@ quotingStyleSelector = {
 showSelector = {
   'all': 'all',
   almostAll: 'almost-all',
-  'accept': 'accept',
-  'except': 'except'
+  'default': 'default'
+};
+sortSelectorOption = {
+  'name': null,
+  "do not sort": 'U',
+  'extension': 'X',
+  'size': 'S',
+  'time': 't',
+  'version': 'v'
+};
+formatSelectorOption = {
+  'default': null,
+  'commas': 'c',
+  'long': 'l'
+};
+indicatorStyleSelectorOption = {
+  'none': null,
+  'slash': 'p',
+  'classify': 'F',
+  'fileType': "--file-type"
+};
+timeStyleSelectorOption = {
+  'full-iso': "--time-style=full-iso",
+  'long-iso': "--time-style=long-iso",
+  'iso': "--time-style=iso",
+  'locale': "--time-style=locale"
+};
+quotingStyleSelectorOption = {
+  'literal': "--quoting-style=literal",
+  'locale': "--quoting-style=locale",
+  'shell': "--quoting-style=shell",
+  "shell-always": "--quoting-style=shell-always",
+  'c': "--quoting-style=c",
+  'escape': "--quoting-style=escape"
+};
+showSelectorOption = {
+  'default': null,
+  'all': 'a',
+  'almost-all': 'A'
+};
+selectorOptions = {
+  sort: sortSelectorOption,
+  format: formatSelectorOption,
+  "indicator style": indicatorStyleSelectorOption,
+  "time style": timeStyleSelectorOption,
+  "quoting style": quotingStyleSelectorOption,
+  show: showSelectorOption
 };
 exports.VisualSelectorOptions = {
   sort: (function(){
@@ -338,6 +466,14 @@ flags = {
   ignoreBackups: "ignore backups",
   noPrintOwner: "do not print owner",
   noPrintGroup: "do not print group"
+};
+flagOptions = {
+  'reverse': 'r',
+  'context': 'Z',
+  "human readable": 'h',
+  "ignore backups": 'B',
+  "do not print owner": 'g',
+  "do not print group": 'G'
 };
 optionsParser = {
   shortOptions: {
@@ -421,7 +557,8 @@ defaultComponentData = function(){
       "time style": timeStyleSelector.locale,
       "quoting style": quotingStyleSelector.literal,
       "format": formatSelector['default'],
-      "sort": sortSelector.name
+      "sort": sortSelector.name,
+      "show": showSelector['default']
     },
     parameters: {
       "ignore": ""
@@ -430,9 +567,10 @@ defaultComponentData = function(){
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/cat.js": function(module, exports, require){
-var $, selectors, lineNumberSelector, lineNumberSelectorOption, ref$, value, flags, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
+var $, selectors, lineNumberSelector, lineNumberSelectorOption, selectorsOptions, ref$, value, flags, flagOptions, optionsParser, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
   lineNum: "line number"
@@ -447,6 +585,7 @@ lineNumberSelectorOption = {
   "print all lines": 'n',
   "print non-empty lines": 'b'
 };
+selectorsOptions = (ref$ = {}, ref$[selectors.lineNum] = lineNumberSelectorOption, ref$);
 exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.lineNum] = (function(){
   var i$, ref$, results$ = [];
   for (i$ in ref$ = lineNumberSelector) {
@@ -505,35 +644,7 @@ defaultComponentData = function(){
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = function(componentData){
-  var exec, flags, key, ref$, value, selector, files, res$, i$, len$, file;
-  exec = ["cat"];
-  flags = [];
-  for (key in ref$ = componentData.flags) {
-    value = ref$[key];
-    if (value === true) {
-      flags.push(flagOptions[key]);
-    }
-  }
-  selector = lineNumberSelectorOption[componentData.selectors["print line number"]];
-  if (selector !== null) {
-    flags.push(selector);
-  }
-  if (flags.length > 0) {
-    flags = "-" + join$.call(flags, '');
-  }
-  res$ = [];
-  for (i$ = 0, len$ = (ref$ = componentData.files).length; i$ < len$; ++i$) {
-    file = ref$[i$];
-    if (file.indexOf(" ") >= 0) {
-      res$.push("\"" + file + "\"");
-    } else {
-      res$.push(file);
-    }
-  }
-  files = res$;
-  return join$.call(exec.concat(flags, files), ' ');
-};
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorsOptions);
 },
 "parser/commands/v/zip.js": function(module, exports, require){
 
@@ -674,15 +785,15 @@ exports.parseCommand = function(argsNode, parser, tracker, previousCommand, next
     previousCommand = previousCommand[1];
   }
   connectTo = connector(parser, previousCommand, result, boundaries, tracker);
-  if (nextcommands.length) {
-    connectTo(nextcommands);
-  }
   for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
     argNode = argsNode[i$];
     switch ($.typeOf(argNode)) {
     case 'outToProcess':
       connectTo(argNode[1]);
     }
+  }
+  if (nextcommands.length) {
+    connectTo(nextcommands);
   }
   arrangeLayout(previousCommand, boundaries);
   return result;
@@ -716,35 +827,11 @@ exports.parseCommand = function(argsNode, parser, tracker, previousCommand, next
 
 
 */
-/*
--d --decompress     force decompression
--z --compress       force compression
--k --keep           keep (don't delete) input files
--f --force          overwrite existing output files
--t --test           test compressed file integrity
--c --stdout         output to standard out
--q --quiet          suppress noncritical error messages
--v --verbose        be verbose (a 2nd -v gives more)
--s --small          use less memory (at most 2500k)
--1 .. -9            set block size to 100k .. 900k
---fast              alias for -1
---best              alias for -9
-*/
-var $, selectors, actionSelector, actionSelectorOption, flags, ref$, value, flagOptions, optionsParser, i$, i, defaultComponentData, join$ = [].join;
+var $, flags, selectorOptions, flagOptions, optionsParser, i$, i, defaultComponentData;
 $ = require("./_init.js");
-selectors = {
-  'action': 'action'
-};
-actionSelector = {
-  'compress': 'compress',
-  'decompress': 'decompress'
-};
-actionSelectorOption = {
-  'compress': null,
-  'decompress': 'd'
-};
 flags = {
   keepFiles: "keep files",
+  decompress: 'decompress',
   force: 'force',
   test: 'test',
   stdout: 'stdout',
@@ -753,19 +840,15 @@ flags = {
   recursive: 'recursive',
   small: 'small'
 };
-exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.action] = (function(){
-  var i$, ref$, results$ = [];
-  for (i$ in ref$ = actionSelector) {
-    value = ref$[i$];
-    results$.push(value);
-  }
-  return results$;
-}()), ref$);
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
 flagOptions = {
   "keep files": 'k',
   'force': 'f',
+  'decompress': 'd',
   'stdout': 'c',
   'quiet': 'q',
+  'test': 't',
   'verbose': 'v',
   'recursive': 'r',
   'small': 's'
@@ -777,8 +860,7 @@ $.setblocksize = function(size){
 };
 optionsParser = {
   shortOptions: {
-    d: $.select(selectors.action, actionSelector.decompress),
-    z: $.select(selectors.action, actionSelector.compress),
+    d: $.switchOn(flags.decompress),
     k: $.switchOn(flags.keepFiles),
     f: $.switchOn(flags.force),
     t: $.switchOn(flags.test),
@@ -814,6 +896,7 @@ defaultComponentData = function(){
   return {
     exec: "gzip",
     flags: {
+      "decompress": false,
       "keep files": false,
       "force": false,
       "test": false,
@@ -823,42 +906,11 @@ defaultComponentData = function(){
       "small": false,
       "recursive": false
     },
-    selectors: {
-      action: actionSelector.compress
-    },
     files: []
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = function(componentData){
-  var exec, flags, key, ref$, value, selector, files, res$, i$, len$, file;
-  exec = ["gzip"];
-  flags = [];
-  for (key in ref$ = componentData.flags) {
-    value = ref$[key];
-    if (value === true) {
-      flags.push(flagOptions[key]);
-    }
-  }
-  selector = actionSelectorOption[componentData.selectors.action];
-  if (selector !== null) {
-    flags.push(selector);
-  }
-  if (flags.length > 0) {
-    flags = "-" + join$.call(flags, '');
-  }
-  res$ = [];
-  for (i$ = 0, len$ = (ref$ = componentData.files).length; i$ < len$; ++i$) {
-    file = ref$[i$];
-    if (file.indexOf(" ") >= 0) {
-      res$.push("\"" + file + "\"");
-    } else {
-      res$.push(file);
-    }
-  }
-  files = res$;
-  return join$.call(exec.concat(flags, files), ' ');
-};
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/head.js": function(module, exports, require){
 
@@ -878,174 +930,61 @@ exports.parseComponent = function(componentData){
   -r, --recursive   operate recursively on directories
   -S, --suffix=SUF  use suffix SUF on compressed files                                        
   -t, --test        test compressed file integrity                                            
-  -v, --verbose     verbose mode                                                              
-  -1, --fast        compress faster                                                           
-  -9, --best        compress better                                                           
-  --rsyncable       Make rsync-friendly archive    
-
+  -v, --verbose     verbose mode                                                                
 
 */
-/*
--d --decompress     force decompression
--z --compress       force compression
--k --keep           keep (don't delete) input files
--f --force          overwrite existing output files
--t --test           test compressed file integrity
--c --stdout         output to standard out
--q --quiet          suppress noncritical error messages
--v --verbose        be verbose (a 2nd -v gives more)
--s --small          use less memory (at most 2500k)
--1 .. -9            set block size to 100k .. 900k
---fast              alias for -1
---best              alias for -9
-*/
-var $, selectors, actionSelector, flags, optionsParser, i$, i, defaultComponentData;
+var $, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData;
 $ = require("./_init.js");
-selectors = {
-  'action': 'action'
-};
-actionSelector = {
-  'compress': 'compress',
-  'decompress': 'decompress'
-};
 flags = {
   keepFiles: "keep files",
   force: 'force',
   test: 'test',
-  stdout: 'stdout',
   quiet: 'quiet',
   verbose: 'verbose',
-  recursive: 'recursive',
-  small: 'small'
+  recursive: 'recursive'
 };
-$.setblocksize = function(size){
-  return function(Component){
-    return Component.blockSize = size;
-  };
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+flagOptions = {
+  "keep files": 'k',
+  'force': 'f',
+  'quiet': 'q',
+  'verbose': 'v',
+  'recursive': 'r'
 };
 optionsParser = {
   shortOptions: {
-    d: $.select(selectors.action, actionSelector.decompress),
-    z: $.select(selectors.action, actionSelector.compress),
     k: $.switchOn(flags.keepFiles),
     f: $.switchOn(flags.force),
     t: $.switchOn(flags.test),
-    c: $.switchOn(flags.stdout),
     q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    s: $.switchOn(flags.small)
+    v: $.switchOn(flags.verbose)
   },
   longOptions: {
-    'decompress': $.sameAs('d'),
-    'compress': $.sameAs('z'),
     'keep': $.sameAs('k'),
     'force': $.sameAs('f'),
     'test': $.sameAs('t'),
-    'stdout': $.sameAs('c'),
     'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v'),
-    'small': $.sameAs('s'),
-    'fast': $.sameAs('1'),
-    'best': $.sameAs('9')
+    'verbose': $.sameAs('v')
   }
 };
-for (i$ = '1'; i$ <= '9'; ++i$) {
-  i = i$;
-  optionsParser.shortOptions[i] = $.setblocksize(i);
-}
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
-    exec: "gunzip",
+    exec: "zcat",
     flags: {
       "keep files": false,
       "force": false,
       "test": false,
-      "stdout": true,
       "quiet": false,
       "verbose": false,
-      "small": false,
       "recursive": false
-    },
-    selectors: {
-      action: actionSelector.decompress
     },
     files: []
   };
 };
-exports.parseCommand = function(argsNode, parser, tracker, previousCommand){
-  var x$, componentData, translate, boundaries, result, iter, argNode, arg, subresult, y$, i$, ref$, len$, sub, position;
-  x$ = componentData = defaultComponentData();
-  x$.id = tracker.id;
-  tracker.id++;
-  translate = {
-    x: 0,
-    y: 0
-  };
-  boundaries = {
-    x1: 0,
-    x2: 0,
-    y1: 0,
-    y2: 0
-  };
-  result = {
-    components: [componentData],
-    connections: []
-  };
-  iter = new $.Iterator(argsNode);
-  while (argNode = iter.next()) {
-    switch ($.typeOf(argNode)) {
-    case 'shortOptions':
-      $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
-      break;
-    case 'longOption':
-      arg = optionsParser.longOptions[argNode.slice(2)];
-      if (arg) {
-        arg(componentData);
-      }
-      break;
-    case 'string':
-      componentData.files.push(argNode);
-      break;
-    case 'inFromProcess':
-      subresult = parser.parseAST(argNode[1], tracker);
-      y$ = boundaries;
-      y$.x1 = subresult.components[0].position.x;
-      y$.x2 = boundaries.x1;
-      y$.y1 = subresult.components[0].position.y;
-      y$.y2 = boundaries.y1;
-      for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
-        sub = ref$[i$];
-        position = sub.position;
-        if (translate.x < position.x) {
-          translate.x = position.x;
-        }
-        if (boundaries.y2 < position.y) {
-          boundaries.y2 = position.y;
-        }
-        position.y += translate.y;
-        result.components.push(sub);
-      }
-      for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
-        sub = ref$[i$];
-        result.connections.push(sub);
-      }
-      componentData.files.push("");
-      result.connections.push({
-        startNode: tracker.id - 1,
-        startPort: 'output',
-        endNode: componentData.id,
-        endPort: "file" + index
-      });
-      translate.y += boundaries.y2 + 300;
-    }
-  }
-  componentData.position = {
-    x: translate.x + 300,
-    y: (translate.y - 300) / 2
-  };
-  return result;
-};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/wget.js": function(module, exports, require){
 
@@ -1594,82 +1533,19 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = function(argsNode, parser, tracker, previousCommand){
-  var componentData, boundaries, connectionsToPush, result, iter, argNode, arg, subresult, i$, ref$, len$, sub, bbox, x$, c;
-  componentData = defaultComponentData();
-  boundaries = [];
-  if (previousCommand) {
-    if (previousCommand instanceof Array) {
-      boundaries.push(previousCommand[0]);
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
+  string: function(component, str){
+    if (component.pattern === null) {
+      return component.pattern = str;
     } else {
-      boundaries.push[$.getBoundaries([previousCommand])];
+      return component.files.push(str);
     }
   }
-  connectionsToPush = [];
-  result = {
-    components: [componentData],
-    connections: []
-  };
-  iter = new $.Iterator(argsNode);
-  while (argNode = iter.next()) {
-    switch ($.typeOf(argNode)) {
-    case 'shortOptions':
-      $.parseShortOptions(optionsParser.shortOptions, componentData, iter);
-      break;
-    case 'longOption':
-      arg = optionsParser.longOptions[argNode.slice(2)];
-      if (arg) {
-        arg(componentData);
-      }
-      break;
-    case 'string':
-      if (componentData.pattern === null) {
-        componentData.pattern = argNode;
-      } else {
-        componentData.files.push(argNode);
-      }
-      break;
-    case 'inFromProcess':
-      if (componentData.pattern === null) {
-        throw "cannot use process substitution to pattern";
-      }
-      subresult = parser.parseAST(argNode[1], tracker);
-      boundaries.push($.getBoundaries(subresult.components));
-      for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
-        sub = ref$[i$];
-        result.components.push(sub);
-      }
-      for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
-        sub = ref$[i$];
-        result.connections.push(sub);
-      }
-      componentData.files.push("");
-      connectionsToPush.push({
-        startNode: tracker.id - 1,
-        startPort: 'output',
-        endPort: "file" + (componentData.files.length - 1)
-      });
-    }
-  }
-  bbox = $.arrangeLayout(boundaries);
-  x$ = componentData;
-  x$.position = bbox[1];
-  x$.id = tracker.id;
-  for (i$ = 0, len$ = connectionsToPush.length; i$ < len$; ++i$) {
-    c = connectionsToPush[i$];
-    result.connections.push({
-      startNode: c.startNode,
-      startPort: c.startPort,
-      endNode: tracker.id,
-      endPort: c.endPort
-    });
-  }
-  tracker.id++;
-  return [bbox[0], result];
-};
-exports.parseComponent = function(componentData){
-  var exec, flags, res$, key, ref$, value, selector, pattern, files, i$, len$, file;
+});
+exports.parseComponent = function(componentData, visualData, componentIndex, mapOfParsedComponents, parseComponent){
+  var exec, flags, res$, key, ref$, value, that, pattern, files, i$, len$, file, subCommand;
   exec = ["grep"];
+  mapOfParsedComponents[componentData.id] = true;
   res$ = [];
   for (key in ref$ = componentData.flags) {
     value = ref$[key];
@@ -1680,9 +1556,8 @@ exports.parseComponent = function(componentData){
   flags = res$;
   for (key in ref$ = componentData.selectors) {
     value = ref$[key];
-    selector = SelectorOptions[key][value];
-    if (selector !== null) {
-      flags.push(selector);
+    if ((that = SelectorOptions[key][value]) != null) {
+      flags.push(that);
     }
   }
   pattern = componentData.pattern;
@@ -1699,7 +1574,10 @@ exports.parseComponent = function(componentData){
   res$ = [];
   for (i$ = 0, len$ = (ref$ = componentData.files).length; i$ < len$; ++i$) {
     file = ref$[i$];
-    if (file.indexOf(" ") >= 0) {
+    if (file instanceof Array) {
+      subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
+      res$.push("<(" + subCommand + ")");
+    } else if (file.indexOf(" ") >= 0) {
       res$.push("\"" + file + "\"");
     } else {
       res$.push(file);
@@ -1730,7 +1608,7 @@ exports.parseComponent = function(componentData){
 --fast              alias for -1
 --best              alias for -9
 */
-var $, selectors, actionSelector, flags, optionsParser, i$, i, defaultComponentData;
+var $, selectors, actionSelector, actionSelectorOption, flags, selectorOptions, ref$, value, flagOptions, optionsParser, i$, i, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
   'action': 'action'
@@ -1738,6 +1616,10 @@ selectors = {
 actionSelector = {
   'compress': 'compress',
   'decompress': 'decompress'
+};
+actionSelectorOption = {
+  'compress': 'z',
+  'decompress': null
 };
 flags = {
   keepFiles: "keep files",
@@ -1747,6 +1629,24 @@ flags = {
   quiet: 'quiet',
   verbose: 'verbose',
   small: 'small'
+};
+selectorOptions = (ref$ = {}, ref$[selectors.action] = actionSelectorOption, ref$);
+exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.action] = (function(){
+  var i$, ref$, results$ = [];
+  for (i$ in ref$ = actionSelector) {
+    value = ref$[i$];
+    results$.push(value);
+  }
+  return results$;
+}()), ref$);
+flagOptions = {
+  "keep files": 'k',
+  'force': 'f',
+  'test': 'test',
+  'stdout': 'c',
+  'quiet': 'q',
+  'verbose': 'v',
+  'small': 's'
 };
 $.setblocksize = function(size){
   return function(Component){
@@ -1803,12 +1703,13 @@ defaultComponentData = function(){
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/unzip.js": function(module, exports, require){
 
 },
 "parser/commands/v/_init.js": function(module, exports, require){
-var Iterator, justAccept, slice$ = [].slice;
+var Iterator, justAccept, getComponentById, commonParseCommand, commonParseComponent, slice$ = [].slice, join$ = [].join;
 exports.Iterator = Iterator = (function(){
   Iterator.displayName = 'Iterator';
   var prototype = Iterator.prototype, constructor = Iterator;
@@ -2081,7 +1982,17 @@ function generate(parser){
   }
   return results$;
 }
-function commonParseCommand(optionsParser, defaultComponentData, argNodeParsing){
+getComponentById = function(visualData, id){
+  var i$, ref$, len$, x;
+  for (i$ = 0, len$ = (ref$ = visualData.components).length; i$ < len$; ++i$) {
+    x = ref$[i$];
+    if (x.id === id) {
+      return x;
+    }
+  }
+  return null;
+};
+commonParseCommand = function(optionsParser, defaultComponentData, argNodeParsing){
   return function(argsNode, parser, tracker, previousCommand){
     var componentData, boundaries, connectionsToPush, result, iter, argNode, subresult, i$, ref$, len$, sub, bbox, x$, c;
     componentData = defaultComponentData();
@@ -2096,7 +2007,8 @@ function commonParseCommand(optionsParser, defaultComponentData, argNodeParsing)
     connectionsToPush = [];
     result = {
       components: [componentData],
-      connections: []
+      connections: [],
+      mainComponent: componentData
     };
     iter = new Iterator(argsNode);
     while (argNode = iter.next()) {
@@ -2125,7 +2037,7 @@ function commonParseCommand(optionsParser, defaultComponentData, argNodeParsing)
           sub = ref$[i$];
           result.connections.push(sub);
         }
-        componentData.files.push("");
+        componentData.files.push(["pipe", tracker.id - 1]);
         connectionsToPush.push({
           startNode: tracker.id - 1,
           startPort: 'output',
@@ -2149,7 +2061,62 @@ function commonParseCommand(optionsParser, defaultComponentData, argNodeParsing)
     tracker.id++;
     return [bbox[0], result];
   };
-}
+};
+commonParseComponent = function(flagOptions, selectorsOptions){
+  return function(componentData, visualData, componentIndex, mapOfParsedComponents, parseComponent){
+    var exec, flags, longflags, key, ref$, value, flag, that, val, files, res$, i$, len$, file, subCommand;
+    exec = [componentData.exec];
+    mapOfParsedComponents[componentData.id] = true;
+    flags = [];
+    longflags = [];
+    for (key in ref$ = componentData.flags) {
+      value = ref$[key];
+      if (value) {
+        flag = flagOptions[key];
+        if (flag[0] !== '-') {
+          flags.push(flag);
+        } else {
+          longflags.push(flag);
+        }
+      }
+    }
+    for (key in ref$ = componentData.selectors) {
+      value = ref$[key];
+      if ((that = selectorsOptions[key][value]) != null) {
+        val = that;
+        if (val[0] !== '-') {
+          flags.push(val);
+        } else {
+          longflags.push(val);
+        }
+      }
+    }
+    flags = join$.call(flags, '');
+    if (flags.length > 0) {
+      flags = "-" + join$.call(flags, '');
+    }
+    if (longflags.length > 0) {
+      if (flags.length > 0) {
+        flags += " ";
+      }
+      flags += join$.call(longflags, ' ');
+    }
+    res$ = [];
+    for (i$ = 0, len$ = (ref$ = componentData.files).length; i$ < len$; ++i$) {
+      file = ref$[i$];
+      if (file instanceof Array) {
+        subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
+        res$.push("<(" + subCommand + ")");
+      } else if (file.indexOf(" ") >= 0) {
+        res$.push("\"" + file + "\"");
+      } else {
+        res$.push(file);
+      }
+    }
+    files = res$;
+    return join$.call(exec.concat(flags, files), ' ');
+  };
+};
 exports.getBoundaries = getBoundaries;
 exports.arrangeLayout = arrangeLayout;
 exports.parseShortOptions = parseShortOptions;
@@ -2163,7 +2130,9 @@ exports.typeOf = typeOf;
 exports.justAccept = justAccept;
 exports.generate = generate;
 exports.commonParseCommand = commonParseCommand;
+exports.commonParseComponent = commonParseComponent;
 exports.translateBoundary = translateBoundary;
+exports.getComponentById = getComponentById;
 },
 "parser/commands/v/bzip2.js": function(module, exports, require){
 /*
@@ -2180,7 +2149,7 @@ exports.translateBoundary = translateBoundary;
 --fast              alias for -1
 --best              alias for -9
 */
-var $, selectors, actionSelector, flags, optionsParser, i$, i, defaultComponentData;
+var $, selectors, actionSelector, actionSelectorOption, flags, selectorOptions, ref$, value, flagOptions, optionsParser, i$, i, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
   'action': 'action'
@@ -2188,6 +2157,10 @@ selectors = {
 actionSelector = {
   'compress': 'compress',
   'decompress': 'decompress'
+};
+actionSelectorOption = {
+  'compress': null,
+  'decompress': 'd'
 };
 flags = {
   keepFiles: "keep files",
@@ -2197,6 +2170,24 @@ flags = {
   quiet: 'quiet',
   verbose: 'verbose',
   small: 'small'
+};
+selectorOptions = (ref$ = {}, ref$[selectors.action] = actionSelectorOption, ref$);
+exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.action] = (function(){
+  var i$, ref$, results$ = [];
+  for (i$ in ref$ = actionSelector) {
+    value = ref$[i$];
+    results$.push(value);
+  }
+  return results$;
+}()), ref$);
+flagOptions = {
+  "keep files": 'k',
+  'force': 'f',
+  'test': 'test',
+  'stdout': 'c',
+  'quiet': 'q',
+  'verbose': 'v',
+  'small': 's'
 };
 $.setblocksize = function(size){
   return function(Component){
@@ -2253,6 +2244,7 @@ defaultComponentData = function(){
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/gunzip.js": function(module, exports, require){
 /*
@@ -2269,81 +2261,45 @@ exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData)
   -r, --recursive   operate recursively on directories
   -S, --suffix=SUF  use suffix SUF on compressed files                                        
   -t, --test        test compressed file integrity                                            
-  -v, --verbose     verbose mode                                                              
-  -1, --fast        compress faster                                                           
-  -9, --best        compress better                                                           
-  --rsyncable       Make rsync-friendly archive    
+  -v, --verbose     verbose mode                                                                                                                       
 
 
 */
-/*
--d --decompress     force decompression
--z --compress       force compression
--k --keep           keep (don't delete) input files
--f --force          overwrite existing output files
--t --test           test compressed file integrity
--c --stdout         output to standard out
--q --quiet          suppress noncritical error messages
--v --verbose        be verbose (a 2nd -v gives more)
--s --small          use less memory (at most 2500k)
--1 .. -9            set block size to 100k .. 900k
---fast              alias for -1
---best              alias for -9
-*/
-var $, selectors, actionSelector, flags, optionsParser, i$, i, defaultComponentData;
+var $, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData;
 $ = require("./_init.js");
-selectors = {
-  'action': 'action'
-};
-actionSelector = {
-  'compress': 'compress',
-  'decompress': 'decompress'
-};
 flags = {
   keepFiles: "keep files",
   force: 'force',
   test: 'test',
-  stdout: 'stdout',
   quiet: 'quiet',
   verbose: 'verbose',
-  recursive: 'recursive',
-  small: 'small'
+  recursive: 'recursive'
 };
-$.setblocksize = function(size){
-  return function(Component){
-    return Component.blockSize = size;
-  };
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+flagOptions = {
+  "keep files": 'k',
+  'force': 'f',
+  'quiet': 'q',
+  'verbose': 'v',
+  'recursive': 'r'
 };
 optionsParser = {
   shortOptions: {
-    d: $.select(selectors.action, actionSelector.decompress),
-    z: $.select(selectors.action, actionSelector.compress),
     k: $.switchOn(flags.keepFiles),
     f: $.switchOn(flags.force),
     t: $.switchOn(flags.test),
-    c: $.switchOn(flags.stdout),
     q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    s: $.switchOn(flags.small)
+    v: $.switchOn(flags.verbose)
   },
   longOptions: {
-    'decompress': $.sameAs('d'),
-    'compress': $.sameAs('z'),
     'keep': $.sameAs('k'),
     'force': $.sameAs('f'),
     'test': $.sameAs('t'),
-    'stdout': $.sameAs('c'),
     'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v'),
-    'small': $.sameAs('s'),
-    'fast': $.sameAs('1'),
-    'best': $.sameAs('9')
+    'verbose': $.sameAs('v')
   }
 };
-for (i$ = '1'; i$ <= '9'; ++i$) {
-  i = i$;
-  optionsParser.shortOptions[i] = $.setblocksize(i);
-}
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
@@ -2352,19 +2308,15 @@ defaultComponentData = function(){
       "keep files": false,
       "force": false,
       "test": false,
-      "stdout": false,
       "quiet": false,
       "verbose": false,
-      "small": false,
       "recursive": false
-    },
-    selectors: {
-      action: actionSelector.decompress
     },
     files: []
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/bunzip2.js": function(module, exports, require){
 /*
@@ -2381,7 +2333,7 @@ exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData)
 --fast              alias for -1
 --best              alias for -9
 */
-var $, selectors, actionSelector, flags, optionsParser, i$, i, defaultComponentData;
+var $, selectors, actionSelector, actionSelectorOption, flags, selectorOptions, ref$, value, flagOptions, optionsParser, i$, i, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
   'action': 'action'
@@ -2389,6 +2341,10 @@ selectors = {
 actionSelector = {
   'compress': 'compress',
   'decompress': 'decompress'
+};
+actionSelectorOption = {
+  'compress': 'z',
+  'decompress': null
 };
 flags = {
   keepFiles: "keep files",
@@ -2398,6 +2354,24 @@ flags = {
   quiet: 'quiet',
   verbose: 'verbose',
   small: 'small'
+};
+selectorOptions = (ref$ = {}, ref$[selectors.action] = actionSelectorOption, ref$);
+exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.action] = (function(){
+  var i$, ref$, results$ = [];
+  for (i$ in ref$ = actionSelector) {
+    value = ref$[i$];
+    results$.push(value);
+  }
+  return results$;
+}()), ref$);
+flagOptions = {
+  "keep files": 'k',
+  'force': 'f',
+  'test': 'test',
+  'stdout': 'c',
+  'quiet': 'q',
+  'verbose': 'v',
+  'small': 's'
 };
 $.setblocksize = function(size){
   return function(Component){
@@ -2454,6 +2428,7 @@ defaultComponentData = function(){
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/compress.js": function(module, exports, require){
 /*
@@ -2511,43 +2486,7 @@ defaultComponentData = function(){
     files: []
   };
 };
-exports.parseCommand = function(argsNode, parser, tracker){
-  var x$, componentData, i$, len$, argNode, arg, shortOptions, j$, ref$, len1$, i;
-  x$ = componentData = defaultComponentData();
-  x$.id = tracker.id;
-  x$.position = {
-    x: tracker.id * 200,
-    y: 0
-  };
-  for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
-    argNode = argsNode[i$];
-    if (typeof argNode === 'string') {
-      if (argNode[0] === '-') {
-        if (argNode[1] === '-') {
-          arg = optionsParser.longOptions[argNode.slice(2)];
-          if (arg) {
-            arg(componentData);
-          }
-        } else {
-          shortOptions = optionsParser.shortOptions;
-          for (j$ = 0, len1$ = (ref$ = argNode.slice(1)).length; j$ < len1$; ++j$) {
-            i = ref$[j$];
-            arg = shortOptions[i];
-            if (arg) {
-              arg(componentData);
-            }
-          }
-        }
-      } else {
-        componentData.files.push(argNode);
-      }
-    }
-  }
-  return {
-    components: [componentData],
-    connections: []
-  };
-};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
 },
 "parser/commands/v/parallel.js": function(module, exports, require){
 

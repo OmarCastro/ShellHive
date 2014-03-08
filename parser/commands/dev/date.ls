@@ -1,4 +1,36 @@
 
+$ = require("./_init.js");
+
+selectors = {
+  \format 
+  \match
+}
+
+optionsParser = 
+  shortOptions:
+    d : $.setParameter "date"  
+    f : $.setParameter "file" 
+    I : $.selectParameter \format, "ISO-8601"
+  longOptions:
+    \field-separator : $.sameAs \d  
+
+$.generate(optionsParser)
+
+
+defaultComponentData = ->
+  exec:"date"
+  parameters:
+    "date" : "now"
+    "file" : ""
+  parameterSelectors:
+    format: null
+  script: ""
+
+
+exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
+    string: (component, str) ->
+        component.script = str;
+    })
 
 
 /*DESCRIPTION

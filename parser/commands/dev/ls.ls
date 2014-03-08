@@ -10,9 +10,11 @@ selectors = {
   quoting-style:  "quoting style"
 }
 
+## Selectors
+
 sortSelector = { 
   \name
-  \noSort: "do not sort"
+  \noSort : "do not sort"
   \extension
   \size
   \time
@@ -22,7 +24,7 @@ sortSelector = {
 formatSelector = {
   \default
   \commas
-  \verbose
+  \long
 }
 
 indicatorStyleSelector = {
@@ -47,9 +49,66 @@ quotingStyleSelector = {
 showSelector = {
   \all,
   almost-all:\almost-all
-  \accept
-  \except
+  \default
 }
+
+## Selector Options
+
+
+sortSelectorOption = { 
+  \name : null
+  "do not sort": \U
+  \extension : \X 
+  \size : \S
+  \time : \t
+  \version : \v
+}
+
+formatSelectorOption = {
+  \default : null
+  \commas : \c
+  \long : \l
+}
+
+indicatorStyleSelectorOption = {
+  \none : null
+  \slash : \p
+  \classify : \F
+  \fileType : "--file-type"
+}
+
+timeStyleSelectorOption = {
+  \full-iso : "--time-style=full-iso"
+  \long-iso : "--time-style=long-iso"
+  \iso : "--time-style=iso"
+  \locale : "--time-style=locale"
+}
+
+
+quotingStyleSelectorOption = {
+  \literal : "--quoting-style=literal"
+  \locale :  "--quoting-style=locale"
+  \shell :  "--quoting-style=shell"
+  "shell-always" :  "--quoting-style=shell-always"
+  \c :  "--quoting-style=c"
+  \escape :  "--quoting-style=escape"
+}
+
+showSelectorOption = {
+  \default : null
+  \all : \a
+  \almost-all : \A
+}
+
+
+
+const selectorOptions =
+  sort: sortSelectorOption
+  format: formatSelectorOption
+  "indicator style": indicatorStyleSelectorOption
+  "time style": timeStyleSelectorOption
+  "quoting style": quotingStyleSelectorOption
+  show: showSelectorOption
 
 exports.VisualSelectorOptions =
   sort: [value for ,value of sortSelector]
@@ -64,11 +123,21 @@ exports.VisualSelectorOptions =
 flags = {
   \reverse
   \context
+  humanReadable: "human readable"
   ignore-backups: "ignore backups"
   no-print-owner: "do not print owner"
   no-print-group: "do not print group"
 }
 
+
+flagOptions = {
+  \reverse : \r
+  \context : \Z
+  "human readable": \h
+  "ignore backups": \B
+  "do not print owner": \g
+  "do not print group": \G
+}
 
 
 optionsParser = 
@@ -85,7 +154,7 @@ optionsParser =
     F  :  $.select  selectors.indicator-style, indicatorStyleSelector.classify
     g  :  $.switchOn flags.no-print-owner
     G  :  $.switchOn flags.no-print-group
-    h  :  $.switchOn! 
+    h  :  $.switchOn flags.humanReadable
     H  :  $.switchOn! 
     i  :  $.switchOn!
     I  :  $.setParameter \ignore  
@@ -140,68 +209,17 @@ $.generate(optionsParser)
 
 defaultComponentData = ->
   exec:"ls",
-  flags:{-"reverse",-"do not list owner",-"do not list group",-"numeric ID",-"inode"}
+  flags:{-"reverse",-"do not list owner",-"do not list group",-"numeric ID",-"inode",-"human readable"}
   selectors:
     "indicator style": indicatorStyleSelector.none
     "time style":      timeStyleSelector.locale
     "quoting style":   quotingStyleSelector.literal
     "format":          formatSelector.default
     "sort"  :          sortSelector.name
+    "show"  :          showSelector.default
   parameters:
     "ignore" : ""
   files:[]
 
-
-
-exports.parseCommand = (argsNode, parser, tracker, previousCommand) ->
-  componentData = defaultComponentData!
-  translate = {
-    x: if previousCommand
-       then previousCommand.position.x
-       else 0
-    y: if previousCommand
-       then previousCommand.position.y
-       else 0
-  }
-  boundaries = {x1:0,x2:0,y1:0,y2:0}
-  connectionsToPush = []
-
-  result = {components:[componentData],connections:[]}
-  iter = new $.Iterator argsNode
-  while argNode = iter.next!
-    switch $.typeOf argNode
-    case \shortOptions
-      $.parseShortOptions(optionsParser.shortOptions,componentData,iter)
-    case \longOption
-      arg = optionsParser.longOptions[argNode.slice(2)];
-      arg componentData if arg
-    case \string
-      componentData.files.push(argNode)
-    case \inFromProcess
-      subresult = parser.parseAST(argNode[1], tracker)
-      boundaries
-        ..x1 = subresult.components[0].position.x
-        ..x2 = boundaries.x1
-        ..y1 = subresult.components[0].position.y
-        ..y2 = boundaries.y1
-      for sub in subresult.components
-        position = sub.position
-        translate.x = position.x if translate.x < position.x
-        boundaries.y2 = position.y if boundaries.y2 < position.y
-        position.y += translate.y
-        result.components.push sub
-      for sub in subresult.connections
-        result.connections.push sub
-      componentData.files.push("");
-      connectionsToPush.push({startNode: tracker.id-1, startPort: \output, endPort: "file#index"})
-      translate.y += boundaries.y2 + 300
-  componentData
-    ..position = {x: translate.x + 300; y: (translate.y - 300) / 2}
-    ..id = tracker.id
-
-  for c in connectionsToPush
-    result.connections.push({startNode:c.startNode, startPort:c.startPort
-      ,endNode: tracker.id,endPort:c.endPort}) 
-
-  tracker.id++ 
-  result
+exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions)

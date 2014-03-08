@@ -42,7 +42,7 @@ app.controller 'visual2text', ($scope) ->
       }
       let indx = i
         $scope.$watch "TransformResults[#indx].visualData.components", ((newValue)->
-          results[indx].command = shellParser.parseComponent newValue[0]
+          results[indx].command = shellParser.parseVisualData results[indx].visualData
         ), true
     $scope.tab = results[0].id
 
@@ -120,6 +120,8 @@ app.controller 'visual-playground', ($scope) ->
   startX = 0
   startY = 0
 
+##data-flow
+
 app.controller 'data-flow', ($scope) ->
   emptyresult = {
     components:[]
@@ -130,6 +132,8 @@ app.controller 'data-flow', ($scope) ->
   connectors = []
   examples =
     * title:"single",
+      command: "cat -A"
+    * title:"single2",
       command: "ls -IAmACoolGuy"
     * title:"pipe",
       command: """grep 2004 | cat uselessUseOfCat.txt | grep "oh really" | grep "yes really" | cat | cat | gzip"""
@@ -137,22 +141,34 @@ app.controller 'data-flow', ($scope) ->
       command: "cat <(grep 2004 events.txt) <(grep 1958 ye_olde_events.txt)"
     * title:"tee",
       command: "cat | tee >(cat) >(cat) | cat"
+    * title:"tee tree",
+      command: "cat | tee >(cat | tee >(cat) >(cat)) >(cat | tee >(cat) >(cat) | cat) | cat"
     * title:"process substitution tree",
-      command: "cat <( cat <(grep \"cat\" cat.cat.txt) <(grep t2 txt.txt) ) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)"
+      command: "cat <(cat <(grep \"cat\" cat.cat.txt) <(grep t2 txt.txt)) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)"
+    * title:"p.subst. + tee + pipe",
+      command: "grep 'knights of ni' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt))"
     * title:"a long workflow",
-      command: "grep 'for test purposes only' <( cat - <(grep 1 txt.txt) <(grep t2 txt2.txt) ) <(grep 2 txt.txt) <(grep 3 txt2.txt) | 
-                cat - <(cat <(grep txt) <(grep t2) ) | cat | grep 'its complex alright' 
-                <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt) ) | tee >(bzip2) >(grep mimi <(cat ni.txt) | cat | tee >(cat | gzip) | bzip2) | grep | tee >(bzip2) | gzip"
+      command: "grep 'for test purposes only' <(cat - <(grep 1 txt.txt) <(grep t2 txt2.txt)) <(grep 2 txt.txt) <(grep 3 txt2.txt) | 
+                cat - <(cat <(grep txt) <(grep t2)) | cat | grep 'its complex alright' 
+                <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt)) | tee >(bzip2) >(grep mimi <(cat ni.txt) | cat | tee >(cat | gzip) | bzip2) | grep | tee >(bzip2) | gzip"
     
 
-  results = for example,index in examples
-    {
+  results = []
+  for example,index in examples
+    results.push {
       id: index
+      inputCommand: example.command
       example.title
       example.command
       visualData: emptyresult
       parsed:false
     }
+
+    let indx = index
+      $scope.$watch "TransformResults[#indx].visualData", ((newValue)->
+        return unless results[indx].parsed
+        results[indx].command = shellParser.parseVisualData results[indx].visualData
+      ), true
 
   translateX = 0
   translateY = 0

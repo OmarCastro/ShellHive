@@ -1,13 +1,10 @@
 div(sidebar)
-    ul
-        li(ng-repeat="file in implementedCommands")
-            span(ng-bind="file")
 svg
     g.edges
         path.emptyEdge
         path(connector,ng-repeat="edge in visualData.connections")
 .nodes(style="{{transform}}-origin: 0 0")
-    .component(component,ng-repeat="data in visualData.components" data-node-id="{{data.id}}" style="{{transform}}:translate3d({{data.position.x}}px, {{data.position.y}}px, 0)")
+    .component(component,ng-repeat="(id, data) in visualData.components" data-node-id="{{data.id}}" style="{{transform}}:translate3d({{data.position.x}}px, {{data.position.y}}px, 0)")
         .title {{data.exec}}
         .ports
             .input
@@ -39,10 +36,13 @@ svg
         div(ng-if="isImplemented(data) && data.files !== undefined")
             | files :
             br(ng-if="data.files.length > 0")
-            label(ng-repeat="file in data.files track by $index") 
+            div(ng-repeat="file in data.files track by $index") 
                 span.box(data-port="file{{$index}}")
-                input(type="text",ng-model="data.files[$index]")
+                input(type="text",ng-model="data.files[$index]" ng-if="isString(data.files[$index])")
+                span(ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])")
                 button(ng-click="data.files.splice($index,1)"). -
+                button(ng-click="swapPrevious(data.files,$index,data.id)",ng-if="$index"). &#11014;
+                button(ng-click="swapPrevious(data.files,$index + 1,data.id)",ng-if="$index != data.files.length -1 "). &#11015;
                 br
             button(ng-click="data.files.push('')"). +
             br
