@@ -49,6 +49,7 @@ $.generate(optionsParser)
   
 
 defaultComponentData = ->
+  type:\command
   exec:"compress",
   flags:{-"force",-"stdout",-"statistics",-"recursive"}
   selectors:

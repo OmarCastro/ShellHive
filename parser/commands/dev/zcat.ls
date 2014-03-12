@@ -59,6 +59,7 @@ $.generate(optionsParser)
 
 
 defaultComponentData = ->
+  type:\command
   exec:"zcat",
   flags:{-"keep files",-"force",-"test",-"quiet",-"verbose",-"recursive"}
   files: []

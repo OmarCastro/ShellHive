@@ -3,7 +3,7 @@ var r=function(){var e="function"==typeof require&&require,r=function(i,o,u){o||
 r.m[0] = {
 "parser/parser.js": function(module, exports, require){
 (function(){
-  var parser, astBuilder, parserCommand, implementedCommands, res$, key, VisualSelectorOptions, indexComponents, join$ = [].join;
+  var parser, astBuilder, parserCommand, implementedCommands, res$, key, VisualSelectorOptions, isImplemented, indexComponents, createMacro, join$ = [].join;
   parser = {};
   astBuilder = require('./ast-builder/ast-builder');
   parserCommand = {
@@ -18,6 +18,7 @@ r.m[0] = {
     gzip: require('./commands/v/gzip'),
     gunzip: require('./commands/v/gunzip'),
     zcat: require('./commands/v/zcat'),
+    tr: require('./commands/v/tr'),
     tee: require('./commands/v/tee')
   };
   res$ = [];
@@ -27,9 +28,6 @@ r.m[0] = {
     }
   }
   implementedCommands = res$;
-  function isImplemented(command){
-    return !!parserCommand(command);
-  }
   VisualSelectorOptions = {
     cat: parserCommand.cat.VisualSelectorOptions,
     grep: parserCommand.grep.VisualSelectorOptions,
@@ -72,9 +70,27 @@ r.m[0] = {
       ye: ye
     };
   }
+  isImplemented = function(command){
+    return parserCommand.command != null;
+  };
+  /**
+   * Parses the syntax of the command and
+   * transforms into an Abstract Syntax Tree
+   * @param command command
+   * @return the resulting AST
+   */
   function generateAST(command){
     return astBuilder.parse(command);
   }
+  /**
+   * Parses the Abstract Syntax Tree
+   * and transforms it to a graph representation format
+   * that can be used in the visual application
+   *
+   * @param ast - the Abstract Syntax Tree
+   * @param tracker - and tracker the tracks the id of a component
+   * @returns the visual representation of the object
+   */
   function parseAST(ast, tracker){
     var components, connections, LastCommandComponent, CommandComponent, i$, len$, index, commandNode, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
     components = [];
@@ -132,16 +148,20 @@ r.m[0] = {
     }
     return {
       firstMainComponent: firstMainComponent,
+      counter: tracker.id,
       components: components,
       connections: connections
     };
   }
+  /**
+   * parses the command
+   */
   function parseCommand(command){
     return parseAST(generateAST(command));
   }
-  function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
-    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
-  }
+  /**
+   * Creates an index of the components
+   */
   indexComponents = function(visualData){
     var i$, ref$, len$, comp, results$ = {};
     for (i$ = 0, len$ = (ref$ = visualData.components).length; i$ < len$; ++i$) {
@@ -150,6 +170,18 @@ r.m[0] = {
     }
     return results$;
   };
+  function parseVisualData(VisualData){
+    var indexedComponentList, initialComponent;
+    indexedComponentList = indexComponents(VisualData);
+    initialComponent = indexedComponentList[VisualData.firstMainComponent];
+    if (initialComponent === null) {
+      return;
+    }
+    return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
+  }
+  function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
+    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+  }
   function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents){
     var commands, isFirst, i$, ref$, len$, connection, outputs, res$, endNodeId, j$, ref1$, len1$, component, endNode, nextcommands, comm, to$, i;
     commands = [];
@@ -200,13 +232,35 @@ r.m[0] = {
     }
     return join$.call(commands, " | ");
   }
-  function parseVisualData(VisualData){
-    var indexedComponentList, initialComponent;
-    indexedComponentList = indexComponents(VisualData);
-    initialComponent = indexedComponentList[VisualData.firstMainComponent];
-    if (initialComponent === null) {
-      return;
+  createMacro = function(name, description, fromMacro){
+    var x$, macroData;
+    if (fromMacro) {
+      x$ = macroData = JSON.parse(JSON.stringify(fromMacro));
+      x$.name = name;
+      x$.description = description;
+      return x$;
+    } else {
+      return macroData = {
+        name: name,
+        description: description,
+        entryComponent: null,
+        exitComponent: null,
+        count: 0,
+        components: [],
+        connections: []
+      };
     }
+  };
+  function compileMacro(macro){
+    var indexedComponentList, initialComponent;
+    if (macro.entryComponent === null) {
+      throw "no component defined as Macro Entry";
+    }
+    if (macro.exitComponent === null) {
+      throw "no component defined as Macro Exit";
+    }
+    indexedComponentList = indexComponents(macro);
+    initialComponent = indexedComponentList[macro.entryComponent];
     return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
   }
   parser.generateAST = generateAST;
@@ -223,8 +277,116 @@ r.m[0] = {
   exports.parseComponent = parseComponent;
   exports.implementedCommands = implementedCommands;
   exports.parseVisualData = parseVisualData;
+  exports.createMacro = createMacro;
   exports.VisualSelectorOptions = VisualSelectorOptions;
 }).call(this);
+},
+"parser/commands/v/wc.js": function(module, exports, require){
+
+},
+"parser/commands/v/tr.js": function(module, exports, require){
+/*  -c, -C, --complement usa o complemento de SET1
+  -d, --delete apaga caracteres em SET1, não traduz
+  -s, --squeeze-repeats substitui cada sequência de entrada de um caractere repetido
+                            que esteja listado em SET1 com uma única ocorrência
+                            deste caractere
+  -t, --truncate-set1 primeiro truncar SET1 para tamanho do SET2
+      --help     exibir esta ajuda e sair
+      --version  mostrar a informação de versão e sair
+
+SETs são especificados como cadeias de caracteres. A maioria
+auro-representa-se. Sequências interpretadas são:
+
+  \NNN            carácter com valor octal NNN (1 a 3 dígitos octais)
+  \\              backslash (barra invertida)
+  \a              BEL audível
+  \b              backspace (espaço atrás)
+  \f              form feed
+  \n              nova linha
+  \r              return (enter)
+  \t              tab horizontal
+  \v              tab vertical
+  CAR1-CAR2       todos os caracteres de CAR1 a CAR2 por ordem crescente
+  [CAR*]          em SET2, cópias de CAR até tamanho de SET1
+  [CAR*REP]       REP cópias de CAR, REP octal se começar por 0
+  [:alnum:]       todas as letras e dígitos
+  [:alpha:]       todas as letras                                                                                                                                                               
+  [:blank:]       todos os espaços brancos horizontais                                                                                                                                          
+  [:cntrl:]       todos os caracteres de controlo                                                                                                                                               
+  [:digit:]       todos os dígitos                                                                                                                                                              
+  [:graph:]       todos os caracteres mostráveis, excluindo space (espaço)                                                                                                                      
+  [:lower:]       todas as letras minúsculas                                                                                                                                                    
+  [:print:]       todos os caracteres mostráveis, incluindo space (espaço)                                                                                                                      
+  [:punct:]       todos os caracteres de pontuação                                                                                                                                              
+  [:space:]       todos os espaços brancos horizontais e verticais                                                                                                                              
+  [:upper:]       todas as letras maiúsculas                                                                                                                                                    
+  [:xdigit:]      todos os dígitos hexadecimais                                                                                                                                                 
+  [=CAR=]         todos os caracteres equivalentes a CAR  
+*/
+var $, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
+$ = require("./_init.js");
+flags = {
+  'complement': 'complement',
+  'delete': 'delete',
+  squeeze: "squeeze repeats",
+  truncate: "truncate set1"
+};
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+flagOptions = {
+  'complement': 'c',
+  'delete': 'd',
+  "squeeze repeats": 's',
+  "truncate set1": 't'
+};
+optionsParser = {
+  shortOptions: {
+    c: $.switchOn(flags.complement),
+    C: $.switchOn(flags.complement),
+    d: $.switchOn(flags['delete']),
+    s: $.switchOn(flags.squeeze),
+    t: $.switchOn(flags.truncate)
+  },
+  longOptions: {
+    'complement': $.sameAs('c'),
+    'delete': $.sameAs('d'),
+    'squeeze-repeats': $.sameAs('s'),
+    'truncate-set1': $.sameAs('t')
+  }
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    type: 'command',
+    exec: 'tr',
+    flags: {
+      "complement": false,
+      "delete": false,
+      "squeeze repeats": false,
+      "truncate set1": false
+    },
+    set1: "",
+    set2: ""
+  };
+};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
+  string: function(component, str){
+    var set1, set2;
+    if (set1 === "") {
+      set1 = str;
+    } else {
+      set2 = str;
+    }
+  }
+});
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions, null, function(component, exec, flags, files){
+  var set1, set2;
+  set1 = component.set1, set2 = component.set2;
+  return join$.call(exec.concat(flags, set1, set2), ' ');
+});
+},
+"parser/commands/v/pv.js": function(module, exports, require){
+
 },
 "parser/commands/v/pr.js": function(module, exports, require){
 /*
@@ -304,17 +466,8 @@ Argumentos mandatórios para opções longas são mandatórios para opções cur
       --version  mostrar a informação de versão e sair
 */
 },
-"parser/commands/v/wc.js": function(module, exports, require){
-
-},
-"parser/commands/v/tr.js": function(module, exports, require){
-
-},
-"parser/commands/v/pv.js": function(module, exports, require){
-
-},
 "parser/commands/v/ls.js": function(module, exports, require){
-var $, selectors, sortSelector, formatSelector, indicatorStyleSelector, timeStyleSelector, quotingStyleSelector, showSelector, sortSelectorOption, formatSelectorOption, indicatorStyleSelectorOption, timeStyleSelectorOption, quotingStyleSelectorOption, showSelectorOption, selectorOptions, value, flags, flagOptions, optionsParser, defaultComponentData;
+var $, selectors, parameters, parameterOptions, sortSelector, formatSelector, indicatorStyleSelector, timeStyleSelector, quotingStyleSelector, showSelector, sortSelectorOption, formatSelectorOption, indicatorStyleSelectorOption, timeStyleSelectorOption, quotingStyleSelectorOption, showSelectorOption, selectorOptions, value, flags, flagOptions, optionsParser, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
   'sort': 'sort',
@@ -323,6 +476,12 @@ selectors = {
   indicatorStyle: "indicator style",
   timeStyle: "time style",
   quotingStyle: "quoting style"
+};
+parameters = {
+  'ignore': 'ignore'
+};
+parameterOptions = {
+  'ignore': 'I'
 };
 sortSelector = {
   'name': 'name',
@@ -373,7 +532,7 @@ sortSelectorOption = {
 };
 formatSelectorOption = {
   'default': null,
-  'commas': 'c',
+  'commas': 'm',
   'long': 'l'
 };
 indicatorStyleSelectorOption = {
@@ -462,18 +621,22 @@ exports.VisualSelectorOptions = {
 flags = {
   'reverse': 'reverse',
   'context': 'context',
+  'inode': 'inode',
   humanReadable: "human readable",
   ignoreBackups: "ignore backups",
-  noPrintOwner: "do not print owner",
-  noPrintGroup: "do not print group"
+  noPrintOwner: "do not list owner",
+  noPrintGroup: "do not list group",
+  numericId: "numeric ID"
 };
 flagOptions = {
   'reverse': 'r',
   'context': 'Z',
   "human readable": 'h',
   "ignore backups": 'B',
-  "do not print owner": 'g',
-  "do not print group": 'G'
+  "do not list owner": 'g',
+  "do not list group": 'G',
+  "numeric ID": 'n',
+  'inode': 'i'
 };
 optionsParser = {
   shortOptions: {
@@ -491,13 +654,13 @@ optionsParser = {
     G: $.switchOn(flags.noPrintGroup),
     h: $.switchOn(flags.humanReadable),
     H: $.switchOn(),
-    i: $.switchOn(),
+    i: $.switchOn,
     I: $.setParameter('ignore'),
     k: $.switchOn(),
     l: $.select(selectors.format, formatSelector.verbose),
     L: $.switchOn(),
     m: $.select(selectors.format, formatSelector.commas),
-    n: $.switchOn(),
+    n: $.switchOn(flags.numericId),
     N: $.switchOn(),
     o: $.switchOn(),
     p: $.select(selectors.indicatorStyle, indicatorStyleSelector.slash),
@@ -543,6 +706,7 @@ optionsParser = {
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
+    type: 'command',
     exec: "ls",
     flags: {
       "reverse": false,
@@ -567,7 +731,7 @@ defaultComponentData = function(){
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions, parameterOptions);
 },
 "parser/commands/v/cat.js": function(module, exports, require){
 var $, selectors, lineNumberSelector, lineNumberSelectorOption, selectorsOptions, ref$, value, flags, flagOptions, optionsParser, defaultComponentData;
@@ -632,6 +796,7 @@ $.generate(optionsParser);
 defaultComponentData = function(){
   var ref$;
   return {
+    type: 'command',
     exec: "cat",
     flags: {
       "show non-printing": false,
@@ -646,40 +811,11 @@ defaultComponentData = function(){
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = $.commonParseComponent(flagOptions, selectorsOptions);
 },
-"parser/commands/v/zip.js": function(module, exports, require){
+"parser/commands/v/tar.js": function(module, exports, require){
 
 },
-"parser/commands/v/awk.js": function(module, exports, require){
-/*
--f arqprog              --file=arqprog
--F fs                   --field-separator=fs
--v var=val              --assign=var=val
-*/
-var $, optionsParser, defaultComponentData;
-$ = require("./_init.js");
-optionsParser = {
-  shortOptions: {
-    F: $.setParameter("field separator")
-  },
-  longOptions: {
-    'field-separator': $.sameAs('F')
-  }
-};
-$.generate(optionsParser);
-defaultComponentData = function(){
-  return {
-    exec: "awk",
-    parameters: {
-      "field separator": " "
-    },
-    script: ""
-  };
-};
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
-  string: function(component, str){
-    return component.script = str;
-  }
-});
+"parser/commands/v/ssh.js": function(module, exports, require){
+
 },
 "parser/commands/v/sed.js": function(module, exports, require){
 /*
@@ -710,6 +846,42 @@ argumento não-opção é considerado como o 'script' a interpretar. Todos os
 restantes argumentos só nomes de ficheiros de entrada; se não forem especificados
 ficheiros de entrada, então, a entrada padrão (standard input) é lida.  
 */
+},
+"parser/commands/v/zip.js": function(module, exports, require){
+
+},
+"parser/commands/v/awk.js": function(module, exports, require){
+/*
+-f arqprog              --file=arqprog
+-F fs                   --field-separator=fs
+-v var=val              --assign=var=val
+*/
+var $, optionsParser, defaultComponentData;
+$ = require("./_init.js");
+optionsParser = {
+  shortOptions: {
+    F: $.setParameter("field separator")
+  },
+  longOptions: {
+    'field-separator': $.sameAs('F')
+  }
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    type: 'command',
+    exec: "awk",
+    parameters: {
+      "field separator": " "
+    },
+    script: ""
+  };
+};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
+  string: function(component, str){
+    return component.script = str;
+  }
+});
 },
 "parser/commands/v/tee.js": function(module, exports, require){
 var $;
@@ -796,124 +968,149 @@ exports.parseCommand = function(argsNode, parser, tracker, previousCommand, next
     connectTo(nextcommands);
   }
   arrangeLayout(previousCommand, boundaries);
+  result.counter = tracker.id;
   return result;
 };
 },
-"parser/commands/v/ssh.js": function(module, exports, require){
-
-},
-"parser/commands/v/tar.js": function(module, exports, require){
-
-},
-"parser/commands/v/gzip.js": function(module, exports, require){
+"parser/commands/v/tail.js": function(module, exports, require){
 /*
 
-  -c, --stdout      write on standard output, keep original files unchanged
-  -d, --decompress  decompress
-  -f, --force       force overwrite of output file and compress links
-  -h, --help        give this help
-  -k, --keep        keep (don't delete) input files
-  -l, --list        list compressed file contents
-  -n, --no-name     do not save or restore the original name and time stamp
-  -N, --name        save or restore the original name and time stamp
-  -q, --quiet       suppress all warnings
-  -r, --recursive   operate recursively on directories
-  -S, --suffix=SUF  use suffix SUF on compressed files                                        
-  -t, --test        test compressed file integrity                                            
-  -v, --verbose     verbose mode                                                              
-  -1, --fast        compress faster                                                           
-  -9, --best        compress better                                                           
-  --rsyncable       Make rsync-friendly archive    
-
+  -c, --bytes=[-]K         print the first K bytes of each file;
+                             with the leading '-', print all but the last
+                             K bytes of each file
+  -n, --lines=[-]K         print the first K lines instead of the first 10;
+                             with the leading '-', print all but the last
+                             K lines of each file
+  -q, --quiet, --silent    nuncar mostrar cabeçalhos com nomes de ficheiros
+  -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
 
 */
-var $, flags, selectorOptions, flagOptions, optionsParser, i$, i, defaultComponentData;
+var $, flags, parameters, parameterOptions, selectors, showHeadersSelector, showHeadersSelectorOption, selectorOptions, flagOptions, optionsParser, defaultComponentData;
 $ = require("./_init.js");
-flags = {
-  keepFiles: "keep files",
-  decompress: 'decompress',
-  force: 'force',
-  test: 'test',
-  stdout: 'stdout',
-  quiet: 'quiet',
-  verbose: 'verbose',
-  recursive: 'recursive',
-  small: 'small'
+flags = {};
+parameters = {
+  'lines': 'lines',
+  'bytes': 'bytes'
+};
+parameterOptions = {
+  'lines': 'n',
+  'bytes': 'b'
+};
+selectors = {
+  showHeaders: "show headers"
+};
+showHeadersSelector = {
+  'default': 'default',
+  always: 'always',
+  never: 'never'
+};
+showHeadersSelectorOption = {
+  'default': null,
+  always: 'v',
+  never: 'q'
 };
 selectorOptions = {};
 exports.VisualSelectorOptions = {};
-flagOptions = {
-  "keep files": 'k',
-  'force': 'f',
-  'decompress': 'd',
-  'stdout': 'c',
-  'quiet': 'q',
-  'test': 't',
-  'verbose': 'v',
-  'recursive': 'r',
-  'small': 's'
-};
-$.setblocksize = function(size){
-  return function(Component){
-    return Component.blockSize = size;
-  };
-};
+flagOptions = {};
 optionsParser = {
   shortOptions: {
-    d: $.switchOn(flags.decompress),
-    k: $.switchOn(flags.keepFiles),
-    f: $.switchOn(flags.force),
-    t: $.switchOn(flags.test),
-    c: $.switchOn(flags.stdout),
-    q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    r: $.switchOn(flags.recursive),
-    s: $.switchOn(flags.small)
+    q: $.select(selectors.showHeaders(showHeadersSelector.never)),
+    v: $.select(selectors.showHeaders(showHeadersSelector.always))
   },
-  longOptions: [
-    {
-      'decompress': $.sameAs('d'),
-      'compress': $.sameAs('z'),
-      'keep': $.sameAs('k'),
-      'force': $.sameAs('f'),
-      'test': $.sameAs('t'),
-      'stdout': $.sameAs('c'),
-      'quiet': $.sameAs('q'),
-      'verbose': $.sameAs('v'),
-      'small': $.sameAs('s')
-    }, 'recursive:', $.sameAs('r'), {
-      'fast': $.sameAs('1'),
-      'best': $.sameAs('9')
-    }
-  ]
+  longOptions: {
+    'quiet': $.sameAs('q'),
+    'silent': $.sameAs('q'),
+    'verbose': $.sameAs('v')
+  }
 };
-for (i$ = '1'; i$ <= '9'; ++i$) {
-  i = i$;
-  optionsParser.shortOptions[i] = $.setblocksize(i);
-}
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
-    exec: "gzip",
+    type: 'command',
+    exec: 'tr',
     flags: {
-      "decompress": false,
       "keep files": false,
       "force": false,
       "test": false,
-      "stdout": false,
       "quiet": false,
       "verbose": false,
-      "small": false,
       "recursive": false
     },
     files: []
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions, parameterOptions);
 },
 "parser/commands/v/head.js": function(module, exports, require){
+/*
 
+  -c, --bytes=[-]K         print the first K bytes of each file;
+                             with the leading '-', print all but the last
+                             K bytes of each file
+  -n, --lines=[-]K         print the first K lines instead of the first 10;
+                             with the leading '-', print all but the last
+                             K lines of each file
+  -q, --quiet, --silent    nuncar mostrar cabeçalhos com nomes de ficheiros
+  -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
+
+*/
+var $, flags, parameters, parameterOptions, selectors, showHeadersSelector, showHeadersSelectorOption, selectorOptions, flagOptions, optionsParser, defaultComponentData;
+$ = require("./_init.js");
+flags = {};
+parameters = {
+  'lines': 'lines',
+  'bytes': 'bytes'
+};
+parameterOptions = {
+  'lines': 'n',
+  'bytes': 'b'
+};
+selectors = {
+  showHeaders: "show headers"
+};
+showHeadersSelector = {
+  'default': 'default',
+  always: 'always',
+  never: 'never'
+};
+showHeadersSelectorOption = {
+  'default': null,
+  always: 'v',
+  never: 'q'
+};
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+flagOptions = {};
+optionsParser = {
+  shortOptions: {
+    q: $.select(selectors.showHeaders(showHeadersSelector.never)),
+    v: $.select(selectors.showHeaders(showHeadersSelector.always))
+  },
+  longOptions: {
+    'quiet': $.sameAs('q'),
+    'silent': $.sameAs('q'),
+    'verbose': $.sameAs('v')
+  }
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    type: 'command',
+    exec: 'tr',
+    flags: {
+      "keep files": false,
+      "force": false,
+      "test": false,
+      "quiet": false,
+      "verbose": false,
+      "recursive": false
+    },
+    files: []
+  };
+};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions, parameterOptions);
 },
 "parser/commands/v/zcat.js": function(module, exports, require){
 /*
@@ -971,6 +1168,7 @@ optionsParser = {
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
+    type: 'command',
     exec: "zcat",
     flags: {
       "keep files": false,
@@ -986,239 +1184,132 @@ defaultComponentData = function(){
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
-"parser/commands/v/wget.js": function(module, exports, require){
-
-},
-"parser/commands/v/curl.js": function(module, exports, require){
-/*
-     --anyauth       Pick "any" authentication method (H)
- -a, --append        Append to target file when uploading (F/SFTP)
-     --basic         Use HTTP Basic Authentication (H)
-     --cacert FILE   CA certificate to verify peer against (SSL)
-     --capath DIR    CA directory to verify peer against (SSL)
- -E, --cert CERT[:PASSWD] Client certificate file and password (SSL)                          
-     --cert-type TYPE Certificate file type (DER/PEM/ENG) (SSL)                               
-     --ciphers LIST  SSL ciphers to use (SSL)                                                 
-     --compressed    Request compressed response (using deflate or gzip)                      
- -K, --config FILE   Specify which config file to read                                        
-     --connect-timeout SECONDS  Maximum time allowed for connection                           
- -C, --continue-at OFFSET  Resumed transfer offset                                            
- -b, --cookie STRING/FILE  String or file to read cookies from (H)                            
- -c, --cookie-jar FILE  Write cookies to this file after operation (H)
-     --create-dirs   Create necessary local directory hierarchy
-     --crlf          Convert LF to CRLF in upload
-     --crlfile FILE  Get a CRL list in PEM format from the given file
- -d, --data DATA     HTTP POST data (H)
-     --data-ascii DATA  HTTP POST ASCII data (H)
-     --data-binary DATA  HTTP POST binary data (H)
-     --data-urlencode DATA  HTTP POST data url encoded (H)
-     --delegation STRING GSS-API delegation permission
-     --digest        Use HTTP Digest Authentication (H)
-     --disable-eprt  Inhibit using EPRT or LPRT (F)
-     --disable-epsv  Inhibit using EPSV (F)
- -D, --dump-header FILE  Write the headers to this file
-     --egd-file FILE  EGD socket path for random data (SSL)
-     --engine ENGINE  Crypto engine (SSL). "--engine list" for list
- -f, --fail          Fail silently (no output at all) on HTTP errors (H)
- -F, --form CONTENT  Specify HTTP multipart POST data (H)
-     --form-string STRING  Specify HTTP multipart POST data (H)
-     --ftp-account DATA  Account data string (F)
-     --ftp-alternative-to-user COMMAND  String to replace "USER [name]" (F)
-     --ftp-create-dirs  Create the remote dirs if not present (F)
-     --ftp-method [MULTICWD/NOCWD/SINGLECWD] Control CWD usage (F)
-     --ftp-pasv      Use PASV/EPSV instead of PORT (F)
- -P, --ftp-port ADR  Use PORT with given address instead of PASV (F)
-     --ftp-skip-pasv-ip Skip the IP address for PASV (F)
-     --ftp-pret      Send PRET before PASV (for drftpd) (F)
-     --ftp-ssl-ccc   Send CCC after authenticating (F)
-     --ftp-ssl-ccc-mode ACTIVE/PASSIVE  Set CCC mode (F)
-     --ftp-ssl-control Require SSL/TLS for ftp login, clear for transfer (F)
- -G, --get           Send the -d data with a HTTP GET (H)
- -g, --globoff       Disable URL sequences and ranges using {} and []
- -H, --header LINE   Custom header to pass to server (H)
- -I, --head          Show document info only
- -h, --help          This help text
-     --hostpubmd5 MD5  Hex encoded MD5 string of the host public key. (SSH)
- -0, --http1.0       Use HTTP 1.0 (H)
-     --ignore-content-length  Ignore the HTTP Content-Length header
- -i, --include       Include protocol headers in the output (H/F)
- -k, --insecure      Allow connections to SSL sites without certs (H)
-     --interface INTERFACE  Specify network interface/address to use
- -4, --ipv4          Resolve name to IPv4 address
- -6, --ipv6          Resolve name to IPv6 address
- -j, --junk-session-cookies Ignore session cookies read from file (H)
-     --keepalive-time SECONDS  Interval between keepalive probes
-     --key KEY       Private key file name (SSL/SSH)
-     --key-type TYPE Private key file type (DER/PEM/ENG) (SSL)
-     --krb LEVEL     Enable Kerberos with specified security level (F)
-     --libcurl FILE  Dump libcurl equivalent code of this command line
-     --limit-rate RATE  Limit transfer speed to this rate
- -l, --list-only     List only names of an FTP directory (F)
-     --local-port RANGE  Force use of these local port numbers
- -L, --location      Follow redirects (H)
-     --location-trusted like --location and send auth to other hosts (H)
- -M, --manual        Display the full manual
-     --mail-from FROM  Mail from this address
-     --mail-rcpt TO  Mail to this receiver(s)
-     --mail-auth AUTH  Originator address of the original email
-     --max-filesize BYTES  Maximum file size to download (H/F)
-     --max-redirs NUM  Maximum number of redirects allowed (H)
- -m, --max-time SECONDS  Maximum time allowed for the transfer
-     --metalink      Process given URLs as metalink XML file
-     --negotiate     Use HTTP Negotiate Authentication (H)
- -n, --netrc         Must read .netrc for user name and password
-     --netrc-optional Use either .netrc or URL; overrides -n
-     --netrc-file FILE  Set up the netrc filename to use
- -N, --no-buffer     Disable buffering of the output stream
-     --no-keepalive  Disable keepalive use on the connection
-     --no-sessionid  Disable SSL session-ID reusing (SSL)
-     --noproxy       List of hosts which do not use proxy
-     --ntlm          Use HTTP NTLM authentication (H)
- -o, --output FILE   Write output to <file> instead of stdout
-     --pass PASS     Pass phrase for the private key (SSL/SSH)
-     --post301       Do not switch to GET after following a 301 redirect (H)
-     --post302       Do not switch to GET after following a 302 redirect (H)
-     --post303       Do not switch to GET after following a 303 redirect (H)
- -#, --progress-bar  Display transfer progress as a progress bar
-     --proto PROTOCOLS  Enable/disable specified protocols
-     --proto-redir PROTOCOLS  Enable/disable specified protocols on redirect
- -x, --proxy [PROTOCOL://]HOST[:PORT] Use proxy on given port
-     --proxy-anyauth Pick "any" proxy authentication method (H)
-     --proxy-basic   Use Basic authentication on the proxy (H)
-     --proxy-digest  Use Digest authentication on the proxy (H)
-     --proxy-negotiate Use Negotiate authentication on the proxy (H)
-     --proxy-ntlm    Use NTLM authentication on the proxy (H)
- -U, --proxy-user USER[:PASSWORD]  Proxy user and password
-     --proxy1.0 HOST[:PORT]  Use HTTP/1.0 proxy on given port
- -p, --proxytunnel   Operate through a HTTP proxy tunnel (using CONNECT)
-     --pubkey KEY    Public key file name (SSH)
- -Q, --quote CMD     Send command(s) to server before transfer (F/SFTP)
-     --random-file FILE  File for reading random data from (SSL)
- -r, --range RANGE   Retrieve only the bytes within a range
-     --raw           Do HTTP "raw", without any transfer decoding (H)
- -e, --referer       Referer URL (H)
- -J, --remote-header-name Use the header-provided filename (H)
- -O, --remote-name   Write output to a file named as the remote file
-     --remote-name-all Use the remote file name for all URLs
- -R, --remote-time   Set the remote file's time on the local output
- -X, --request COMMAND  Specify request command to use
-     --resolve HOST:PORT:ADDRESS  Force resolve of HOST:PORT to ADDRESS
-     --retry NUM   Retry request NUM times if transient problems occur
-     --retry-delay SECONDS When retrying, wait this many seconds between each
-     --retry-max-time SECONDS  Retry only within this period
-     --sasl-ir       Enable initial response in SASL authentication -S, --show-error    Show error. With -s, make curl show errors when they occur
- -s, --silent        Silent mode. Don't output anything
-     --socks4 HOST[:PORT]  SOCKS4 proxy on given host + port
-     --socks4a HOST[:PORT]  SOCKS4a proxy on given host + port
-     --socks5 HOST[:PORT]  SOCKS5 proxy on given host + port
-     --socks5-hostname HOST[:PORT] SOCKS5 proxy, pass host name to proxy
-     --socks5-gssapi-service NAME  SOCKS5 proxy service name for gssapi
-     --socks5-gssapi-nec  Compatibility with NEC SOCKS5 server
- -Y, --speed-limit RATE  Stop transfers below speed-limit for 'speed-time' secs
- -y, --speed-time SECONDS  Time for trig speed-limit abort. Defaults to 30
-     --ssl           Try SSL/TLS (FTP, IMAP, POP3, SMTP)
-     --ssl-reqd      Require SSL/TLS (FTP, IMAP, POP3, SMTP)
- -2, --sslv2         Use SSLv2 (SSL)
- -3, --sslv3         Use SSLv3 (SSL)
-     --ssl-allow-beast Allow security flaw to improve interop (SSL)
-     --stderr FILE   Where to redirect stderr. - means stdout
-     --tcp-nodelay   Use the TCP_NODELAY option
- -t, --telnet-option OPT=VAL  Set telnet option
-     --tftp-blksize VALUE  Set TFTP BLKSIZE option (must be >512)
- -z, --time-cond TIME  Transfer based on a time condition
- -1, --tlsv1         Use TLSv1 (SSL)
-     --trace FILE    Write a debug trace to the given file
-     --trace-ascii FILE  Like --trace but without the hex output
-     --trace-time    Add time stamps to trace/verbose output
-     --tr-encoding   Request compressed transfer encoding (H)
- -T, --upload-file FILE  Transfer FILE to destination
-     --url URL       URL to work with
- -B, --use-ascii     Use ASCII/text transfer
- -u, --user USER[:PASSWORD]  Server user and password
-     --tlsuser USER  TLS username
-     --tlspassword STRING TLS password
-     --tlsauthtype STRING  TLS authentication type (default SRP)
- -A, --user-agent STRING  User-Agent to send to server (H)
- -v, --verbose       Make the operation more talkative
- -V, --version       Show version number and quit
- -w, --write-out FORMAT  What to output after completion
-     --xattr        Store metadata in extended file attributes
- -q                 If used as the first parameter disables .curlrc
-
-*/
-},
 "parser/commands/v/time.js": function(module, exports, require){
 
 },
-"parser/commands/v/date.js": function(module, exports, require){
-var $, selectors, optionsParser, defaultComponentData;
+"parser/commands/v/grep.js": function(module, exports, require){
+/*
+grep:
+  Matcher Selection:
+    arguments:
+      - ["E","--extended-regexp","Interpret PATTERN as an extended regular expression"]
+      - ["F","--fixed-strings","Interpret PATTERN as a list of fixed strings, separated by newlines, any of which is to be matched."]
+      - ["G","--basic-regexp","Interpret PATTERN as a basic regular expression (BRE, see below).  This is the default."]
+      - ["P","--perl-regexp","display $ at end of each line"]
+  Matching Control:
+    arguments:
+        - ["e PATTERN","--regexp=PATTERN","Use PATTERN as the pattern.  This can be used to specify multiple search patterns, or to protect a pattern beginning with a hyphen (-)."]
+        - ["f FILE","--file=FILE","Obtain patterns from FILE, one per line.  The empty file contains zero patterns, and therefore matches nothing."]
+        - ["i","--ignore-case","Ignore case distinctions in both the PATTERN and the input files."]
+        - ["v","--invert-match","Invert the sense of matching, to select non-matching lines."]
+        - ["w","--word-regexp"," Select only those lines containing matches that form whole words.  The test is that the matching substring must either be at the beginning of the line, or preceded by a non-
+              word constituent character.  Similarly, it must be either at the end of the line or followed by a non-word constituent character.  Word-constituent characters  are  letters,
+              digits, and the underscore."]
+        - ["x","--line-regexp","Select only those matches that exactly match the whole line."]
+
+*/
+var $, selectors, patternTypeSelector, patternTypeSelectorOption, ref$, matchSelector, matchSelectorOption, selectorOptions, value, flags, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
 $ = require("./_init.js");
 selectors = {
-  'format': 'format',
+  'patternType': 'patternType',
   'match': 'match'
+};
+patternTypeSelector = {
+  extendedRegex: "extended regexp",
+  fixedStrings: "fixed strings",
+  basicRegex: "basic regexp",
+  perlRegex: "perl regexp"
+};
+patternTypeSelectorOption = (ref$ = {}, ref$[patternTypeSelector.extendedRegex] = 'E', ref$[patternTypeSelector.fixedStrings] = 'F', ref$[patternTypeSelector.basicRegex] = null, ref$[patternTypeSelector.perlRegex] = 'P', ref$);
+matchSelector = {
+  'default': "default",
+  wholeLine: "whole line",
+  wholeWord: "whole word"
+};
+matchSelectorOption = (ref$ = {}, ref$[matchSelector['default']] = null, ref$[matchSelector.wholeLine] = 'x', ref$[matchSelector.wholeWord] = 'w', ref$);
+selectorOptions = (ref$ = {}, ref$[selectors.patternType] = patternTypeSelectorOption, ref$[selectors.match] = matchSelectorOption, ref$);
+exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.patternType] = (function(){
+  var i$, ref$, results$ = [];
+  for (i$ in ref$ = patternTypeSelector) {
+    value = ref$[i$];
+    results$.push(value);
+  }
+  return results$;
+}()), ref$[selectors.match] = (function(){
+  var i$, ref$, results$ = [];
+  for (i$ in ref$ = matchSelector) {
+    value = ref$[i$];
+    results$.push(value);
+  }
+  return results$;
+}()), ref$);
+flags = {
+  ignoreCase: "ignore case",
+  invertMatch: "invert match"
+};
+flagOptions = {
+  "ignore case": 'i',
+  "invert match": 'v'
 };
 optionsParser = {
   shortOptions: {
-    d: $.setParameter("date"),
-    f: $.setParameter("file"),
-    I: $.selectParameter('format', "ISO-8601")
+    E: $.select(selectors.patternType, patternTypeSelector.extendedRegex),
+    F: $.select(selectors.patternType, patternTypeSelector.fixedStrings),
+    G: $.select(selectors.patternType, patternTypeSelector.basicRegex),
+    i: $.switchOn(flags.ignoreCase),
+    P: $.select(selectors.patternType, patternTypeSelector.perlRegex),
+    v: $.switchOn(flags.invertMatch),
+    x: $.select(selectors.match, matchSelector.wholeLine),
+    w: $.selectIfUnselected(selectors.match, matchSelector.wholeWord, matchSelector.wholeLine),
+    y: $.switchOn(flags.ignoreCase)
   },
   longOptions: {
-    'field-separator': $.sameAs('d')
+    'extended-regexp': $.sameAs('E'),
+    'fixed-strings': $.sameAs('F'),
+    'basic-regexp': $.sameAs('G'),
+    'perl-regexp': $.sameAs('P'),
+    'ignore-case': $.sameAs('i'),
+    'invert-match': $.sameAs('v'),
+    'word-regexp': $.sameAs('w'),
+    'line-regexp': $.sameAs('x')
   }
 };
 $.generate(optionsParser);
 defaultComponentData = function(){
+  var ref$;
   return {
-    exec: "date",
-    parameters: {
-      "date": "now",
-      "file": ""
+    type: 'command',
+    exec: "grep",
+    flags: {
+      "ignore case": false,
+      "invert match": false
     },
-    parameterSelectors: {
-      format: null
-    },
-    script: ""
+    selectors: (ref$ = {}, ref$[selectors.patternType] = patternTypeSelector.basicRegex, ref$[selectors.match] = matchSelector['default'], ref$),
+    pattern: null,
+    files: []
   };
 };
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
   string: function(component, str){
-    return component.script = str;
+    if (component.pattern === null) {
+      return component.pattern = str;
+    } else {
+      return component.files.push(str);
+    }
   }
 });
-/*DESCRIPTION
-       Display the current time in the given FORMAT, or set the system date.
-
-       -d, --date=STRING
-              display time described by STRING, not 'now'
-
-       -f, --file=DATEFILE
-              like --date once for each line of DATEFILE
-
-       -I[TIMESPEC], --iso-8601[=TIMESPEC]
-              output date/time in ISO 8601 format.  TIMESPEC='date' for date only (the default), 'hours', 'minutes', 'seconds', or 'ns' for date and time to the indicated precision.
-
-       -r, --reference=FILE
-              display the last modification time of FILE
-
-       -R, --rfc-2822
-              output date and time in RFC 2822 format.  Example: Mon, 07 Aug 2006 12:34:56 -0600
-
-       --rfc-3339=TIMESPEC
-              output date and time in RFC 3339 format.  TIMESPEC='date', 'seconds', or 'ns' for date and time to the indicated precision.  Date and time components are separated by a sin‐
-              gle space: 2006-08-07 12:34:56-06:00
-
-       -s, --set=STRING
-              set time described by STRING
-
-       -u, --utc, --universal
-              print or set Coordinated Universal Time
-
-       --help display this help and exit
-
-       --version
-              output version information and exit
-*/
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions, null, function(component, exec, flags, files){
+  var pattern;
+  pattern = component.pattern;
+  if (pattern) {
+    if (pattern.indexOf(" ") >= 0) {
+      pattern = "\"" + pattern + "\"";
+    }
+  } else {
+    pattern = "\"\"";
+  }
+  return join$.call(exec.concat(flags, pattern, files), ' ');
+});
 },
 "parser/commands/v/diff.js": function(module, exports, require){
 /*
@@ -1432,166 +1523,502 @@ DESCRIPTION
 
 */
 },
-"parser/commands/v/grep.js": function(module, exports, require){
+"parser/commands/v/sort.js": function(module, exports, require){
 /*
-grep:
-  Matcher Selection:
-    arguments:
-      - ["E","--extended-regexp","Interpret PATTERN as an extended regular expression"]
-      - ["F","--fixed-strings","Interpret PATTERN as a list of fixed strings, separated by newlines, any of which is to be matched."]
-      - ["G","--basic-regexp","Interpret PATTERN as a basic regular expression (BRE, see below).  This is the default."]
-      - ["P","--perl-regexp","display $ at end of each line"]
-  Matching Control:
-    arguments:
-        - ["e PATTERN","--regexp=PATTERN","Use PATTERN as the pattern.  This can be used to specify multiple search patterns, or to protect a pattern beginning with a hyphen (-)."]
-        - ["f FILE","--file=FILE","Obtain patterns from FILE, one per line.  The empty file contains zero patterns, and therefore matches nothing."]
-        - ["i","--ignore-case","Ignore case distinctions in both the PATTERN and the input files."]
-        - ["v","--invert-match","Invert the sense of matching, to select non-matching lines."]
-        - ["w","--word-regexp"," Select only those lines containing matches that form whole words.  The test is that the matching substring must either be at the beginning of the line, or preceded by a non-
-              word constituent character.  Similarly, it must be either at the end of the line or followed by a non-word constituent character.  Word-constituent characters  are  letters,
-              digits, and the underscore."]
-        - ["x","--line-regexp","Select only those matches that exactly match the whole line."]
+  -b, --ignore-leading-blanks  ignorar espaços iniciais
+  -d, --dictionary-order      considerar apenas espaços e car. alfanuméricos
+  -f, --ignore-case           ignorar capitalização de letras
+  -g, --general-numeric-sort  compare according to general numerical value
+  -i, --ignore-nonprinting    consider only printable characters
+  -M, --month-sort            compare (unknown) < 'JAN' < ... < 'DEC'
+  -h, --human-numeric-sort compara números humanamente legíveis (ex: 2K 1G)
+  -n, --numeric-sort          comparar de acordo com o valor numérico da expressão
+  -R, --random-sort           ordenar por "hash" aleatório de chaves
+      --random-source=FICHEIRO    obter bytes aleatórios de um FICHEIRO
+  -r, --reverse               inverter o resultado das comparações
+      --sort=PALAVRA ordenar de acordo com PALAVRA:
+                                general-numeric -g, human-numeric -h, mês -M,
+                                numérico -n, aleatório -R, versão -V
+  -V, --version-sort ordenação natural dos números (de versão) dentro do texto
+
+
+      --batch-size=NMERGE   fundir pelo menos NMERGE entradas de uma só vez;
+                            para mais, usar ficheiros temporários
+  -c, --check, --check=diagnose-first  verifica por entrada ordenada; não ordena
+  -C, --check=quiet, --check=silent  semelhante a -c, mas não relata a primeira linha inválida
+      --compress-program=PROG  comprime temporários com PROG;
+                              descomprime-os com PROG -d
+      --debug               anota a parte da linha usada para ordenação,
+                              e avisa sobre uso questionável de stderr
+      --files0-from=F       lê entrada a partir dos arquivos especificados por
+                            nomes no arquivo F terminados com NUL;
+                            Se F for - então lê nomes a partir da entrada padrão
+  -k, --key=KEYDEF          sort via a key; KEYDEF gives location and type
+  -m, --merge               merge already sorted files; do not sort
+  -o, --output=FICHEIRO     resultado no FICHEIRO em vez da saída padrão
+  -s, --stable              estabilizar desactivando comparações de recurso
+  -S, --buffer-size=TAMANHO usar TAMANHO para memória principal temporária
+  -t, --field-separator=SEP  usar SEP ao invés da transição de não-vazios para vazios
+  -T, --temporary-directory=DIR  usar DIR para arquivos temporários, não $TMPDIR ou /tmp;
+                              múltiplas opções especificam múltiplos diretórios
+      --parallel=N          altera o número de tipos executados simultaneamente a N
+  -u, --unique              com -c, verifica por ordenação estrita;
+                              sem -c, exibe apenas a primeira de uma execução igual
+  -z, --zero-terminated     terminar linhas com byte 0, não nova linha
 
 */
-var $, selectors, patternTypeSelector, patternTypeSelectorOption, ref$, matchSelector, matchSelectorOption, SelectorOptions, value, flags, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
+},
+"parser/commands/v/date.js": function(module, exports, require){
+var $, selectors, optionsParser, defaultComponentData;
 $ = require("./_init.js");
 selectors = {
-  'patternType': 'patternType',
+  'format': 'format',
   'match': 'match'
 };
-patternTypeSelector = {
-  extendedRegex: "extended regexp",
-  fixedStrings: "fixed strings",
-  basicRegex: "basic regexp",
-  perlRegex: "perl regexp"
-};
-patternTypeSelectorOption = (ref$ = {}, ref$[patternTypeSelector.extendedRegex] = 'E', ref$[patternTypeSelector.fixedStrings] = 'F', ref$[patternTypeSelector.basicRegex] = null, ref$[patternTypeSelector.perlRegex] = 'P', ref$);
-matchSelector = {
-  'default': "default",
-  wholeLine: "whole line",
-  wholeWord: "whole word"
-};
-matchSelectorOption = (ref$ = {}, ref$[matchSelector['default']] = null, ref$[matchSelector.wholeLine] = 'x', ref$[matchSelector.wholeWord] = 'w', ref$);
-SelectorOptions = (ref$ = {}, ref$[selectors.patternType] = patternTypeSelectorOption, ref$[selectors.match] = matchSelectorOption, ref$);
-exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.patternType] = (function(){
-  var i$, ref$, results$ = [];
-  for (i$ in ref$ = patternTypeSelector) {
-    value = ref$[i$];
-    results$.push(value);
+optionsParser = {
+  shortOptions: {
+    d: $.setParameter("date"),
+    f: $.setParameter("file"),
+    I: $.selectParameter('format', "ISO-8601")
+  },
+  longOptions: {
+    'field-separator': $.sameAs('d')
   }
-  return results$;
-}()), ref$[selectors.match] = (function(){
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    exec: "date",
+    parameters: {
+      "date": "now",
+      "file": ""
+    },
+    parameterSelectors: {
+      format: null
+    },
+    script: ""
+  };
+};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
+  string: function(component, str){
+    return component.script = str;
+  }
+});
+/*DESCRIPTION
+       Display the current time in the given FORMAT, or set the system date.
+
+       -d, --date=STRING
+              display time described by STRING, not 'now'
+
+       -f, --file=DATEFILE
+              like --date once for each line of DATEFILE
+
+       -I[TIMESPEC], --iso-8601[=TIMESPEC]
+              output date/time in ISO 8601 format.  TIMESPEC='date' for date only (the default), 'hours', 'minutes', 'seconds', or 'ns' for date and time to the indicated precision.
+
+       -r, --reference=FILE
+              display the last modification time of FILE
+
+       -R, --rfc-2822
+              output date and time in RFC 2822 format.  Example: Mon, 07 Aug 2006 12:34:56 -0600
+
+       --rfc-3339=TIMESPEC
+              output date and time in RFC 3339 format.  TIMESPEC='date', 'seconds', or 'ns' for date and time to the indicated precision.  Date and time components are separated by a sin‐
+              gle space: 2006-08-07 12:34:56-06:00
+
+       -s, --set=STRING
+              set time described by STRING
+
+       -u, --utc, --universal
+              print or set Coordinated Universal Time
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+*/
+},
+"parser/commands/v/gzip.js": function(module, exports, require){
+/*
+
+  -c, --stdout      write on standard output, keep original files unchanged
+  -d, --decompress  decompress
+  -f, --force       force overwrite of output file and compress links
+  -h, --help        give this help
+  -k, --keep        keep (don't delete) input files
+  -l, --list        list compressed file contents
+  -n, --no-name     do not save or restore the original name and time stamp
+  -N, --name        save or restore the original name and time stamp
+  -q, --quiet       suppress all warnings
+  -r, --recursive   operate recursively on directories
+  -S, --suffix=SUF  use suffix SUF on compressed files                                        
+  -t, --test        test compressed file integrity                                            
+  -v, --verbose     verbose mode                                                              
+  -1, --fast        compress faster                                                           
+  -9, --best        compress better                                                           
+  --rsyncable       Make rsync-friendly archive    
+
+
+*/
+var $, flags, selectorOptions, flagOptions, optionsParser, i$, i, defaultComponentData;
+$ = require("./_init.js");
+flags = {
+  keepFiles: "keep files",
+  decompress: 'decompress',
+  force: 'force',
+  test: 'test',
+  stdout: 'stdout',
+  quiet: 'quiet',
+  verbose: 'verbose',
+  recursive: 'recursive',
+  small: 'small'
+};
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+flagOptions = {
+  "keep files": 'k',
+  'force': 'f',
+  'decompress': 'd',
+  'stdout': 'c',
+  'quiet': 'q',
+  'test': 't',
+  'verbose': 'v',
+  'recursive': 'r',
+  'small': 's'
+};
+$.setblocksize = function(size){
+  return function(Component){
+    return Component.blockSize = size;
+  };
+};
+optionsParser = {
+  shortOptions: {
+    d: $.switchOn(flags.decompress),
+    k: $.switchOn(flags.keepFiles),
+    f: $.switchOn(flags.force),
+    t: $.switchOn(flags.test),
+    c: $.switchOn(flags.stdout),
+    q: $.switchOn(flags.quiet),
+    v: $.switchOn(flags.verbose),
+    r: $.switchOn(flags.recursive),
+    s: $.switchOn(flags.small)
+  },
+  longOptions: [
+    {
+      'decompress': $.sameAs('d'),
+      'compress': $.sameAs('z'),
+      'keep': $.sameAs('k'),
+      'force': $.sameAs('f'),
+      'test': $.sameAs('t'),
+      'stdout': $.sameAs('c'),
+      'quiet': $.sameAs('q'),
+      'verbose': $.sameAs('v'),
+      'small': $.sameAs('s')
+    }, 'recursive:', $.sameAs('r'), {
+      'fast': $.sameAs('1'),
+      'best': $.sameAs('9')
+    }
+  ]
+};
+for (i$ = '1'; i$ <= '9'; ++i$) {
+  i = i$;
+  optionsParser.shortOptions[i] = $.setblocksize(i);
+}
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    type: 'command',
+    exec: "gzip",
+    flags: {
+      "decompress": false,
+      "keep files": false,
+      "force": false,
+      "test": false,
+      "stdout": false,
+      "quiet": false,
+      "verbose": false,
+      "small": false,
+      "recursive": false
+    },
+    files: []
+  };
+};
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
+},
+"parser/commands/v/curl.js": function(module, exports, require){
+/*
+     --anyauth       Pick "any" authentication method (H)
+ -a, --append        Append to target file when uploading (F/SFTP)
+     --basic         Use HTTP Basic Authentication (H)
+     --cacert FILE   CA certificate to verify peer against (SSL)
+     --capath DIR    CA directory to verify peer against (SSL)
+ -E, --cert CERT[:PASSWD] Client certificate file and password (SSL)                          
+     --cert-type TYPE Certificate file type (DER/PEM/ENG) (SSL)                               
+     --ciphers LIST  SSL ciphers to use (SSL)                                                 
+     --compressed    Request compressed response (using deflate or gzip)                      
+ -K, --config FILE   Specify which config file to read                                        
+     --connect-timeout SECONDS  Maximum time allowed for connection                           
+ -C, --continue-at OFFSET  Resumed transfer offset                                            
+ -b, --cookie STRING/FILE  String or file to read cookies from (H)                            
+ -c, --cookie-jar FILE  Write cookies to this file after operation (H)
+     --create-dirs   Create necessary local directory hierarchy
+     --crlf          Convert LF to CRLF in upload
+     --crlfile FILE  Get a CRL list in PEM format from the given file
+ -d, --data DATA     HTTP POST data (H)
+     --data-ascii DATA  HTTP POST ASCII data (H)
+     --data-binary DATA  HTTP POST binary data (H)
+     --data-urlencode DATA  HTTP POST data url encoded (H)
+     --delegation STRING GSS-API delegation permission
+     --digest        Use HTTP Digest Authentication (H)
+     --disable-eprt  Inhibit using EPRT or LPRT (F)
+     --disable-epsv  Inhibit using EPSV (F)
+ -D, --dump-header FILE  Write the headers to this file
+     --egd-file FILE  EGD socket path for random data (SSL)
+     --engine ENGINE  Crypto engine (SSL). "--engine list" for list
+ -f, --fail          Fail silently (no output at all) on HTTP errors (H)
+ -F, --form CONTENT  Specify HTTP multipart POST data (H)
+     --form-string STRING  Specify HTTP multipart POST data (H)
+     --ftp-account DATA  Account data string (F)
+     --ftp-alternative-to-user COMMAND  String to replace "USER [name]" (F)
+     --ftp-create-dirs  Create the remote dirs if not present (F)
+     --ftp-method [MULTICWD/NOCWD/SINGLECWD] Control CWD usage (F)
+     --ftp-pasv      Use PASV/EPSV instead of PORT (F)
+ -P, --ftp-port ADR  Use PORT with given address instead of PASV (F)
+     --ftp-skip-pasv-ip Skip the IP address for PASV (F)
+     --ftp-pret      Send PRET before PASV (for drftpd) (F)
+     --ftp-ssl-ccc   Send CCC after authenticating (F)
+     --ftp-ssl-ccc-mode ACTIVE/PASSIVE  Set CCC mode (F)
+     --ftp-ssl-control Require SSL/TLS for ftp login, clear for transfer (F)
+ -G, --get           Send the -d data with a HTTP GET (H)
+ -g, --globoff       Disable URL sequences and ranges using {} and []
+ -H, --header LINE   Custom header to pass to server (H)
+ -I, --head          Show document info only
+ -h, --help          This help text
+     --hostpubmd5 MD5  Hex encoded MD5 string of the host public key. (SSH)
+ -0, --http1.0       Use HTTP 1.0 (H)
+     --ignore-content-length  Ignore the HTTP Content-Length header
+ -i, --include       Include protocol headers in the output (H/F)
+ -k, --insecure      Allow connections to SSL sites without certs (H)
+     --interface INTERFACE  Specify network interface/address to use
+ -4, --ipv4          Resolve name to IPv4 address
+ -6, --ipv6          Resolve name to IPv6 address
+ -j, --junk-session-cookies Ignore session cookies read from file (H)
+     --keepalive-time SECONDS  Interval between keepalive probes
+     --key KEY       Private key file name (SSL/SSH)
+     --key-type TYPE Private key file type (DER/PEM/ENG) (SSL)
+     --krb LEVEL     Enable Kerberos with specified security level (F)
+     --libcurl FILE  Dump libcurl equivalent code of this command line
+     --limit-rate RATE  Limit transfer speed to this rate
+ -l, --list-only     List only names of an FTP directory (F)
+     --local-port RANGE  Force use of these local port numbers
+ -L, --location      Follow redirects (H)
+     --location-trusted like --location and send auth to other hosts (H)
+ -M, --manual        Display the full manual
+     --mail-from FROM  Mail from this address
+     --mail-rcpt TO  Mail to this receiver(s)
+     --mail-auth AUTH  Originator address of the original email
+     --max-filesize BYTES  Maximum file size to download (H/F)
+     --max-redirs NUM  Maximum number of redirects allowed (H)
+ -m, --max-time SECONDS  Maximum time allowed for the transfer
+     --metalink      Process given URLs as metalink XML file
+     --negotiate     Use HTTP Negotiate Authentication (H)
+ -n, --netrc         Must read .netrc for user name and password
+     --netrc-optional Use either .netrc or URL; overrides -n
+     --netrc-file FILE  Set up the netrc filename to use
+ -N, --no-buffer     Disable buffering of the output stream
+     --no-keepalive  Disable keepalive use on the connection
+     --no-sessionid  Disable SSL session-ID reusing (SSL)
+     --noproxy       List of hosts which do not use proxy
+     --ntlm          Use HTTP NTLM authentication (H)
+ -o, --output FILE   Write output to <file> instead of stdout
+     --pass PASS     Pass phrase for the private key (SSL/SSH)
+     --post301       Do not switch to GET after following a 301 redirect (H)
+     --post302       Do not switch to GET after following a 302 redirect (H)
+     --post303       Do not switch to GET after following a 303 redirect (H)
+ -#, --progress-bar  Display transfer progress as a progress bar
+     --proto PROTOCOLS  Enable/disable specified protocols
+     --proto-redir PROTOCOLS  Enable/disable specified protocols on redirect
+ -x, --proxy [PROTOCOL://]HOST[:PORT] Use proxy on given port
+     --proxy-anyauth Pick "any" proxy authentication method (H)
+     --proxy-basic   Use Basic authentication on the proxy (H)
+     --proxy-digest  Use Digest authentication on the proxy (H)
+     --proxy-negotiate Use Negotiate authentication on the proxy (H)
+     --proxy-ntlm    Use NTLM authentication on the proxy (H)
+ -U, --proxy-user USER[:PASSWORD]  Proxy user and password
+     --proxy1.0 HOST[:PORT]  Use HTTP/1.0 proxy on given port
+ -p, --proxytunnel   Operate through a HTTP proxy tunnel (using CONNECT)
+     --pubkey KEY    Public key file name (SSH)
+ -Q, --quote CMD     Send command(s) to server before transfer (F/SFTP)
+     --random-file FILE  File for reading random data from (SSL)
+ -r, --range RANGE   Retrieve only the bytes within a range
+     --raw           Do HTTP "raw", without any transfer decoding (H)
+ -e, --referer       Referer URL (H)
+ -J, --remote-header-name Use the header-provided filename (H)
+ -O, --remote-name   Write output to a file named as the remote file
+     --remote-name-all Use the remote file name for all URLs
+ -R, --remote-time   Set the remote file's time on the local output
+ -X, --request COMMAND  Specify request command to use
+     --resolve HOST:PORT:ADDRESS  Force resolve of HOST:PORT to ADDRESS
+     --retry NUM   Retry request NUM times if transient problems occur
+     --retry-delay SECONDS When retrying, wait this many seconds between each
+     --retry-max-time SECONDS  Retry only within this period
+     --sasl-ir       Enable initial response in SASL authentication -S, --show-error    Show error. With -s, make curl show errors when they occur
+ -s, --silent        Silent mode. Don't output anything
+     --socks4 HOST[:PORT]  SOCKS4 proxy on given host + port
+     --socks4a HOST[:PORT]  SOCKS4a proxy on given host + port
+     --socks5 HOST[:PORT]  SOCKS5 proxy on given host + port
+     --socks5-hostname HOST[:PORT] SOCKS5 proxy, pass host name to proxy
+     --socks5-gssapi-service NAME  SOCKS5 proxy service name for gssapi
+     --socks5-gssapi-nec  Compatibility with NEC SOCKS5 server
+ -Y, --speed-limit RATE  Stop transfers below speed-limit for 'speed-time' secs
+ -y, --speed-time SECONDS  Time for trig speed-limit abort. Defaults to 30
+     --ssl           Try SSL/TLS (FTP, IMAP, POP3, SMTP)
+     --ssl-reqd      Require SSL/TLS (FTP, IMAP, POP3, SMTP)
+ -2, --sslv2         Use SSLv2 (SSL)
+ -3, --sslv3         Use SSLv3 (SSL)
+     --ssl-allow-beast Allow security flaw to improve interop (SSL)
+     --stderr FILE   Where to redirect stderr. - means stdout
+     --tcp-nodelay   Use the TCP_NODELAY option
+ -t, --telnet-option OPT=VAL  Set telnet option
+     --tftp-blksize VALUE  Set TFTP BLKSIZE option (must be >512)
+ -z, --time-cond TIME  Transfer based on a time condition
+ -1, --tlsv1         Use TLSv1 (SSL)
+     --trace FILE    Write a debug trace to the given file
+     --trace-ascii FILE  Like --trace but without the hex output
+     --trace-time    Add time stamps to trace/verbose output
+     --tr-encoding   Request compressed transfer encoding (H)
+ -T, --upload-file FILE  Transfer FILE to destination
+     --url URL       URL to work with
+ -B, --use-ascii     Use ASCII/text transfer
+ -u, --user USER[:PASSWORD]  Server user and password
+     --tlsuser USER  TLS username
+     --tlspassword STRING TLS password
+     --tlsauthtype STRING  TLS authentication type (default SRP)
+ -A, --user-agent STRING  User-Agent to send to server (H)
+ -v, --verbose       Make the operation more talkative
+ -V, --version       Show version number and quit
+ -w, --write-out FORMAT  What to output after completion
+     --xattr        Store metadata in extended file attributes
+ -q                 If used as the first parameter disables .curlrc
+
+*/
+},
+"parser/commands/v/wget.js": function(module, exports, require){
+
+},
+"parser/commands/v/bzip2.js": function(module, exports, require){
+/*
+-d --decompress     force decompression
+-z --compress       force compression
+-k --keep           keep (don't delete) input files
+-f --force          overwrite existing output files
+-t --test           test compressed file integrity
+-c --stdout         output to standard out
+-q --quiet          suppress noncritical error messages
+-v --verbose        be verbose (a 2nd -v gives more)
+-s --small          use less memory (at most 2500k)
+-1 .. -9            set block size to 100k .. 900k
+--fast              alias for -1
+--best              alias for -9
+*/
+var $, selectors, actionSelector, actionSelectorOption, flags, selectorOptions, ref$, value, flagOptions, optionsParser, i$, i, defaultComponentData;
+$ = require("./_init.js");
+selectors = {
+  'action': 'action'
+};
+actionSelector = {
+  'compress': 'compress',
+  'decompress': 'decompress'
+};
+actionSelectorOption = {
+  'compress': null,
+  'decompress': 'd'
+};
+flags = {
+  keepFiles: "keep files",
+  force: 'force',
+  test: 'test',
+  stdout: 'stdout',
+  quiet: 'quiet',
+  verbose: 'verbose',
+  small: 'small'
+};
+selectorOptions = (ref$ = {}, ref$[selectors.action] = actionSelectorOption, ref$);
+exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.action] = (function(){
   var i$, ref$, results$ = [];
-  for (i$ in ref$ = matchSelector) {
+  for (i$ in ref$ = actionSelector) {
     value = ref$[i$];
     results$.push(value);
   }
   return results$;
 }()), ref$);
-flags = {
-  ignoreCase: "ignore case",
-  invertMatch: "invert match"
-};
 flagOptions = {
-  "ignore case": 'i',
-  "invert match": 'v'
+  "keep files": 'k',
+  'force': 'f',
+  'test': 'test',
+  'stdout': 'c',
+  'quiet': 'q',
+  'verbose': 'v',
+  'small': 's'
+};
+$.setblocksize = function(size){
+  return function(Component){
+    return Component.blockSize = size;
+  };
 };
 optionsParser = {
   shortOptions: {
-    E: $.select(selectors.patternType, patternTypeSelector.extendedRegex),
-    F: $.select(selectors.patternType, patternTypeSelector.fixedStrings),
-    G: $.select(selectors.patternType, patternTypeSelector.basicRegex),
-    i: $.switchOn(flags.ignoreCase),
-    P: $.select(selectors.patternType, patternTypeSelector.perlRegex),
-    v: $.switchOn(flags.invertMatch),
-    x: $.select(selectors.match, matchSelector.wholeLine),
-    w: $.selectIfUnselected(selectors.match, matchSelector.wholeWord, matchSelector.wholeLine),
-    y: $.switchOn(flags.ignoreCase)
+    d: $.select(selectors.action, actionSelector.decompress),
+    z: $.select(selectors.action, actionSelector.compress),
+    k: $.switchOn(flags.keepFiles),
+    f: $.switchOn(flags.force),
+    t: $.switchOn(flags.test),
+    c: $.switchOn(flags.stdout),
+    q: $.switchOn(flags.quiet),
+    v: $.switchOn(flags.verbose),
+    s: $.switchOn(flags.small)
   },
   longOptions: {
-    'extended-regexp': $.sameAs('E'),
-    'fixed-strings': $.sameAs('F'),
-    'basic-regexp': $.sameAs('G'),
-    'perl-regexp': $.sameAs('P'),
-    'ignore-case': $.sameAs('i'),
-    'invert-match': $.sameAs('v'),
-    'word-regexp': $.sameAs('w'),
-    'line-regexp': $.sameAs('x')
+    'decompress': $.sameAs('d'),
+    'compress': $.sameAs('z'),
+    'keep': $.sameAs('k'),
+    'force': $.sameAs('f'),
+    'test': $.sameAs('t'),
+    'stdout': $.sameAs('c'),
+    'quiet': $.sameAs('q'),
+    'verbose': $.sameAs('v'),
+    'small': $.sameAs('s'),
+    'fast': $.sameAs('1'),
+    'best': $.sameAs('9')
   }
 };
+for (i$ = '1'; i$ <= '9'; ++i$) {
+  i = i$;
+  optionsParser.shortOptions[i] = $.setblocksize(i);
+}
 $.generate(optionsParser);
 defaultComponentData = function(){
-  var ref$;
   return {
-    exec: "grep",
+    type: 'command',
+    exec: "bzip2",
     flags: {
-      "ignore case": false,
-      "invert match": false
+      "keep files": false,
+      "force": false,
+      "test": false,
+      "stdout": false,
+      "quiet": false,
+      "verbose": false,
+      "small": false
     },
-    selectors: (ref$ = {}, ref$[selectors.patternType] = patternTypeSelector.basicRegex, ref$[selectors.match] = matchSelector['default'], ref$),
-    pattern: null,
+    selectors: {
+      action: actionSelector.compress
+    },
     files: []
   };
 };
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
-  string: function(component, str){
-    if (component.pattern === null) {
-      return component.pattern = str;
-    } else {
-      return component.files.push(str);
-    }
-  }
-});
-exports.parseComponent = function(componentData, visualData, componentIndex, mapOfParsedComponents, parseComponent){
-  var exec, flags, res$, key, ref$, value, that, pattern, files, i$, len$, file, subCommand;
-  exec = ["grep"];
-  mapOfParsedComponents[componentData.id] = true;
-  res$ = [];
-  for (key in ref$ = componentData.flags) {
-    value = ref$[key];
-    if (value === true) {
-      res$.push(flagOptions[key]);
-    }
-  }
-  flags = res$;
-  for (key in ref$ = componentData.selectors) {
-    value = ref$[key];
-    if ((that = SelectorOptions[key][value]) != null) {
-      flags.push(that);
-    }
-  }
-  pattern = componentData.pattern;
-  if (pattern) {
-    if (pattern.indexOf(" ") >= 0) {
-      pattern = "\"" + pattern + "\"";
-    }
-  } else {
-    pattern = "\"\"";
-  }
-  if (flags.length > 0) {
-    flags = "-" + join$.call(flags, '');
-  }
-  res$ = [];
-  for (i$ = 0, len$ = (ref$ = componentData.files).length; i$ < len$; ++i$) {
-    file = ref$[i$];
-    if (file instanceof Array) {
-      subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
-      res$.push("<(" + subCommand + ")");
-    } else if (file.indexOf(" ") >= 0) {
-      res$.push("\"" + file + "\"");
-    } else {
-      res$.push(file);
-    }
-  }
-  files = res$;
-  return join$.call(exec.concat(flags, pattern, files), ' ');
-};
-},
-"parser/commands/v/tail.js": function(module, exports, require){
-
-},
-"parser/commands/v/sort.js": function(module, exports, require){
-
+exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
 "parser/commands/v/bzcat.js": function(module, exports, require){
 /*
@@ -1686,6 +2113,7 @@ for (i$ = '1'; i$ <= '9'; ++i$) {
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
+    type: 'command',
     exec: "bzcat",
     flags: {
       "keep files": false,
@@ -1705,11 +2133,9 @@ defaultComponentData = function(){
 exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
 },
-"parser/commands/v/unzip.js": function(module, exports, require){
-
-},
 "parser/commands/v/_init.js": function(module, exports, require){
-var Iterator, justAccept, getComponentById, commonParseCommand, commonParseComponent, slice$ = [].slice, join$ = [].join;
+var Boundaries, Iterator, justAccept, getComponentById, commonParseCommand, parseFlagsAndSelectors, commonParseComponent, slice$ = [].slice, join$ = [].join;
+Boundaries = require("./_graphlayout.js");
 exports.Iterator = Iterator = (function(){
   Iterator.displayName = 'Iterator';
   var prototype = Iterator.prototype, constructor = Iterator;
@@ -1730,107 +2156,6 @@ exports.Iterator = Iterator = (function(){
   };
   return Iterator;
 }());
-function getBoundaries(components){
-  var firstPos, boundary, i$, to$, i, pos, x$;
-  if (components.length === 0) {
-    return null;
-  }
-  firstPos = components[0].position;
-  boundary = {
-    left: firstPos.x,
-    rigth: firstPos.x,
-    top: firstPos.y,
-    bottom: firstPos.y,
-    components: components
-  };
-  for (i$ = 1, to$ = components.length - 1; i$ <= to$; ++i$) {
-    i = i$;
-    pos = components[i].position;
-    x$ = boundary;
-    if (pos.x < boundary.left) {
-      x$.left = pos.x;
-    }
-    if (pos.x > boundary.rigth) {
-      x$.rigth = pos.x;
-    }
-    if (pos.y < boundary.top) {
-      x$.top = pos.y;
-    }
-    if (pos.y > boundary.bottom) {
-      x$.bottom = pos.y;
-    }
-  }
-  return boundary;
-}
-function translateBoundary(boundary, x, y){
-  var x$, i$, ref$, len$, comp, y$, results$ = [];
-  y == null && (y = 0);
-  x$ = boundary;
-  x$.left += x;
-  x$.rigth += x;
-  x$.top += y;
-  x$.bottom += y;
-  for (i$ = 0, len$ = (ref$ = boundary.components).length; i$ < len$; ++i$) {
-    comp = ref$[i$];
-    y$ = comp.position;
-    y$.x += x;
-    y$.y += y;
-    results$.push(y$);
-  }
-  return results$;
-}
-function arrangeLayout(boundaries){
-  var maxX, prevBound, components, i$, len$, boundary, x, y;
-  maxX = 0;
-  prevBound = null;
-  components = [];
-  for (i$ = 0, len$ = boundaries.length; i$ < len$; ++i$) {
-    boundary = boundaries[i$];
-    if (boundary) {
-      if (maxX < boundary.rigth) {
-        maxX = boundary.rigth;
-      }
-      components = components.concat(boundary.components);
-    }
-  }
-  for (i$ = 0, len$ = boundaries.length; i$ < len$; ++i$) {
-    boundary = boundaries[i$];
-    if (boundary) {
-      translateBoundary(boundary, maxX - boundary.rigth, prevBound ? prevBound.bottom + 350 - boundary.top : 0);
-      prevBound = boundary;
-    }
-  }
-  x = (function(){
-    switch (boundaries.length) {
-    case 0:
-      return 0;
-    default:
-      return maxX + 450;
-    }
-  }());
-  y = (function(){
-    switch (boundaries.length) {
-    case 0:
-      return 0;
-    case 1:
-      return prevBound.bottom;
-    default:
-      return prevBound.bottom;
-    }
-  }());
-  return [
-    {
-      left: 0,
-      rigth: x,
-      top: 0,
-      bottom: y,
-      components: components
-    }, {
-      x: x,
-      y: y / 2
-    }
-  ];
-}
 function parseShortOptions(shortOptions, componentData, argsNodeIterator){
   var iter, option, arg, results$ = [];
   iter = new Iterator(argsNodeIterator.current.slice(1));
@@ -2001,7 +2326,7 @@ commonParseCommand = function(optionsParser, defaultComponentData, argNodeParsin
       if (previousCommand instanceof Array) {
         boundaries.push(previousCommand[0]);
       } else {
-        boundaries.push[getBoundaries([previousCommand])];
+        boundaries.push[Boundaries.getBoundaries([previousCommand])];
       }
     }
     connectionsToPush = [];
@@ -2028,7 +2353,7 @@ commonParseCommand = function(optionsParser, defaultComponentData, argNodeParsin
         break;
       case 'inFromProcess':
         subresult = parser.parseAST(argNode[1], tracker);
-        boundaries.push(getBoundaries(subresult.components));
+        boundaries.push(Boundaries.getBoundaries(subresult.components));
         for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
           sub = ref$[i$];
           result.components.push(sub);
@@ -2045,7 +2370,7 @@ commonParseCommand = function(optionsParser, defaultComponentData, argNodeParsin
         });
       }
     }
-    bbox = arrangeLayout(boundaries);
+    bbox = Boundaries.arrangeLayout(boundaries);
     x$ = componentData;
     x$.position = bbox[1];
     x$.id = tracker.id;
@@ -2062,45 +2387,56 @@ commonParseCommand = function(optionsParser, defaultComponentData, argNodeParsin
     return [bbox[0], result];
   };
 };
-commonParseComponent = function(flagOptions, selectorsOptions){
-  return function(componentData, visualData, componentIndex, mapOfParsedComponents, parseComponent){
-    var exec, flags, longflags, key, ref$, value, flag, that, val, files, res$, i$, len$, file, subCommand;
-    exec = [componentData.exec];
-    mapOfParsedComponents[componentData.id] = true;
-    flags = [];
-    longflags = [];
-    for (key in ref$ = componentData.flags) {
-      value = ref$[key];
-      if (value) {
-        flag = flagOptions[key];
-        if (flag[0] !== '-') {
-          flags.push(flag);
-        } else {
-          longflags.push(flag);
-        }
+parseFlagsAndSelectors = function(component, options){
+  var sFlags, lFlags, flagOptions, key, ref$, value, flag, selectorOptions, that, val;
+  sFlags = [];
+  lFlags = [];
+  flagOptions = options.flags;
+  for (key in ref$ = component.flags) {
+    value = ref$[key];
+    if (value) {
+      flag = flagOptions[key];
+      if (flag[0] !== '-') {
+        sFlags.push(flag);
+      } else {
+        lFlags.push(flag);
       }
     }
-    for (key in ref$ = componentData.selectors) {
+  }
+  if (component.selectors) {
+    selectorOptions = options.selectors;
+    for (key in ref$ = component.selectors) {
       value = ref$[key];
-      if ((that = selectorsOptions[key][value]) != null) {
+      if ((that = selectorOptions[key][value]) != null) {
         val = that;
         if (val[0] !== '-') {
-          flags.push(val);
+          sFlags.push(val);
         } else {
-          longflags.push(val);
+          lFlags.push(val);
         }
       }
     }
-    flags = join$.call(flags, '');
-    if (flags.length > 0) {
-      flags = "-" + join$.call(flags, '');
+  }
+  if (flags.length > 0) {
+    sFlags = "-" + join$.call(sFlags, '');
+  }
+  if (lFlags.length > 0) {
+    if (lFlags.length > 0) {
+      sFlags += " ";
     }
-    if (longflags.length > 0) {
-      if (flags.length > 0) {
-        flags += " ";
-      }
-      flags += join$.call(longflags, ' ');
-    }
+    sFlags += join$.call(lFlags, ' ');
+  }
+  return sFlags;
+};
+commonParseComponent = function(flagOptions, selectorsOptions, parameterOptions, beforeJoin){
+  return function(componentData, visualData, componentIndex, mapOfParsedComponents, parseComponent){
+    var exec, flags, files, res$, i$, ref$, len$, file, subCommand, parameters, key, value;
+    exec = [componentData.exec];
+    mapOfParsedComponents[componentData.id] = true;
+    flags = parseFlagsAndSelectors(componentData, {
+      flagOptions: flagOptions,
+      selectorsOptions: selectorsOptions
+    });
     res$ = [];
     for (i$ = 0, len$ = (ref$ = componentData.files).length; i$ < len$; ++i$) {
       file = ref$[i$];
@@ -2114,11 +2450,30 @@ commonParseComponent = function(flagOptions, selectorsOptions){
       }
     }
     files = res$;
-    return join$.call(exec.concat(flags, files), ' ');
+    res$ = [];
+    for (key in ref$ = componentData.parameters) {
+      value = ref$[key];
+      if (value) {
+        if (value.indexOf(" ") >= 0) {
+          res$.push("\"-" + parameterOptions[key] + value + "\"");
+        } else {
+          res$.push("-" + parameterOptions[key] + value);
+        }
+      }
+    }
+    parameters = res$;
+    if (parameters.length > 0) {
+      parameters = join$.call(parameters, ' ');
+    }
+    if (beforeJoin) {
+      return beforeJoin(componentData, exec, flags, files, parameters);
+    } else {
+      return join$.call(exec.concat(flags, parameters, files), ' ');
+    }
   };
 };
-exports.getBoundaries = getBoundaries;
-exports.arrangeLayout = arrangeLayout;
+exports.getBoundaries = Boundaries.getBoundaries;
+exports.arrangeLayout = Boundaries.arrangeLayout;
 exports.parseShortOptions = parseShortOptions;
 exports.parseLongOptions = parseLongOptions;
 exports.switchOn = switchOn;
@@ -2131,120 +2486,11 @@ exports.justAccept = justAccept;
 exports.generate = generate;
 exports.commonParseCommand = commonParseCommand;
 exports.commonParseComponent = commonParseComponent;
-exports.translateBoundary = translateBoundary;
+exports.translateBoundary = Boundaries.translateBoundary;
 exports.getComponentById = getComponentById;
 },
-"parser/commands/v/bzip2.js": function(module, exports, require){
-/*
--d --decompress     force decompression
--z --compress       force compression
--k --keep           keep (don't delete) input files
--f --force          overwrite existing output files
--t --test           test compressed file integrity
--c --stdout         output to standard out
--q --quiet          suppress noncritical error messages
--v --verbose        be verbose (a 2nd -v gives more)
--s --small          use less memory (at most 2500k)
--1 .. -9            set block size to 100k .. 900k
---fast              alias for -1
---best              alias for -9
-*/
-var $, selectors, actionSelector, actionSelectorOption, flags, selectorOptions, ref$, value, flagOptions, optionsParser, i$, i, defaultComponentData;
-$ = require("./_init.js");
-selectors = {
-  'action': 'action'
-};
-actionSelector = {
-  'compress': 'compress',
-  'decompress': 'decompress'
-};
-actionSelectorOption = {
-  'compress': null,
-  'decompress': 'd'
-};
-flags = {
-  keepFiles: "keep files",
-  force: 'force',
-  test: 'test',
-  stdout: 'stdout',
-  quiet: 'quiet',
-  verbose: 'verbose',
-  small: 'small'
-};
-selectorOptions = (ref$ = {}, ref$[selectors.action] = actionSelectorOption, ref$);
-exports.VisualSelectorOptions = (ref$ = {}, ref$[selectors.action] = (function(){
-  var i$, ref$, results$ = [];
-  for (i$ in ref$ = actionSelector) {
-    value = ref$[i$];
-    results$.push(value);
-  }
-  return results$;
-}()), ref$);
-flagOptions = {
-  "keep files": 'k',
-  'force': 'f',
-  'test': 'test',
-  'stdout': 'c',
-  'quiet': 'q',
-  'verbose': 'v',
-  'small': 's'
-};
-$.setblocksize = function(size){
-  return function(Component){
-    return Component.blockSize = size;
-  };
-};
-optionsParser = {
-  shortOptions: {
-    d: $.select(selectors.action, actionSelector.decompress),
-    z: $.select(selectors.action, actionSelector.compress),
-    k: $.switchOn(flags.keepFiles),
-    f: $.switchOn(flags.force),
-    t: $.switchOn(flags.test),
-    c: $.switchOn(flags.stdout),
-    q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    s: $.switchOn(flags.small)
-  },
-  longOptions: {
-    'decompress': $.sameAs('d'),
-    'compress': $.sameAs('z'),
-    'keep': $.sameAs('k'),
-    'force': $.sameAs('f'),
-    'test': $.sameAs('t'),
-    'stdout': $.sameAs('c'),
-    'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v'),
-    'small': $.sameAs('s'),
-    'fast': $.sameAs('1'),
-    'best': $.sameAs('9')
-  }
-};
-for (i$ = '1'; i$ <= '9'; ++i$) {
-  i = i$;
-  optionsParser.shortOptions[i] = $.setblocksize(i);
-}
-$.generate(optionsParser);
-defaultComponentData = function(){
-  return {
-    exec: "bzip2",
-    flags: {
-      "keep files": false,
-      "force": false,
-      "test": false,
-      "stdout": false,
-      "quiet": false,
-      "verbose": false,
-      "small": false
-    },
-    selectors: {
-      action: actionSelector.compress
-    },
-    files: []
-  };
-};
-exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
+"parser/commands/v/unzip.js": function(module, exports, require){
+
 },
 "parser/commands/v/gunzip.js": function(module, exports, require){
 /*
@@ -2303,6 +2549,7 @@ optionsParser = {
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
+    type: 'command',
     exec: "gunzip",
     flags: {
       "keep files": false,
@@ -2411,6 +2658,7 @@ for (i$ = '1'; i$ <= '9'; ++i$) {
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
+    type: 'command',
     exec: "bunzip2",
     flags: {
       "keep files": false,
@@ -2473,6 +2721,7 @@ optionsParser = {
 $.generate(optionsParser);
 defaultComponentData = function(){
   return {
+    type: 'command',
     exec: "compress",
     flags: {
       "force": false,
@@ -2493,6 +2742,133 @@ exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData)
 },
 "parser/commands/v/uncompress.js": function(module, exports, require){
 
+},
+"parser/commands/v/_graphlayout.js": function(module, exports, require){
+var createBoundary, Boundary, comp;
+createBoundary = function(left, rigth, top, bottom, components){
+  left == null && (left = 0);
+  rigth == null && (rigth = 0);
+  top == null && (top = 0);
+  bottom == null && (bottom = 0);
+  return {
+    left: left,
+    rigth: rigth,
+    top: top,
+    bottom: bottom,
+    components: components
+  };
+};
+createBoundary.fromSinglePoint = function(x, y){
+  return this(x, x, y, y, components);
+};
+Boundary = [
+  {
+    extend: function(boundary, x, y){
+      var x$;
+      x$ = boundary;
+      if (x < boundary.left) {
+        x$.left = x;
+      }
+      if (x > boundary.rigth) {
+        x$.rigth = x;
+      }
+      if (y < boundary.top) {
+        x$.top = y;
+      }
+      if (y > boundary.bottom) {
+        x$.bottom = y;
+      }
+    },
+    translate: function(boundary, x, y){
+      var x$;
+      y == null && (y = 0);
+      x$ = boundary;
+      x$.left += x;
+      x$.rigth += x;
+      x$.top += y;
+      x$.bottom += y;
+    }
+  }, (function(){
+    var i$, ref$, len$, x$, results$ = [];
+    for (i$ = 0, len$ = (ref$ = boundary.components).length; i$ < len$; ++i$) {
+      comp = ref$[i$];
+      x$ = comp.position;
+      x$.x += x;
+      x$.y += y;
+      results$.push(x$);
+    }
+    return results$;
+  }())
+];
+function getBoundaries(components){
+  var firstPos, boundary, i$, to$, i, pos;
+  if (components.length === 0) {
+    return null;
+  }
+  firstPos = components[0].position;
+  boundary = createBoundary(firstPos.x, firstPos.y, components);
+  for (i$ = 1, to$ = components.length - 1; i$ <= to$; ++i$) {
+    i = i$;
+    pos = components[i].position;
+    Boundary.extend(boundary, pos.x, pos.y);
+  }
+  return boundary;
+}
+function arrangeLayout(boundaries){
+  var maxX, prevBound, components, i$, len$, boundary, x, y;
+  maxX = 0;
+  prevBound = null;
+  components = [];
+  for (i$ = 0, len$ = boundaries.length; i$ < len$; ++i$) {
+    boundary = boundaries[i$];
+    if (boundary) {
+      if (maxX < boundary.rigth) {
+        maxX = boundary.rigth;
+      }
+      components = components.concat(boundary.components);
+    }
+  }
+  for (i$ = 0, len$ = boundaries.length; i$ < len$; ++i$) {
+    boundary = boundaries[i$];
+    if (boundary) {
+      translateBoundary(boundary, maxX - boundary.rigth, prevBound ? prevBound.bottom + 350 - boundary.top : 0);
+      prevBound = boundary;
+    }
+  }
+  x = (function(){
+    switch (boundaries.length) {
+    case 0:
+      return 0;
+    default:
+      return maxX + 450;
+    }
+  }());
+  y = (function(){
+    switch (boundaries.length) {
+    case 0:
+      return 0;
+    case 1:
+      return prevBound.bottom;
+    default:
+      return prevBound.bottom;
+    }
+  }());
+  return [
+    {
+      left: 0,
+      rigth: x,
+      top: 0,
+      bottom: y,
+      components: components
+    }, {
+      x: x,
+      y: y / 2
+    }
+  ];
+}
+exports.getBoundaries = getBoundaries;
+exports.arrangeLayout = arrangeLayout;
+exports.translateBoundary = Boundary.translate;
 },
 "parser/ast-builder/ast-builder.js": function(module, exports, require){
 /* parser generated by jison 0.4.13 */

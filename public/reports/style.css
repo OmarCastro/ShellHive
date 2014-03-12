@@ -14,12 +14,15 @@ path.sel{stroke:#00f;stroke-width:5}
 .component .output,.inline-component .output{float:right}
 .component .box,.inline-component .box{display:inline-block;margin-top:.2em;height:.7em;width:1em;background-color:#aaa;-webkit-border-radius:.1em;border-radius:.1em;}
 .component .box:hover,.inline-component .box:hover{background-color:#00f}
+.component label,.inline-component label{font-weight:normal;margin:0}
+.component input[type="checkbox"],.inline-component input[type="checkbox"]{margin:0}
 
 body{background-color:#eee;color:#111;font-family:Arial;overflow:visible}
 .asttest{position:relative;background-color:#ddd;border:solid 1px #000;-webkit-border-radius:3px;border-radius:3px;width:100%;table-layout:fixed;}
 .asttest .passed,.asttest .failed{font-weight:bold;padding-bottom:.5em}
 .asttest .passed{background-color:#86c144}
 .asttest .failed{background-color:#ac4739;color:#eee}
+.asttest code{color:inherit;background:none}
 .asttest .command td{border-bottom:solid 1px #808080;}
 .asttest .command td pre{display:inline-block}
 .center{text-align:center}

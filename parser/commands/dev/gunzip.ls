@@ -60,6 +60,7 @@ $.generate(optionsParser)
 
 
 defaultComponentData = ->
+  type:\command
   exec:"gunzip",
   flags:{-"keep files",-"force",-"test",-"quiet",-"verbose",-"recursive"}
   files: []

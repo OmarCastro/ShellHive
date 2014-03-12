@@ -9,7 +9,7 @@
       stylus: {
         reports: {
           files: {
-            'public/reports/style.css': ['views/css/style.styl', 'public/reports/style.styl']
+            'public/reports/css/style.css': ['views/css/style.styl', 'public/reports/style.styl']
           }
         }
       },
@@ -21,7 +21,8 @@
             }
           },
           files: {
-            "public/reports/weeklyReport3.html": ["public/reports/weeklyReport3.jade"]
+            "public/reports/weeklyReport4.html": ["public/reports/weeklyReport4.jade"],
+            "public/reports/demo1.html": ["public/reports/demo1.jade"]
           }
         }
       },
@@ -51,7 +52,7 @@
             bare: true
           },
           files: {
-            'public/reports/js3/reportApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/reportInit.ls', 'livescript/weeklyReport/play.ls', 'livescript/weeklyReport/directives.ls']
+            'public/reports/js4/reportApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/reportInit.ls', 'livescript/weeklyReport/play.ls', 'livescript/weeklyReport/directives.ls']
           }
         },
         demo: {
@@ -59,7 +60,7 @@
             bare: true
           },
           files: {
-            'public/reports/js3/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/weeklyReport/directives.ls']
+            'public/reports/js4/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/weeklyReport/directives.ls']
           }
         }
       },
@@ -70,15 +71,15 @@
             stderr: true,
             failOnError: true
           },
-          command: "ls parser/commands/dev/ | parallel 'find parser/commands/dev/{} -newer parser/commands/v/{.}.js' | parallel 'basename {}' | parallel 'lsc -p -b -c parser/commands/dev/{} > parser/commands/v/{.}.js'"
+          command: "ls parser/commands/dev/| grep '\\.ls' | parallel 'test -e parser/commands/v/{.}.js || touch parser/commands/v/{.}.js; find parser/commands/dev/{} -newer parser/commands/v/{.}.js' | parallel 'basename {}' | parallel 'lsc -p -b -c parser/commands/dev/{} > parser/commands/v/{.}.js'"
         },
         glueParser: {
-          command: "gluejs --no-cache --global shellParser --main parser/parser.js --include parser/commands/v/ --include parser/parser.js --include parser/ast-builder/ast-builder.js | tee public/js/parser.js > public/reports/js3/parser.js"
+          command: "gluejs --no-cache --global shellParser --main parser/parser.js --include parser/commands/v/ --include parser/parser.js --include parser/ast-builder/ast-builder.js | tee public/js/parser.js > public/reports/js4/parser.js"
         }
       },
       watch: {
         report_html: {
-          files: ["public/reports/weeklyReport3.jade", "public/reports/component.jade", "public/reports/graph.jade"],
+          files: ["public/reports/weeklyReport4.jade", "public/reports/MacroCreationModal.jade", "public/reports/sidebar.jade", "public/reports/demo1.jade", "public/reports/component.jade", "public/reports/graph.jade"],
           tasks: ['jade:compile']
         },
         report_css: {

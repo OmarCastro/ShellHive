@@ -90,6 +90,7 @@ $.generate(optionsParser)
   
 
 defaultComponentData = ->
+  type:\command
   exec:"bzip2",
   flags:{-"keep files",-"force",-"test",-"stdout",-"quiet",-"verbose",-"small"}
   selectors:

@@ -184,6 +184,7 @@ app.controller 'data-flow', ($scope) ->
       ..visualData = visualData
       ..parsed = true  
   $scope
+    ..screenHeight = window.screen.availHeight
     ..TransformResults = results
     ..screenHeight = window.screen.availHeight
     ..tab = results.0.id

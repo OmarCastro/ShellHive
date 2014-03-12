@@ -118,7 +118,7 @@ AST_tests = [
     asserts: ['equals(ast.length,3)', 'equals(ast[0].exec,"ls")', 'equals(ast[1].exec,"parallel")', 'equals(ast[2].exec,ast[1].exec)', 'equals(ast[0].args,["parser/commands/dev/"])', 'equals(ast[1].args,["find parser/commands/dev/{} -newer parser/commands/v/{.}.js"])', 'equals(ast[2].args,["basename {}"])']
   }
 ];
-app = angular.module('report', []);
+app = angular.module('report', ['ui.bootstrap']);
 app.controller('examples', function($scope){
   var examples, results, res$, i$, len$, index, example, AST, visualData, x$;
   $scope.options = SelectionOptions;
@@ -365,12 +365,12 @@ app.directive("graphModel", function($document){
     restrict: 'A',
     replace: false,
     scope: {
-      visualData: '=graphModel',
+      graphModel: '=',
       options: '='
     },
     controller: [
       '$scope', '$element', '$attrs', function(scope, element, attr){
-        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, x$, nodesElem, edgesElem, svgElem, $svgElem, nodesElemStyle, edgesElemStyle, update, mousemove, mouseup, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, y$;
+        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, graphModel, x$, nodesElem, edgesElem, svgElem, $svgElem, nodesElemStyle, edgesElemStyle, update, mousemove, mouseup, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, y$;
         pointerId = 0;
         scale = 1;
         graphX = 0;
@@ -380,7 +380,13 @@ app.directive("graphModel", function($document){
         edgeIniX = 0;
         edgeIniY = 0;
         elem = element[0];
+        graphModel = scope.graphModel;
+        graphModel.macros = {};
         x$ = scope;
+        x$.$watch("graphModel", function(){
+          return scope.visualData = scope.graphModel;
+        });
+        x$.visualData = scope.graphModel;
         x$.implementedCommands = listOfImplementedCommands;
         x$.isImplemented = isImplemented;
         x$.isArray = angular.isArray;
@@ -436,6 +442,9 @@ app.directive("graphModel", function($document){
         };
         element.bind("pointerdown", function(ev){
           var event, targetTag, x$;
+          if (ev.which === 3) {
+            return false;
+          }
           event = ev.originalEvent;
           targetTag = event.target.tagName;
           if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL')) {
@@ -511,7 +520,6 @@ app.directive("graphModel", function($document){
         y$.moveEdge = function(event){
           var ref$, x, y;
           ref$ = mapMouseToScene(event), x = ref$.x, y = ref$.y;
-          console.log(x, y);
           return setEdgePath(edgeIniX, edgeIniY, x, y);
         };
         y$.endEdge = function(){
@@ -526,6 +534,16 @@ app.directive("graphModel", function($document){
         y$.mapPointToScene = mapPointToScene;
         y$.mapMouseToScene = mapMouseToScene;
         y$.mapMouseToView = mapMouseToView;
+        y$.setGraphView = function(view){
+          scope.visualData = view;
+        };
+        y$.revertToRoot = function(){
+          scope.visualData = graphModel;
+        };
+        y$.newMacro = function(name, descr){
+          graphModel.macros[name] = shellParser.createMacro(name, descr);
+          scope.$digest();
+        };
         y$.translateNode = function(id, position, x, y){
           var i$, ref$, len$, el;
           position.x += x / scale;
@@ -581,7 +599,6 @@ app.directive("connector", function($document){
       };
       scope.reset = function(){
         var Startnode, StartPort, Endnode, EndPort;
-        console.log('mi');
         Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']");
         StartPort = Startnode.querySelector(".box[data-port='" + dataedge.startPort + "']");
         Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']");
@@ -625,6 +642,12 @@ app.directive("component", function($document){
       imstyle = elem.style;
       element.bind("pointerdown", function(ev){
         var event, targetTag, pointerId, x$;
+        switch (ev.which) {
+        case 2:
+          return true;
+        case 3:
+          return false;
+        }
         event = ev.originalEvent;
         targetTag = event.target.tagName;
         if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL')) {
@@ -742,25 +765,53 @@ app.directive('sidebar', [
       },
       link: function(scope, element, attr, graphModelCtrl){
         requestAnimationFrame(function(){
-          return element.find('li').each(function(index){
+          element.find('ul.command > li').each(function(index){
             return $(this).bind('click', function(ev){
               var newResult, x$, newComponent;
               ev.stopPropagation();
               newResult = shellParser.parseCommand($(this).attr('data-command'));
               x$ = newComponent = newResult.components[0];
-              x$.id = graphModelCtrl.getVisualData().components.length;
+              x$.id = graphModelCtrl.getVisualData().counter++;
               x$.position = graphModelCtrl.mapPointToScene(0, 0);
               graphModelCtrl.getVisualData().components.push(newComponent);
-              console.log(graphModelCtrl.getVisualData().components);
               return graphModelCtrl.updateScope();
+            });
+          });
+          return element.find('li[new-macro]').each(function(index){
+            return $(this).bind('click', function(ev){
+              graphModelCtrl.newMacro("test macro", "ability to choose the name will be developed next");
+              return ev.stopPropagation();
             });
           });
         });
       },
-      template: "<ul>\n  <li data-command=\"{{command}}\" ng-repeat=\"command in implementedCommands\">\n      <span ng-bind=\"command\"></span>\n  </li>\n</ul>"
+      template: "<span style=\"color:white\">Commands</span>\n<ul class=\"command\">\n  <li data-command=\"{{command}}\" ng-repeat=\"command in implementedCommands\">\n      <span ng-bind=\"command\"></span>\n  </li>\n</ul>\n<br>\n<ul><li new-macro> New Macro </li></ul>\n<span style=\"color:white\">Macros</span>\n<ul class=\"macro\">\n  <li sidebar-macro-component=\"name\" ng-repeat=\"(name, val) in $parent.graphModel.macros\"></li>\n</ul>"
     };
   }
 ]);
+app.directive('sidebarMacroComponent', function(){
+  return {
+    replace: true,
+    require: '^graphModel',
+    scope: {
+      sidebarMacroComponent: '='
+    },
+    link: function(scope, element, attrs, graphModelCtrl){
+      scope.selectItem = function(){
+        var name, x$, newComponent;
+        name = scope.sidebarMacroComponent;
+        x$ = newComponent = {
+          type: 'subgraph',
+          macro: graphModelCtrl.getVisualData().macros[name]
+        };
+        x$.id = graphModelCtrl.getVisualData().counter++;
+        x$.position = graphModelCtrl.mapPointToScene(0, 0);
+        graphModelCtrl.getVisualData().components.push(newComponent);
+      };
+    },
+    template: "<li>\n    <div ng-click='selectItem()'>\n        {{sidebarMacroComponent}}\n    </div>\n</li>"
+  };
+});
 activeDrop = null;
 app.directive('dropdownSelect', [
   '$document', function($document){

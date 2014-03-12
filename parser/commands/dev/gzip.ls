@@ -89,6 +89,7 @@ $.generate(optionsParser)
   
 
 defaultComponentData = ->
+  type:\command
   exec:"gzip",
   flags:{-"decompress",-"keep files",-"force",-"test",-"stdout",-"quiet",-"verbose",-"small",-"recursive"}
   files: []

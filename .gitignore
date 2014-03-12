@@ -14,3 +14,5 @@ results
 npm-debug.log
 node_modules
 parser/commands/v
+bower_components
+typescript

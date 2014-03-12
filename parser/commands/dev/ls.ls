@@ -10,6 +10,14 @@ selectors = {
   quoting-style:  "quoting style"
 }
 
+parameters = {
+  \ignore
+}
+
+parameterOptions = {
+  \ignore : \I
+}
+
 ## Selectors
 
 sortSelector = { 
@@ -66,7 +74,7 @@ sortSelectorOption = {
 
 formatSelectorOption = {
   \default : null
-  \commas : \c
+  \commas : \m
   \long : \l
 }
 
@@ -123,10 +131,12 @@ exports.VisualSelectorOptions =
 flags = {
   \reverse
   \context
+  \inode
   humanReadable: "human readable"
   ignore-backups: "ignore backups"
-  no-print-owner: "do not print owner"
-  no-print-group: "do not print group"
+  no-print-owner: "do not list owner"
+  no-print-group: "do not list group"
+  numeric-id: "numeric ID"
 }
 
 
@@ -135,8 +145,10 @@ flagOptions = {
   \context : \Z
   "human readable": \h
   "ignore backups": \B
-  "do not print owner": \g
-  "do not print group": \G
+  "do not list owner": \g
+  "do not list group": \G
+  "numeric ID": \n
+  \inode : \i
 }
 
 
@@ -156,13 +168,13 @@ optionsParser =
     G  :  $.switchOn flags.no-print-group
     h  :  $.switchOn flags.humanReadable
     H  :  $.switchOn! 
-    i  :  $.switchOn!
+    i  :  $.switchOn 
     I  :  $.setParameter \ignore  
     k  :  $.switchOn! 
-    l  :  $.select   selectors.format, formatSelector.verbose
+    l  :  $.select   selectors.format, formatSelector.long
     L  :  $.switchOn! 
     m  :  $.select   selectors.format, formatSelector.commas
-    n  :  $.switchOn! 
+    n  :  $.switchOn flags.numeric-id
     N  :  $.switchOn! 
     o  :  $.switchOn! 
     p  :  $.select  selectors.indicator-style, indicatorStyleSelector.slash
@@ -208,8 +220,13 @@ $.generate(optionsParser)
   
 
 defaultComponentData = ->
+  type:\command
   exec:"ls",
-  flags:{-"reverse",-"do not list owner",-"do not list group",-"numeric ID",-"inode",-"human readable"}
+  flags:{
+    -"reverse",
+    -"do not list owner",
+    -"do not list group",
+    -"numeric ID",-"inode",-"human readable"}
   selectors:
     "indicator style": indicatorStyleSelector.none
     "time style":      timeStyleSelector.locale
@@ -222,4 +239,4 @@ defaultComponentData = ->
   files:[]
 
 exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
-exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions)
+exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions,parameterOptions)

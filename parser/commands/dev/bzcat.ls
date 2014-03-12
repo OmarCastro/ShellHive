@@ -90,6 +90,7 @@ $.generate(optionsParser)
 
 
 defaultComponentData = ->
+  type:\command
   exec:"bzcat",
   flags:{-"keep files",-"force",-"test",+"stdout",-"quiet",-"verbose",-"small"}
   selectors:

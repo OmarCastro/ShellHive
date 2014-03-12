@@ -1,5 +1,5 @@
 (function(){
-  var parser, astBuilder, parserCommand, implementedCommands, res$, key, VisualSelectorOptions, indexComponents, join$ = [].join;
+  var parser, astBuilder, parserCommand, implementedCommands, res$, key, VisualSelectorOptions, isImplemented, indexComponents, createMacro, join$ = [].join;
   parser = {};
   astBuilder = require('./ast-builder/ast-builder');
   parserCommand = {
@@ -14,6 +14,7 @@
     gzip: require('./commands/v/gzip'),
     gunzip: require('./commands/v/gunzip'),
     zcat: require('./commands/v/zcat'),
+    tr: require('./commands/v/tr'),
     tee: require('./commands/v/tee')
   };
   res$ = [];
@@ -23,9 +24,6 @@
     }
   }
   implementedCommands = res$;
-  function isImplemented(command){
-    return !!parserCommand(command);
-  }
   VisualSelectorOptions = {
     cat: parserCommand.cat.VisualSelectorOptions,
     grep: parserCommand.grep.VisualSelectorOptions,
@@ -68,9 +66,27 @@
       ye: ye
     };
   }
+  isImplemented = function(command){
+    return parserCommand.command != null;
+  };
+  /**
+   * Parses the syntax of the command and
+   * transforms into an Abstract Syntax Tree
+   * @param command command
+   * @return the resulting AST
+   */
   function generateAST(command){
     return astBuilder.parse(command);
   }
+  /**
+   * Parses the Abstract Syntax Tree
+   * and transforms it to a graph representation format
+   * that can be used in the visual application
+   *
+   * @param ast - the Abstract Syntax Tree
+   * @param tracker - and tracker the tracks the id of a component
+   * @returns the visual representation of the object
+   */
   function parseAST(ast, tracker){
     var components, connections, LastCommandComponent, CommandComponent, i$, len$, index, commandNode, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
     components = [];
@@ -128,16 +144,20 @@
     }
     return {
       firstMainComponent: firstMainComponent,
+      counter: tracker.id,
       components: components,
       connections: connections
     };
   }
+  /**
+   * parses the command
+   */
   function parseCommand(command){
     return parseAST(generateAST(command));
   }
-  function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
-    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
-  }
+  /**
+   * Creates an index of the components
+   */
   indexComponents = function(visualData){
     var i$, ref$, len$, comp, results$ = {};
     for (i$ = 0, len$ = (ref$ = visualData.components).length; i$ < len$; ++i$) {
@@ -146,6 +166,18 @@
     }
     return results$;
   };
+  function parseVisualData(VisualData){
+    var indexedComponentList, initialComponent;
+    indexedComponentList = indexComponents(VisualData);
+    initialComponent = indexedComponentList[VisualData.firstMainComponent];
+    if (initialComponent === null) {
+      return;
+    }
+    return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
+  }
+  function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
+    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+  }
   function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents){
     var commands, isFirst, i$, ref$, len$, connection, outputs, res$, endNodeId, j$, ref1$, len1$, component, endNode, nextcommands, comm, to$, i;
     commands = [];
@@ -196,13 +228,35 @@
     }
     return join$.call(commands, " | ");
   }
-  function parseVisualData(VisualData){
-    var indexedComponentList, initialComponent;
-    indexedComponentList = indexComponents(VisualData);
-    initialComponent = indexedComponentList[VisualData.firstMainComponent];
-    if (initialComponent === null) {
-      return;
+  createMacro = function(name, description, fromMacro){
+    var x$, macroData;
+    if (fromMacro) {
+      x$ = macroData = JSON.parse(JSON.stringify(fromMacro));
+      x$.name = name;
+      x$.description = description;
+      return x$;
+    } else {
+      return macroData = {
+        name: name,
+        description: description,
+        entryComponent: null,
+        exitComponent: null,
+        count: 0,
+        components: [],
+        connections: []
+      };
     }
+  };
+  function compileMacro(macro){
+    var indexedComponentList, initialComponent;
+    if (macro.entryComponent === null) {
+      throw "no component defined as Macro Entry";
+    }
+    if (macro.exitComponent === null) {
+      throw "no component defined as Macro Exit";
+    }
+    indexedComponentList = indexComponents(macro);
+    initialComponent = indexedComponentList[macro.entryComponent];
     return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
   }
   parser.generateAST = generateAST;
@@ -219,5 +273,6 @@
   exports.parseComponent = parseComponent;
   exports.implementedCommands = implementedCommands;
   exports.parseVisualData = parseVisualData;
+  exports.createMacro = createMacro;
   exports.VisualSelectorOptions = VisualSelectorOptions;
 }).call(this);

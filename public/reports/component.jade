@@ -29,11 +29,12 @@ div(ng-if="data.exec == 'grep'")
 div(ng-if="isImplemented(data) && data.files !== undefined")
     | files :
     br(ng-if="data.files.length > 0")
-    label(ng-repeat="file in data.files track by $index") 
-        span.box
-        input(type="text",ng-model="data.files[$index]")
-        button(ng-click="data.files.splice($index,1)"). -
-        br
+    div(ng-repeat="file in data.files track by $index") 
+        label
+            span.box
+            input(type="text",ng-model="data.files[$index]")
+            button(ng-click="data.files.splice($index,1)"). -
+            br
     button(ng-click="data.files.push('')"). +
     br
 
@@ -53,7 +54,8 @@ div(ng-if="isImplemented(data) && data.parameters")
 div(ng-if="isImplemented(data) && data.selectors && data.exec != 'grep' ")
     div(ng-repeat="(name, option) in data.selectors track by name")
         | {{name}}:
-        select(dropdown-model='data.selectors[name]',dropdown-select="options[data.exec][name]")
+        select(ng-model='data.selectors[name]',ng-options="c for c in options[data.exec][name]")
+        //-select(dropdown-model='data.selectors[name]',dropdown-select="options[data.exec][name]")
         br
 
 
@@ -65,8 +67,9 @@ div(ng-if="isImplemented(data) && data.parameterSelectors")
         input(type="text", ng-model='data.parameterSelectors[name].value' ng-if="data.parameterSelectors[name].hasParameters")
         br
 div
-    label(ng-repeat="(nam, val) in data.flags track by nam")
-        input(type="checkbox",ng-model="data.flags[nam]")
-        | {{nam}}
-        br
+    div(ng-repeat="(nam, val) in data.flags track by nam")
+        label
+            input(type="checkbox",ng-model="data.flags[nam]")
+            | {{nam}}
+            br
 

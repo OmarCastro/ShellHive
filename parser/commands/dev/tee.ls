@@ -57,4 +57,5 @@ exports.parseCommand = (argsNode, parser, tracker,previousCommand, nextcommands,
 
   connectTo(nextcommands) if nextcommands.length
   arrangeLayout(previousCommand,boundaries)
+  result.counter = tracker.id
   result

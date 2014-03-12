@@ -60,6 +60,7 @@ const optionsParser =
 $.generate(optionsParser)
 
 defaultComponentData = ->
+  type:\command
   exec:"cat"
   flags:
     "show non-printing":false,

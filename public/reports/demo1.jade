@@ -1,0 +1,36 @@
+doctype
+html
+  head
+    title Demo Week 4 - Omar Castro
+    meta(charset="utf-8")
+    link(rel="stylesheet",href="css/dropdowns.css")
+    link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+    link(rel="stylesheet",href="css/style.css")
+
+  body(ng-app="report",style="margin:2em")
+        .TransformResults(ng-controller="data-flow" ng-init="heMan = false; showInitial = false")
+            table.asttest(ng-init="res = TransformResults[0]",style="height:{{screenHeight}}px")
+                tr
+                    td.top(style="position:relative")
+                        div
+                            label
+                                input(type="checkbox",ng-model="$parent.heMan")
+                                | show visualData
+                            | &nbsp;&nbsp;&nbsp;
+                            label
+                                input(type="checkbox",ng-model="$parent.showInitial")
+                                | Show Initial Command
+                        pre(ng-bind-template="command : {{showInitial ? res.inputCommand : res.command}}")
+                        .visual-builder.border.data-flow(ng-hide="$parent.$parent.heMan" graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:5em;bottom:0;left:0;right:0")
+                            include graph.jade
+                        pre(ng-show="$parent.$parent.heMan"). data : {{res.visualData | json}}
+  script(src="js/jquery-2.1.0.min.js")
+  script(src="js/angular.min.js")
+  script(src="js/ui-bootstrap-tpls.min.js")
+  script(src="js/pointerevents.min.js")
+  script(src="js4/parser.js")
+  script(src="js4/reportApp.js")
+  script(type="text/ng-template" id="myModalContent.html")
+    include MacroCreationModal.jade
+  script(type="text/ng-template" id="sidebarModel.html")
+    include sidebar.jade

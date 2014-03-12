@@ -5,228 +5,203 @@ html
     meta(charset="utf-8")
     link(rel="stylesheet",href="css/keys.css")
     link(rel="stylesheet",href="css/dropdowns.css")
-    link(rel="stylesheet",href="style.css")
+    link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+    link(rel="stylesheet",href="css/style.css")
+
   body(ng-app="report",style="margin:2em")
     .center
         h1 Weekly report
         p. MIEIC thesis
         p. Omar Alejandro Castillo de Castro 
-        p. Week 24/02/2012 - 01/03/2012
+        p. Week 02/02/2012 - 08/03/2012
 
-    h2  List of tasks done
-    div.changeList
+    accordion(close-others="true")
+      accordion-group(heading="Tasks done")
+        h2  Tasks done
+        div.changeList
+            p.
+                The next list shows the implementation tasks that has been done this week:
+
+            ul
+               li. Implement component connections functionality in visual mode
+               li. Add graphical interface to create components in the visual mode
+               li. Transformation of visual program to text code  
+               li. Parse of the "<code>head</code>" command to visual representation
+               li. Parse of the "<code>tail</code>" command to visual representation
+               li. Parse of the "<code>tr</code>" command to visual representation
+               li. Parse of the "<code>tee</code>" command to visual representation
+               li. Parse of the "<code>date</code>" command to visual representation
+               li. Parse of visual representation of "<code>awk</code>" command to shell code
+               li. Parse of visual representation of "<code>compress</code>" command to shell code
+               li. Parse of visual representation of "<code>ls</code>" command to shell code
+               li. Parse of visual representation of "<code>head</code>" command to shell code
+               li. Parse of visual representation of "<code>tail</code>" command to shell code
+               li. Parse of visual representation of "<code>tr</code>" command to shell code
+               li. Begin the implementation of supporting the concept of Macros
+
+      accordion-group(heading="AST tests")
+        h2  AST tests
         p.
-            In this week I finished revising the technical report, then I started
-            the implementation of the Unix commands parser. The next list shows
-            the implementation tasks that has been done this week:
+            The next interface shows the tests made to validate the AST of the commands,  on the right side,
+            the code highlighted as green means the test has passed, as red means the test has failed.
+        .ASTtest(ng-controller="ASTTester")
+            .tab(ng-repeat="result in testResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
+                | {{result.title}}
+            table.asttest(ng-repeat="result in testResults track by result.id",ng-show="tab == result.id")
+                tr.command
+                    td(colspan=2)
+                        pre. command : {{result.command}}
+                tr
+                    td.border.ast
+                        .center. AST Result
+                        pre. {{result.ast}}
+                    td.border.top
+                        .center. AST Tests
+                        div(ng-repeat="res in result.results",ng-class="res.class") 
+                            code. {{res.command}}
+
+      accordion-group(heading="Visual representation of Unix commands")
+        h2  Visual representation of Unix commands
+        p.
+            The next interface shows the current planned visual interface of the nodes for each
+            command, Interacting with the visual node does nothing, in each report additional
+            commands will be added and the interface is going to be updated.
+
+        .TransformResults(ng-controller="examples")
+            .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
+                | {{result.title}}
+            table.asttest(ng-repeat="result in TransformResults track by result.id",ng-show="tab == result.id")
+                tr.command
+                    td(colspan=3)
+                        pre. command : {{result.command}}
+                tr
+                    td.border.ast.top
+                        .center AST
+                        pre. {{result.AST}}
+                    td.border.top
+                        .center. Visual Component Data
+                        pre. {{result.JSONVisualData}}
+                    td.border.most.center(ng-init="data = result.visualData.components[0]")
+                        div(ng-if="!isImplemented(data)")
+                            | Visual representation not implemented
+                        .inline-component(ng-if="isImplemented(data)")
+                            include component.jade
+      accordion-group(heading="From visual representation to Unix text commands")
+        h2  From visual representation to Unix text commands
+        p.
+            The next interface shows the tranformation of the visual node to a command, by interacting
+            with the visual node the data and the commands are automatically updated.
+
+
+        .TransformResults(ng-controller="visual2text")
+            .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
+                | {{result.title}}
+            table.asttest(ng-repeat="result in TransformResults track by result.id",ng-show="tab == result.id")
+                tr.command
+                    td(colspan=2)
+                        pre. command : {{result.command}}
+                tr
+                    td.border.top
+                        .center. Visual Component Data
+                        pre. {{result.visualData | json}}
+                    td.border.most.center(ng-init="data = result.visualData.components[0]")
+                        div(ng-if="!isImplemented(data)")
+                            | Visual representation not implemented
+                        .inline-component(ng-if="isImplemented(data)")
+                            include component.jade
+      accordion-group(heading="Data-flow diagrams")
+        h2 Data-flow diagrams
+
+        p.
+            The next interface shows examples of dataflows generated by using only a command, this
+            is used for a use-case when the user wants to create a workflow by using text instead
+            of creating manually with the visual tools 
+
+        h4 Interaction
+
+        p.
+            for now the implemented interactions are dragging nodes and the scene,
+            and zooming in and out, to drag the scene is simply by holding the left mouse
+            button on an empty space in the scene and moving it, to zoom in and out, use 
+            <kbd class="light">alt</kbd> + mouse wheel
+
+        p.
+          It is still early to interact with macros, at least it is possible to create a single macro
+          and to create instance of the same macro
+
+
+
+        .TransformResults(ng-controller="data-flow" ng-init="heMan = false; showInitial = false")
+            .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
+                | {{result.title}}
+            table.asttest(ng-repeat="res in TransformResults track by res.id",ng-show="tab == res.id",style="height:{{screenHeight}}px")
+                tr
+                    td.top(style="position:relative")
+                        div
+                            label
+                                input(type="checkbox",ng-model="$parent.heMan")
+                                | show visualData
+                            | &nbsp;&nbsp;&nbsp;
+                            label
+                                input(type="checkbox",ng-model="$parent.showInitial")
+                                | Show Initial Command
+                        pre(ng-bind-template="command : {{showInitial ? res.inputCommand : res.command}}")
+                        .visual-builder.border.data-flow(ng-show="$parent.$parent.heMan == false" graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:5em;bottom:0;left:0;right:0")
+                            include graph.jade
+                        pre(ng-show="heMan"). data : {{res.visualData | json}}
+      accordion-group(heading="PlayGround")
+        h2  PlayGround
+
+        p.
+            This is just an area to play or test some of the completed features, it will be
+            updated in each report. For now the AST builder is done, when filling the command
+            box it automatically updates the resulting AST of the command. 
+
+        p.
+            A note on the Visual Builder, the commands supported are the ones in the
+            "Visual representation to Unix text commands" section. The <code>"tee"</code>
+            command, not included in the section, is also supported
+
+        .playGround(ng-init="tab=1")
+            .tab(ng-click="tab=1", ng-class="(tab == 1)?'true':'no'"). Visual Builder
+            .tab(ng-click="tab=2", ng-class="(tab == 2)?'true':'no'"). AST Builder
+            table.asttest(ng-show="tab == 2",style="min-height:20em")
+                tr
+                    td.top.ast-builder(ng-controller="ast-playground")
+                        label(style="display:block")
+                            | command : 
+                            input.code(ng-model="builder.code",ng-change="generateAST()",style="width:80%")
+                            br
+                        div.result
+                            | result
+                            pre(ng-show="!builder.error"). {{builder.result}}
+                            pre(style="color:red",ng-show="builder.error"). {{builder.result}}
+            table.asttest(ng-controller="visual-playground", ng-show="tab == 1",style="height:{{screenHeight}}px")
+                tr
+                    td.top(style="position:relative")
+                        label(style="display:block")
+                            | command : 
+                            input.code(ng-model="builder.code",ng-change="generateAST()",style="width:80%")
+                            br
+                        .visual-builder.border(graph-model="builder.result" options="options" touch-action="none",style="position:absolute; top:2em;bottom:0;left:0;right:0")
+                            include graph.jade
+
+
+      accordion-group(heading="Plans for the next week")
+
+        h2  Plans for the next week
 
         ul
-           li. Create the visual representations of Unix shell code using <i>pipes</i> and <i>process substiitution</i>
-           li. Implement a graph layout
-           li. basic interaction with the scene
-           li. Parse of the "<code>awk</code>" command to visual representation
-           li. Parse of the "<code>gzip</code>" command to visual representation
-           li. Parse of the "<code>zcat</code>" command to visual representation
-           li. Parse of the "<code>gunzip</code>" command to visual representation 
-           li. Parse of the "<code>ls</code>" command to visual representation
-           li. Parse of the "<code>date</code>" command to visual representation (incomplete)
-           li. Parse of visual representation of "<code>grep</code>" command to shell code
-           li. Parse of visual representation of "<code>gzip</code>" command to shell code
-
-    p.
-        In this week, the plan changed from support macros to implement a graph layout due to 2 reasons:
-
-    ul
-        li
-            b. To test the visual representations of multiple commands.            
-            |&nbsp;Without it all nodes positions would be the same and it would be difficult to test it.
-            br
-        li
-            b. Its possible that the user might want to create a workflow using only text commands.
-            |&nbsp;The fact that the user can alternate between visual and text mode means that this task
-            | would need to be done sonner or later.
-
-    p
-        | To choose the layout, a little reaseach was made to see which layout would be good enough to
-        | represent the visual command. During the research I found a site which includes information about some of the 
-        a(href="http://docs.yworks.com/yfiles/doc/developers-guide/layout.html"). layout styles.
-        |&nbsp;I believe the 
-        a(href="http://docs.yworks.com/yfiles/doc/developers-guide/incremental_hierarchical_layouter.html")
-                | hierarchical layout 
-        |&nbsp;is a good layout to represent the code visually.
-    p.
-        Since the nodes inputs are on the left side
-        and outputs on the right side, the direction of the hierarchical layout is from left to right.
-
-
-    p.
-        The basic interaction task was to test large workflows
-
-
-
-
-    h2  AST tests
-    p.
-        The next interface shows the tests made to validate the AST of the commands,  on the right side,
-        the code highlighted as green means the test has passed, as red means the test has failed.
-
-    .ASTtest(ng-controller="ASTTester")
-        .tab(ng-repeat="result in testResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
-            | {{result.title}}
-        table.asttest(ng-repeat="result in testResults track by result.id",ng-show="tab == result.id")
-            tr.command
-                td(colspan=2)
-                    | command : 
-                    pre. {{result.command}}
-            tr
-                td.border.ast
-                    .center. AST Result
-                    pre. {{result.ast}}
-                td.border.top
-                    .center. AST Tests
-                    div(ng-repeat="res in result.results",ng-class="res.class") 
-                        code. {{res.command}}
-
-
-    h2  Visual representation of Unix commands
-
-    p.
-        The next interface shows the current planned visual interface of the nodes for each
-        command, Interacting with the visual node does nothing, in each report additional
-        commands will be added and the interface is going to be updated.
-
-
-
-    .TransformResults(ng-controller="examples")
-        .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
-            | {{result.title}}
-        table.asttest(ng-repeat="result in TransformResults track by result.id",ng-show="tab == result.id")
-            tr.command
-                td(colspan=3)
-                    | command : 
-                    pre. {{result.command}}
-            tr
-                td.border.ast.top
-                    .center AST
-                    pre. {{result.AST}}
-                td.border.top
-                    .center. Visual Component Data
-                    pre. {{result.JSONVisualData}}
-                td.border.most.center(ng-init="data = result.visualData.components[0]")
-                    div(ng-if="!isImplemented(data)")
-                        | Visual representation not implemented
-                    .inline-component(ng-if="isImplemented(data)")
-                        include component.jade
-
-    h2  Visual representation to Unix text commands
-
-    p.
-        The next interface shows the tranformation of the visual node to a command, by interacting
-        with the visual node the data and the commands are automatically updated.
-
-
-    .TransformResults(ng-controller="visual2text")
-        .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
-            | {{result.title}}
-        table.asttest(ng-repeat="result in TransformResults track by result.id",ng-show="tab == result.id")
-            tr.command
-                td(colspan=2)
-                    | command : 
-                    pre. {{result.command}}
-            tr
-                td.border.top
-                    .center. Visual Component Data
-                    pre. {{result.visualData | json}}
-                td.border.most.center(ng-init="data = result.visualData.components[0]")
-                    div(ng-if="!isImplemented(data)")
-                        | Visual representation not implemented
-                    .inline-component(ng-if="isImplemented(data)")
-                        include component.jade
-    h2 Data-flow diagrams
-
-    p.
-        The next interface shows examples of dataflows generated by using only a command, this
-        is used for a use-case when the user wants to create a workflow by using text instead
-        of creating manually with the visual tools 
-
-    h4 Interaction
-
-    p.
-        for now the implemented interactions are dragging nodes and the scene,
-        and zooming in and out, to drag the scene is simply by holding the left mouse
-        button on an empty space in the scene and moving it, to zoom in and out, use 
-        <kbd class="light">alt</kbd> + mouse wheel
-
-
-
-    .TransformResults(ng-controller="data-flow" ng-init="heMan = false; synthesize = false")
-        .tab(ng-repeat="result in TransformResults track by result.id", ng-click="updateTab(result.id)", ng-class="(tab == result.id)?'true':'no'")
-            | {{result.title}}
-        table.asttest(ng-repeat="res in TransformResults track by res.id",ng-show="tab == res.id",style="height:{{screenHeight}}px")
-            tr
-                td.top(style="position:relative")
-                    pre(ng-bind-template="command : {{synthesize ? res.command : res.inputCommand}}")
-                    div(style="position:absolute; top:0;right:0")
-                        label
-                            input(type="checkbox",ng-model="$parent.heMan")
-                            | show visualData
-                        label
-                            input(type="checkbox",ng-model="$parent.synthesize")
-                            | synthesize
-                    .visual-builder.border.data-flow(ng-show="$parent.$parent.heMan == false" graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:4em;bottom:0;left:0;right:0")
-                        include graph.jade
-                    pre(ng-show="heMan"). data : {{res.visualData | json}}
-
-
-    h2  PlayGround
-
-    p.
-        This is just an area to play or test some of the completed features, it will be
-        updated in each report. For now the AST builder is done, when filling the command
-        box it automatically updates the resulting AST of the command. 
-
-    p.
-        A note on the Visual Builder, the commands supported are the ones in the
-        "Visual representation to Unix text commands" section. The <code>"tee"</code>
-        command, not included in the section, is also supported
-
-    .playGround(ng-init="tab=1")
-        .tab(ng-click="tab=1", ng-class="(tab == 1)?'true':'no'"). Visual Builder
-        .tab(ng-click="tab=2", ng-class="(tab == 2)?'true':'no'"). AST Builder
-        table.asttest(ng-show="tab == 2",style="min-height:20em")
-            tr
-                td.top.ast-builder(ng-controller="ast-playground")
-                    label
-                        | command : 
-                        input.code(ng-model="builder.code",ng-change="generateAST()",style="width:80%")
-                        br
-                    div.result
-                        | result
-                        pre(ng-show="!builder.error"). {{builder.result}}
-                        pre(style="color:red",ng-show="builder.error"). {{builder.result}}
-        table.asttest(ng-controller="visual-playground", ng-show="tab == 1",style="height:{{screenHeight}}px")
-            tr
-                td.top(style="position:relative")
-                    label
-                        | command : 
-                        input.code(ng-model="builder.code",ng-change="generateAST()",style="width:80%")
-                        br
-                    .visual-builder.border(graph-model="builder.result" options="options" touch-action="none",style="position:absolute; top:2em;bottom:0;left:0;right:0")
-                        include graph.jade
-
-
-
-    h2  Plans for the next week
-
-    ul
-        li. Implement the connection between nodes in visual mode
-        li. Add graphical interface to create nodes in the visual mode
-        li. Support the concept of a Macro, which is a composition of interconnected commands. There should be a way to specify the inputs/outputs of the macro from unconnected i/o nodes in the children
-        li. Continue implementing the parser for other commands.
+            li. Finish implementing the support of the Macro concept
+            li. Allow the commands to be run in a server
+            li. Improve the interface
+            li. More tests
+            li. Release the first alpha (or beta) version for testing
+            li. Continue implementing the parser for other commands.
 
     script(src="js/jquery-2.1.0.min.js")
     script(src="js/angular.min.js")
-    script(src="js/angular-dropdown.min.js")
+    script(src="js/ui-bootstrap-tpls.min.js")
     script(src="js/pointerevents.min.js")
     script(src="js3/parser.js")  
     script(src="js3/reportApp.js")

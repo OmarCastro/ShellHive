@@ -17,6 +17,7 @@ $.generate(optionsParser)
 
 
 defaultComponentData = ->
+  type:\command
   exec:"awk"
   parameters:
     "field separator" : " "

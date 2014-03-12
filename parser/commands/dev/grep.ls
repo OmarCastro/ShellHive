@@ -56,7 +56,7 @@ const matchSelectorOption =
   (matchSelector.wholeWord): \w
 
 
-SelectorOptions = 
+selectorOptions = 
   (selectors.patternType): patternTypeSelectorOption
   (selectors.match)      : matchSelectorOption
 
@@ -101,6 +101,7 @@ $.generate(optionsParser)
   
 
 defaultComponentData = ->
+  type:\command
   exec:"grep",
   flags:{-"ignore case",-"invert match"}
   selectors:
@@ -120,25 +121,11 @@ exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
         component.files.push(str)
     })
 
-exports.parseComponent = (componentData,visualData,componentIndex,mapOfParsedComponents,parseComponent) ->
-  exec  = ["grep"]
-  mapOfParsedComponents[componentData.id] = true
-  flags = [flagOptions[key] for key, value of componentData.flags when value is true]
-
-  for key, value of componentData.selectors
-    flags.push that if SelectorOptions[key][value]?
-
-  pattern = componentData.pattern
+exports.parseComponent = $.commonParseComponent flagOptions,selectorOptions, null, (component,exec,flags,files) ->
+  pattern = component.pattern
   if pattern 
     if pattern.indexOf(" ") >= 0
       pattern = "\"#pattern\""
   else
-   pattern = "\"\"";
-
-  flags = "-" + flags * '' if flags.length > 0
-  files = for file in componentData.files
-    if file instanceof Array
-      subCommand = parseComponent(componentIndex[file.1],visualData,componentIndex,mapOfParsedComponents)
-      "<(#subCommand)"
-    else if file.indexOf(" ") >= 0 then "\"#file\"" else file
+    pattern = "\"\"";
   (exec ++ flags ++ pattern ++ files) * ' '

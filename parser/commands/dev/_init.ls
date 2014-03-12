@@ -1,4 +1,7 @@
 
+Boundaries = require("./_graphlayout.js");
+
+
 exports.Iterator = class Iterator
   (ArgList) ->
     @index = 0
@@ -8,60 +11,6 @@ exports.Iterator = class Iterator
   hasNext: -> @index != @length
   next: -> @current = @argList[@index++]
   rest: -> @argList.slice @index
-
-function getBoundaries(components)
-  return null if components.length == 0
-  firstPos = components[0].position
-  boundary =
-    left  : firstPos.x
-    rigth : firstPos.x
-    top   : firstPos.y
-    bottom: firstPos.y
-    components: components
-  for i from 1 to components.length - 1
-    pos = components[i].position
-    boundary
-      ..left   = pos.x if pos.x < boundary.left
-      ..rigth  = pos.x if pos.x > boundary.rigth
-      ..top    = pos.y if pos.y < boundary.top
-      ..bottom = pos.y if pos.y > boundary.bottom
-  return boundary
-
-
-function translateBoundary(boundary,x,y = 0)
-  boundary
-    ..left   += x
-    ..rigth  += x
-    ..top    += y
-    ..bottom += y
-  for comp in boundary.components
-    comp.position
-      ..x += x
-      ..y += y
-
-function arrangeLayout(boundaries)
-  maxX = 0
-  prevBound = null
-  components = []
-  for boundary in boundaries when boundary
-    maxX = boundary.rigth if maxX < boundary.rigth
-    components = components ++ boundary.components
-  for boundary in boundaries when boundary
-    translateBoundary boundary, maxX - boundary.rigth, 
-      if prevBound then prevBound.bottom + 350 - boundary.top else 0
-    prevBound = boundary
-  x = switch boundaries.length
-    | 0 => 0
-    | _ => maxX + 450
-  y = switch boundaries.length
-    | 0 => 0
-    | 1 => prevBound.bottom
-    | _ => (prevBound.bottom)
-
-  return [{left:0,rigth:x ,top:0 ,bottom:y,components},{x,y:y/2}]
-
-
-
 
 function parseShortOptions(shortOptions,componentData,argsNodeIterator)
   iter = new Iterator argsNodeIterator.current.slice(1)
@@ -188,7 +137,7 @@ commonParseCommand = (optionsParser,defaultComponentData, argNodeParsing) ->
       if previousCommand instanceof Array
         boundaries.push previousCommand.0
       else
-        boundaries.push[getBoundaries([previousCommand])]
+        boundaries.push[Boundaries.getBoundaries([previousCommand])]
     connectionsToPush = []
 
     result = {components:[componentData],connections:[],mainComponent: componentData}
@@ -207,7 +156,7 @@ commonParseCommand = (optionsParser,defaultComponentData, argNodeParsing) ->
 
       case \inFromProcess
         subresult = parser.parseAST(argNode[1], tracker)
-        boundaries.push getBoundaries subresult.components
+        boundaries.push Boundaries.getBoundaries subresult.components
         for sub in subresult.components
           result.components.push sub
         for sub in subresult.connections
@@ -219,7 +168,7 @@ commonParseCommand = (optionsParser,defaultComponentData, argNodeParsing) ->
           endPort: "file#{componentData.files.length - 1}"
         }
       
-    bbox = arrangeLayout(boundaries)
+    bbox = Boundaries.arrangeLayout(boundaries)
     componentData
       ..position = bbox[1]
       ..id = tracker.id
@@ -232,41 +181,64 @@ commonParseCommand = (optionsParser,defaultComponentData, argNodeParsing) ->
     tracker.id++ 
     [bbox.0,result]
 
-commonParseComponent = (flagOptions, selectorsOptions) ->
-  (componentData,visualData,componentIndex,mapOfParsedComponents,parseComponent) ->
-    exec = [componentData.exec]
-    mapOfParsedComponents[componentData.id] = true
-
-    flags = []
-    longflags = []
-    for key, value of componentData.flags when value
+parseFlagsAndSelectors = (component, options) -> 
+    {flagOptions,selectorOptions} = options
+    sFlags = [] #short flags (1 char flag)
+    lFlags = [] #long flags (string flag starting with with "--")
+    for key, value of component.flags when value
       flag = flagOptions[key]
       if flag[0] != \-
-      then  flags.push flag
-      else  longflags.push flag
+      then  sFlags.push flag
+      else  lFlags.push flag
 
-    for key, value of componentData.selectors when selectorsOptions[key][value]?
-      val = that
-      if val[0] != \- 
-      then flags.push val 
-      else longflags.push val
+    if component.selectors
+      for key, value of component.selectors when selectorOptions[key][value]?
+        val = that
+        if val[0] != \- 
+        then  sFlags.push val
+        else  lFlags.push val
 
-    flags = flags * ''
-    flags = "-" + flags * '' if flags.length > 0
-    if longflags.length > 0
-      flags += " " if flags.length > 0
-      flags += longflags * ' '
-    files = for file in componentData.files
+    if sFlags.length > 0
+      sFlags = "-" + sFlags * ''
+    if lFlags.length > 0
+      sFlags += " " if lFlags.length > 0
+      sFlags += lFlags * ' '
+    sFlags
+
+
+
+commonParseComponent = (flagOptions, selectorOptions, parameterOptions, beforeJoin) ->
+  options = {flagOptions, selectorOptions, parameterOptions}
+  (component,visualData,componentIndex,mapOfParsedComponents,parseComponent) ->
+    exec = [component.exec]
+
+    mapOfParsedComponents[component.id] = true
+
+    flags = parseFlagsAndSelectors component, options
+
+    parameters = for key, value of component.parameters
+          if value
+            if value.indexOf(" ") >= 0 
+            then "\"-#{parameterOptions[key]}#value\""
+            else "-#{parameterOptions[key]}#value"
+
+    files = for file in component.files
       if file instanceof Array
         subCommand = parseComponent(componentIndex[file.1],visualData,componentIndex,mapOfParsedComponents)
         "<(#subCommand)"
-      else if file.indexOf(" ") >= 0 then "\"#file\"" else file
-    (exec ++ flags ++ files) * ' '
+      else if file.indexOf(" ") >= 0 
+           then "\"#file\""
+           else file
+
+    parameters = parameters * ' ' if parameters.length > 0
+    if beforeJoin 
+    then beforeJoin(component,exec,flags,files,parameters)
+    else (exec ++ flags ++ parameters ++ files) * ' '
 
 
 exports <<< {
-  getBoundaries
-  arrangeLayout
+  Boundaries.getBoundaries
+  Boundaries.arrangeLayout
   parseShortOptions
   parseLongOptions
   switchOn
@@ -279,6 +251,6 @@ exports <<< {
   generate
   commonParseCommand
   commonParseComponent
-  translateBoundary
+  Boundaries.translateBoundary
   getComponentById
 }

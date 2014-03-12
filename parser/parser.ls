@@ -14,12 +14,10 @@ parserCommand =
   gzip:      require './commands/v/gzip'
   gunzip:    require './commands/v/gunzip'
   zcat:      require './commands/v/zcat'
+  tr:        require './commands/v/tr'
   tee:       require './commands/v/tee'
 
 implementedCommands = [key for key of parserCommand when key != \tee]
-
-function isImplemented(command)
-  return !!parserCommand(command)
 
 VisualSelectorOptions = 
   cat:      parserCommand.cat.VisualSelectorOptions
@@ -49,9 +47,39 @@ function getPositionBoundaries(components)
     xe = py if px > xe
   return {xs,ys,xe,ye}
 
+
+isImplemented = (command) -> parserCommand.command?
+
+
+
+
+
+
+
+### =================  TEXT TO VISUAL DATA =================
+
+
+
+/**
+ * Parses the syntax of the command and
+ * transforms into an Abstract Syntax Tree
+ * @param command command
+ * @return the resulting AST
+ */
 function generateAST(command)
   return astBuilder.parse(command)
 
+
+
+/**
+ * Parses the Abstract Syntax Tree
+ * and transforms it to a graph representation format
+ * that can be used in the visual application
+ *
+ * @param ast - the Abstract Syntax Tree
+ * @param tracker - and tracker the tracks the id of a component
+ * @returns the visual representation of the object
+ */
 function parseAST(ast, tracker)
   components = []
   connections = []
@@ -92,16 +120,37 @@ function parseAST(ast, tracker)
       "mi" if CommandComponent is void
       firstMainComponent = CommandComponent.id if index < 1
 
-  return {firstMainComponent,components,connections}
+  return {firstMainComponent,counter:tracker.id,components,connections}
 
 
+
+/**
+ * parses the command
+ */
 function parseCommand(command)
   return parseAST generateAST(command)
+
+
+
+
+### =================  VISUAL DATA TO TEXT =================
+
+/**
+ * Creates an index of the components
+ */
+indexComponents = (visualData) -> {[comp.id,comp] for comp in visualData.components}
+
+
+function parseVisualData(VisualData)
+  indexedComponentList = indexComponents(VisualData)
+  initialComponent = indexedComponentList[VisualData.firstMainComponent]
+  return if initialComponent is null
+  parseVisualDatafromComponent(initialComponent,VisualData,indexedComponentList,{}) 
+
 
 function parseComponent(component, visualData,componentIndex,mapOfParsedComponents)
   return parserCommand[component.exec].parseComponent(component,visualData,componentIndex,mapOfParsedComponents,parseVisualDatafromComponent)
 
-indexComponents = (visualData) -> {[comp.id,comp] for comp in visualData.components}
 
 
 function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents)
@@ -143,12 +192,34 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
   return commands * " | "
 
 
-function parseVisualData(VisualData)
-  indexedComponentList = indexComponents(VisualData)
-  initialComponent = indexedComponentList[VisualData.firstMainComponent]
-  return if initialComponent is null
-  parseVisualDatafromComponent(initialComponent,VisualData,indexedComponentList,{}) 
+### ==== Macros ====
+
+createMacro = (name, description, fromMacro) ->
+  if fromMacro
+    macroData = JSON.parse(JSON.stringify(fromMacro))
+      ..name = name
+      ..description = description
+  else
+    macroData = {
+      name: name
+      description: description
+      entryComponent: null
+      exitComponent: null
+      count: 0
+      components: []
+      connections: []
+    }
+
+function compileMacro(macro)
+  if macro.entryComponent is null 
+    throw "no component defined as Macro Entry"
+  if macro.exitComponent is null
+    throw "no component defined as Macro Exit"
+  indexedComponentList = indexComponents(macro)
+  initialComponent = indexedComponentList[macro.entryComponent]
+  parseVisualDatafromComponent(initialComponent,VisualData,indexedComponentList,{})
+
 
 
 parser  <<< {generateAST,parseAST,astBuilder,parseCommand, parseComponent,implementedCommands, parseVisualData }
-exports <<< {generateAST,parseAST,astBuilder,parseCommand, parseComponent,implementedCommands, parseVisualData, VisualSelectorOptions}
+exports <<< {generateAST,parseAST,astBuilder,parseCommand, parseComponent,implementedCommands, parseVisualData, createMacro ,VisualSelectorOptions}
