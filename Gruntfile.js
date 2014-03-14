@@ -52,7 +52,7 @@
             bare: true
           },
           files: {
-            'public/reports/js4/reportApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/reportInit.ls', 'livescript/weeklyReport/play.ls', 'livescript/weeklyReport/directives.ls']
+            'public/reports/js4/reportApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/reportInit.ls', 'livescript/weeklyReport/play.ls', 'livescript/angularjs/directives/*.ls']
           }
         },
         demo: {
@@ -87,7 +87,7 @@
           tasks: ['stylus:reports']
         },
         report: {
-          files: ['livescript/weeklyReport/*.ls'],
+          files: ['livescript/weeklyReport/*.ls', 'livescript/angularjs/**/*.ls'],
           tasks: ['livescript:report']
         },
         parserCommands: {

@@ -27,7 +27,8 @@ app.directive "graphModel", ($document) ->
 
     elem = element[0];
     graphModel = scope.graphModel
-    graphModel.macros = {}
+    graphModel.macros = {sss:shellParser.createMacro \sss,\ddd}
+    graphModel.macroList = [key for key,val of graphModel.macros]
     scope
       ..popupText = ''
       ..graph = this
@@ -49,7 +50,7 @@ app.directive "graphModel", ($document) ->
           else if connection.endPort == "file#{index-1}"
             connection.endPort = "file#index"
 
-    elem.style[cssTransform] = "translate3d(0,0,0)"
+    #elem.style[cssTransform] = "translate3d(0,0,0)"
     nodesElem = elem.querySelector(".nodes")
     edgesElem = elem.querySelector(".edges")
     svgElem = elem.querySelector("svg")
@@ -58,7 +59,7 @@ app.directive "graphModel", ($document) ->
     nodesElemStyle = nodesElem.style
     edgesElemStyle = edgesElem.style
 
-    popup = elem.querySelector("div[popup]")
+    popup = elem.querySelector(".popup")
     $popup = $(popup)
     popupHeight = $popup.height!
     $popup.hide!
@@ -85,10 +86,10 @@ app.directive "graphModel", ($document) ->
 
     element.bind "pointerdown", (ev) !->
       return false if ev.which == 3
-      hidePopupAndEdge!
       event = ev.originalEvent
       targetTag = event.target.tagName
-      return if pointerId || targetTag in <[INPUT SELECT LABEL]>
+      return if pointerId || targetTag in <[INPUT SELECT LABEL A LI]>
+      hidePopupAndEdge!
       pointerId := event.pointerId
       $document
         ..bind "pointermove", mousemove
@@ -97,6 +98,10 @@ app.directive "graphModel", ($document) ->
       startY := event.screenY
       event.preventDefault!
       event.stopPropagation!
+
+
+
+
     newComponent = (content, position)->
       if content.split(" ")[0] in listOfImplementedCommands
         newCommandComponent(content, position)
@@ -140,6 +145,7 @@ app.directive "graphModel", ($document) ->
 
     scaleFromMouse = (amount, event) !->
       return if (scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)
+      hidePopupAndEdge!
       {x,y} = mapMouseToView event
       relpointX = x - graphX
       relpointY = y - graphY
@@ -187,7 +193,7 @@ app.directive "graphModel", ($document) ->
           ..startNode = startNode
           ..startPort = startPort
         console.log popupHeight / 2
-        popup.style[cssTransform] = "translate(#{x}px,#{y - popupHeight / 2}px)"
+        popup.style[cssTransform] = "translate(#{Math.floor(x)}px,#{Math.floor(y - popupHeight / 2)}px)"
         $popup.show!
         $popupInput.focus!
         scope.$digest!
@@ -207,13 +213,13 @@ app.directive "graphModel", ($document) ->
 
 ##graphC
     this
+      ..isFreeSpace = (elem) -> elem in [svgElem, nodesElem ]
       ..showPopup = showPopup
       ..nodesElement = nodesElem
       ..popupSubmit = popupSubmit
       ..hidePopup = hidePopup
       ..hidePopupAndEdge = hidePopupAndEdge
       ..nodesElement = nodesElem
-      ..typeAheadModel = listOfImplementedCommands
       ..newCommandComponent = newCommandComponent
       ..startEdge = startEdge
       ..moveEdge = moveEdge
@@ -227,41 +233,13 @@ app.directive "graphModel", ($document) ->
       ..revertToRoot = !-> scope.visualData = graphModel;
       ..newMacro = (name, descr) !-> 
         graphModel.macros[name] = shellParser.createMacro name, descr
-        this.typeAheadModel = listOfImplementedCommands ++ [key for key in graphModel.macros]
+        graphModel.macroList = [key for key of graphModel.macros]
       ..translateNode = (id,position,x,y) !->
         position.x += x/scale
         position.y += y/scale
         for el in edgesElem.querySelectorAll("[connector]")
           $(el).scope().updateWithId(id)
   ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -409,7 +387,7 @@ app.directive "port", ($document) ->
       pointedElem = document.elementFromPoint event.clientX,event.clientY
       $pointedElem = $(pointedElem)
 
-      if pointedElem == graphModelController.nodesElement
+      if graphModelController.isFreeSpace pointedElem
         graphModelController.showPopup event, scope.componentId, attr.port
       else
         graphModelController.endEdge!

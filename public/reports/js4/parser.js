@@ -180,7 +180,14 @@ r.m[0] = {
     return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
   }
   function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
-    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+    switch (component.type) {
+    case 'command':
+      return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+    case 'subgraph':
+      return '';
+    default:
+      return '';
+    }
   }
   function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents){
     var commands, isFirst, i$, ref$, len$, connection, outputs, res$, endNodeId, j$, ref1$, len1$, component, endNode, nextcommands, comm, to$, i;
@@ -245,7 +252,7 @@ r.m[0] = {
         description: description,
         entryComponent: null,
         exitComponent: null,
-        count: 0,
+        counter: 0,
         components: [],
         connections: []
       };

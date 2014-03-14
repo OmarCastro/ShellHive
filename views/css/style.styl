@@ -9,6 +9,7 @@ body, .graph, .nodes
 	width 90%
 	height 100%
 	transform-origin: 0 0
+	//transform translate3d(0,0,0)
 div[graph-model] svg
 	background-color: #ccc
 
@@ -27,6 +28,15 @@ div[sidebar]
 	background-color: #ddd
 
 	z-index: 5
+
+.popup
+	position absolute
+	z-index 10
+	left 10%
+	a
+		padding-top 0
+		padding-bottom 0
+
 
 svg.edges
 	z-index: 1

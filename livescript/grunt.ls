@@ -28,7 +28,7 @@ module.exports = (grunt) !->
             'livescript/weeklyReport/init.ls'
             'livescript/weeklyReport/reportInit.ls'
             'livescript/weeklyReport/play.ls'
-            'livescript/weeklyReport/directives.ls'
+            'livescript/angularjs/directives/*.ls'
       demo:
         options:{+bare}    
         files: 
@@ -69,7 +69,7 @@ module.exports = (grunt) !->
         files:['public/reports/style.styl','views/css/style.styl']
         tasks:['stylus:reports']
       report:
-        files: ['livescript/weeklyReport/*.ls']
+        files: ['livescript/weeklyReport/*.ls','livescript/angularjs/**/*.ls']
         tasks: ['livescript:report']        
       parserCommands:
         files: ['parser/commands/dev/*.ls']

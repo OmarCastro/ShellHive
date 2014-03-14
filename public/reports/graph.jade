@@ -1,7 +1,16 @@
 div(sidebar)
-div(popup, style="position: absolute; z-index:10; left:10%")
-    form(ng:submit="graph.popupSubmit(popupText)")
-        input(type="text" ng-model="popupText" typeahead="foo for foo in graph.typeAheadModel | filter:$viewValue | limitTo:5")
+div.popup
+    form.dropdown.open(ng:submit="graph.popupSubmit(popupText)")
+        input(type="text" ng-model="popupText")
+        ul.dropdown-menu
+            li(ng-show="comms.length")
+                b command component
+            li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms = (implementedCommands | filter:popupText)")
+                a(ng-click="graph.popupSubmit(foo)") {{foo}}
+            li(ng-show="comms2.length")
+                b macro component
+            li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms2 = (graphModel.macroList | filter:popupText)")
+                a(ng-click="graph.popupSubmit(foo)") {{foo}}
 svg
     g.edges
         path.emptyEdge
@@ -28,6 +37,8 @@ svg
             br
             div.
                 {{data.macro.description}}
+            button(ng-click="graph.setGraphView(data.macro)").
+                view macro
         div(ng-if="data.type == 'command'")
             .title 
                 span(ng-bind="data.exec")

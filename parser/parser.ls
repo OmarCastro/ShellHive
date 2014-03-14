@@ -149,8 +149,10 @@ function parseVisualData(VisualData)
 
 
 function parseComponent(component, visualData,componentIndex,mapOfParsedComponents)
-  return parserCommand[component.exec].parseComponent(component,visualData,componentIndex,mapOfParsedComponents,parseVisualDatafromComponent)
-
+  switch component.type
+  | \command => parserCommand[component.exec].parseComponent(component,visualData,componentIndex,mapOfParsedComponents,parseVisualDatafromComponent)
+  | \subgraph => ''
+  | otherwise => '' 
 
 
 function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents)
@@ -205,7 +207,7 @@ createMacro = (name, description, fromMacro) ->
       description: description
       entryComponent: null
       exitComponent: null
-      count: 0
+      counter: 0
       components: []
       connections: []
     }

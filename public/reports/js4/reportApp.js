@@ -360,307 +360,6 @@ app.controller('data-flow', function($scope){
     }, true);
   }
 });
-var activeDrop;
-app.directive("graphModel", function($document){
-  return {
-    restrict: 'A',
-    replace: false,
-    scope: {
-      graphModel: '=',
-      options: '='
-    },
-    controller: [
-      '$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
-        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, graphModel, x$, nodesElem, edgesElem, svgElem, $svgElem, nodesElemStyle, edgesElemStyle, popup, $popup, popupHeight, $popupInput, update, mousemove, mouseup, newComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, popupSubmit, hidePopup, hidePopupAndEdge, y$;
-        pointerId = 0;
-        scale = 1;
-        graphX = 0;
-        graphY = 0;
-        startX = 0;
-        startY = 0;
-        edgeIniX = 0;
-        edgeIniY = 0;
-        elem = element[0];
-        graphModel = scope.graphModel;
-        graphModel.macros = {};
-        x$ = scope;
-        x$.popupText = '';
-        x$.graph = this;
-        x$.$watch("graphModel", function(){
-          return scope.visualData = scope.graphModel;
-        });
-        x$.visualData = scope.graphModel;
-        x$.implementedCommands = listOfImplementedCommands;
-        x$.isImplemented = isImplemented;
-        x$.isArray = angular.isArray;
-        x$.isString = angular.isString;
-        x$.swapPrevious = function(array, index, id){
-          var ref$, i$, len$, connection, results$ = [];
-          if (index === 0) {
-            return;
-          }
-          ref$ = [array[index - 1], array[index]], array[index] = ref$[0], array[index - 1] = ref$[1];
-          for (i$ = 0, len$ = (ref$ = scope.visualData.connections).length; i$ < len$; ++i$) {
-            connection = ref$[i$];
-            if (connection.endNode === id) {
-              if (connection.endPort === "file" + index) {
-                results$.push(connection.endPort = "file" + (index - 1));
-              } else if (connection.endPort === "file" + (index - 1)) {
-                results$.push(connection.endPort = "file" + index);
-              }
-            }
-          }
-          return results$;
-        };
-        elem.style[cssTransform] = "translate3d(0,0,0)";
-        nodesElem = elem.querySelector(".nodes");
-        edgesElem = elem.querySelector(".edges");
-        svgElem = elem.querySelector("svg");
-        $svgElem = $(svgElem);
-        nodesElemStyle = nodesElem.style;
-        edgesElemStyle = edgesElem.style;
-        popup = elem.querySelector("div[popup]");
-        $popup = $(popup);
-        popupHeight = $popup.height();
-        $popup.hide();
-        $popupInput = $popup.find("input");
-        update = function(){
-          var transform;
-          transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
-          nodesElemStyle[cssTransform] = transform;
-          return edgesElemStyle[cssTransform] = transform;
-        };
-        update();
-        mousemove = function(ev){
-          var event;
-          event = ev.originalEvent;
-          graphX += event.screenX - startX;
-          graphY += event.screenY - startY;
-          startX = event.screenX;
-          startY = event.screenY;
-          update();
-        };
-        mouseup = function(){
-          var x$;
-          pointerId = 0;
-          x$ = $document;
-          x$.unbind("pointermove", mousemove);
-          x$.unbind("pointerup", mouseup);
-          return x$;
-        };
-        element.bind("pointerdown", function(ev){
-          var event, targetTag, x$;
-          if (ev.which === 3) {
-            return false;
-          }
-          hidePopupAndEdge();
-          event = ev.originalEvent;
-          targetTag = event.target.tagName;
-          if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL')) {
-            return;
-          }
-          pointerId = event.pointerId;
-          x$ = $document;
-          x$.bind("pointermove", mousemove);
-          x$.bind("pointerup", mouseup);
-          startX = event.screenX;
-          startY = event.screenY;
-          event.preventDefault();
-          event.stopPropagation();
-        });
-        newComponent = function(content, position){
-          if (in$(content.split(" ")[0], listOfImplementedCommands)) {
-            return newCommandComponent(content, position);
-          } else {
-            return newMacroComponent(content, position);
-          }
-        };
-        newMacroComponent = function(name, position){
-          var visualData, newComponent;
-          visualData = scope.visualData;
-          newComponent = {
-            type: 'subgraph',
-            macro: graphModel.macros[name],
-            id: visualData.counter++,
-            position: {}
-          };
-          visualData.components.push(newComponent);
-          importAll$(newComponent.position, position);
-          return newComponent;
-        };
-        newCommandComponent = function(command, position){
-          var visualData, newResult, x$, newComponent;
-          console.log(command);
-          visualData = scope.visualData;
-          newResult = shellParser.parseCommand(command);
-          x$ = newComponent = newResult.components[0];
-          x$.id = visualData.counter++;
-          importAll$(x$.position, position);
-          visualData.components.push(newComponent);
-          return newComponent;
-        };
-        mapMouseToScene = function(event){
-          var ref$, x, y;
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
-          return mapPointToScene(x, y);
-        };
-        mapMouseToView = function(event){
-          var offset;
-          offset = $svgElem.offset();
-          return {
-            x: event.pageX - offset.left,
-            y: event.pageY - offset.top
-          };
-        };
-        mapPointToScene = function(x, y){
-          return {
-            x: (x - graphX) / scale,
-            y: (y - graphY) / scale
-          };
-        };
-        scaleFromMouse = function(amount, event){
-          var ref$, x, y, relpointX, relpointY;
-          if ((scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)) {
-            return;
-          }
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
-          relpointX = x - graphX;
-          relpointY = y - graphY;
-          graphX += Math.round(-relpointX * amount + relpointX);
-          graphY += Math.round(-relpointY * amount + relpointY);
-          scale *= amount;
-          update();
-        };
-        MouseWheelHandler = function(event){
-          if (!event.altKey) {
-            return;
-          }
-          event.preventDefault();
-          event.stopPropagation();
-          if ((event.wheelDelta || -event.detail) > 0) {
-            return scaleFromMouse(1.1, event);
-          } else {
-            return scaleFromMouse(0.9, event);
-          }
-        };
-        mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
-        elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
-        simpleEdge = element.find('.emptyEdge')[0];
-        setEdgePath = function(iniX, iniY, endX, endY){
-          var xpoint;
-          xpoint = (endX - iniX) / 4;
-          return simpleEdge.setAttribute('d', "M " + iniX + " " + iniY + " H " + (iniX + 0.5 * xpoint) + " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY + " H " + endX);
-        };
-        popupState = {
-          x: 0,
-          y: 0,
-          startNode: 0,
-          startPort: 0
-        };
-        startEdge = function(elem, position, ev){
-          this.hidePopup();
-          edgeIniX = elem.offsetLeft + position.x;
-          edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
-          return setEdgePath(edgeIniX, edgeIniY, edgeIniX, edgeIniY);
-        };
-        moveEdge = function(event){
-          var ref$, x, y;
-          ref$ = mapMouseToScene(event), x = ref$.x, y = ref$.y;
-          return setEdgePath(edgeIniX, edgeIniY, x, y);
-        };
-        endEdge = function(){
-          console.log("edge finished");
-          return simpleEdge.setAttribute('d', "M 0 0");
-        };
-        showPopup = function(event, startNode, startPort){
-          var ref$, x, y, x$;
-          scope.popupText = '';
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
-          importAll$(popupState, {
-            x: x,
-            y: y
-          });
-          x$ = popupState;
-          x$.startNode = startNode;
-          x$.startPort = startPort;
-          console.log(popupHeight / 2);
-          popup.style[cssTransform] = "translate(" + x + "px," + (y - popupHeight / 2) + "px)";
-          $popup.show();
-          $popupInput.focus();
-          return scope.$digest();
-        };
-        popupSubmit = function(content){
-          var comp;
-          comp = newComponent(content, popupState);
-          scope.visualData.connections.push({
-            startNode: popupState.startNode,
-            startPort: popupState.startPort,
-            endNode: comp.id,
-            endPort: 'input'
-          });
-          hidePopup();
-          return endEdge();
-        };
-        hidePopup = function(){
-          return $popup.hide();
-        };
-        hidePopupAndEdge = function(){
-          $popup.hide();
-          return endEdge();
-        };
-        y$ = this;
-        y$.showPopup = showPopup;
-        y$.nodesElement = nodesElem;
-        y$.popupSubmit = popupSubmit;
-        y$.hidePopup = hidePopup;
-        y$.hidePopupAndEdge = hidePopupAndEdge;
-        y$.nodesElement = nodesElem;
-        y$.typeAheadModel = listOfImplementedCommands;
-        y$.newCommandComponent = newCommandComponent;
-        y$.startEdge = startEdge;
-        y$.moveEdge = moveEdge;
-        y$.endEdge = endEdge;
-        y$.updateScope = function(){
-          return scope.$digest();
-        };
-        y$.getVisualData = function(){
-          return scope.visualData;
-        };
-        y$.mapPointToScene = mapPointToScene;
-        y$.mapMouseToScene = mapMouseToScene;
-        y$.mapMouseToView = mapMouseToView;
-        y$.setGraphView = function(view){
-          hidePopupAndEdge();
-          scope.visualData = view;
-        };
-        y$.revertToRoot = function(){
-          scope.visualData = graphModel;
-        };
-        y$.newMacro = function(name, descr){
-          var key;
-          graphModel.macros[name] = shellParser.createMacro(name, descr);
-          this.typeAheadModel = listOfImplementedCommands.concat((function(){
-            var i$, ref$, len$, results$ = [];
-            for (i$ = 0, len$ = (ref$ = graphModel.macros).length; i$ < len$; ++i$) {
-              key = ref$[i$];
-              results$.push(key);
-            }
-            return results$;
-          }()));
-        };
-        y$.translateNode = function(id, position, x, y){
-          var i$, ref$, len$, el;
-          position.x += x / scale;
-          position.y += y / scale;
-          for (i$ = 0, len$ = (ref$ = edgesElem.querySelectorAll("[connector]")).length; i$ < len$; ++i$) {
-            el = ref$[i$];
-            $(el).scope().updateWithId(id);
-          }
-        };
-      }
-    ]
-  };
-});
 app.directive("connector", function($document){
   return {
     scope: true,
@@ -746,6 +445,7 @@ app.directive("component", function($document){
       imstyle = elem.style;
       element.bind("pointerdown", function(ev){
         var event, targetTag, pointerId, x$;
+        console.log(datanode);
         switch (ev.which) {
         case 2:
           return true;
@@ -755,8 +455,8 @@ app.directive("component", function($document){
         graphModelController.hidePopupAndEdge();
         event = ev.originalEvent;
         targetTag = event.target.tagName;
-        if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL')) {
-          return;
+        if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'BUTTON')) {
+          return true;
         }
         pointerId = event.pointerId;
         x$ = $document;
@@ -840,7 +540,7 @@ app.directive("port", function($document){
         event = ev.originalEvent;
         pointedElem = document.elementFromPoint(event.clientX, event.clientY);
         $pointedElem = $(pointedElem);
-        if (pointedElem === graphModelController.nodesElement) {
+        if (graphModelController.isFreeSpace(pointedElem)) {
           graphModelController.showPopup(event, scope.componentId, attr.port);
         } else {
           graphModelController.endEdge();
@@ -863,6 +563,325 @@ app.directive("port", function($document){
     }
   };
 });
+app.directive("graphModel", function($document){
+  return {
+    replace: false,
+    scope: {
+      graphModel: '=',
+      options: '='
+    },
+    controller: [
+      '$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
+        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, nodesElem, nodesElemStyle, edgesElem, edgesElemStyle, svgElem, $svgElem, popup, $popup, popupHeight, $popupInput, graphModel, res$, key, ref$, val, x$, update, mousemove, mouseup, newComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, popupSubmit, hidePopup, hidePopupAndEdge, y$;
+        pointerId = 0;
+        scale = 1;
+        graphX = 0;
+        graphY = 0;
+        startX = 0;
+        startY = 0;
+        edgeIniX = 0;
+        edgeIniY = 0;
+        elem = element[0];
+        nodesElem = elem.querySelector(".nodes");
+        nodesElemStyle = nodesElem.style;
+        edgesElem = elem.querySelector(".edges");
+        edgesElemStyle = edgesElem.style;
+        svgElem = elem.querySelector("svg");
+        $svgElem = $(svgElem);
+        popup = elem.querySelector(".popup");
+        $popup = $(popup);
+        popupHeight = $popup.height();
+        $popup.hide();
+        $popupInput = $popup.find("input");
+        graphModel = scope.graphModel;
+        graphModel.macros = {
+          sss: shellParser.createMacro('sss', 'ddd')
+        };
+        res$ = [];
+        for (key in ref$ = graphModel.macros) {
+          val = ref$[key];
+          res$.push(key);
+        }
+        graphModel.macroList = res$;
+        x$ = scope;
+        x$.popupText = '';
+        x$.graph = this;
+        x$.$watch("graphModel", function(){
+          return scope.visualData = scope.graphModel;
+        });
+        x$.visualData = scope.graphModel;
+        x$.implementedCommands = listOfImplementedCommands;
+        x$.isImplemented = isImplemented;
+        x$.isArray = angular.isArray;
+        x$.isString = angular.isString;
+        x$.swapPrevious = function(array, index, id){
+          var ref$, i$, len$, connection, results$ = [];
+          if (index === 0) {
+            return;
+          }
+          ref$ = [array[index - 1], array[index]], array[index] = ref$[0], array[index - 1] = ref$[1];
+          for (i$ = 0, len$ = (ref$ = scope.visualData.connections).length; i$ < len$; ++i$) {
+            connection = ref$[i$];
+            if (connection.endNode === id) {
+              if (connection.endPort === "file" + index) {
+                results$.push(connection.endPort = "file" + (index - 1));
+              } else if (connection.endPort === "file" + (index - 1)) {
+                results$.push(connection.endPort = "file" + index);
+              }
+            }
+          }
+          return results$;
+        };
+        update = function(){
+          var transform;
+          transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
+          nodesElemStyle[cssTransform] = transform;
+          return edgesElemStyle[cssTransform] = transform;
+        };
+        update();
+        mousemove = function(ev){
+          var event;
+          event = ev.originalEvent;
+          graphX += event.screenX - startX;
+          graphY += event.screenY - startY;
+          startX = event.screenX;
+          startY = event.screenY;
+          update();
+        };
+        mouseup = function(){
+          var x$;
+          pointerId = 0;
+          x$ = $document;
+          x$.unbind("pointermove", mousemove);
+          x$.unbind("pointerup", mouseup);
+          return x$;
+        };
+        element.bind("pointerdown", function(ev){
+          var event, targetTag, x$;
+          if (ev.which === 3) {
+            return false;
+          }
+          event = ev.originalEvent;
+          targetTag = event.target.tagName;
+          if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'A' || targetTag === 'LI' || targetTag === 'BUTTON')) {
+            return;
+          }
+          hidePopupAndEdge();
+          pointerId = event.pointerId;
+          x$ = $document;
+          x$.bind("pointermove", mousemove);
+          x$.bind("pointerup", mouseup);
+          startX = event.screenX;
+          startY = event.screenY;
+          event.preventDefault();
+          event.stopPropagation();
+        });
+        newComponent = function(content, position){
+          if (in$(content.split(" ")[0], listOfImplementedCommands)) {
+            return newCommandComponent(content, position);
+          } else {
+            return newMacroComponent(content, position);
+          }
+        };
+        newMacroComponent = function(name, position){
+          var visualData, newComponent;
+          visualData = scope.visualData;
+          newComponent = {
+            type: 'subgraph',
+            macro: graphModel.macros[name],
+            id: visualData.counter++,
+            position: {}
+          };
+          visualData.components.push(newComponent);
+          importAll$(newComponent.position, position);
+          return newComponent;
+        };
+        newCommandComponent = function(command, position){
+          var visualData, newResult, x$, newComponent;
+          console.log(command);
+          visualData = scope.visualData;
+          newResult = shellParser.parseCommand(command);
+          x$ = newComponent = newResult.components[0];
+          x$.id = visualData.counter++;
+          importAll$(x$.position, position);
+          visualData.components.push(newComponent);
+          return newComponent;
+        };
+        mapMouseToScene = function(event){
+          var ref$, x, y;
+          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          return mapPointToScene(x, y);
+        };
+        mapMouseToView = function(event){
+          var offset;
+          offset = $svgElem.offset();
+          return {
+            x: event.pageX - offset.left,
+            y: event.pageY - offset.top
+          };
+        };
+        mapPointToScene = function(x, y){
+          return {
+            x: (x - graphX) / scale,
+            y: (y - graphY) / scale
+          };
+        };
+        scaleFromMouse = function(amount, event){
+          var ref$, x, y, relpointX, relpointY;
+          if ((scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)) {
+            return;
+          }
+          hidePopupAndEdge();
+          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          relpointX = x - graphX;
+          relpointY = y - graphY;
+          graphX += Math.round(-relpointX * amount + relpointX);
+          graphY += Math.round(-relpointY * amount + relpointY);
+          scale *= amount;
+          update();
+        };
+        MouseWheelHandler = function(event){
+          if (!event.altKey) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          if ((event.wheelDelta || -event.detail) > 0) {
+            return scaleFromMouse(1.1, event);
+          } else {
+            return scaleFromMouse(0.9, event);
+          }
+        };
+        mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+        elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
+        simpleEdge = element.find('.emptyEdge')[0];
+        setEdgePath = function(iniX, iniY, endX, endY){
+          var xpoint;
+          xpoint = (endX - iniX) / 4;
+          return simpleEdge.setAttribute('d', "M " + iniX + " " + iniY + " H " + (iniX + 0.5 * xpoint) + " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY + " H " + endX);
+        };
+        popupState = {
+          x: 0,
+          y: 0,
+          startNode: 0,
+          startPort: 0
+        };
+        startEdge = function(elem, position, ev){
+          this.hidePopup();
+          edgeIniX = elem.offsetLeft + position.x;
+          edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
+          return setEdgePath(edgeIniX, edgeIniY, edgeIniX, edgeIniY);
+        };
+        moveEdge = function(event){
+          var ref$, x, y;
+          ref$ = mapMouseToScene(event), x = ref$.x, y = ref$.y;
+          return setEdgePath(edgeIniX, edgeIniY, x, y);
+        };
+        endEdge = function(){
+          console.log("edge finished");
+          return simpleEdge.setAttribute('d', "M 0 0");
+        };
+        showPopup = function(event, startNode, startPort){
+          var ref$, x, y, x$;
+          scope.popupText = '';
+          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          importAll$(popupState, {
+            x: x,
+            y: y
+          });
+          x$ = popupState;
+          x$.startNode = startNode;
+          x$.startPort = startPort;
+          console.log(popupHeight / 2);
+          popup.style[cssTransform] = "translate(" + Math.floor(x) + "px," + Math.floor(y - popupHeight / 2) + "px)";
+          $popup.show();
+          $popupInput.focus();
+          return scope.$digest();
+        };
+        popupSubmit = function(content){
+          var comp;
+          comp = newComponent(content, popupState);
+          scope.visualData.connections.push({
+            startNode: popupState.startNode,
+            startPort: popupState.startPort,
+            endNode: comp.id,
+            endPort: 'input'
+          });
+          hidePopup();
+          return endEdge();
+        };
+        hidePopup = function(){
+          return $popup.hide();
+        };
+        hidePopupAndEdge = function(){
+          $popup.hide();
+          return endEdge();
+        };
+        y$ = this;
+        y$.isFreeSpace = function(elem){
+          return elem === svgElem || elem === nodesElem;
+        };
+        y$.showPopup = showPopup;
+        y$.nodesElement = nodesElem;
+        y$.popupSubmit = popupSubmit;
+        y$.hidePopup = hidePopup;
+        y$.hidePopupAndEdge = hidePopupAndEdge;
+        y$.nodesElement = nodesElem;
+        y$.newCommandComponent = newCommandComponent;
+        y$.newMacroComponent = newMacroComponent;
+        y$.startEdge = startEdge;
+        y$.moveEdge = moveEdge;
+        y$.endEdge = endEdge;
+        y$.updateScope = function(){
+          return scope.$digest();
+        };
+        y$.getVisualData = function(){
+          return scope.visualData;
+        };
+        y$.mapPointToScene = mapPointToScene;
+        y$.mapMouseToScene = mapMouseToScene;
+        y$.mapMouseToView = mapMouseToView;
+        y$.setGraphView = function(view){
+          hidePopupAndEdge();
+          console.log("graphview set to", view);
+          scope.visualData = view;
+          scope.$digest();
+        };
+        y$.revertToRoot = function(){
+          scope.visualData = graphModel;
+        };
+        y$.newMacro = function(name, descr){
+          var res$, key;
+          graphModel.macros[name] = shellParser.createMacro(name, descr);
+          res$ = [];
+          for (key in graphModel.macros) {
+            res$.push(key);
+          }
+          graphModel.macroList = res$;
+        };
+        y$.translateNode = function(id, position, x, y){
+          var i$, ref$, len$, el;
+          position.x += x / scale;
+          position.y += y / scale;
+          for (i$ = 0, len$ = (ref$ = edgesElem.querySelectorAll("[connector]")).length; i$ < len$; ++i$) {
+            el = ref$[i$];
+            $(el).scope().updateWithId(id);
+          }
+        };
+      }
+    ]
+  };
+});
+function in$(x, xs){
+  var i = -1, l = xs.length >>> 0;
+  while (++i < l) if (x === xs[i]) return true;
+  return false;
+}
+function importAll$(obj, src){
+  for (var key in src) obj[key] = src[key];
+  return obj;
+}
+var activeDrop;
 app.directive('sidebar', [
   '$document', function($document){
     return {
@@ -928,15 +947,9 @@ app.directive('sidebarMacroComponent', function(){
     },
     link: function(scope, element, attrs, graphModelCtrl){
       scope.selectItem = function(){
-        var name, x$, newComponent;
+        var name;
         name = scope.sidebarMacroComponent;
-        x$ = newComponent = {
-          type: 'subgraph',
-          macro: graphModelCtrl.getVisualData().macros[name]
-        };
-        x$.id = graphModelCtrl.getVisualData().counter++;
-        x$.position = graphModelCtrl.mapPointToScene(0, 0);
-        graphModelCtrl.getVisualData().components.push(newComponent);
+        graphModelCtrl.newMacroComponent(graphModelCtrl.mapPointToScene(0, 0));
       };
     },
     template: "<li>\n    <a ng-click='selectItem()'>\n        {{sidebarMacroComponent}}\n    </a>\n</li>"
@@ -997,12 +1010,3 @@ app.directive('dropdownSelectItem', [function(){
     template: "<li>\n    <a href='' class='dropdown-item'\n        ng-click='selectItem()'>\n        {{dropdownSelectItem}}\n    </a>\n</li>"
   };
 }]);
-function in$(x, xs){
-  var i = -1, l = xs.length >>> 0;
-  while (++i < l) if (x === xs[i]) return true;
-  return false;
-}
-function importAll$(obj, src){
-  for (var key in src) obj[key] = src[key];
-  return obj;
-}
