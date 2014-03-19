@@ -22,6 +22,8 @@ div.navbar.navbar-default
                 ul.dropdown-menu
                     li(ng-repeat="command in implementedCommands") 
                         a(ng-click="newCommandAtTopLeft(command)", ng-bind="command")
+            li
+                a(href="#" ng-click="$emit('runCommand', [])") RUN!!!
 
 
                     
@@ -44,13 +46,15 @@ div.popup.dropdown.open
         li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms2 = (graphModel.macroList | filter:popupText)")
             a(ng-click="graph.popupSubmit(foo)") {{foo}}
 .background
+    .shell
+        div(ng-repeat="line in $parent.shellText" ng-class="line.type" ng-bind="line.text")
 svg
     g.edges
         path.emptyEdge
         path(connector,ng-repeat="edge in visualData.connections")
 .workspace
     .nodes
-        .component(component,ng-repeat="(id, data) in visualData.components" data-node-id="{{data.id}}" style="{{transform}}:translate3d({{data.position.x}}px, {{data.position.y}}px, 0)")
+        .component(component,ng-repeat="(id, data) in visualData.components" data-node-id="{{data.id}}" style="{{transform}}:translate({{data.position.x}}px, {{data.position.y}}px)")
             div(ng-if="data.type == 'file'")
                 .title(title="{{data.macro.description}}") 
                     | FILE

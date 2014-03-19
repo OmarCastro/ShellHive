@@ -1,7 +1,7 @@
 
 Boundaries = require("./_graphlayout");
-ComponentConnections = require("./utils/componentConnections")
-optionsParser = require("./utils/optionsParser")
+ComponentConnections = require("../utils/componentConnections")
+optionsParser = require("../utils/optionsParser")
 
 
 

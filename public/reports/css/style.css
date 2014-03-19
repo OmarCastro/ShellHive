@@ -6,6 +6,9 @@ div[graph-model] > .background{background-color:#ccc}
 div[graph-model] > .workspace,div[graph-model] > svg{overflow:hidden}
 div[graph-model] > .navbar{position:absolute;top:0;left:0;right:0;height:50px;}
 div[graph-model] > .navbar .glyphicon{border:solid 1px #333;margin:5px;padding:2px;font-size:34px}
+.background .shell{z-index:6;overflow:scroll;position:absolute;top:50%;left:0;right:0;bottom:5%;background-color:#333;color:#fff;font-family:Monospace}
+.shell .call{font-weight:bold}
+.shell .error{color:#f99}
 .input-group>.input-group-addon.glyphicon{top:0}
 .popup{position:absolute;top:50px;left:0;z-index:10;white-space:nowrap;}
 .popup > .dropdown-menu.well{padding:1px}
@@ -17,7 +20,7 @@ path{fill:none;stroke:#aaa;stroke-width:5;}
 path.sel{stroke:#00f;stroke-width:5}
 .component,.inline-component{font-size:1em;position:absolute;min-width:80px;min-height:80px;background-color:#fff;-webkit-border-radius:.3em;border-radius:.3em;border:.2em solid #aaa;z-index:2;}
 .component .title,.inline-component .title{text-align:center;background-color:#ddd;height:1.5em;border-top-left-radius:.1em;border-top-right-radius:.1em;}
-.component .title .close-button,.inline-component .title .close-button{float:right;text-decoration:none}
+.component .title .close-button,.inline-component .title .close-button{float:right;font-size:1.1em;text-decoration:none}
 .component .input,.inline-component .input{float:left}
 .component .output,.inline-component .output{float:right}
 .component .box,.inline-component .box{display:inline-block;margin-top:.2em;height:.7em;width:1em;background-color:#aaa;-webkit-border-radius:.1em;border-radius:.1em;}

@@ -30,6 +30,21 @@ div[graph-model]
 			padding 2px
 			font-size: 34px
 
+.background .shell
+	z-index 6
+	overflow: scroll
+	absolute top 50% left 0 right 0 bottom 5%
+	background-color #333
+	color white
+	font-family Monospace
+
+	
+.shell 
+	.call
+		font-weight bold		
+	.error
+		color: #f99
+
 .input-group>.input-group-addon.glyphicon
 	top 0
 
@@ -87,6 +102,7 @@ path
 		border-top-right-radius 0.1em
 		.close-button
 			float right
+			font-size 1.1em
 			text-decoration none
 	.input
 		float left

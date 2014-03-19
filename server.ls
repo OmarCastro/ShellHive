@@ -1,93 +1,6 @@
 require! {express, jade, fs, util, stylus, nib, Datastore: nedb, \child_process .spawn}
-
-
-
-
-/**
- defines a unix commands
-*//*
-class CommandProcess
-	(exec, args, nodeId) ->
-		@exec = exec
-		@args = args
-		@has-pipe = no
-		@isClosed = yes
-		@next-process = null
-		@captureStdout = no
-		@node-id = nodeId
-		@line-command = ''
-	commandString: -> 
-		args = []
-		for x in @args
-			if x.indexOf(' ') is -1
-				args.push x
-			else
-				args.push "\"#x\""
-		"#{@exec} #{args * ' '}"
-	onErrData: (data) !-> @errdata += data
-	onOutData: (data)!-> 
-		@outdata += data.toString('utf8')
-		nextProc = @next-process
-		if nextProc
-			nextProc.spawn.stdin.write data unless nextProc.isClosed
-	onSpawnClosed: (code)!-> 
-		console.log 'the process', @commandString!, ' closed'
-		unless code is 0
-			io.sockets.in \helpers .emit \error {id: @node-id, commandline: @line-command, content: @errdata}
-		if @captureStdout
-			io.sockets.in \helpers .emit \stdout {id: @node-id, commandline: @line-command, content: @outdata}
-		nextProc = @next-process
-		if nextProc
-			nextProc.spawn.stdin.end! unless nextProc.isClosed
-		@isClosed = yes
-
-
-	run: ->
-		@isClosed = no
-		@errdata = ""
-		@outdata = ""
-		pr = @
-		@spawn = spawn @exec, @args
-			..stdout.on \data, -> pr.onOutData(it)
-			..stderr.on \data, -> pr.onErrData(it)
-			..on \close, -> pr.onSpawnClosed(it)
-
-
-/**
-defines a complete unix command line
-
-
-*//*
-class CommandLine
-	(exec, args, nodeId) ->
-		new-process = new CommandProcess(exec, args, nodeId)
-			..captureStdout = yes
-			..line-command = new-process.commandString!
-		@processes = [new-process]
-
-
-	cdpipe: (exec, args, nodeId)->
-		lastprocess = @processes[@processes.length-1]
-		new-process = new CommandProcess(exec, args, nodeId)
-			..captureStdout = yes
-			..line-command = "#{lastprocess.commandString!} | #{new-process.commandString!}"
-
-		@processes.push new-process
-		lastprocess.next-process = new-process
-
-		this
-	run: ->
-		for x in @processes
-			x.run!
-	captureProcess: (num)!->
-		@processes[num].captureStdout = yes
-	commandString: -> [x.commandString! for x in @processes]*' | '
-
-
-# */
-
-
-
+commandRunner = require './server/commandRunner'
+parser = require './target/parser/parser'
 
 app = express!
 db = new Datastore {filename: 'db/basic.db', autoload: true}
@@ -122,6 +35,18 @@ app.get \/helper, (req, res) !-> res.render('helper.jade')
 #for now we're testing with one workflow
 
 io.sockets.on \connection (socket)!->
+
+	socket.on \runCommand (socketData) !->
+		try
+			command = parser.parseVisualData(socketData.visualData)
+			socket.emit("commandCall", command)
+			commandRunner.run(command)
+				..onStdOut = (data) !-> socket.emit("stdout", data.toString('utf8'))
+				..onStdErr = (data) !-> socket.emit("stderr", data.toString('utf8'))
+				..onExit = (code) !-> socket.emit("commExit", code)
+		catch e
+			socket.emit("stderr", "error parsing the graph #e")
+
 
 	/*
 		new user entry event

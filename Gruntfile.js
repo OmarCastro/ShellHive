@@ -44,8 +44,32 @@
         },
         parser: {
           files: {
-            'parser/parser.js': ['parser/parser.ls']
+            'target/parser/parser.js': ['src/parser/parser.ls']
           }
+        },
+        utilities: {
+          expand: true,
+          flatten: true,
+          cwd: 'src/parser/utils/',
+          src: ['*.ls'],
+          dest: 'target/parser/utils/',
+          ext: '.js'
+        },
+        commands: {
+          expand: true,
+          flatten: true,
+          cwd: 'src/parser/commands/',
+          src: ['*.ls'],
+          dest: 'target/parser/commands/',
+          ext: '.js'
+        },
+        server: {
+          expand: true,
+          flatten: true,
+          cwd: 'livescript/server/',
+          src: ['*.ls'],
+          dest: 'server',
+          ext: '.js'
         },
         report: {
           options: {
@@ -60,32 +84,28 @@
             bare: true
           },
           files: {
-            'public/reports/js5/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/weeklyReport/directives.ls']
+            'public/reports/js5/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/angularjs/directives/*.ls']
           }
         }
       },
       shell: {
-        compileLsParser: {
-          options: {
-            stdout: true,
-            stderr: true,
-            failOnError: true
-          },
-          command: "find parser/commands/dev/ -type f | grep '\\.ls' | sed s/parser\\\\/commands\\\\/dev\\\\///g| parallel 'test -e parser/commands/v/{.}.js || (mkdir -p $(dirname parser/commands/v/{.}.js) && touch parser/commands/v/{.}.js); find parser/commands/dev/{} -newer parser/commands/v/{.}.js' | sed s/parser\\\\/commands\\\\/dev\\\\///g | parallel 'lsc -p -b -c parser/commands/dev/{} > parser/commands/v/{.}.js'"
-        },
         glueParser: {
           options: {
             stdout: true,
             stderr: true,
             failOnError: true
           },
-          command: "browserify parser/shellParser.js | tee public/js/parser.js > public/reports/js5/parser.js"
+          command: "browserify target/parser/shellParser.js | tee public/js/parser.js > public/reports/js5/parser.js"
         }
       },
       watch: {
         report_html: {
-          files: ["public/reports/weeklyReport5.jade", "public/reports/MacroCreationModal.jade", "public/reports/sidebar.jade", "public/reports/demo1.jade", "public/reports/component.jade", "public/reports/graph.jade"],
+          files: ["public/reports/*.jade"],
           tasks: ['jade:compile']
+        },
+        server: {
+          files: ['livescript/server/*.ls'],
+          tasks: ['livescript:server']
         },
         report_css: {
           files: ['public/reports/style.styl', 'views/css/style.styl'],
@@ -93,15 +113,11 @@
         },
         report: {
           files: ['livescript/weeklyReport/*.ls', 'livescript/angularjs/**/*.ls'],
-          tasks: ['livescript:report']
+          tasks: ['livescript:report', 'livescript:demo']
         },
         parserCommands: {
-          files: ['parser/commands/dev/**/*.ls'],
-          tasks: ['shell:compileLsParser', 'shell:glueParser']
-        },
-        parser: {
-          files: ['parser/parser.ls'],
-          tasks: ['livescript:parser', 'shell:glueParser']
+          files: ['src/parser/**/*.ls'],
+          tasks: ['newer:livescript:parser', 'newer:livescript:commands', 'newer:livescript:utilities', 'shell:glueParser']
         },
         html: {
           files: ['elements/*.jade'],
@@ -122,6 +138,8 @@
       }
     };
     grunt.initConfig(config);
+    grunt.loadNpmTasks('grunt-newer');
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-stylus');
     grunt.loadNpmTasks('grunt-contrib-jade');

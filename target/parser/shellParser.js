@@ -1,0 +1,1 @@
+shellParser = require("./parser.js");

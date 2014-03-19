@@ -1,0 +1,1 @@
+parallel 'find parser/commands/dev/{} -newer parser/commands/v/{.}.js\''

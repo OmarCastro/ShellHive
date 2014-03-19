@@ -81,8 +81,8 @@ app.directive "component", ($document) ->
         graphModelController.hidePopupAndEdge!
         event = ev.originalEvent
         targetTag = event.target.tagName
-        return true if pointerId 
-               or targetTag in <[INPUT SELECT LABEL BUTTON A]>
+        console.log targetTag
+        return true if pointerId or targetTag in <[INPUT SELECT LABEL BUTTON A]>
         pointerId = event.pointerId
         $document
           ..bind "pointermove", mousemove

@@ -178,7 +178,11 @@ app.directive "graphModel", ($document) ->
 
     setEdgePath = (iniX,iniY,endX,endY) ->
         xpoint = (endX - iniX)/4
-        simpleEdge.setAttribute \d , "M #iniX #iniY H #{iniX+0.5*xpoint} C #{iniX+2*xpoint},#iniY #{iniX+xpoint*2},#endY #{iniX+xpoint*4},#endY H #endX"
+        simpleEdge.setAttribute \d , 
+        """M #iniX #iniY 
+           H #{iniX+0.5*xpoint} 
+           C #{iniX+2*xpoint},#iniY #{iniX+xpoint*2},#endY #{iniX+xpoint*4},#endY 
+           H #endX"""
 
 
     popupState = {x:0,y:0,startNode:0,startPort:0}
@@ -249,6 +253,7 @@ app.directive "graphModel", ($document) ->
 ##graphC
     this
       ..removeComponent = (id) !->
+        console.log "removing component"
         scope.visualData
           ..components = [x for x in scope.visualData.components when x.id != id]
           ..connections = [x for x in scope.visualData.connections when x.startNode != id and x.endNode != id]

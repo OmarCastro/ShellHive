@@ -6,10 +6,12 @@ html
     link(rel="stylesheet",href="css/dropdowns.css")
     link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
     link(rel="stylesheet",href="css/style.css")
+    script(src="/socket.io/socket.io.js")
 
-  body(ng-app="report",style="margin:0;height:100%")
+
+  body(ng-app="demo",style="margin:0;height:100%")
         .TransformResults(ng-controller="data-flow" style="height:100%")
-            div(ng-init="res = TransformResults[0]",style="height:100%")
+            div(style="height:100%")
               .visual-builder.border.data-flow(graph-model="res.visualData" options="options" touch-action="none",style="position:fixed; top:0px;bottom:0;left:0;right:0")
                 include graph.jade
   script(src="js/jquery-2.1.0.min.js")
@@ -19,8 +21,8 @@ html
   //-script(src="js/strap/angular-strap.min.js")
   //-script(src="js/strap/angular-strap.tpl.min.js")
   script(src="js/pointerevents.min.js")
-  script(src="js4/parser.js")
-  script(src="js4/reportApp.js")
+  script(src="js5/parser.js")
+  script(src="js5/demoApp.js")
   script(type="text/ng-template" id="myModalContent.html")
     include MacroCreationModal.jade
   script(type="text/ng-template" id="sidebarModel.html")
