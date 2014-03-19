@@ -39,16 +39,20 @@ const showHeadersSelectorOption =
   always: \v
   never: \q
 
-const selectorOptions = {}
-exports.VisualSelectorOptions = {}
+const selectorOptions = 
+  (selectors.showHeaders): showHeadersSelectorOption
+
+exports.VisualSelectorOptions =
+  (selectors.showHeaders): [value for ,value of showHeadersSelector]
+
 
 const flagOptions = {}
 
 
 optionsParser = 
   shortOptions:
-    q  :  $.select selectors.showHeaders showHeadersSelector.never
-    v  :  $.select selectors.showHeaders showHeadersSelector.always
+    q  :  $.select selectors.showHeaders, showHeadersSelector.never
+    v  :  $.select selectors.showHeaders, showHeadersSelector.always
   longOptions:
     \quiet :   $.sameAs \q
     \silent :  $.sameAs \q
@@ -60,8 +64,10 @@ $.generate(optionsParser)
 
 defaultComponentData = ->
   type:\command
-  exec: \tr,
-  flags:{-"keep files",-"force",-"test",-"quiet",-"verbose",-"recursive"}
+  exec: \tail,
+  flags:{}
+  selectors:
+    (selectors.showHeaders): showHeadersSelector.default
   files:[]
 
 

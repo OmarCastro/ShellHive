@@ -82,7 +82,7 @@ app.directive "component", ($document) ->
         event = ev.originalEvent
         targetTag = event.target.tagName
         return true if pointerId 
-               or targetTag in <[INPUT SELECT LABEL BUTTON]>
+               or targetTag in <[INPUT SELECT LABEL BUTTON A]>
         pointerId = event.pointerId
         $document
           ..bind "pointermove", mousemove
@@ -150,7 +150,10 @@ app.directive "port", ($document) ->
       $pointedElem = $(pointedElem)
 
       if graphModelController.isFreeSpace pointedElem
-        graphModelController.showPopup event, scope.componentId, attr.port
+        if attr.port in <[output error retcode]>
+          graphModelController.showPopup event, scope.componentId, attr.port, null, \input
+        else
+          graphModelController.showPopup event, null, \output, scope.componentId, attr.port
       else
         graphModelController.endEdge!
         outAttr = $pointedElem.attr "data-port"        

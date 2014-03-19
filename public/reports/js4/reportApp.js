@@ -34,7 +34,7 @@ function closestParentWithClass(element, classStr){
   return null;
 }
 SelectionOptions = shellParser.VisualSelectorOptions;
-var examplesControllerData, visual2textControllerData, AST_tests, app;
+var examplesControllerData, visual2textControllerData, dataFlowExamples, AST_tests, app;
 examplesControllerData = [
   {
     title: "awk",
@@ -69,6 +69,12 @@ examplesControllerData = [
   }, {
     title: "compress",
     command: "compress file1.txt.gz"
+  }, {
+    title: "head",
+    command: "head file1.txt"
+  }, {
+    title: "tail",
+    command: "tail file1.txt"
   }
 ];
 visual2textControllerData = [
@@ -79,8 +85,68 @@ visual2textControllerData = [
     title: 'grep',
     command: 'grep -E "we are the champions" queens_lyrics.txt'
   }, {
-    title: 'gzip',
-    command: 'gzip -d'
+    title: "bzip2",
+    command: "bzip2 file1.txt"
+  }, {
+    title: "bzcat",
+    command: "bzcat file1.txt.bz2"
+  }, {
+    title: "bunzip2",
+    command: "bunzip2 file1.txt.bz2"
+  }, {
+    title: "ls",
+    command: "ls -BartIsACoolGuy"
+  }, {
+    title: "gzip",
+    command: "gzip file1.txt.gz"
+  }, {
+    title: "gunzip",
+    command: "gunzip file1.txt.gz"
+  }, {
+    title: "zcat",
+    command: "zcat file1.txt.gz"
+  }, {
+    title: "compress",
+    command: "compress file1.txt.gz"
+  }, {
+    title: "head",
+    command: "head file1.txt"
+  }, {
+    title: "tail",
+    command: "tail file1.txt"
+  }
+];
+dataFlowExamples = [
+  {
+    title: "single",
+    command: "cat -A"
+  }, {
+    title: "single2",
+    command: "ls -IAmACoolGuy"
+  }, {
+    title: "redirections",
+    command: "cat file1.txt > file2.txt 2> file3.txt"
+  }, {
+    title: "pipe",
+    command: "grep 2004 | cat uselessUseOfCat.txt | grep \"oh really\" | grep \"yes really\" | cat | cat | gzip"
+  }, {
+    title: "process substitution",
+    command: "cat <(grep 2004 events.txt) <(grep 1958 ye_olde_events.txt)"
+  }, {
+    title: "tee",
+    command: "cat | tee >(cat) >(cat) | cat"
+  }, {
+    title: "tee tree",
+    command: "cat | tee >(cat | tee >(cat) >(cat)) >(cat | tee >(cat) >(cat) | cat) | cat"
+  }, {
+    title: "process substitution tree",
+    command: "cat <(cat <(grep \"cat\" cat.cat.txt) <(grep t2 txt.txt)) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)"
+  }, {
+    title: "p.subst. + tee + pipe",
+    command: "grep 'knights of ni' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt))"
+  }, {
+    title: "a long workflow",
+    command: "grep 'for test purposes only' <(cat - <(grep 1 txt.txt) <(grep t2 txt2.txt)) <(grep 2 txt.txt) <(grep 3 txt2.txt) | cat - <(cat <(grep txt) <(grep t2)) | cat | grep 'its complex alright' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt)) | tee >(bzip2) >(grep mimi <(cat ni.txt) | cat | tee >(cat | gzip) | bzip2) | grep | tee >(bzip2) | gzip"
   }
 ];
 AST_tests = [
@@ -95,7 +161,7 @@ AST_tests = [
   }, {
     title: "redirection",
     command: "grep line < file1.txt > file2.txt 2> file3.txt &> file4.txt",
-    asserts: ['equals(ast[0].exec,"grep")', 'equals(ast[0].args[1],["inFrom","file1.txt"])', 'equals(ast[0].args[2],["outTo","file2.txt"])', 'equals(ast[0].args[3],["errTo","file2.txt"])', 'equals(ast[0].args[4],["out&errTo","file2.txt"])']
+    asserts: ['equals(ast[0].exec,"grep")', 'equals(ast[0].args[1],["inFrom","file1.txt"])', 'equals(ast[0].args[2],["outTo","file2.txt"])', 'equals(ast[0].args[3],["errTo","file3.txt"])', 'equals(ast[0].args[4],["out&errTo","file4.txt"])']
   }, {
     title: "quoted arguments",
     command: "cat \"in a galaxy.txt\" 'far far away.txt'",
@@ -279,36 +345,7 @@ app.controller('data-flow', function($scope){
   };
   $scope.options = SelectionOptions;
   connectors = [];
-  examples = [
-    {
-      title: "single",
-      command: "cat -A"
-    }, {
-      title: "single2",
-      command: "ls -IAmACoolGuy"
-    }, {
-      title: "pipe",
-      command: "grep 2004 | cat uselessUseOfCat.txt | grep \"oh really\" | grep \"yes really\" | cat | cat | gzip"
-    }, {
-      title: "process substitution",
-      command: "cat <(grep 2004 events.txt) <(grep 1958 ye_olde_events.txt)"
-    }, {
-      title: "tee",
-      command: "cat | tee >(cat) >(cat) | cat"
-    }, {
-      title: "tee tree",
-      command: "cat | tee >(cat | tee >(cat) >(cat)) >(cat | tee >(cat) >(cat) | cat) | cat"
-    }, {
-      title: "process substitution tree",
-      command: "cat <(cat <(grep \"cat\" cat.cat.txt) <(grep t2 txt.txt)) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)"
-    }, {
-      title: "p.subst. + tee + pipe",
-      command: "grep 'knights of ni' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt))"
-    }, {
-      title: "a long workflow",
-      command: "grep 'for test purposes only' <(cat - <(grep 1 txt.txt) <(grep t2 txt2.txt)) <(grep 2 txt.txt) <(grep 3 txt2.txt) | cat - <(cat <(grep txt) <(grep t2)) | cat | grep 'its complex alright' <(cat <(grep txt | tee >(bzip2) | cat) - <(grep t2 ni.txt)) | tee >(bzip2) >(grep mimi <(cat ni.txt) | cat | tee >(cat | gzip) | bzip2) | grep | tee >(bzip2) | gzip"
-    }
-  ];
+  examples = dataFlowExamples;
   results = [];
   for (i$ = 0, len$ = examples.length; i$ < len$; ++i$) {
     index = i$;
@@ -455,7 +492,7 @@ app.directive("component", function($document){
         graphModelController.hidePopupAndEdge();
         event = ev.originalEvent;
         targetTag = event.target.tagName;
-        if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'BUTTON')) {
+        if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'BUTTON' || targetTag === 'A')) {
           return true;
         }
         pointerId = event.pointerId;
@@ -536,12 +573,16 @@ app.directive("port", function($document){
         graphModelController.moveEdge(ev.originalEvent);
       };
       mouseup = function(ev){
-        var event, pointedElem, $pointedElem, outAttr, outPortScope, x$;
+        var event, pointedElem, $pointedElem, ref$, outAttr, outPortScope, x$;
         event = ev.originalEvent;
         pointedElem = document.elementFromPoint(event.clientX, event.clientY);
         $pointedElem = $(pointedElem);
         if (graphModelController.isFreeSpace(pointedElem)) {
-          graphModelController.showPopup(event, scope.componentId, attr.port);
+          if ((ref$ = attr.port) === 'output' || ref$ === 'error' || ref$ === 'retcode') {
+            graphModelController.showPopup(event, scope.componentId, attr.port, null, 'input');
+          } else {
+            graphModelController.showPopup(event, null, 'output', scope.componentId, attr.port);
+          }
         } else {
           graphModelController.endEdge();
           outAttr = $pointedElem.attr("data-port");
@@ -572,7 +613,7 @@ app.directive("graphModel", function($document){
     },
     controller: [
       '$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
-        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, nodesElem, nodesElemStyle, edgesElem, edgesElemStyle, svgElem, $svgElem, popup, $popup, popupHeight, $popupInput, graphModel, res$, key, ref$, val, x$, update, mousemove, mouseup, newComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, popupSubmit, hidePopup, hidePopupAndEdge, y$;
+        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, nodesElem, nodesElemStyle, edgesElem, edgesElemStyle, svgElem, $svgElem, workspace, $workspace, popup, $popup, popupHeight, $popupInput, graphModel, res$, key, ref$, val, x$, update, mousemove, mouseup, newComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, popupSubmit, hidePopup, hidePopupAndEdge, y$;
         pointerId = 0;
         scale = 1;
         graphX = 0;
@@ -588,9 +629,11 @@ app.directive("graphModel", function($document){
         edgesElemStyle = edgesElem.style;
         svgElem = elem.querySelector("svg");
         $svgElem = $(svgElem);
+        workspace = elem.querySelector(".workspace");
+        $workspace = $(workspace);
         popup = elem.querySelector(".popup");
         $popup = $(popup);
-        popupHeight = $popup.height();
+        popupHeight = $popup.find("form").height();
         $popup.hide();
         $popupInput = $popup.find("input");
         graphModel = scope.graphModel;
@@ -698,7 +741,6 @@ app.directive("graphModel", function($document){
         };
         newCommandComponent = function(command, position){
           var visualData, newResult, x$, newComponent;
-          console.log(command);
           visualData = scope.visualData;
           newResult = shellParser.parseCommand(command);
           x$ = newComponent = newResult.components[0];
@@ -714,10 +756,10 @@ app.directive("graphModel", function($document){
         };
         mapMouseToView = function(event){
           var offset;
-          offset = $svgElem.offset();
+          offset = $workspace.offset();
           return {
-            x: event.pageX - offset.left,
-            y: event.pageY - offset.top
+            x: Math.round(event.pageX - offset.left),
+            y: Math.round(event.pageY - offset.top)
           };
         };
         mapPointToScene = function(x, y){
@@ -778,10 +820,9 @@ app.directive("graphModel", function($document){
           return setEdgePath(edgeIniX, edgeIniY, x, y);
         };
         endEdge = function(){
-          console.log("edge finished");
           return simpleEdge.setAttribute('d', "M 0 0");
         };
-        showPopup = function(event, startNode, startPort){
+        showPopup = function(event, startNode, startPort, endNode, endPort){
           var ref$, x, y, x$;
           scope.popupText = '';
           ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
@@ -792,8 +833,9 @@ app.directive("graphModel", function($document){
           x$ = popupState;
           x$.startNode = startNode;
           x$.startPort = startPort;
-          console.log(popupHeight / 2);
-          popup.style[cssTransform] = "translate(" + Math.floor(x) + "px," + Math.floor(y - popupHeight / 2) + "px)";
+          x$.endNode = endNode;
+          x$.endPort = endPort;
+          popup.style[cssTransform] = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
           $popup.show();
           $popupInput.focus();
           return scope.$digest();
@@ -801,11 +843,13 @@ app.directive("graphModel", function($document){
         popupSubmit = function(content){
           var comp;
           comp = newComponent(content, popupState);
+          popupState.startNode == null && (popupState.startNode = comp.id);
+          popupState.endNode == null && (popupState.endNode = comp.id);
           scope.visualData.connections.push({
             startNode: popupState.startNode,
             startPort: popupState.startPort,
-            endNode: comp.id,
-            endPort: 'input'
+            endNode: popupState.endNode,
+            endPort: popupState.endPort
           });
           hidePopup();
           return endEdge();
@@ -817,9 +861,55 @@ app.directive("graphModel", function($document){
           $popup.hide();
           return endEdge();
         };
+        scope.newMacroModal = function(){
+          var form, modalInstance;
+          form = {
+            name: '',
+            description: ''
+          };
+          modalInstance = $modal.open({
+            templateUrl: 'myModalContent.html',
+            controller: function($scope, $modalInstance){
+              $scope.form = form;
+              $scope.cancel = function(){
+                return $modalInstance.dismiss('cancel');
+              };
+              $scope.ok = function(){
+                $modalInstance.close(form);
+              };
+            }
+          });
+          return modalInstance.result.then(function(selectedItem){
+            scope.graph.newMacro(form.name, form.description);
+            return form.name = form.description = '';
+          });
+        };
+        scope.newCommandAtTopLeft = function(command){
+          return newCommandComponent(command, mapPointToScene(0, 0));
+        };
         y$ = this;
+        y$.removeComponent = function(id){
+          var x$, res$, i$, ref$, len$, x;
+          x$ = scope.visualData;
+          res$ = [];
+          for (i$ = 0, len$ = (ref$ = scope.visualData.components).length; i$ < len$; ++i$) {
+            x = ref$[i$];
+            if (x.id !== id) {
+              res$.push(x);
+            }
+          }
+          x$.components = res$;
+          res$ = [];
+          for (i$ = 0, len$ = (ref$ = scope.visualData.connections).length; i$ < len$; ++i$) {
+            x = ref$[i$];
+            if (x.startNode !== id && x.endNode !== id) {
+              res$.push(x);
+            }
+          }
+          x$.connections = res$;
+        };
         y$.isFreeSpace = function(elem){
-          return elem === svgElem || elem === nodesElem;
+          return elem === svgElem || elem === workspace || elem === nodesElem;
         };
         y$.showPopup = showPopup;
         y$.nodesElement = nodesElem;
@@ -832,6 +922,7 @@ app.directive("graphModel", function($document){
         y$.startEdge = startEdge;
         y$.moveEdge = moveEdge;
         y$.endEdge = endEdge;
+        y$.isMacroView;
         y$.updateScope = function(){
           return scope.$digest();
         };
@@ -843,7 +934,6 @@ app.directive("graphModel", function($document){
         y$.mapMouseToView = mapMouseToView;
         y$.setGraphView = function(view){
           hidePopupAndEdge();
-          console.log("graphview set to", view);
           scope.visualData = view;
           scope.$digest();
         };
@@ -881,80 +971,69 @@ function importAll$(obj, src){
   for (var key in src) obj[key] = src[key];
   return obj;
 }
-var activeDrop;
-app.directive('sidebar', [
-  '$document', function($document){
-    return {
-      replace: false,
-      scope: true,
-      require: '^graphModel',
-      controller: function($scope, $element, $modal, $attrs){
-        var form;
-        form = {
-          name: '',
-          description: ''
-        };
-        console.log($scope.graph);
-        $scope.implementedCommands = shellParser.implementedCommands;
-        return $scope.open = function(){
-          var modalInstance;
-          modalInstance = $modal.open({
-            templateUrl: 'myModalContent.html',
-            controller: function($scope, $modalInstance){
-              var ctrl;
-              ctrl = this;
-              $scope.form = form;
-              $scope.cancel = function(){
-                return $modalInstance.dismiss('cancel');
-              };
-              $scope.ok = function(){
-                $modalInstance.close(form);
-              };
-            },
-            resolve: {
-              items: function(){
-                return $scope.items;
-              }
-            }
-          });
-          return modalInstance.result.then(function(selectedItem){
-            $scope.graph.newMacro(form.name, form.description);
-            return form.name = form.description = '';
-          });
-        };
-      },
-      link: function(scope, element, attr, graphModelCtrl){
-        requestAnimationFrame(function(){
-          return element.find('a[data-command]').each(function(index){
-            return $(this).bind('click', function(ev){
-              console.log(ev);
-              graphModelCtrl.newCommandComponent($(this).attr('data-command'), graphModelCtrl.mapPointToScene(0, 0));
-              return graphModelCtrl.updateScope();
-            });
-          });
-        });
-      },
-      templateUrl: 'sidebarModel.html'
-    };
-  }
-]);
-app.directive('sidebarMacroComponent', function(){
-  return {
-    replace: true,
-    require: '^graphModel',
-    scope: {
+/*
+##sidebar
+
+app.directive 'sidebar', ['$document', ($document) ->
+  replace: false
+  scope: true
+  require: '^graphModel'
+  controller: ($scope, $element, $modal, $attrs) ->
+    form =
+      name:''
+      description:''    
+    console.log $scope.graph
+    $scope.implementedCommands = shellParser.implementedCommands
+    $scope.open = -> 
+      modalInstance = $modal.open {
+        templateUrl: 'myModalContent.html'
+        controller: ($scope, $modalInstance) !->
+          ctrl = this
+          $scope.form = form
+          $scope.cancel = -> $modalInstance.dismiss('cancel');
+          $scope.ok = !-> $modalInstance.close(form);
+        resolve:
+          items: -> $scope.items
+      }
+
+      modalInstance.result.then (selectedItem) ->
+        $scope.graph.newMacro form.name, form.description
+        form.name = form.description = ''
+
+  link:(scope, element, attr,graphModelCtrl) !->
+    requestAnimationFrame ->
+      element.find('a[data-command]').each (index) ->
+        $ this .bind 'click', (ev)->
+          console.log ev
+          graphModelCtrl.newCommandComponent do
+            $(this).attr(\data-command)
+            graphModelCtrl.mapPointToScene 0,0
+          graphModelCtrl.updateScope!
+
+
+  templateUrl: 'sidebarModel.html'
+
+]
+
+
+app.directive 'sidebarMacroComponent',  ->
+  replace: true
+  require: '^graphModel'
+  scope:
       sidebarMacroComponent: '='
-    },
-    link: function(scope, element, attrs, graphModelCtrl){
-      scope.selectItem = function(){
-        var name;
-        name = scope.sidebarMacroComponent;
-        graphModelCtrl.newMacroComponent(graphModelCtrl.mapPointToScene(0, 0));
-      };
-    },
-    template: "<li>\n    <a ng-click='selectItem()'>\n        {{sidebarMacroComponent}}\n    </a>\n</li>"
-  };
-});
+  link: (scope, element, attrs, graphModelCtrl) !->
+      scope.selectItem = !->
+        name = scope.sidebarMacroComponent
+        graphModelCtrl.newMacroComponent graphModelCtrl.mapPointToScene 0,0
+        #console.log graphModelCtrl.getVisualData!.macros[name]
+  template: """
+      <li>
+          <a ng-click='selectItem()'>
+              {{sidebarMacroComponent}}
+          </a>
+      </li>"""
+# */
+var activeDrop;
 activeDrop = null;
 app.directive('dropdownSelect', [
   '$document', function($document){

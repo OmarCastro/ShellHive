@@ -16,29 +16,31 @@
 $ = require("./_init.js");
 
 
-selectors = {
-  \action
-}
-
-actionSelector =
-  \compress
-  \decompress
-
-
-
 flags = {
   force : \force
+  decompress: \decompress
   stdout : \stdout
   statistics: \statistics
   \recursive
 }
+
+const flagOptions = {
+  \force : \f
+  \decompress : \d
+  \stdout : \c
+  \statistics : \v
+  \recursive : \r
+}
+
+const selectorOptions = {}
+exports.VisualSelectorOptions = {}
 
 $.setblocksize = (size) -> (Component) ->
     Component.block-size = size
 
 optionsParser = 
   shortOptions:
-    d  :  $.select  selectors.action, actionSelector.decompress
+    d  :  $.switchOn flags.decompress
     f  :  $.switchOn flags.force
     c  :  $.switchOn flags.stdout
     v  :  $.switchOn flags.statistics
@@ -46,16 +48,14 @@ optionsParser =
 
 $.generate(optionsParser)
 
-  
 
 defaultComponentData = ->
   type:\command
   exec:"compress",
-  flags:{-"force",-"stdout",-"statistics",-"recursive"}
-  selectors:
-    action: actionSelector.compress
+  flags:{-"decompress",-"force",-"stdout",-"statistics",-"recursive"}
   files: []
 
 
 exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions)
 

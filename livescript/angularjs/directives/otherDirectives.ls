@@ -1,5 +1,5 @@
 
-
+/*
 ##sidebar
 
 app.directive 'sidebar', ['$document', ($document) ->
@@ -60,7 +60,7 @@ app.directive 'sidebarMacroComponent',  ->
               {{sidebarMacroComponent}}
           </a>
       </li>"""
-    
+# */
 
 
 

@@ -14,6 +14,8 @@
     gzip: require('./commands/v/gzip'),
     gunzip: require('./commands/v/gunzip'),
     zcat: require('./commands/v/zcat'),
+    head: require('./commands/v/head'),
+    tail: require('./commands/v/tail'),
     tr: require('./commands/v/tr'),
     tee: require('./commands/v/tee')
   };
@@ -33,7 +35,10 @@
     bzip2: parserCommand.gzip.VisualSelectorOptions,
     gzip: parserCommand.gzip.VisualSelectorOptions,
     gunzip: parserCommand.gzip.VisualSelectorOptions,
-    zcat: parserCommand.gzip.VisualSelectorOptions
+    zcat: parserCommand.gzip.VisualSelectorOptions,
+    head: parserCommand.head.VisualSelectorOptions,
+    tail: parserCommand.tail.VisualSelectorOptions,
+    compress: parserCommand.compress.VisualSelectorOptions
   };
   function getPositionBoundaries(components){
     var xs, ys, xe, ye, i$, len$, component, position, px, py, xy;
@@ -168,6 +173,9 @@
   };
   function parseVisualData(VisualData){
     var indexedComponentList, initialComponent;
+    if (VisualData.components.length < 1) {
+      return '';
+    }
     indexedComponentList = indexComponents(VisualData);
     initialComponent = indexedComponentList[VisualData.firstMainComponent];
     if (initialComponent === null) {

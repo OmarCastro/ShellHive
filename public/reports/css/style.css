@@ -1,15 +1,23 @@
-body,.graph,.nodes{margin:0;overflow:hidden}
-.nodes,div[graph-model] svg{position:absolute;top:0;left:10%;width:90%;height:100%;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-o-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}
-div[graph-model] svg{background-color:#ccc}
+body,.graph,.nodes{margin:0}
+div[graph-model]{overflow:hidden;}
+div[graph-model] > svg,div[graph-model] > .workspace,div[graph-model] > .background{font-size:12px;position:absolute;top:50px;left:0;width:100%;height:100%;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-o-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}
+div[graph-model] > .workspace >.nodes{font-size:12px;position:absolute;top:0;left:0;width:100%;height:100%;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-o-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}
+div[graph-model] > .background{background-color:#ccc}
+div[graph-model] > .workspace,div[graph-model] > svg{overflow:hidden}
+div[graph-model] > .navbar{position:absolute;top:0;left:0;right:0;height:50px;}
+div[graph-model] > .navbar .glyphicon{border:solid 1px #333;margin:5px;padding:2px;font-size:34px}
+.input-group>.input-group-addon.glyphicon{top:0}
+.popup{position:absolute;top:50px;left:0;z-index:10;white-space:nowrap;}
+.popup > .dropdown-menu.well{padding:1px}
+.popup a{padding-top:0;padding-bottom:0}
 .graph{position:fixed;top:0;left:0;width:100%;height:100%}
 div[sidebar]{overflow:auto;display:inline-block;position:absolute;top:0;left:0;bottom:0;width:10%;-webkit-transition:all 0.3s linear;-moz-transition:all 0.3s linear;-o-transition:all 0.3s linear;-ms-transition:all 0.3s linear;transition:all 0.3s linear;background-color:#ddd;z-index:5}
-.popup{position:absolute;z-index:10;left:10%;}
-.popup a{padding-top:0;padding-bottom:0}
 svg.edges{z-index:1}
 path{fill:none;stroke:#aaa;stroke-width:5;}
 path.sel{stroke:#00f;stroke-width:5}
 .component,.inline-component{font-size:1em;position:absolute;min-width:80px;min-height:80px;background-color:#fff;-webkit-border-radius:.3em;border-radius:.3em;border:.2em solid #aaa;z-index:2;}
-.component .title,.inline-component .title{text-align:center;background-color:#ddd;height:1.5em;border-top-left-radius:.1em;border-top-right-radius:.1em}
+.component .title,.inline-component .title{text-align:center;background-color:#ddd;height:1.5em;border-top-left-radius:.1em;border-top-right-radius:.1em;}
+.component .title .close-button,.inline-component .title .close-button{float:right;text-decoration:none}
 .component .input,.inline-component .input{float:left}
 .component .output,.inline-component .output{float:right}
 .component .box,.inline-component .box{display:inline-block;margin-top:.2em;height:.7em;width:1em;background-color:#aaa;-webkit-border-radius:.1em;border-radius:.1em;}
@@ -36,7 +44,5 @@ td.top{vertical-align:top}
 p,body > li{margin-left:3em;margin-right:3em;text-align:justify}
 .center p{text-align:center}
 .nodes{overflow:visible;z-index:1}
-div[graph-model]{overflow:hidden;}
-div[graph-model] *{font-size:12px}
 .border{border:solid 1px #808080}
 pre{white-space:pre-wrap;white-space:-moz-pre-wrap;word-wrap:break-word;}

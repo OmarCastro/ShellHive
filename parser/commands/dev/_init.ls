@@ -1,5 +1,8 @@
 
-Boundaries = require("./_graphlayout.js");
+Boundaries = require("./_graphlayout");
+ComponentConnections = require("./utils/componentConnections")
+optionsParser = require("./utils/optionsParser")
+
 
 
 exports.Iterator = class Iterator
@@ -11,84 +14,6 @@ exports.Iterator = class Iterator
   hasNext: -> @index != @length
   next: -> @current = @argList[@index++]
   rest: -> @argList.slice @index
-
-function parseShortOptions(shortOptions,componentData,argsNodeIterator)
-  iter = new Iterator argsNodeIterator.current.slice(1)
-  while option = iter.next!
-    arg = shortOptions[option]
-    break if arg and arg componentData,argsNodeIterator,iter
-
-
-function parseLongOptions(longOptions,componentData,argsNodeIterator)
-  optionStr = argsNodeIterator.current.slice(2);
-  indexOfSep = optionStr.indexOf \=
-  if indexOfSep > -1
-    iter = new Iterator(optionStr)
-      ..index = indexOfSep + 1
-    optionKey = optionStr.slice 0,indexOfSep
-    arg = longOptions[optionKey];
-    arg = longOptions[optionStr] if !arg
-    arg componentData, argsNodeIterator, iter if arg
-  else
-    arg = longOptions[optionStr];
-    arg componentData if arg
-
-/**
-  enables flags (flags)
-  @returns a boolean indicating 
-  that the rest of the argument was used 
-*/
-function switchOn (...flags)
-  return (Component) ->
-    for flag in flags
-      Component.flags[flag] = true
-    false
-
-/**
-  set parameter (param)
-  @returns a boolean indicating 
-  that the rest of the argument was used 
-*/
-function setParameter (param)
-  paramFn = (Component,state,substate) ->
-    hasNext = substate.hasNext!
-    parameter = if hasNext then substate.rest! else state.next!
-    Component.parameters[param] = parameter
-    true
-  paramFn.ptype = \param
-  paramFn.param = param
-  return paramFn
-
-
-/**
-  set the selector _key_ with the value _value_
-*/
-function select(key,value)
-  return (Component) !-> 
-    Component.selectors[key] = value
-
-
-function selectParameter(key,value)
-  paramFn = (Component,state,substate)->
-    parameselectParameterter = if substate.hasNext! then substate.rest! else state.next!
-    Component.selectors[key] = [value,parameter]
-    true
-  paramFn.ptype = \param
-  paramFn.param = param
-  paramFn
-
-
-function selectIfUnselected(key,value,...selections)
-  return (Component) !-> 
-    selectorValue = Component.selectors[key]
-    for selection in selections
-      return false if selectorValue == selection
-    Component.selectors[key] = value
-
-
-function sameAs(option)
-  return [\same,option]
-
 
 /**
   gets the type of argument Nodes
@@ -127,9 +52,31 @@ getComponentById = (visualData,id) !->
     return x
   return null
 
+addFileComponent = (options, filename) ->
+  {componentData,connectionsToPush,tracker} = options
+  componentData.files.push(argNode)
+  newComponent = {
+    type: \file
+    filename: argNode
+    id: tracker.id
+    position: {x:0,y:0}
+  }
+  connectionsToPush.push {
+    startNode: tracker.id,
+    startPort: \output,
+    endPort: "file#{componentData.files.length - 1}"
+  }
+
+commonNodeParsing = {
+  string: (options) -> addFileComponent(options,options.iterator.current)
+  shortOptions: (options) -> addFileComponent(options,options.iterator.current)
+  longOption: (options) -> addFileComponent(options,options.iterator.current)
+}
 
 
-commonParseCommand = (optionsParser,defaultComponentData, argNodeParsing) ->
+
+
+commonParseCommand = (optionsParserData,defaultComponentData, argNodeParsing) ->
   (argsNode, parser, tracker, previousCommand) ->
     componentData = defaultComponentData!
     boundaries = []
@@ -138,46 +85,82 @@ commonParseCommand = (optionsParser,defaultComponentData, argNodeParsing) ->
         boundaries.push previousCommand.0
       else
         boundaries.push[Boundaries.getBoundaries([previousCommand])]
-    connectionsToPush = []
+    connections = new ComponentConnections(componentData)
+    stdoutRedirection = null
+    stderrRedirection = null
 
     result = {components:[componentData],connections:[],mainComponent: componentData}
     iter = new Iterator argsNode
     while argNode = iter.next!
       switch typeOf argNode
       case \shortOptions
-        parseShortOptions(optionsParser.shortOptions,componentData,iter)
+        optionsParser.parseShortOptions(optionsParserData,componentData,iter)
       case \longOption
-        parseLongOptions(optionsParser.longOptions,componentData,iter)
+        optionsParser.parseLongOptions(optionsParserData,componentData,iter)
       case \string
         if argNodeParsing && argNodeParsing.string
           argNodeParsing.string(componentData,argNode)
-        else 
+        else
+          newComponent = {
+            type: \file
+            filename: argNode
+            id: tracker.id
+            position: {x:0,y:0}
+          }
+          inputPort = "file#{componentData.files.length}"
           componentData.files.push(argNode)
+          connections.addConnectionToInputPort inputPort, {id:tracker.id, port:\output}
+          tracker.id++
+          result.components.push newComponent
+          boundaries.push Boundaries.getBoundaries [newComponent]
 
       case \inFromProcess
         subresult = parser.parseAST(argNode[1], tracker)
         boundaries.push Boundaries.getBoundaries subresult.components
-        for sub in subresult.components
-          result.components.push sub
-        for sub in subresult.connections
-          result.connections.push sub
+        result
+          ..components  ++= subresult.components
+          ..connections ++= subresult.connections
+        inputPort = "file#{componentData.files.length}"
+        connections.addConnectionToInputPort inputPort, {id:tracker.id-1, port:\output}
         componentData.files.push(["pipe",tracker.id-1]);
-        connectionsToPush.push {
-          startNode: tracker.id-1,
-          startPort: \output,
-          endPort: "file#{componentData.files.length - 1}"
+
+      case \outTo
+        newComponent = {
+          type: \file
+          filename: argNode[1]
+          id: tracker.id
+          position: {x:0,y:0}
         }
+        connections.addConnectionFromOutputPort {id:tracker.id, port:\input}
+        tracker.id++
+        result.components.push newComponent
+        stdoutRedirection = newComponent
+      case \errTo
+        console.log \errTo!!
+        newComponent = {
+          type: \file
+          filename: argNode[1]
+          id: tracker.id
+          position: {x:0,y:0}
+        }
+        connections.addConnectionFromErrorPort {id:tracker.id, port: \input}
+        tracker.id++
+        result.components.push newComponent
+        stderrRedirection = newComponent
+
       
     bbox = Boundaries.arrangeLayout(boundaries)
+    
     componentData
       ..position = bbox[1]
       ..id = tracker.id
+    if stdoutRedirection
+      stdoutRedirection.position = bbox[1] with {x:bbox[1].x + 400}
+    if stderrRedirection
+      y = if stdoutRedirection then 100 else 0
+      stderrRedirection.position = {x:bbox[1].x + 400, y: bbox[1].y + y}
 
-
-    for c in connectionsToPush
-      result.connections.push({startNode:c.startNode, startPort:c.startPort
-        ,endNode: tracker.id,endPort:c.endPort}) 
-
+    result.connections ++= connections.toConnectionList()
     tracker.id++ 
     [bbox.0,result]
 
@@ -216,11 +199,10 @@ commonParseComponent = (flagOptions, selectorOptions, parameterOptions, beforeJo
 
     flags = parseFlagsAndSelectors component, options
 
-    parameters = for key, value of component.parameters
-          if value
-            if value.indexOf(" ") >= 0 
-            then "\"-#{parameterOptions[key]}#value\""
-            else "-#{parameterOptions[key]}#value"
+    parameters = for key, value of component.parameters when value
+      if value.indexOf(" ") >= 0 
+      then "\"-#{parameterOptions[key]}#value\""
+      else "-#{parameterOptions[key]}#value"
 
     files = for file in component.files
       if file instanceof Array
@@ -235,22 +217,13 @@ commonParseComponent = (flagOptions, selectorOptions, parameterOptions, beforeJo
     then beforeJoin(component,exec,flags,files,parameters)
     else (exec ++ flags ++ parameters ++ files) * ' '
 
-
+exports <<< optionsParser
+exports <<< Boundaries
 exports <<< {
-  Boundaries.getBoundaries
-  Boundaries.arrangeLayout
-  parseShortOptions
-  parseLongOptions
-  switchOn
-  setParameter
-  select
-  selectIfUnselected
-  sameAs
   typeOf
   justAccept
   generate
   commonParseCommand
   commonParseComponent
-  Boundaries.translateBoundary
   getComponentById
 }

@@ -22,7 +22,7 @@ tree:
 /* lexical grammar */
 %lex
 %%
-"&>"                  return '>'
+"&>"                  return '&>'
 "2>&1"                return '2>&1'
 "2>"                  return '2>'
 ">("                  return '>('

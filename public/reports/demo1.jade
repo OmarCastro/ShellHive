@@ -9,14 +9,15 @@ html
 
   body(ng-app="report",style="margin:0;height:100%")
         .TransformResults(ng-controller="data-flow" style="height:100%")
-            table.asttest(ng-init="res = TransformResults[0]",style="height:100%")
-                tr
-                    td.top(style="position:relative")
-                        .visual-builder.border.data-flow(graph-model="res.visualData" options="options" touch-action="none",style="position:fixed; top:0;bottom:0;left:0;right:0")
-                            include graph.jade
+            div(ng-init="res = TransformResults[0]",style="height:100%")
+              .visual-builder.border.data-flow(graph-model="res.visualData" options="options" touch-action="none",style="position:fixed; top:0px;bottom:0;left:0;right:0")
+                include graph.jade
   script(src="js/jquery-2.1.0.min.js")
   script(src="js/angular.min.js")
+  //-script(src="js/angular-animate.min.js")
   script(src="js/ui-bootstrap-tpls.min.js")
+  //-script(src="js/strap/angular-strap.min.js")
+  //-script(src="js/strap/angular-strap.tpl.min.js")
   script(src="js/pointerevents.min.js")
   script(src="js4/parser.js")
   script(src="js4/reportApp.js")

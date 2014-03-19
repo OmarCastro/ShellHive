@@ -14,7 +14,7 @@ module.exports = (grunt) !->
           data:
             debug: false
         files:
-          "public/reports/weeklyReport4.html": ["public/reports/weeklyReport4.jade"]
+          "public/reports/weeklyReport5.html": ["public/reports/weeklyReport5.jade"]
           "public/reports/demo1.html": ["public/reports/demo1.jade"]
     livescript:
       home_js:   files: 'public/js/script.ls.js': ['livescript/home/*.ls']
@@ -24,7 +24,7 @@ module.exports = (grunt) !->
       report:
         options:{+bare}    
         files: 
-          'public/reports/js4/reportApp.js':
+          'public/reports/js5/reportApp.js':
             'livescript/weeklyReport/init.ls'
             'livescript/weeklyReport/reportInit.ls'
             'livescript/weeklyReport/play.ls'
@@ -32,33 +32,28 @@ module.exports = (grunt) !->
       demo:
         options:{+bare}    
         files: 
-          'public/reports/js4/demoApp.js':
+          'public/reports/js5/demoApp.js':
             'livescript/weeklyReport/init.ls'
             'livescript/weeklyReport/demoInit.ls'
             'livescript/weeklyReport/directives.ls'
     shell:
       compileLsParser:
         options:{+stdout,+stderr,+failOnError}
-        command: "ls parser/commands/dev/
+        command: "find parser/commands/dev/ -type f 
                   | grep '\\.ls' 
-                  | parallel 'test -e parser/commands/v/{.}.js || touch parser/commands/v/{.}.js; find parser/commands/dev/{} -newer parser/commands/v/{.}.js' 
-                  | parallel 'basename {}' 
+                  | sed s/parser\\\\/commands\\\\/dev\\\\///g
+                  | parallel 'test -e parser/commands/v/{.}.js || (mkdir -p $(dirname parser/commands/v/{.}.js) && touch parser/commands/v/{.}.js); find parser/commands/dev/{} -newer parser/commands/v/{.}.js' 
+                  | sed s/parser\\\\/commands\\\\/dev\\\\///g 
                   | parallel 'lsc -p -b -c parser/commands/dev/{} > parser/commands/v/{.}.js'" 
       glueParser: 
-        command: "gluejs 
-                 --no-cache 
-                 --global shellParser 
-                 --main parser/parser.js 
-                 --include parser/commands/v/ 
-                 --include parser/parser.js 
-                 --include parser/ast-builder/ast-builder.js 
-                 | tee public/js/parser.js > public/reports/js4/parser.js"
+        options:{+stdout,+stderr,+failOnError}
+        command: "browserify parser/shellParser.js | tee public/js/parser.js > public/reports/js5/parser.js"
 
 
     watch:
       report_html:
         files: [
-          "public/reports/weeklyReport4.jade"
+          "public/reports/weeklyReport5.jade"
           "public/reports/MacroCreationModal.jade"
           "public/reports/sidebar.jade"
           "public/reports/demo1.jade"
@@ -72,7 +67,7 @@ module.exports = (grunt) !->
         files: ['livescript/weeklyReport/*.ls','livescript/angularjs/**/*.ls']
         tasks: ['livescript:report']        
       parserCommands:
-        files: ['parser/commands/dev/*.ls']
+        files: ['parser/commands/dev/**/*.ls']
         tasks: ['shell:compileLsParser','shell:glueParser']
       parser:
         files: ['parser/parser.ls']

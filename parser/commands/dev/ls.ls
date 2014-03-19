@@ -10,14 +10,6 @@ selectors = {
   quoting-style:  "quoting style"
 }
 
-parameters = {
-  \ignore
-}
-
-parameterOptions = {
-  \ignore : \I
-}
-
 ## Selectors
 
 sortSelector = { 
@@ -55,7 +47,7 @@ quotingStyleSelector = {
 }
 
 showSelector = {
-  \all,
+  \all : \all
   almost-all:\almost-all
   \default
 }
@@ -64,49 +56,46 @@ showSelector = {
 
 
 sortSelectorOption = { 
-  \name : null
+  \name        : null
   "do not sort": \U
-  \extension : \X 
-  \size : \S
-  \time : \t
-  \version : \v
+  \extension   : \X 
+  \size        : \S
+  \time        : \t
+  \version     : \v
 }
 
 formatSelectorOption = {
   \default : null
-  \commas : \m
-  \long : \l
+  \commas  : \m
+  \long    : \l
 }
 
 indicatorStyleSelectorOption = {
-  \none : null
-  \slash : \p
+  \none     : null
+  \slash    : \p
   \classify : \F
   \fileType : "--file-type"
 }
 
-timeStyleSelectorOption = {
+timeStyleSelectorOption =
   \full-iso : "--time-style=full-iso"
   \long-iso : "--time-style=long-iso"
-  \iso : "--time-style=iso"
-  \locale : "--time-style=locale"
-}
+  \iso      : "--time-style=iso"
+  \locale   : "--time-style=locale"
 
 
-quotingStyleSelectorOption = {
+quotingStyleSelectorOption =
   \literal : "--quoting-style=literal"
-  \locale :  "--quoting-style=locale"
-  \shell :  "--quoting-style=shell"
-  "shell-always" :  "--quoting-style=shell-always"
-  \c :  "--quoting-style=c"
-  \escape :  "--quoting-style=escape"
-}
+  \locale  : "--quoting-style=locale"
+  \shell   : "--quoting-style=shell"
+  \shell-always :  "--quoting-style=shell-always"
+  \c       : "--quoting-style=c"
+  \escape  : "--quoting-style=escape"
 
-showSelectorOption = {
-  \default : null
-  \all : \a
-  \almost-all : \A
-}
+showSelectorOption =
+  default : null
+  all : \a
+  almost-all : \A
 
 
 
@@ -128,28 +117,40 @@ exports.VisualSelectorOptions =
 
 
 
+
 flags = {
   \reverse
   \context
   \inode
-  humanReadable: "human readable"
+  humanReadable : "human readable"
   ignore-backups: "ignore backups"
   no-print-owner: "do not list owner"
   no-print-group: "do not list group"
-  numeric-id: "numeric ID"
+  numeric-id    : "numeric ID"
 }
 
 
 flagOptions = {
-  \reverse : \r
-  \context : \Z
-  "human readable": \h
-  "ignore backups": \B
+  \reverse           : \r
+  \context           : \Z
+  "human readable"   : \h
+  "ignore backups"   : \B
   "do not list owner": \g
   "do not list group": \G
-  "numeric ID": \n
-  \inode : \i
+  "numeric ID"       : \n
+  \inode             : \i
 }
+
+
+
+parameters = {
+  \ignore
+}
+
+parameterOptions = {
+  \ignore : \I
+}
+
 
 
 optionsParser = 
@@ -226,7 +227,8 @@ defaultComponentData = ->
     -"reverse",
     -"do not list owner",
     -"do not list group",
-    -"numeric ID",-"inode",-"human readable"}
+    -"numeric ID",-"inode",-"human readable"
+  }
   selectors:
     "indicator style": indicatorStyleSelector.none
     "time style":      timeStyleSelector.locale

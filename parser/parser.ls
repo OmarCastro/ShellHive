@@ -14,6 +14,8 @@ parserCommand =
   gzip:      require './commands/v/gzip'
   gunzip:    require './commands/v/gunzip'
   zcat:      require './commands/v/zcat'
+  head:      require './commands/v/head'
+  tail:      require './commands/v/tail'
   tr:        require './commands/v/tr'
   tee:       require './commands/v/tee'
 
@@ -32,6 +34,9 @@ VisualSelectorOptions =
   gunzip:   parserCommand.gzip.VisualSelectorOptions
   zcat:     parserCommand.gzip.VisualSelectorOptions
 
+  head:     parserCommand.head.VisualSelectorOptions
+  tail:     parserCommand.tail.VisualSelectorOptions
+  compress: parserCommand.compress.VisualSelectorOptions
 function getPositionBoundaries(components)
   xs = components[0].position.x
   ys = components[0].position.y
@@ -142,6 +147,7 @@ indexComponents = (visualData) -> {[comp.id,comp] for comp in visualData.compone
 
 
 function parseVisualData(VisualData)
+  return '' if VisualData.components.length < 1
   indexedComponentList = indexComponents(VisualData)
   initialComponent = indexedComponentList[VisualData.firstMainComponent]
   return if initialComponent is null

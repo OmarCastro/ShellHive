@@ -1,8 +1,11 @@
 require! {express, jade, fs, util, stylus, nib, Datastore: nedb, \child_process .spawn}
 
+
+
+
 /**
  defines a unix commands
-*/
+*//*
 class CommandProcess
 	(exec, args, nodeId) ->
 		@exec = exec
@@ -54,7 +57,7 @@ class CommandProcess
 defines a complete unix command line
 
 
-*/
+*//*
 class CommandLine
 	(exec, args, nodeId) ->
 		new-process = new CommandProcess(exec, args, nodeId)
@@ -81,7 +84,7 @@ class CommandLine
 	commandString: -> [x.commandString! for x in @processes]*' | '
 
 
-
+# */
 
 
 

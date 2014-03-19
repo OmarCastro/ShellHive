@@ -13,7 +13,7 @@ function arrangeLayout(previousCommand,boundaries)
   components = []
   for boundary in boundaries
     $.translateBoundary boundary, previousCommand.position.x + 500, 
-      if prevBound then prevBound.bottom + 400 - boundary.top else minY
+      if prevBound then prevBound.bottom - boundary.top else minY
     prevBound = boundary
     components = components ++ boundary.components
 

@@ -8,7 +8,6 @@ app.directive "graphModel", ($document) ->
     graphModel: '='
     options: '='
   controller:['$scope', '$element','$modal', '$attrs', (scope, element, $modal, attr) !->
-    #console.log scope.options
     pointerId = 0
     
     #graph transformations
@@ -35,10 +34,13 @@ app.directive "graphModel", ($document) ->
     
     svgElem = elem.querySelector("svg")
     $svgElem = $(svgElem)
-    
+
+    workspace = elem.querySelector(".workspace")
+    $workspace = $(workspace)
+
     popup = elem.querySelector(".popup")
     $popup = $(popup)
-    popupHeight = $popup.height!
+    popupHeight = $popup.find("form").height!
     
     $popup.hide!
     $popupInput = $popup.find("input");
@@ -60,6 +62,8 @@ app.directive "graphModel", ($document) ->
       ..isImplemented = isImplemented
       ..isArray = angular.isArray
       ..isString = angular.isString
+
+
 
       ..swapPrevious = (array,index,id) ->
         return if index == 0;
@@ -125,7 +129,7 @@ app.directive "graphModel", ($document) ->
       newComponent.position <<<< position
       newComponent
     newCommandComponent = (command, position)->
-      console.log command
+      #console.log command
       {visualData} = scope
       newResult = shellParser.parseCommand command
       newComponent = newResult.components[0]
@@ -139,10 +143,10 @@ app.directive "graphModel", ($document) ->
       mapPointToScene x,y
 
     mapMouseToView = (event) !->
-      offset = $svgElem.offset!
+      offset = $workspace.offset!
       return {
-        x: event.pageX - offset.left
-        y: event.pageY - offset.top
+        x: Math.round(event.pageX - offset.left)
+        y: Math.round(event.pageY - offset.top)
       }
 
     mapPointToScene = (x,y)->
@@ -186,28 +190,35 @@ app.directive "graphModel", ($document) ->
         setEdgePath edgeIniX,edgeIniY,edgeIniX,edgeIniY
     moveEdge = (event) ->
         {x,y} = mapMouseToScene event
+        #console.log event.pageX,",", event.pageY, "--" x,",",y,", scale: ", scale, " GX:", graphX, " GY:", graphY
         setEdgePath edgeIniX,edgeIniY,x,y
     endEdge = ->
-        console.log "edge finished"
+        #console.log "edge finished"
         simpleEdge.setAttribute \d, "M 0 0"
 
-    showPopup = (event,startNode,startPort) ->
+    showPopup = (event,startNode,startPort,endNode,endPort) ->
         scope.popupText = ''
         {x,y} = mapMouseToView event
         popupState <<<< {x,y}
         popupState
           ..startNode = startNode
           ..startPort = startPort
-        console.log popupHeight / 2
-        popup.style[cssTransform] = "translate(#{Math.floor(x)}px,#{Math.floor(y - popupHeight / 2)}px)"
+          ..endNode = endNode
+          ..endPort = endPort
+        #console.log popupHeight / 2
+        popup.style[cssTransform] = "translate(#{Math.round(x)}px,#{Math.round(y - popupHeight / 2)}px)"
         $popup.show!
         $popupInput.focus!
         scope.$digest!
     popupSubmit = (content) ->
         comp = newComponent(content,popupState);
+        popupState.startNode ?= comp.id
+        popupState.endNode ?= comp.id
         scope.visualData.connections.push {
           popupState.startNode, 
-          popupState.startPort, endNode: comp.id, endPort: \input
+          popupState.startPort, 
+          popupState.endNode, 
+          popupState.endPort, 
         }
         hidePopup!
         endEdge!
@@ -216,10 +227,32 @@ app.directive "graphModel", ($document) ->
     hidePopupAndEdge = ->
         $popup.hide!
         endEdge!
+    scope.newMacroModal = -> 
+        form =
+          name:''
+          description:''
+        modalInstance = $modal.open {
+        templateUrl: 'myModalContent.html'
+        controller: ($scope, $modalInstance) !->
+          $scope.form = form
+          $scope.cancel = -> $modalInstance.dismiss('cancel');
+          $scope.ok = !-> $modalInstance.close(form);
+        }
+
+        modalInstance.result.then (selectedItem) ->
+          scope.graph.newMacro form.name, form.description
+          form.name = form.description = ''
+
+    scope.newCommandAtTopLeft = (command)->
+      newCommandComponent(command, mapPointToScene 0,0)
 
 ##graphC
     this
-      ..isFreeSpace = (elem) -> elem in [svgElem, nodesElem]
+      ..removeComponent = (id) !->
+        scope.visualData
+          ..components = [x for x in scope.visualData.components when x.id != id]
+          ..connections = [x for x in scope.visualData.connections when x.startNode != id and x.endNode != id]
+      ..isFreeSpace = (elem) -> elem in [svgElem, workspace, nodesElem]
       ..showPopup = showPopup
       ..nodesElement = nodesElem
       ..popupSubmit = popupSubmit
@@ -231,6 +264,7 @@ app.directive "graphModel", ($document) ->
       ..startEdge = startEdge
       ..moveEdge = moveEdge
       ..endEdge = endEdge
+      ..isMacroView
       ..updateScope = -> scope.$digest!
       ..getVisualData = -> scope.visualData
       ..mapPointToScene = mapPointToScene
@@ -238,7 +272,7 @@ app.directive "graphModel", ($document) ->
       ..mapMouseToView = mapMouseToView
       ..setGraphView = (view) !->  
         hidePopupAndEdge!;
-        console.log "graphview set to", view 
+        #console.log "graphview set to", view 
         scope.visualData = view
         scope.$digest!
       ..revertToRoot = !-> scope.visualData = graphModel;
