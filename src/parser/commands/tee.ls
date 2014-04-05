@@ -1,4 +1,6 @@
 $ = require("./_init.js");
+#Boundary = require("../../common/Boundary");
+Boundary = require("./_graphlayout");
 
 /**
   Arranges the nodes using a hierarchical layout
@@ -11,11 +13,11 @@ function arrangeLayout(previousCommand,boundaries)
     minY = 0 
   prevBound = null
   components = []
+  translateX =  previousCommand.position.x + 500
   for boundary in boundaries
-    $.translateBoundary boundary, previousCommand.position.x + 500, 
-      if prevBound then prevBound.bottom - boundary.top else minY
+    translateY = if prevBound then prevBound.bottom - boundary.top else minY
+    boundary.translateXY translateX,translateY
     prevBound = boundary
-    components = components ++ boundary.components
 
   x = switch boundaries.length
     | 0 => 0
@@ -30,7 +32,7 @@ function arrangeLayout(previousCommand,boundaries)
 function connector(parser,previousCommand,result, boundaries, tracker)
   return (commandList) !->
       subresult = parser.parseAST(commandList, tracker)
-      boundaries.push $.getBoundaries subresult.components
+      boundaries.push Boundary.fromComponents subresult.components
       for sub in subresult.components
         result.components.push sub
       for sub in subresult.connections

@@ -1,4 +1,6 @@
-$ = require("./_init.js");
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
 
 selectors = {
@@ -6,8 +8,8 @@ selectors = {
   \format
   \show
   indicator-style:  "indicator style"
-  time-style:  "time style"
-  quoting-style:  "quoting style"
+  #time-style:  "time style"
+  #quoting-style:  "quoting style"
 }
 
 ## Selectors
@@ -29,7 +31,7 @@ formatSelector = {
 
 indicatorStyleSelector = {
   \none,\slash,\classify,
-  fileType: "file type"
+  #fileType: "file type"
 }
 
 timeStyleSelector = {
@@ -81,11 +83,11 @@ timeStyleSelectorOption =
   \full-iso : "--time-style=full-iso"
   \long-iso : "--time-style=long-iso"
   \iso      : "--time-style=iso"
-  \locale   : "--time-style=locale"
+  \locale   : null
 
 
 quotingStyleSelectorOption =
-  \literal : "--quoting-style=literal"
+  \literal : null
   \locale  : "--quoting-style=locale"
   \shell   : "--quoting-style=shell"
   \shell-always :  "--quoting-style=shell-always"
@@ -160,9 +162,9 @@ optionsParser =
     b  :  $.select selectors.quoting-style,  quotingStyleSelector.escape 
     B  :  $.switchOn flags.ignore-backups
     c  :  $.switchOn! 
-    C  :  $.justAccept! 
+    C  :  $.ignore 
     d  :  $.switchOn!
-    D  :  $.justAccept! 
+    D  :  $.ignore 
     f  :  $.switchOn! 
     F  :  $.select  selectors.indicator-style, indicatorStyleSelector.classify
     g  :  $.switchOn flags.no-print-owner
@@ -240,5 +242,5 @@ defaultComponentData = ->
     "ignore" : ""
   files:[]
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
-exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions,parameterOptions)
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = common.commonParseComponent(flagOptions,selectorOptions,parameterOptions)

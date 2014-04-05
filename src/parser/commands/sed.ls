@@ -1,25 +1,25 @@
 /*
--n, --quiet, --silent
-                 elimir exibição automática do espaço de padrões
--e script, --expression=script
-             adicionar o 'script' aos comandos a serem executados
--f script, --file=script
-             adicionar os conteúdos de 'script' aos comandos a serem executados
---follow-symlinks
-             wguir ligações simbólicas ao processar no lugar
--i[SUFIXO], --in-place[=SUFIXO]
-             editar arquivos no local (faça backup se SUFIXO for fornecido)
--l N, --line-length=N
-             especificar comprimento de linha desejado no comando 'l'
---posix
-             desactivar todas as extensões GNU.
--r, --regexp-extended
-             usar expressões regulares extendidas no 'script'.
--s, --separate
-             considerar ficheiros como separados em vez de uma única longa corrente contínua.
--u, --unbuffered
-             carregar quantidades mínimas de dados dos ficheiros
-             de entrada e despejar mais frequentemente a memória temporária de saída
+sed [-n] script[file...]
+
+sed [-n][-e script]...[-f script_file]...[file...]
+
+DESCRIPTION
+
+The sed utility is a stream editor that shall read one or more text files, make editing changes according to a script of editing commands, and write the results to standard output. The script shall be obtained from either the script operand string or a combination of the option-arguments from the -e script and -f script_file options.
+
+OPTIONS
+
+The sed utility shall conform to the Base Definitions volume of IEEE Std 1003.1-2001, Section 12.2, Utility Syntax Guidelines, except that the order of presentation of the -e and -f options is significant.
+
+The following options shall be supported:
+
+-e  script
+      Add the editing commands specified by the script option-argument to the end of the script of editing commands. The script option-argument shall have the same properties as the script operand, described in the OPERANDS section.
+-f  script_file
+      Add the editing commands in the file script_file to the end of the script.
+-n
+      Suppress the default output (in which each line, after it is examined for editing, is written to standard output). Only lines explicitly selected for output are written.
+      Multiple -e and -f options may be specified. All commands shall be added to the script in the order specified, regardless of their origin.
 
 Se não forem dadas as opções -e, --expression, -f ou --file, então, o primeiro
 argumento não-opção é considerado como o 'script' a interpretar. Todos os

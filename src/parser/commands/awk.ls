@@ -5,7 +5,15 @@
 -v var=val              --assign=var=val
 */
 
-$ = require("./_init.js");
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
+
+val = $.generateSelectors({});
+
+selectors = val.selectors
+selectorOptions = val.selectorOptions
+exports.VisualSelectorOptions = val.VisualSelectorOptions
 
 optionsParser = 
   shortOptions:
@@ -14,6 +22,14 @@ optionsParser =
     \field-separator : $.sameAs \F  
 
 $.generate(optionsParser)
+
+parameters = {
+  "field separator"
+}
+
+parameterOptions = {
+  "field separator" : \F
+}
 
 
 defaultComponentData = ->
@@ -24,7 +40,18 @@ defaultComponentData = ->
   script: ""
 
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
+
+
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
     string: (component, str) ->
         component.script = str;
     })
+
+exports.parseComponent = common.commonParseComponent {},{},parameterOptions, (component,exec,flags,files,parameters) ->
+  script = component.script.replace('\"',"\\\"")
+  if script 
+    if /^[\n\ ]+$/.test script
+      script = "\"#repStr\""
+  else
+    script = "\"\"";
+  (exec ++ parameters ++ script) * ' '

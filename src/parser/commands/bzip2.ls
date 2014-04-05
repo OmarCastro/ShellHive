@@ -14,21 +14,21 @@
 --best              alias for -9
 */
 
-$ = require("./_init.js");
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
+val = $.generateSelectors({
+  \action :
+    \compress : null
+    \decompress : \d
+});
 
-selectors = {
-  \action
-}
-
-actionSelector = {
-  \compress
-  \decompress
-}
-
-const actionSelectorOption =
-  \compress : null
-  \decompress : \d
+selectors = val.selectors
+selectorOptions = val.selectorOptions
+actionSelector = val.selectorType['action']
+actionSelectorOption = selectorOptions['action']
+exports.VisualSelectorOptions = val.VisualSelectorOptions
 
 flags = {
   keepFiles : "keep files"
@@ -40,11 +40,6 @@ flags = {
   small: \small
 }
 
-const selectorOptions =
-  (selectors.action): actionSelectorOption
-
-exports.VisualSelectorOptions =
-  (selectors.action): [value for ,value of actionSelector]
 
 const flagOptions =
   "keep files": \k
@@ -97,5 +92,5 @@ defaultComponentData = ->
     action: actionSelector.compress
   files: []
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
-exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions)
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = common.commonParseComponent(flagOptions,selectorOptions)

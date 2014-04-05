@@ -208,3 +208,64 @@ DESCRIPTION
 
 
 */
+
+
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
+
+val = $.generateSelectors({
+  \format :
+    \normal : null
+    \RCS : \n
+    "ed script" : \e 
+
+
+});
+
+selectors = val.selectors
+selectorOptions = val.selectorOptions
+formatSelector = val.selectorType['format']
+formatSelectorOption = selectorOptions['format']
+exports.VisualSelectorOptions = val.VisualSelectorOptions
+
+const flags =
+  ignoreCase:"ignore case"
+  brief:"brief"
+
+
+const flagOptions =
+  "ignore case": \i
+  "brief": \q
+
+const optionsParser = 
+  shortOptions:
+    i: $.switchOn(flags.ignoreCase)
+    q: $.switchOn(flags.brief)
+    e: $.select(selectors.format,formatSelector.edScript)
+    n: $.select(selectors.format,formatSelector.RCS)
+  longOptions:
+    "normal":  $.select(selectors.format,formatSelector.normal)
+    "ed":      $.select(selectors.format,formatSelector.edScript)
+    "rcs":     $.select(selectors.format,formatSelector.RCS)
+    "ignore-case":  $.sameAs \i
+    "brief":        $.sameAs \q
+
+
+$.generate(optionsParser)
+
+defaultComponentData = ->
+  type:\command
+  exec:"diff"
+  flags:
+    "ignore case":false,
+    "brief":false,
+  selectors:
+    (selectors.format): formatSelector.normal
+  files:[] 
+
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = common.commonParseComponent(flagOptions,selectorOptions)
+
+
+

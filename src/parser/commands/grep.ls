@@ -19,52 +19,32 @@ grep:
 
 */
 
-$ = require("./_init.js");
-
-
-selectors = {
-  \patternType 
-  \match
-}
-
-# PATTERN TYPE SELECTORS
-
-const patternTypeSelector =
-  extendedRegex: "extended regexp"
-  fixedStrings:  "fixed strings"
-  basicRegex:    "basic regexp"
-  perlRegex:     "perl regexp"
-
-const patternTypeSelectorOption =
-  (patternTypeSelector.extendedRegex): \E
-  (patternTypeSelector.fixedStrings) : \F
-  (patternTypeSelector.basicRegex)   : null
-  (patternTypeSelector.perlRegex)    : \P
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
 
 
+val = $.generateSelectors({
+  \patternType :
+    "extended regexp" : \E
+    "fixed strings" : \F
+    "basic regexp" : null 
+    #"perl regexp": \P
+  \match :
+    \default : null
+    "whole line" : \x
+    "whole word" : \w
 
+});
 
-const matchSelector =
-  default:    "default"
-  wholeLine:  "whole line"
-  wholeWord:  "whole word"
-
-const matchSelectorOption =
-  (matchSelector.default)  : null
-  (matchSelector.wholeLine): \x
-  (matchSelector.wholeWord): \w
-
-
-selectorOptions = 
-  (selectors.patternType): patternTypeSelectorOption
-  (selectors.match)      : matchSelectorOption
-
-
-exports.VisualSelectorOptions =
-  (selectors.patternType): [value for ,value of patternTypeSelector]
-  (selectors.match)      : [value for ,value of matchSelector]
-
+selectors = val.selectors
+selectorOptions = val.selectorOptions
+patternTypeSelector = val.selectorType['patternType']
+patternTypeSelectorOption = selectorOptions['patternType']
+matchSelector = val.selectorType['match']
+matchSelectorOption = selectorOptions['match']
+exports.VisualSelectorOptions = val.VisualSelectorOptions
 
 const flags = 
   ignore-case : "ignore case"
@@ -77,14 +57,14 @@ const flagOptions =
 
 optionsParser = 
   shortOptions:
-    E  :  $.select  selectors.patternType, patternTypeSelector.extendedRegex
-    F  :  $.select  selectors.patternType, patternTypeSelector.fixedStrings
-    G  :  $.select  selectors.patternType, patternTypeSelector.basicRegex
+    E  :  $.select  selectors.patternType, "extended regexp"
+    F  :  $.select  selectors.patternType, "fixed strings"
+    G  :  $.select  selectors.patternType, "basic regexp"
     i  :  $.switchOn flags.ignore-case
-    P  :  $.select  selectors.patternType, patternTypeSelector.perlRegex
+    #P  :  $.select  selectors.patternType, patternTypeSelector.perlRegex
     v  :  $.switchOn flags.invert-match
-    x  :  $.select selectors.match, matchSelector.wholeLine
-    w  :  $.selectIfUnselected selectors.match, matchSelector.wholeWord, matchSelector.wholeLine
+    x  :  $.select selectors.match, "whole line"
+    w  :  $.selectIfUnselected selectors.match, "whole word", "whole line"
     y  :  $.switchOn flags.ignore-case
   longOptions:
     \extended-regexp : $.sameAs \E
@@ -105,15 +85,15 @@ defaultComponentData = ->
   exec:"grep",
   flags:{-"ignore case",-"invert match"}
   selectors:
-    (selectors.patternType): patternTypeSelector.basicRegex
-    (selectors.match):       matchSelector.default
+    \patternType : patternTypeSelector.basicRegex
+    \match :       matchSelector.default
   pattern: null
   files:[]
 
 
 
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
     string: (component, str) ->
       if component.pattern is null
         component.pattern = str
@@ -121,7 +101,7 @@ exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
         component.files.push(str)
     })
 
-exports.parseComponent = $.commonParseComponent flagOptions,selectorOptions, null, (component,exec,flags,files) ->
+exports.parseComponent = common.commonParseComponent flagOptions,selectorOptions, null, (component,exec,flags,files) ->
   pattern = component.pattern
   if pattern 
     if pattern.indexOf(" ") >= 0

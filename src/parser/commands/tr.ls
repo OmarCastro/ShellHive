@@ -37,7 +37,9 @@ auro-representa-se. Sequências interpretadas são:
   [=CAR=]         todos os caracteres equivalentes a CAR  
 */
 
-$ = require("./_init.js");
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
 flags = {
   \complement
@@ -81,11 +83,11 @@ defaultComponentData = ->
   set2: ""
 
 
-exports.parseCommand   = $.commonParseCommand(optionsParser,defaultComponentData,{
+exports.parseCommand   = common.commonParseCommand(optionsParser,defaultComponentData,{
     string: (component, str) !-> 
         if set1 == "" then set1 = str else set2 = str
     })
 
-exports.parseComponent = $.commonParseComponent flagOptions,selectorOptions, null, (component,exec,flags,files) ->
+exports.parseComponent = common.commonParseComponent flagOptions,selectorOptions, null, (component,exec,flags,files) ->
   {set1,set2} = component
   (exec ++ flags ++ set1 ++ set2) * ' '

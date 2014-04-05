@@ -1,5 +1,7 @@
 
-$ = require("./_init.js");
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
 selectors = {
   \format 
@@ -27,7 +29,7 @@ defaultComponentData = ->
   script: ""
 
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData,{
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
     string: (component, str) ->
         component.script = str;
     })

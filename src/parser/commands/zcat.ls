@@ -18,7 +18,9 @@
 */
 
 
-$ = require("./_init.js");
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
 flags = {
   keepFiles : "keep files"
@@ -65,5 +67,5 @@ defaultComponentData = ->
   files: []
 
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
-exports.parseComponent = $.commonParseComponent(flagOptions,selectorOptions)
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = common.commonParseComponent(flagOptions,selectorOptions)

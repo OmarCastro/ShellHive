@@ -1,24 +1,20 @@
-$ = require("./_init.js");
-
-const selectors =
-  lineNum : "line number"
-
-const lineNumberSelector = 
-  none:"do not print"
-  all:"print all lines"
-  nonEmpty:"print non-empty lines"
-
-const lineNumberSelectorOption =
-  "do not print": null
-  "print all lines": \n
-  "print non-empty lines":\b 
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
 
 
-const selectorsOptions =
-  (selectors.lineNum): lineNumberSelectorOption
+val = $.generateSelectors({
+  "line number":
+    "do not print" : null
+    "print all lines" : \n
+    "print non-empty lines" : \b 
+});
 
-exports.VisualSelectorOptions =
-  (selectors.lineNum): [value for ,value of lineNumberSelector]
+selectors = val.selectors
+selectorOptions = val.selectorOptions
+lineNumberSelector = val.selectorType["line number"]
+lineNumberSelectorOption = selectorOptions["line number"]
+exports.VisualSelectorOptions = val.VisualSelectorOptions
 
 const flags =
   tabs:"show tabs"
@@ -31,10 +27,6 @@ const flagOptions =
   "show tabs": \T,
   "show ends": \E,
   "squeeze blanks": \s
-
-
-
-
 
 const optionsParser = 
   shortOptions:
@@ -71,8 +63,8 @@ defaultComponentData = ->
     (selectors.lineNum): lineNumberSelector.none
   files:[] 
 
-exports.parseCommand = $.commonParseCommand(optionsParser,defaultComponentData)
-exports.parseComponent = $.commonParseComponent(flagOptions,selectorsOptions)
+exports.parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
+exports.parseComponent = common.commonParseComponent(flagOptions,selectorOptions)
 
 
 
