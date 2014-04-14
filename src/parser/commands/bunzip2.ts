@@ -18,8 +18,6 @@ import parserModule = require("../utils/parserData");
 import common = require("./_init");
 
 
-
-
 var selectors = {
   action:{
     name: 'action',
@@ -46,48 +44,50 @@ var flags = {
   keep: {
     name: "keep files",
     option: 'k',
-    description: "keep (don't delete) input files"
+    description: "keep (don't delete) input files",
+    active: false
   },
   force:{
     name: "force",
     option: 'f',
-    description: "overwrite existing output files"
+    description: "overwrite existing output files",
+    active: false
   },
   test:{
     name: "test",
     option: 't',
-    description: "test compressed file integrity"
+    description: "test compressed file integrity",
+    active: false
   },
   stdout: {
     name: "stdout",
     option: 'c',
-    description: "output to standard out"
+    description: "output to standard out",
+    active: false
   },
   quiet: {
     name: "quiet",
     option: 'q',
-    description: "suppress noncritical error messages"
+    description: "suppress noncritical error messages",
+    active: false
   },
   verbose:{
     name: "verbose",
     option: 'v',
-    description: "overwrite existing output files"      
+    description: "overwrite existing output files",    
+    active: false
   },
   small: {
     name: "small",
     option: 's',
-    description: "use less memory (at most 2500k)"      
+    description: "use less memory (at most 2500k)",
+    active: false
   }
 }
 
 
 var config:parserModule.Config = {
-  selectors:{
-    action: {
-      'compress': 'z',
-      'decompress': null
-    }
-  },
+  selectors:selectors,
   flags:flags
 }
 
@@ -143,18 +143,17 @@ var optionsParser = {
 $.generate(optionsParser);
 
 function defaultComponentData(){
+  var componentFlags = {}
+
+  for (var key in flags) {
+    var value = flags[key]
+    componentFlags[value.name] = value.active
+  }
+
   return {
     type: 'command',
     exec: "bunzip2",
-    flags: {
-      "keep files": false,
-      "force": false,
-      "test": false,
-      "stdout": false,
-      "quiet": false,
-      "verbose": false,
-      "small": false
-    },
+    flags: componentFlags,
     selectors: {
       action: selectors.action.options.decompress.name
     },

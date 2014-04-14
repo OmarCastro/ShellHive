@@ -155,4 +155,4 @@ AST_tests =
       #cat chapter1.tex | sed -e "s/''//g" -e "s/[\`\%]//g" -e 's/[][(){}\,\.\;\:\<\>\-\"\~\ =]/\n/g' -e 's/^[ \t]*//' | sort | uniq -c
       #cat chapter1.tex | tr " " "\n" | sort | uniq -c
 
-app = angular.module('report', ['ui.bootstrap']);
+app = angular.module('report', ['ui.bootstrap','ui.layout']);

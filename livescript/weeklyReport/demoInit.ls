@@ -1,11 +1,11 @@
-app = angular.module('demo', ['ui.bootstrap']);
+app = angular.module('demo', ['ui.bootstrap','ui.layout']);
 
 socket = io.connect!
 
 
 app.controller 'data-flow', ['$scope',($scope) ->
     console.log shellParser
-    AST = shellParser.generateAST """ ls -lr | grep e """
+    AST = shellParser.generateAST """ ls -l | grep e """
     visualData = shellParser.parseAST AST
 
     $scope.isImplemented = isImplemented
@@ -21,6 +21,8 @@ app.controller 'data-flow', ['$scope',($scope) ->
 
     $scope.runCommand = (command) ->
        #$scope.shellText ++= [{text:"$ #command", type: "call"}]
+       console.log $scope.res.visualData
+       console.log shellParser.parseVisualData $scope.res.visualData
        socket.emit('runCommand', {visualData: $scope.res.visualData})
 
     socket.on 'commandCall', (data) ->
@@ -35,6 +37,10 @@ app.controller 'data-flow', ['$scope',($scope) ->
         $scope.shellText ++= [{text:x, type: "error"} for x in data.split("\n")]
         $scope.shellText = $scope.shellText[-50 to] if $scope.shellText.length > 50
         $scope.$digest!
+    #socket.on \nodePosChanged (data) !->
+    #    requestAnimationFrame ->
+    #        component = visualData.components
+    #        visualData.components[].position <<< {data.position}
 
 
     $scope.$on "runCommand", (event, message) ->

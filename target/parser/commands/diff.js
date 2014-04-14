@@ -208,6 +208,59 @@ DESCRIPTION
 
 
 */
-(function(){
-
-}).call(this);
+var $, parserModule, common, val, selectors, selectorOptions, formatSelector, formatSelectorOption, flags, flagOptions, optionsParser, defaultComponentData;
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
+val = $.generateSelectors({
+  'format': {
+    'normal': null,
+    'RCS': 'n',
+    "ed script": 'e'
+  }
+});
+selectors = val.selectors;
+selectorOptions = val.selectorOptions;
+formatSelector = val.selectorType['format'];
+formatSelectorOption = selectorOptions['format'];
+console.error(formatSelector);
+exports.VisualSelectorOptions = val.VisualSelectorOptions;
+flags = {
+  ignoreCase: "ignore case",
+  brief: "brief"
+};
+flagOptions = {
+  "ignore case": 'i',
+  "brief": 'q'
+};
+optionsParser = {
+  shortOptions: {
+    i: $.switchOn(flags.ignoreCase),
+    q: $.switchOn(flags.brief),
+    e: $.select(selectors.format, formatSelector.ed_script),
+    n: $.select(selectors.format, formatSelector.RCS)
+  },
+  longOptions: {
+    "normal": $.select(selectors.format, formatSelector.normal),
+    "ed": $.select(selectors.format, formatSelector.ed_script),
+    "rcs": $.select(selectors.format, formatSelector.RCS),
+    "ignore-case": $.sameAs('i'),
+    "brief": $.sameAs('q')
+  }
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  var ref$;
+  return {
+    type: 'command',
+    exec: "diff",
+    flags: {
+      "ignore case": false,
+      "brief": false
+    },
+    selectors: (ref$ = {}, ref$[selectors.format] = formatSelector.normal, ref$),
+    files: []
+  };
+};
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = common.commonParseComponent(flagOptions, selectorOptions);

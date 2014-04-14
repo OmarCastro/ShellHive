@@ -5,46 +5,37 @@ html
     meta(charset="utf-8")
     link(rel="stylesheet",href="css/dropdowns.css")
     link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
-    link(rel="stylesheet",href="css/style.css")
+    link(rel="stylesheet",href="css/ui-layout.css")
+    link(rel="stylesheet",href="css5/style.css")
 
-  body(ng-app="report",style="margin:2em")
+  body(ng-app="report",style="margin:2em" ng-init="isDemo = true")
     .center
         h1 Weekly report
         p. MIEIC thesis
         p. Omar Alejandro Castillo de Castro 
-        p. Week 09/02/2012 - 15/03/2012
+        p. Week 16/02/2012 - 22/03/2012
 
     accordion(close-others="true")
       accordion-group(heading="Tasks done")
         h2  Tasks done
         div.changeList
             p.
-                I had less available time than expected in this week, as such,
-                next list shows the implementation tasks that has been done:
+                The next list shows the implementation tasks that has been done:
             ul
-                li Parse of redirection to visual representation
-                li Added file component (incomplete)
-                li 
-                    | Improved Interface
-                    ul
-                        li Allows the removal of components
-                        li Implemented a feature that creates a component by connecting a port to an free space
-                        li The same feature allows to create a component by writing a text command with options (e.g. "<code>cat -A</code>")
-                        li improved menus locations
-                li Bug fixes on some commands ( specially "<code>head</code>", "<code>tail</code>" and "<code>compress</code>") and on the parser
-                li More Tests
-                li Implemented creation of Macros
-                li Continue the implementation of Macros
-                li 
-                    a(href="demo1.html") Created a Demo page
+                li. Finish the implementation of the support of the Macro concept
+                li. Allow the commands to be run in a server
+                li. Added implementation to parse stderr redirection to visual representation.
+                li. Added implementation to parse stderr redirection and exit code in visual representation to Text.
+                li. Bug fixes and code refactoring
+                li. Research on the parse of complex commands
 
-        h4 Note
-        p.
-            While implementing the macros, a problem has surfaced when dealing with "macros inside macros",
-            which is that exists a possibility of creating a cycle (e.g. creating a puting the same macro inside it)
-        p.
-            As such, I decided to restict that the macros should not have "submacros" until I implment an algorithm to
-            find cycles (I believe it can be a low priority task).
+    
+        p
+            | I believe the solution is ready to be considered as an alpha version
+            
+        p
+            a(href="demo2.html") Here's the demo of the current solution
+
 
       accordion-group(heading="AST tests")
         h2  AST tests
@@ -153,7 +144,7 @@ html
                                 input(type="checkbox",ng-model="$parent.showInitial")
                                 | Show Initial Command
                         pre(ng-bind-template="command : {{showInitial ? res.inputCommand : res.command}}")
-                        .visual-builder.border.data-flow(ng-show="$parent.$parent.heMan == false" graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:5em;bottom:0;left:0;right:0")
+                        .visual-builder.border.data-flow(demo,ng-show="$parent.$parent.heMan == false" graph-model="res.visualData" options="options" touch-action="none",style="position:absolute; top:5em;bottom:0;left:0;right:0")
                             include graph.jade
                         pre(ng-show="heMan"). data : {{res.visualData | json}}
       accordion-group(heading="PlayGround")
@@ -190,7 +181,7 @@ html
                             | command : 
                             input.code(ng-model="builder.code",ng-change="generateAST()",style="width:80%")
                             br
-                        .visual-builder.border(graph-model="builder.result" options="options" touch-action="none",style="position:absolute; top:2em;bottom:0;left:0;right:0")
+                        .visual-builder.border(demo,graph-model="builder.result" options="options" touch-action="none",style="position:absolute; top:2em;bottom:0;left:0;right:0")
                             include graph.jade
 
 
@@ -199,25 +190,33 @@ html
         h2  Plans for the next week
 
         ul
-            li. Finish implementing the support of the Macro concept
-            li. Allow the commands to be run in a server
-            li. Release the first alpha (or beta) version for testing
+            li.
+                More tests
+            li.
+                Create a documentation (report) about the design of the current
+                solution or implement server-side features such as
+                collaboration and database
+
             li. Continue implementing the parser for other commands.
   script(src="js/jquery-2.1.0.min.js")
   script(src="js/angular.min.js")
   //-script(src="js/angular-animate.min.js")
   script(src="js/ui-bootstrap-tpls.min.js")
-  //-script(src="js/strap/angular-strap.min.js")
-  //-script(src="js/strap/angular-strap.tpl.min.js")
+  script(src="js/ui-layout.min.js")
   script(src="js/pointerevents.min.js")
   script(src="js5/parser.js")
   script(src="js5/reportApp.js")
   script(type="text/ng-template" id="myModalContent.html")
     include MacroCreationModal.jade
+  script(type="text/ng-template" id="MacroEditModal.html")
+    include MacroEditModal.jade
   script(type="text/ng-template" id="sidebarModel.html")
     include sidebar.jade
+  script(type="text/ng-template" id="graphTemplate.html")
+    include graph.jade
   script(type="text/ng-template" id="typeaheadTemplate.html")
     a
         span(bind-html-unsafe="match.label | typeaheadHighlight:query")
         span.badge. 14
+
 

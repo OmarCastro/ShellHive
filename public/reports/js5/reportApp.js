@@ -17,7 +17,7 @@ function getCSSSupportedProp(proparray){
   }
 }
 cssTransform = getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
-listOfImplementedCommands = ['awk', 'cat', 'grep', 'bunzip2', 'bzcat', 'bzip2', 'compress', 'ls', 'gzip', 'gunzip', 'zcat'];
+listOfImplementedCommands = ['awk', 'cat', 'grep', 'bunzip2', 'bzcat', 'bzip2', 'compress', 'ls', 'head', 'tail', 'gzip', 'gunzip', 'zcat'];
 function isImplemented(data){
   return listOfImplementedCommands.indexOf(data.exec >= 0);
 }
@@ -184,7 +184,7 @@ AST_tests = [
     asserts: ['equals(ast.length,3)', 'equals(ast[0].exec,"ls")', 'equals(ast[1].exec,"parallel")', 'equals(ast[2].exec,ast[1].exec)', 'equals(ast[0].args,["parser/commands/dev/"])', 'equals(ast[1].args,["find parser/commands/dev/{} -newer parser/commands/v/{.}.js"])', 'equals(ast[2].args,["basename {}"])']
   }
 ];
-app = angular.module('report', ['ui.bootstrap']);
+app = angular.module('report', ['ui.bootstrap', 'ui.layout']);
 app.controller('examples', function($scope){
   var examples, results, res$, i$, len$, index, example, AST, visualData, x$;
   $scope.options = SelectionOptions;
@@ -401,13 +401,13 @@ app.directive("connector", function($document){
   return {
     scope: true,
     link: function(scope, element, attr){
-      var StartPortOffset, EndPortOffset, startPosition, endPosition, startComponent, endComponent, dataedge, elem, $graphElement, resultScope, graphElement, i$, ref$, len$, component, setEdgePath, update;
+      var StartPortOffset, EndPortOffset, startPosition, endPosition, startComponent, endComponent, dataedge, elem, $graphElement, graphElement, i$, ref$, len$, component, setEdgePath, update;
       dataedge = scope.$parent.edge;
       elem = element[0];
       $graphElement = element.closest('[graph-model]');
-      resultScope = $graphElement.scope();
       graphElement = $graphElement[0];
-      for (i$ = 0, len$ = (ref$ = resultScope.visualData.components).length; i$ < len$; ++i$) {
+      console.log("scope.visualData", scope.visualData);
+      for (i$ = 0, len$ = (ref$ = scope.visualData.components).length; i$ < len$; ++i$) {
         component = ref$[i$];
         if (component.id === dataedge.startNode) {
           startComponent = component;
@@ -415,7 +415,7 @@ app.directive("connector", function($document){
           break;
         }
       }
-      for (i$ = 0, len$ = (ref$ = resultScope.visualData.components).length; i$ < len$; ++i$) {
+      for (i$ = 0, len$ = (ref$ = scope.visualData.components).length; i$ < len$; ++i$) {
         component = ref$[i$];
         if (component.id === dataedge.endNode) {
           endComponent = component;
@@ -470,14 +470,12 @@ app.directive("component", function($document){
     scope: true,
     link: function(scope, element, attr, graphModelController){
       var datanode, startX, startY, title, position, elem, imstyle, mousemove, moveBy, mouseup;
-      scope.transform = cssTransform.replace(/[A-Z]/g, function(v){
-        return "-" + v.toLowerCase();
-      });
       datanode = scope.$parent.data;
       startX = 0;
       startY = 0;
       title = datanode.title;
       position = datanode.position;
+      scope.transform = "translate(" + position.x + "px, " + position.y + "px)";
       elem = element[0];
       imstyle = elem.style;
       element.bind("pointerdown", function(ev){
@@ -493,7 +491,7 @@ app.directive("component", function($document){
         event = ev.originalEvent;
         targetTag = event.target.tagName;
         console.log(targetTag);
-        if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'BUTTON' || targetTag === 'A')) {
+        if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'BUTTON' || targetTag === 'A' || targetTag === 'TEXTAREA')) {
           return true;
         }
         pointerId = event.pointerId;
@@ -513,6 +511,7 @@ app.directive("component", function($document){
       };
       moveBy = function(x, y){
         graphModelController.translateNode(datanode.id, position, x, y);
+        scope.transform = "translate(" + position.x + "px, " + position.y + "px)";
         scope.$digest();
       };
       mouseup = function(){
@@ -605,6 +604,7 @@ app.directive("port", function($document){
     }
   };
 });
+var slice$ = [].slice;
 app.directive("graphModel", function($document){
   return {
     replace: false,
@@ -612,9 +612,10 @@ app.directive("graphModel", function($document){
       graphModel: '=',
       options: '='
     },
+    templateUrl: 'graphTemplate.html',
     controller: [
       '$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
-        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, nodesElem, nodesElemStyle, edgesElem, edgesElemStyle, svgElem, $svgElem, workspace, $workspace, popup, $popup, popupHeight, $popupInput, graphModel, res$, key, ref$, val, x$, update, mousemove, mouseup, newComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, popupSubmit, hidePopup, hidePopupAndEdge, y$;
+        var pointerId, scale, graphX, graphY, startX, startY, edgeIniX, edgeIniY, elem, nodesElem, nodesElemStyle, edgesElem, edgesElemStyle, svgElem, $svgElem, workspace, $workspace, popup, $popup, popupHeight, $popupInput, toplayout, splitbar, graphModel, res$, key, ref$, val, x$, $sp, y$, update, mousemove, mouseup, newComponent, newFileComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, popupSubmit, hidePopup, hidePopupAndEdge, z$;
         pointerId = 0;
         scale = 1;
         graphX = 0;
@@ -637,9 +638,11 @@ app.directive("graphModel", function($document){
         popupHeight = $popup.find("form").height();
         $popup.hide();
         $popupInput = $popup.find("input");
+        toplayout = elem.querySelector(".toplayout");
+        splitbar = elem.querySelector(".ui-splitbar");
         graphModel = scope.graphModel;
         graphModel.macros = {
-          sss: shellParser.createMacro('sss', 'ddd')
+          sss: shellParser.createMacro('sss', 'ddd', "grep server | gzip | zcat")
         };
         res$ = [];
         for (key in ref$ = graphModel.macros) {
@@ -647,18 +650,68 @@ app.directive("graphModel", function($document){
           res$.push(key);
         }
         graphModel.macroList = res$;
-        x$ = scope;
-        x$.popupText = '';
-        x$.graph = this;
-        x$.$watch("graphModel", function(){
+        console.log(attr.demo);
+        if (attr.demo !== void 8) {
+          x$ = $sp = scope.$parent;
+          x$.shellText = [];
+          scope.$on("runCommand", function(event, message){
+            var command;
+            command = shellParser.parseVisualData(scope.graphModel);
+            $sp.shellText.push({
+              text: command,
+              type: "call"
+            });
+            $sp.shellText.push({
+              text: "this is a demo",
+              type: "error"
+            });
+            if ($sp.shellText.length > 50) {
+              return $sp.shellText = slice$.call($sp.shellText, -50);
+            }
+          });
+        }
+        y$ = scope;
+        y$.safedigest = function(){
+          if (!(scope.$$phase || scope.$root.$$phase)) {
+            scope.$digest();
+          }
+        };
+        y$.toNatNum = function(num){
+          return num.replace(/[^\d]/, '');
+        };
+        y$.popupText = '';
+        y$.graph = this;
+        y$.$watch("graphModel", function(){
           return scope.visualData = scope.graphModel;
         });
-        x$.visualData = scope.graphModel;
-        x$.implementedCommands = listOfImplementedCommands;
-        x$.isImplemented = isImplemented;
-        x$.isArray = angular.isArray;
-        x$.isString = angular.isString;
-        x$.swapPrevious = function(array, index, id){
+        y$.$watch("shell", function(){
+          if (!scope.shell) {
+            toplayout.style.bottom = "0";
+            return splitbar.style.display = "none";
+          } else {
+            toplayout.style.bottom = (100 - parseFloat(splitbar.style.top)) + "%";
+            return splitbar.style.display = "";
+          }
+        });
+        y$.visualData = scope.graphModel;
+        y$.implementedCommands = listOfImplementedCommands;
+        y$.isImplemented = isImplemented;
+        y$.isArray = angular.isArray;
+        y$.isString = angular.isString;
+        y$.isRootView = function(){
+          return deepEq$(scope.visualData, scope.graphModel, '===');
+        };
+        y$.toRootView = function(){
+          return scope.visualData = scope.graphModel;
+        };
+        y$.macroViewList = function(){
+          if (deepEq$(scope.visualData, scope.graphModel, '===')) {
+            return graphModel.macroList;
+          } else {
+            return [];
+          }
+        };
+        y$.swapPrevious = function(array, index, id){
           var ref$, i$, len$, connection, results$ = [];
           if (index === 0) {
             return;
@@ -700,14 +753,14 @@ app.directive("graphModel", function($document){
           x$.unbind("pointerup", mouseup);
           return x$;
         };
-        element.bind("pointerdown", function(ev){
+        $workspace.bind("pointerdown", function(ev){
           var event, targetTag, x$;
           if (ev.which === 3) {
             return false;
           }
           event = ev.originalEvent;
           targetTag = event.target.tagName;
-          if (pointerId || (targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'A' || targetTag === 'LI' || targetTag === 'BUTTON')) {
+          if (pointerId || (targetTag === 'LI' || targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'LABEL' || targetTag === 'BUTTON' || targetTag === 'A' || targetTag === 'TEXTAREA')) {
             return;
           }
           hidePopupAndEdge();
@@ -723,9 +776,24 @@ app.directive("graphModel", function($document){
         newComponent = function(content, position){
           if (in$(content.split(" ")[0], listOfImplementedCommands)) {
             return newCommandComponent(content, position);
+          } else if (content.split(" ")[0].indexOf(".") > -1) {
+            return newFileComponent(content.split(" ")[0], position);
           } else {
             return newMacroComponent(content, position);
           }
+        };
+        newFileComponent = function(filename, position){
+          var visualData, newComponent;
+          visualData = scope.visualData;
+          newComponent = {
+            type: 'file',
+            id: visualData.counter++,
+            filename: filename,
+            position: {}
+          };
+          visualData.components.push(newComponent);
+          importAll$(newComponent.position, position);
+          return newComponent;
         };
         newMacroComponent = function(name, position){
           var visualData, newComponent;
@@ -839,7 +907,7 @@ app.directive("graphModel", function($document){
           popup.style[cssTransform] = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
           $popup.show();
           $popupInput.focus();
-          return scope.$digest();
+          return scope.safedigest();
         };
         popupSubmit = function(content){
           var comp;
@@ -856,17 +924,22 @@ app.directive("graphModel", function($document){
           return endEdge();
         };
         hidePopup = function(){
-          return $popup.hide();
+          $popup.hide();
+          scope.sel = {
+            open: false
+          };
+          return scope.safedigest();
         };
         hidePopupAndEdge = function(){
-          $popup.hide();
+          hidePopup();
           return endEdge();
         };
         scope.newMacroModal = function(){
           var form, modalInstance;
           form = {
             name: '',
-            description: ''
+            description: '',
+            command: ''
           };
           modalInstance = $modal.open({
             templateUrl: 'myModalContent.html',
@@ -881,15 +954,107 @@ app.directive("graphModel", function($document){
             }
           });
           return modalInstance.result.then(function(selectedItem){
-            scope.graph.newMacro(form.name, form.description);
+            scope.graph.newMacro(form.name, form.description, form.command);
+            return form.name = form.description = '';
+          });
+        };
+        scope.macroEditModal = function(macroName){
+          var macro, form, modalInstance;
+          macro = graphModel.macros[macroName];
+          form = {
+            name: macro.name,
+            description: macro.description
+          };
+          modalInstance = $modal.open({
+            templateUrl: 'MacroEditModal.html',
+            controller: function($scope, $modalInstance){
+              $scope.form = form;
+              $scope.cancel = function(){
+                return $modalInstance.dismiss('cancel');
+              };
+              $scope.edit = function(){
+                $modalInstance.close({
+                  result: "edit"
+                });
+              };
+              $scope['delete'] = function(){
+                $modalInstance.close({
+                  result: "delete"
+                });
+              };
+              $scope.view = function(){
+                $modalInstance.close({
+                  result: "view"
+                });
+              };
+            }
+          });
+          return modalInstance.result.then(function(selectedItem){
+            var x$, res$, key;
+            switch (selectedItem.result) {
+            case "edit":
+              graphModel.macros[form.name] = macro;
+              delete graphModel.macros[macroName];
+              x$ = macro;
+              x$.name = form.name;
+              x$.description = form.description;
+              res$ = [];
+              for (key in graphModel.macros) {
+                res$.push(key);
+              }
+              graphModel.macroList = res$;
+              scope.$digest();
+              break;
+            case "view":
+              scope.graph.setGraphView(graphModel.macros[macroName]);
+              break;
+            case "delete":
+              delete graphModel.macros[macroName];
+              res$ = [];
+              for (key in graphModel.macros) {
+                res$.push(key);
+              }
+              graphModel.macroList = res$;
+            }
             return form.name = form.description = '';
           });
         };
         scope.newCommandAtTopLeft = function(command){
           return newCommandComponent(command, mapPointToScene(0, 0));
         };
-        y$ = this;
-        y$.removeComponent = function(id){
+        this.showPopup = showPopup;
+        this.popupSubmit = popupSubmit;
+        this.hidePopup = hidePopup;
+        this.hidePopupAndEdge = hidePopupAndEdge;
+        this.nodesElement = nodesElem;
+        this.newCommandComponent = newCommandComponent;
+        this.newMacroComponent = newMacroComponent;
+        this.startEdge = startEdge;
+        this.moveEdge = moveEdge;
+        this.endEdge = endEdge;
+        this.mapPointToScene = mapPointToScene;
+        this.mapMouseToScene = mapMouseToScene;
+        this.mapMouseToView = mapMouseToView;
+        z$ = this;
+        z$.setSelection = function(options, obj){
+          var elem, offset, position, y, x;
+          scope.sel = options;
+          options.open = true;
+          elem = obj[0];
+          offset = obj.offset();
+          position = options.data.position;
+          y = offset.top - 50 + elem.offsetHeight * scale;
+          x = offset.left;
+          options.transform = "translate(" + x + "px, " + y + "px)";
+        };
+        z$.selectSelection = function(value){
+          var options, sel, data, name;
+          options = scope.options, sel = scope.sel;
+          data = sel.data, name = sel.name;
+          options[data.exec].$changeToValue(data.selectors[name], name, value);
+          return sel.open = false;
+        };
+        z$.removeComponent = function(id){
           var x$, res$, i$, ref$, len$, x;
           console.log("removing component");
           x$ = scope.visualData;
@@ -910,48 +1075,33 @@ app.directive("graphModel", function($document){
           }
           x$.connections = res$;
         };
-        y$.isFreeSpace = function(elem){
+        z$.isFreeSpace = function(elem){
           return elem === svgElem || elem === workspace || elem === nodesElem;
         };
-        y$.showPopup = showPopup;
-        y$.nodesElement = nodesElem;
-        y$.popupSubmit = popupSubmit;
-        y$.hidePopup = hidePopup;
-        y$.hidePopupAndEdge = hidePopupAndEdge;
-        y$.nodesElement = nodesElem;
-        y$.newCommandComponent = newCommandComponent;
-        y$.newMacroComponent = newMacroComponent;
-        y$.startEdge = startEdge;
-        y$.moveEdge = moveEdge;
-        y$.endEdge = endEdge;
-        y$.isMacroView;
-        y$.updateScope = function(){
+        z$.updateScope = function(){
           return scope.$digest();
         };
-        y$.getVisualData = function(){
+        z$.getVisualData = function(){
           return scope.visualData;
         };
-        y$.mapPointToScene = mapPointToScene;
-        y$.mapMouseToScene = mapMouseToScene;
-        y$.mapMouseToView = mapMouseToView;
-        y$.setGraphView = function(view){
+        z$.setGraphView = function(view){
           hidePopupAndEdge();
           scope.visualData = view;
           scope.$digest();
         };
-        y$.revertToRoot = function(){
+        z$.revertToRoot = function(){
           scope.visualData = graphModel;
         };
-        y$.newMacro = function(name, descr){
+        z$.newMacro = function(name, descr, command){
           var res$, key;
-          graphModel.macros[name] = shellParser.createMacro(name, descr);
+          graphModel.macros[name] = shellParser.createMacro(name, descr, command);
           res$ = [];
           for (key in graphModel.macros) {
             res$.push(key);
           }
           graphModel.macroList = res$;
         };
-        y$.translateNode = function(id, position, x, y){
+        z$.translateNode = function(id, position, x, y){
           var i$, ref$, len$, el;
           position.x += x / scale;
           position.y += y / scale;
@@ -964,6 +1114,90 @@ app.directive("graphModel", function($document){
     ]
   };
 });
+function deepEq$(x, y, type){
+  var toString = {}.toString, hasOwnProperty = {}.hasOwnProperty,
+      has = function (obj, key) { return hasOwnProperty.call(obj, key); };
+  var first = true;
+  return eq(x, y, []);
+  function eq(a, b, stack) {
+    var className, length, size, result, alength, blength, r, key, ref, sizeB;
+    if (a == null || b == null) { return a === b; }
+    if (a.__placeholder__ || b.__placeholder__) { return true; }
+    if (a === b) { return a !== 0 || 1 / a == 1 / b; }
+    className = toString.call(a);
+    if (toString.call(b) != className) { return false; }
+    switch (className) {
+      case '[object String]': return a == String(b);
+      case '[object Number]':
+        return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+      case '[object Date]':
+      case '[object Boolean]':
+        return +a == +b;
+      case '[object RegExp]':
+        return a.source == b.source &&
+               a.global == b.global &&
+               a.multiline == b.multiline &&
+               a.ignoreCase == b.ignoreCase;
+    }
+    if (typeof a != 'object' || typeof b != 'object') { return false; }
+    length = stack.length;
+    while (length--) { if (stack[length] == a) { return true; } }
+    stack.push(a);
+    size = 0;
+    result = true;
+    if (className == '[object Array]') {
+      alength = a.length;
+      blength = b.length;
+      if (first) { 
+        switch (type) {
+        case '===': result = alength === blength; break;
+        case '<==': result = alength <= blength; break;
+        case '<<=': result = alength < blength; break;
+        }
+        size = alength;
+        first = false;
+      } else {
+        result = alength === blength;
+        size = alength;
+      }
+      if (result) {
+        while (size--) {
+          if (!(result = size in a == size in b && eq(a[size], b[size], stack))){ break; }
+        }
+      }
+    } else {
+      if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) {
+        return false;
+      }
+      for (key in a) {
+        if (has(a, key)) {
+          size++;
+          if (!(result = has(b, key) && eq(a[key], b[key], stack))) { break; }
+        }
+      }
+      if (result) {
+        sizeB = 0;
+        for (key in b) {
+          if (has(b, key)) { ++sizeB; }
+        }
+        if (first) {
+          if (type === '<<=') {
+            result = size < sizeB;
+          } else if (type === '<==') {
+            result = size <= sizeB
+          } else {
+            result = size === sizeB;
+          }
+        } else {
+          first = false;
+          result = size === sizeB;
+        }
+      }
+    }
+    stack.pop();
+    return result;
+  }
+}
 function in$(x, xs){
   var i = -1, l = xs.length >>> 0;
   while (++i < l) if (x === xs[i]) return true;
@@ -973,6 +1207,13 @@ function importAll$(obj, src){
   for (var key in src) obj[key] = src[key];
   return obj;
 }
+app.directive("elscope", function($document){
+  return {
+    link: function(scope, element){
+      scope.scopedElement = element;
+    }
+  };
+});
 /*
 ##sidebar
 
@@ -1035,59 +1276,3 @@ app.directive 'sidebarMacroComponent',  ->
           </a>
       </li>"""
 # */
-var activeDrop;
-activeDrop = null;
-app.directive('dropdownSelect', [
-  '$document', function($document){
-    return {
-      restrict: 'A',
-      replace: true,
-      scope: {
-        dropdownSelect: '=',
-        dropdownModel: '=',
-        dropdownOnchange: '&'
-      },
-      controller: [
-        '$scope', '$element', '$attrs', function($scope, $element, $attrs){
-          var body;
-          this.select = function(selected){
-            $scope.dropdownModel = selected;
-            $scope.dropdownOnchange({
-              selected: selected
-            });
-          };
-          body = $document.find("body");
-          body.bind("click", function(){
-            $element.removeClass('active');
-            activeDrop = null;
-          });
-          $element.bind('click', function(event){
-            event.stopPropagation();
-            if (activeDrop && activeDrop !== $element) {
-              activeDrop.removeClass('active');
-              activeDrop = null;
-            }
-            $element.toggleClass('active');
-            activeDrop = $element;
-          });
-        }
-      ],
-      template: "<div class='wrap-dd-select'>\n    <span class='selected'>{{dropdownModel}}</span>\n    <ul class='dropdown'>\n        <li ng-repeat='item in dropdownSelect'\n            class='dropdown-item'\n            dropdown-select-item='item'>\n        </li>\n    </ul>\n</div>"
-    };
-  }
-]);
-app.directive('dropdownSelectItem', [function(){
-  return {
-    require: '^dropdownSelect',
-    replace: true,
-    scope: {
-      dropdownSelectItem: '='
-    },
-    link: function(scope, element, attrs, dropdownSelectCtrl){
-      scope.selectItem = function(){
-        dropdownSelectCtrl.select(scope.dropdownSelectItem);
-      };
-    },
-    template: "<li>\n    <a href='' class='dropdown-item'\n        ng-click='selectItem()'>\n        {{dropdownSelectItem}}\n    </a>\n</li>"
-  };
-}]);

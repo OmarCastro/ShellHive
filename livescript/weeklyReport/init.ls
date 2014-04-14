@@ -24,6 +24,8 @@ listOfImplementedCommands = [
     'bzip2'
     'compress'
     'ls'
+    'head'
+    'tail'
     \gzip
     \gunzip
     \zcat

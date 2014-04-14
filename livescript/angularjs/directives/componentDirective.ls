@@ -5,19 +5,17 @@ app.directive "connector", ($document) ->
       var StartPortOffset, EndPortOffset, 
         startPosition, endPosition,
         startComponent, endComponent
-      
       dataedge = scope.$parent.edge
       elem = element[0]
       $graphElement = element.closest('[graph-model]')
-      resultScope = $graphElement.scope()
       graphElement = $graphElement[0]
-
-      for component in resultScope.visualData.components when component.id == dataedge.startNode
+      console.log "scope.visualData", scope.visualData
+      for component in scope.visualData.components when component.id == dataedge.startNode
           startComponent := component
           startPosition  := component.position
           break
 
-      for component in resultScope.visualData.components when component.id == dataedge.endNode
+      for component in scope.visualData.components when component.id == dataedge.endNode
           endComponent := component
           endPosition  := component.position
           break
@@ -62,14 +60,16 @@ app.directive "component", ($document) ->
     require: '^graphModel'    
     scope:true
     link: (scope, element, attr,graphModelController) !->
-      scope.transform = cssTransform.replace(/[A-Z]/g,(v)->"-#{v.toLowerCase()}")
+      #scope.transform = cssTransform.replace(/[A-Z]/g,(v)->"-#{v.toLowerCase()}")
       datanode = scope.$parent.data
       startX = 0
       startY = 0
       title = datanode.title
       position = datanode.position
+      scope.transform = "translate(#{position.x}px, #{position.y}px)"
       elem = element[0];
       imstyle = elem.style
+      
       #timestamp = 0
 
       element.bind "pointerdown", (ev) !->
@@ -82,7 +82,7 @@ app.directive "component", ($document) ->
         event = ev.originalEvent
         targetTag = event.target.tagName
         console.log targetTag
-        return true if pointerId or targetTag in <[INPUT SELECT LABEL BUTTON A]>
+        return true if pointerId or targetTag in <[INPUT SELECT LABEL BUTTON A TEXTAREA]>
         pointerId = event.pointerId
         $document
           ..bind "pointermove", mousemove
@@ -97,6 +97,7 @@ app.directive "component", ($document) ->
         startY := event.screenY
       moveBy = (x, y) !-> 
         graphModelController.translateNode(datanode.id,position,x,y)
+        scope.transform = "translate(#{position.x}px, #{position.y}px)"
         scope.$digest!
       mouseup = ->
         #console.log "#{Date.now!} - #timestamp = " Date.now! - timestamp

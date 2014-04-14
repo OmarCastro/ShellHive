@@ -227,6 +227,7 @@ selectors = val.selectors
 selectorOptions = val.selectorOptions
 formatSelector = val.selectorType['format']
 formatSelectorOption = selectorOptions['format']
+console.error(formatSelector);
 exports.VisualSelectorOptions = val.VisualSelectorOptions
 
 const flags =
@@ -242,11 +243,11 @@ const optionsParser =
   shortOptions:
     i: $.switchOn(flags.ignoreCase)
     q: $.switchOn(flags.brief)
-    e: $.select(selectors.format,formatSelector.edScript)
+    e: $.select(selectors.format,formatSelector.ed_script)
     n: $.select(selectors.format,formatSelector.RCS)
   longOptions:
     "normal":  $.select(selectors.format,formatSelector.normal)
-    "ed":      $.select(selectors.format,formatSelector.edScript)
+    "ed":      $.select(selectors.format,formatSelector.ed_script)
     "rcs":     $.select(selectors.format,formatSelector.RCS)
     "ignore-case":  $.sameAs \i
     "brief":        $.sameAs \q

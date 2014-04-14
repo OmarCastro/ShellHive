@@ -1,4 +1,27 @@
 //-div(sidebar)
+.popupArea
+    .popup.dropdown.open
+        ul.dropdown-menu.well
+            form(ng:submit="graph.popupSubmit(popupText)")
+                div.input-group.input-group-sm
+                    span.input-group-addon.glyphicon.glyphicon-tasks
+                    input.form-control(type="text" ng-model="popupText")
+            li.dropdown-header(ng-show="comms.length")
+                b command component
+            li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms = (implementedCommands | filter:popupText)")
+                a(ng-click="graph.popupSubmit(foo)") {{foo}}
+            li.dropdown-header(ng-show="comms2.length && isRootView()")
+                b macro component
+
+            li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms2 = (macroViewList() | filter:popupText)")
+                a(ng-click="graph.popupSubmit(foo)") {{foo}}
+
+    .selectpopup.dropdown.open(ng-if="sel.open" ng-style="{transform:sel.transform, WebkitTransform:sel.transform, MsTransform:sel.transform}")
+        ul.dropdown-menu
+            li(ng-repeat="c in options[sel.data.exec][sel.name]")
+                a(ng-click="graph.selectSelection(c)")
+                    span(ng-bind="c")
+
 div.navbar.navbar-default
     div.collapse.navbar-collapse
         ul.nav.navbar-nav
@@ -12,7 +35,7 @@ div.navbar.navbar-default
                     li.divider
                     li.dropdown-header created Macros
                     li(ng-repeat="macro in graphModel.macroList")
-                        a(ng-bind="macro")
+                        a(ng-bind="macro" ng-click="macroEditModal(macro)")
 
 
             li.dropdown
@@ -23,157 +46,81 @@ div.navbar.navbar-default
                     li(ng-repeat="command in implementedCommands") 
                         a(ng-click="newCommandAtTopLeft(command)", ng-bind="command")
             li
-                a(href="#" ng-click="$emit('runCommand', [])") RUN!!!
-
-
+                a(href="#" ng-click="shell = true; $emit('runCommand', [])") run
+            li
+                a(href="#" ng-click="shell = !shell") toogle shell
+            li
+                a(href="#" ng-click="toRootView()") View Root
                     
         ul.nav.navbar-nav.navbar-right
+            li
+                a(href="#" ng-click="showTips = !showTips") Docs
+            li
+                a(href="#") Username
             li 
                 span.glyphicon.glyphicon-user
 
-div.popup.dropdown.open
-    ul.dropdown-menu.well
-        form(ng:submit="graph.popupSubmit(popupText)")
-            div.input-group.input-group-sm
-                span.input-group-addon.glyphicon.glyphicon-tasks
-                input.form-control(type="text" ng-model="popupText")
-        li.dropdown-header(ng-show="comms.length")
-            b command component
-        li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms = (implementedCommands | filter:popupText)")
-            a(ng-click="graph.popupSubmit(foo)") {{foo}}
-        li.dropdown-header(ng-show="comms2.length")
-            b macro component
-        li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms2 = (graphModel.macroList | filter:popupText)")
-            a(ng-click="graph.popupSubmit(foo)") {{foo}}
-.background
-    .shell
+
+.tips(ng-if="showTips")
+    tabset
+        tab(heading="Components")
+            :markdown
+                #Components
+
+                In this module exists 3 types of componenrs
+                
+                - ** Command Component ** - represents a Unix command
+                - ** File Components ** - represents a file that will be used for input and output
+                - ** Macro Components ** - represents macros in the graph, a macro is a composition of interconnected commands
+
+                ## Creating components
+
+                There are 2 ways to create components, one way is by using the top bar, and the
+                other by connecting a port to an empty space
+
+                When connecting to an empty space a popup menu appears
+
+            h3 Creating a command component by using the mouse
+            img(src="tipsNtricks/newComponentMouse.svg" width="45%")
+            | > > > >
+            img(src="tipsNtricks/newComponentResult.svg" width="45%")
+            br
+            h3 Creating command component by using the text field
+            br
+            img(src="tipsNtricks/newComponentText.svg" width="45%")
+            | > > > >
+            img(src="tipsNtricks/newComponentResult.svg" width="45%")
+            br
+            h3 Creating file component by using the text field
+            br
+            img(src="tipsNtricks/newFileComponentText.svg" width="45%")
+            | > > > >
+            img(src="tipsNtricks/newFileComponentResult.svg" width="45%")
+            br
+            h3 Creating command component with arguments by using the text field
+            br
+            img(src="tipsNtricks/newFullCommandComponentText.svg" width="45%")
+            | > > > >
+            img(src="tipsNtricks/newFullCommandComponentTextResult.svg" width="45%")
+
+        tab(heading="Macros")
+            :markdown
+                #Macros
+
+                
+
+div.layout(ui-layout)
+    div.toplayout
+        div.background
+            svg(touch-action="none")
+                g.edges
+                    path.emptyEdge
+                    path.back(connector,ng-repeat="edge in visualData.connections")
+                    path(connector,ng-repeat="edge in visualData.connections")
+
+
+            .workspace(touch-action="none")
+                .nodes
+                    include ccomponent.jade
+    .shell(ng-show="shell" touch-action="all")
         div(ng-repeat="line in $parent.shellText" ng-class="line.type" ng-bind="line.text")
-svg
-    g.edges
-        path.emptyEdge
-        path(connector,ng-repeat="edge in visualData.connections")
-.workspace
-    .nodes
-        .component(component,ng-repeat="(id, data) in visualData.components" data-node-id="{{data.id}}" style="{{transform}}:translate({{data.position.x}}px, {{data.position.y}}px)")
-            div(ng-if="data.type == 'file'")
-                .title(title="{{data.macro.description}}") 
-                    | FILE
-                    a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data.id)")
-                .ports
-                    .input
-                        span.box(data-port="input")
-                        span.text &nbsp;entry&nbsp;&nbsp;
-                    .output(style="text-align: right")
-                        span.text &nbsp;&nbsp;content&nbsp;
-                        span.box(data-port="output")
-                br
-                pre {{data.filename}}
-                //-        code {{data.filename}}
-                //-div(style="position:absolute;top:110%;left:0;right:0; text-align:center")
-                //-    pre(style="display:inline-block")
-                //-        code {{data.filename}}
-            div(ng-if="data.type == 'subgraph'")
-                .title(title="{{data.macro.description}}") 
-                    span(ng-bind="data.macro.name")
-                    a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data.id)")
-
-                .ports
-                    .input
-                        span.box(data-port="input")
-                        span.text &nbsp;stdin&nbsp;&nbsp;
-                    .output(style="text-align: right")
-                        span.text &nbsp;&nbsp;stdout&nbsp;
-                        span.box(data-port="output")
-                        br
-                        span.text &nbsp;&nbsp;stderr&nbsp;
-                        span.box(data-port="error")
-                        br
-                        span.text &nbsp;&nbsp;return&nbsp;
-                        span.box(data-port="retcode")
-                br
-                br
-                br
-                div.
-                    {{data.macro.description}}
-                button(ng-click="graph.setGraphView(data.macro)").
-                    view macro
-            div(ng-if="data.type == 'command'")
-                .title 
-                    span(ng-bind="data.exec")
-                    a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data.id)")
-                .ports
-                    .input
-                        span.box(data-port="input")
-                        span.text &nbsp;stdin&nbsp;&nbsp;
-                    .output(style="text-align: right")
-                        span.text &nbsp;&nbsp;stdout&nbsp;
-                        span.box(data-port="output")
-                        br
-                        span.text &nbsp;&nbsp;stderr&nbsp;
-                        span.box(data-port="error")
-                        br
-                        span.text &nbsp;&nbsp;return&nbsp;
-                        span.box(data-port="retcode")
-                br
-                br
-                br
-                div(ng-if="data.exec == 'grep'")
-                    div
-                        label
-                            | pattern:
-                            input(type="text",ng-model="data.pattern")
-                        br
-                    div(ng-repeat="(name, option) in data.selectors track by name")
-                        span(ng-bind="name")
-                        select(ng-model='data.selectors[name]',ng-options="c for c in options.grep[name]")
-                        br
-                    br
-
-                div(ng-if="isImplemented(data) && data.files !== undefined")
-                    | files :
-                    br(ng-if="data.files.length > 0")
-                    div(ng-repeat="file in data.files track by $index") 
-                        span.box(data-port="file{{$index}}")
-                        input(type="text",ng-model="data.files[$index]" ng-if="isString(data.files[$index])")
-                        span(ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])")
-                        button(ng-click="data.files.splice($index,1)"). -
-                        button(ng-click="swapPrevious(data.files,$index,data.id)",ng-if="$index"). &#11014;
-                        button(ng-click="swapPrevious(data.files,$index + 1,data.id)",ng-if="$index != data.files.length -1 "). &#11015;
-                        br
-                    button(ng-click="data.files.push('')"). +
-                    br
-
-
-                div(ng-if="data.exec == 'awk'")
-                    | script:
-                    br 
-                    textarea(type="text", ng-model='data.script')
-
-                div(ng-if="isImplemented(data) && data.parameters")
-                    div(ng-repeat="(name, option) in data.parameters track by name")
-                        span(ng-bind="name")
-                        input(type="text", ng-model='data.parameters[name]')
-                        br
-
-
-                div(ng-if="isImplemented(data) && data.selectors && data.exec != 'grep' ")
-                    div(ng-repeat="(name, option) in data.selectors track by name")
-                        span(ng-bind="name")
-                        select(ng-model='data.selectors[name]',ng-options="c for c in options[data.exec][name]")
-                        //-select(dropdown-model='data.selectors[name]',dropdown-select="options[data.exec][name]")
-                        br
-
-
-                //-div(ng-if="isImplemented(data) && data.parameterSelectors")
-                    div(ng-repeat="(name, option) in data.parameterSelectors track by name")
-                        span(ng-bind="name")
-                        select(ng-model='data.parameterSelectors[name]',ng-options="c for c in paramOptions[data.exec][name]")
-                        br
-                        input(type="text", ng-model='data.parameterSelectors[name].value' ng-if="data.parameterSelectors[name].hasParameters")
-                        br
-                div
-                    div(ng-repeat="(name, val) in data.flags track by name")
-                        label
-                            input(type="checkbox",ng-model="data.flags[name]")
-                            span(ng-bind="name")
-                            br

@@ -20,14 +20,27 @@ module.exports = (grunt) !->
       helper_js: files: 'public/js/helper.ls.js': ['livescript/helper/*.ls']
       grunt:     files: 'Gruntfile.js'          : ['livescript/grunt.ls']
       parser:    files: 'target/parser/parser.js'      : ['src/parser/parser.ls']
-      utilities:   
+      
+      utilities: 
+        options:{+bare}      
         expand: true,
         flatten: true,
         cwd: 'src/parser/utils/',
         src: ['*.ls'],
         dest: 'target/parser/utils/',
         ext: '.js'
-      commands:   
+
+      common:  
+        options:{+bare}       
+        expand: true,
+        flatten: true,
+        cwd: 'src/common/',
+        src: ['*.ls'],
+        dest: 'target/common/',
+        ext: '.js'
+      
+      commands:  
+        options:{+bare}       
         expand: true,
         flatten: true,
         cwd: 'src/parser/commands/',
@@ -56,6 +69,13 @@ module.exports = (grunt) !->
             'livescript/weeklyReport/init.ls'
             'livescript/weeklyReport/demoInit.ls'
             'livescript/angularjs/directives/*.ls'
+      demoServer:
+        options:{+bare}    
+        files: 
+          'public/reports/js5/demoApp.js':
+            'livescript/weeklyReport/init.ls'
+            'livescript/weeklyReport/demoInit.ls'
+            'livescript/angularjs/directives/*.ls'
     shell:
       glueParser: 
         options:{+stdout,+stderr,+failOnError}
@@ -74,7 +94,12 @@ module.exports = (grunt) !->
         tasks:['stylus:reports']
       report:
         files: ['livescript/weeklyReport/*.ls','livescript/angularjs/**/*.ls']
-        tasks: ['livescript:report','livescript:demo']        
+        tasks: ['livescript:report','livescript:demo'] 
+      common:
+        files: ['src/common/**/*.ls']
+        tasks:
+          'newer:livescript:common'
+          'shell:glueParser'
       parserCommands:
         files: ['src/parser/**/*.ls']
         tasks:

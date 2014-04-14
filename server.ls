@@ -24,9 +24,8 @@ app.configure !->
 				.set 'compress', true
 				.use nib!
 	))
-	__dirname + '/public' |> express.static |> app.use
-	__dirname + '/bower_components' |> express.static |> app.use
-
+	app.use(express.static(__dirname + '/public'))
+	app.use(\/js, express.static(__dirname + '/bower_components'))
 app.get \/, (req, res) !-> res.render('home.jade')
 app.get \/helper, (req, res) !-> res.render('helper.jade')
 

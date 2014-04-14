@@ -7,6 +7,7 @@ app.directive "graphModel", ($document) ->
   scope:
     graphModel: '='
     options: '='
+  templateUrl: 'graphTemplate.html'
   controller:['$scope', '$element','$modal', '$attrs', (scope, element, $modal, attr) !->
     pointerId = 0
     
@@ -41,27 +42,49 @@ app.directive "graphModel", ($document) ->
     popup = elem.querySelector(".popup")
     $popup = $(popup)
     popupHeight = $popup.find("form").height!
-    
+
     $popup.hide!
     $popupInput = $popup.find("input");
 
-
+    toplayout = elem.querySelector(".toplayout")
+    splitbar = elem.querySelector(".ui-splitbar")
     graphModel = scope.graphModel
-    graphModel.macros = {sss:shellParser.createMacro \sss,\ddd}
+    graphModel.macros = {sss:shellParser.createMacro \sss,\ddd, "grep server | gzip | zcat"}
     graphModel.macroList = [key for key,val of graphModel.macros]
 
-
+    console.log attr.demo
+    if attr.demo != void
+      $sp = scope.$parent 
+        ..shellText = []
+      scope.$on "runCommand", (event, message) ->
+        command = shellParser.parseVisualData scope.graphModel
+        $sp.shellText.push {text:command, type: "call"}
+        $sp.shellText.push {text:"this is a demo", type: "error"}
+        $sp.shellText = $sp.shellText[-50 to] if $sp.shellText.length > 50
 
     scope
+      ..safedigest = !-> scope.$digest! unless scope.$$phase or scope.$root.$$phase
+      ..toNatNum = (num) -> num.replace(/[^\d]/,'')
       ..popupText = ''
       ..graph = this
-      ..$watch "graphModel", ->
-        scope.visualData = scope.graphModel;
+      ..$watch "graphModel", -> scope.visualData = scope.graphModel;
+      ..$watch "shell", ->
+        unless scope.shell
+          toplayout.style.bottom = "0"
+          splitbar.style.display = "none"
+        else
+          toplayout.style.bottom = "#{100 - parseFloat(splitbar.style.top)}%"
+          splitbar.style.display = ""
       ..visualData = scope.graphModel;
       ..implementedCommands = listOfImplementedCommands
       ..isImplemented = isImplemented
       ..isArray = angular.isArray
       ..isString = angular.isString
+      ..isRootView = -> scope.visualData === scope.graphModel
+      ..toRootView = -> 
+          scope.visualData = scope.graphModel
+      ..macroViewList = -> if scope.visualData === scope.graphModel
+        then graphModel.macroList else []
 
 
 
@@ -94,11 +117,12 @@ app.directive "graphModel", ($document) ->
         ..unbind "pointermove", mousemove
         ..unbind "pointerup", mouseup
 
-    element.bind "pointerdown", (ev) !->
+    $workspace.bind "pointerdown", (ev) !->
       return false if ev.which == 3
       event = ev.originalEvent
       targetTag = event.target.tagName
-      return if pointerId || targetTag in <[INPUT SELECT LABEL A LI BUTTON]>
+      return if pointerId || targetTag in  <[LI INPUT SELECT LABEL BUTTON A TEXTAREA]>
+
       hidePopupAndEdge!
       pointerId := event.pointerId
       $document
@@ -110,13 +134,26 @@ app.directive "graphModel", ($document) ->
       event.stopPropagation!
 
 
-
+    ##Component
 
     newComponent = (content, position)->
       if content.split(" ")[0] in listOfImplementedCommands
         newCommandComponent(content, position)
+      else if content.split(" ")[0].indexOf(".") > -1
+        newFileComponent(content.split(" ")[0], position)
       else
         newMacroComponent(content, position)
+
+    newFileComponent = (filename,position) ->
+      {visualData} = scope
+      newComponent =
+        type: \file
+        id: visualData.counter++
+        filename: filename
+        position: {}
+      visualData.components.push newComponent
+      newComponent.position <<<< position
+      newComponent
 
     newMacroComponent = (name, position)->
       {visualData} = scope
@@ -137,6 +174,9 @@ app.directive "graphModel", ($document) ->
         ..position <<<< position
       visualData.components.push newComponent
       newComponent
+
+
+
 
     mapMouseToScene = (event) ->
       {x,y} = mapMouseToView event
@@ -213,7 +253,7 @@ app.directive "graphModel", ($document) ->
         popup.style[cssTransform] = "translate(#{Math.round(x)}px,#{Math.round(y - popupHeight / 2)}px)"
         $popup.show!
         $popupInput.focus!
-        scope.$digest!
+        scope.safedigest!
     popupSubmit = (content) ->
         comp = newComponent(content,popupState);
         popupState.startNode ?= comp.id
@@ -228,13 +268,19 @@ app.directive "graphModel", ($document) ->
         endEdge!
     hidePopup = ->
         $popup.hide!
+        scope.sel = {-open}
+        scope.safedigest!
     hidePopupAndEdge = ->
-        $popup.hide!
+        hidePopup!
         endEdge!
+
+    ##Modal
+
     scope.newMacroModal = -> 
         form =
           name:''
           description:''
+          command: ''
         modalInstance = $modal.open {
         templateUrl: 'myModalContent.html'
         controller: ($scope, $modalInstance) !->
@@ -244,45 +290,87 @@ app.directive "graphModel", ($document) ->
         }
 
         modalInstance.result.then (selectedItem) ->
-          scope.graph.newMacro form.name, form.description
+          scope.graph.newMacro form.name, form.description, form.command
           form.name = form.description = ''
+
+    scope.macroEditModal = (macroName)->
+        macro = graphModel.macros[macroName]
+        form =
+          name:macro.name
+          description:macro.description
+
+        modalInstance = $modal.open {
+        templateUrl: 'MacroEditModal.html'
+        controller: ($scope, $modalInstance) !->
+          $scope.form = form
+          $scope.cancel = -> $modalInstance.dismiss('cancel');
+          $scope.edit = !-> $modalInstance.close(result:"edit");
+          $scope.delete = !-> $modalInstance.close(result:"delete");
+          $scope.view = !-> $modalInstance.close(result:"view");
+        }
+
+        modalInstance.result.then (selectedItem) ->
+          switch selectedItem.result
+            when "edit"
+              graphModel.macros[form.name] = macro
+              delete graphModel.macros[macroName]
+                
+              macro
+                ..name = form.name
+                ..description = form.description
+              graphModel.macroList = [key for key of graphModel.macros]
+              scope.$digest!
+            when "view"
+              scope.graph.setGraphView(graphModel.macros[macroName])
+            when "delete"
+              delete graphModel.macros[macroName]
+              graphModel.macroList = [key for key of graphModel.macros]
+
+          form.name = form.description = ''
+
 
     scope.newCommandAtTopLeft = (command)->
       newCommandComponent(command, mapPointToScene 0,0)
 
 ##graphC
+    this <<< {
+      showPopup, popupSubmit, hidePopup, hidePopupAndEdge,
+      nodesElement: nodesElem,
+      newCommandComponent, newMacroComponent,
+      startEdge,moveEdge,endEdge,
+      mapPointToScene,mapMouseToScene,mapMouseToView
+    }
     this
+      ..setSelection = (options, obj) !-> 
+        scope.sel = options;
+        options.open = true
+        elem = obj[0]
+        offset = obj.offset!
+        position = options.data.position
+        y = offset.top - 50 + elem.offsetHeight * scale
+        x = offset.left 
+        options.transform = "translate(#{x}px, #{y}px)"
+      ..selectSelection = (value)->
+        {options, sel} = scope
+        {data, name} = sel
+        options[data.exec].$changeToValue(data.selectors[name],name,value)
+        sel.open=false
       ..removeComponent = (id) !->
         console.log "removing component"
         scope.visualData
           ..components = [x for x in scope.visualData.components when x.id != id]
           ..connections = [x for x in scope.visualData.connections when x.startNode != id and x.endNode != id]
       ..isFreeSpace = (elem) -> elem in [svgElem, workspace, nodesElem]
-      ..showPopup = showPopup
-      ..nodesElement = nodesElem
-      ..popupSubmit = popupSubmit
-      ..hidePopup = hidePopup
-      ..hidePopupAndEdge = hidePopupAndEdge
-      ..nodesElement = nodesElem
-      ..newCommandComponent = newCommandComponent
-      ..newMacroComponent = newMacroComponent
-      ..startEdge = startEdge
-      ..moveEdge = moveEdge
-      ..endEdge = endEdge
-      ..isMacroView
       ..updateScope = -> scope.$digest!
       ..getVisualData = -> scope.visualData
-      ..mapPointToScene = mapPointToScene
-      ..mapMouseToScene = mapMouseToScene
-      ..mapMouseToView = mapMouseToView
       ..setGraphView = (view) !->  
         hidePopupAndEdge!;
         #console.log "graphview set to", view 
         scope.visualData = view
         scope.$digest!
       ..revertToRoot = !-> scope.visualData = graphModel;
-      ..newMacro = (name, descr) !-> 
-        graphModel.macros[name] = shellParser.createMacro name, descr
+      ..newMacro = (name, descr, command) !-> 
+        graphModel.macros[name] = shellParser.createMacro name, descr, command
         graphModel.macroList = [key for key of graphModel.macros]
       ..translateNode = (id,position,x,y) !->
         position.x += x/scale

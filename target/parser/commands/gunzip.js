@@ -1,73 +1,80 @@
-/*
+var $ = require("../utils/optionsParser");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
 
-  -c, --stdout      write on standard output, keep original files unchanged
-  -d, --decompress  decompress
-  -f, --force       force overwrite of output file and compress links
-  -h, --help        give this help
-  -k, --keep        keep (don't delete) input files
-  -l, --list        list compressed file contents
-  -n, --no-name     do not save or restore the original name and time stamp
-  -N, --name        save or restore the original name and time stamp
-  -q, --quiet       suppress all warnings
-  -r, --recursive   operate recursively on directories
-  -S, --suffix=SUF  use suffix SUF on compressed files                                        
-  -t, --test        test compressed file integrity                                            
-  -v, --verbose     verbose mode                                                                                                                       
-
-
-*/
-(function(){
-  var $, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData;
-  $ = require("./_init.js");
-  flags = {
-    keepFiles: "keep files",
-    force: 'force',
-    test: 'test',
-    quiet: 'quiet',
-    verbose: 'verbose',
-    recursive: 'recursive'
-  };
-  selectorOptions = {};
-  exports.VisualSelectorOptions = {};
-  flagOptions = {
-    "keep files": 'k',
-    'force': 'f',
-    'quiet': 'q',
-    'verbose': 'v',
-    'recursive': 'r'
-  };
-  optionsParser = {
-    shortOptions: {
-      k: $.switchOn(flags.keepFiles),
-      f: $.switchOn(flags.force),
-      t: $.switchOn(flags.test),
-      q: $.switchOn(flags.quiet),
-      v: $.switchOn(flags.verbose)
+var flags = {
+    keep: {
+        name: "keep files",
+        option: 'k',
+        description: "keep (don't delete) input files",
+        active: false
     },
-    longOptions: {
-      'keep': $.sameAs('k'),
-      'force': $.sameAs('f'),
-      'test': $.sameAs('t'),
-      'quiet': $.sameAs('q'),
-      'verbose': $.sameAs('v')
+    force: {
+        name: "force",
+        option: 'f',
+        description: "overwrite existing output files",
+        active: false
+    },
+    quiet: {
+        name: "quiet",
+        option: 'q',
+        description: "suppress noncritical error messages",
+        active: false
+    },
+    verbose: {
+        name: "verbose",
+        option: 'v',
+        description: "overwrite existing output files",
+        active: false
+    },
+    recursive: {
+        name: "recursive",
+        option: 'v',
+        description: "overwrite existing output files",
+        active: false
     }
-  };
-  $.generate(optionsParser);
-  defaultComponentData = function(){
+};
+
+var config = {
+    flags: flags
+};
+
+var bzipData = new parserModule.ParserData(config);
+
+var shortOptions = {
+    k: $.switchOn(flags.keep),
+    f: $.switchOn(flags.force),
+    q: $.switchOn(flags.quiet),
+    v: $.switchOn(flags.verbose),
+    r: $.switchOn(flags.recursive)
+};
+
+var longOptions = {
+    'keep': $.sameAs('k'),
+    'force': $.sameAs('f'),
+    'test': $.sameAs('t'),
+    'quiet': $.sameAs('q'),
+    'verbose': $.sameAs('v')
+};
+
+var optionsParser = {
+    shortOptions: shortOptions,
+    longOptions: longOptions
+};
+
+$.generate(optionsParser);
+
+function defaultComponentData() {
     return {
-      type: 'command',
-      exec: "gunzip",
-      flags: {
-        "keep files": false,
-        "force": false,
-        "test": false,
-        "quiet": false,
-        "verbose": false,
-        "recursive": false
-      },
-      files: []
+        type: 'command',
+        exec: "gunzip",
+        flags: bzipData.componentFlags,
+        selectors: bzipData.componentSelectors,
+        files: []
     };
-  };
-  exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-  exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
-}).call(this);
+}
+;
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
+exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+//# sourceMappingURL=gunzip.js.map

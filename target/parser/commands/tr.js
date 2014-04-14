@@ -36,66 +36,66 @@ auro-representa-se. Sequências interpretadas são:
   [:xdigit:]      todos os dígitos hexadecimais                                                                                                                                                 
   [=CAR=]         todos os caracteres equivalentes a CAR  
 */
-(function(){
-  var $, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
-  $ = require("./_init.js");
-  flags = {
-    'complement': 'complement',
-    'delete': 'delete',
-    squeeze: "squeeze repeats",
-    truncate: "truncate set1"
-  };
-  selectorOptions = {};
-  exports.VisualSelectorOptions = {};
-  flagOptions = {
-    'complement': 'c',
-    'delete': 'd',
-    "squeeze repeats": 's',
-    "truncate set1": 't'
-  };
-  optionsParser = {
-    shortOptions: {
-      c: $.switchOn(flags.complement),
-      C: $.switchOn(flags.complement),
-      d: $.switchOn(flags['delete']),
-      s: $.switchOn(flags.squeeze),
-      t: $.switchOn(flags.truncate)
+var $, parserModule, common, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
+flags = {
+  'complement': 'complement',
+  'delete': 'delete',
+  squeeze: "squeeze repeats",
+  truncate: "truncate set1"
+};
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+flagOptions = {
+  'complement': 'c',
+  'delete': 'd',
+  "squeeze repeats": 's',
+  "truncate set1": 't'
+};
+optionsParser = {
+  shortOptions: {
+    c: $.switchOn(flags.complement),
+    C: $.switchOn(flags.complement),
+    d: $.switchOn(flags['delete']),
+    s: $.switchOn(flags.squeeze),
+    t: $.switchOn(flags.truncate)
+  },
+  longOptions: {
+    'complement': $.sameAs('c'),
+    'delete': $.sameAs('d'),
+    'squeeze-repeats': $.sameAs('s'),
+    'truncate-set1': $.sameAs('t')
+  }
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    type: 'command',
+    exec: 'tr',
+    flags: {
+      "complement": false,
+      "delete": false,
+      "squeeze repeats": false,
+      "truncate set1": false
     },
-    longOptions: {
-      'complement': $.sameAs('c'),
-      'delete': $.sameAs('d'),
-      'squeeze-repeats': $.sameAs('s'),
-      'truncate-set1': $.sameAs('t')
-    }
+    set1: "",
+    set2: ""
   };
-  $.generate(optionsParser);
-  defaultComponentData = function(){
-    return {
-      type: 'command',
-      exec: 'tr',
-      flags: {
-        "complement": false,
-        "delete": false,
-        "squeeze repeats": false,
-        "truncate set1": false
-      },
-      set1: "",
-      set2: ""
-    };
-  };
-  exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
-    string: function(component, str){
-      var set1, set2;
-      if (set1 === "") {
-        set1 = str;
-      } else {
-        set2 = str;
-      }
-    }
-  });
-  exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions, null, function(component, exec, flags, files){
+};
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
+  string: function(component, str){
     var set1, set2;
-    set1 = component.set1, set2 = component.set2;
-    return join$.call(exec.concat(flags, set1, set2), ' ');
-  });
-}).call(this);
+    if (set1 === "") {
+      set1 = str;
+    } else {
+      set2 = str;
+    }
+  }
+});
+exports.parseComponent = common.commonParseComponent(flagOptions, selectorOptions, null, function(component, exec, flags, files){
+  var set1, set2;
+  set1 = component.set1, set2 = component.set2;
+  return join$.call(exec.concat(flags, set1, set2), ' ');
+});

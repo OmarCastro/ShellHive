@@ -1,108 +1,172 @@
-/*
+var $ = require("../utils/optionsParser");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
 
-  -c, --stdout      write on standard output, keep original files unchanged
-  -d, --decompress  decompress
-  -f, --force       force overwrite of output file and compress links
-  -h, --help        give this help
-  -k, --keep        keep (don't delete) input files
-  -l, --list        list compressed file contents
-  -n, --no-name     do not save or restore the original name and time stamp
-  -N, --name        save or restore the original name and time stamp
-  -q, --quiet       suppress all warnings
-  -r, --recursive   operate recursively on directories
-  -S, --suffix=SUF  use suffix SUF on compressed files                                        
-  -t, --test        test compressed file integrity                                            
-  -v, --verbose     verbose mode                                                              
-  -1, --fast        compress faster                                                           
-  -9, --best        compress better                                                           
-  --rsyncable       Make rsync-friendly archive    
+var selectors = {
+    ratio: {
+        name: 'ratio',
+        description: 'compress ratio of the algorithm',
+        options: {
+            1: {
+                name: '1 - fast',
+                option: '1',
+                description: 'compress the received data'
+            },
+            2: {
+                name: '2',
+                option: '2',
+                description: 'decompress the received data'
+            },
+            3: {
+                name: '3',
+                option: '3',
+                description: 'decompress the received data'
+            },
+            4: {
+                name: '4',
+                option: '4',
+                description: 'decompress the received data'
+            },
+            5: {
+                name: '5',
+                option: '5',
+                description: 'decompress the received data'
+            },
+            6: {
+                name: '6',
+                option: '6',
+                description: 'decompress the received data',
+                default: true
+            },
+            7: {
+                name: '7',
+                option: '7',
+                description: 'decompress the received data'
+            },
+            8: {
+                name: '8',
+                option: '8',
+                description: 'decompress the received data'
+            },
+            9: {
+                name: '9 - best',
+                option: '9',
+                description: 'decompress the received data'
+            }
+        }
+    }
+};
 
-
-*/
-(function(){
-  var $, flags, selectorOptions, flagOptions, optionsParser, i$, i, defaultComponentData;
-  $ = require("./_init.js");
-  flags = {
-    keepFiles: "keep files",
-    decompress: 'decompress',
-    force: 'force',
-    test: 'test',
-    stdout: 'stdout',
-    quiet: 'quiet',
-    verbose: 'verbose',
-    recursive: 'recursive',
-    small: 'small'
-  };
-  selectorOptions = {};
-  exports.VisualSelectorOptions = {};
-  flagOptions = {
-    "keep files": 'k',
-    'force': 'f',
-    'decompress': 'd',
-    'stdout': 'c',
-    'quiet': 'q',
-    'test': 't',
-    'verbose': 'v',
-    'recursive': 'r',
-    'small': 's'
-  };
-  $.setblocksize = function(size){
-    return function(Component){
-      return Component.blockSize = size;
-    };
-  };
-  optionsParser = {
-    shortOptions: {
-      d: $.switchOn(flags.decompress),
-      k: $.switchOn(flags.keepFiles),
-      f: $.switchOn(flags.force),
-      t: $.switchOn(flags.test),
-      c: $.switchOn(flags.stdout),
-      q: $.switchOn(flags.quiet),
-      v: $.switchOn(flags.verbose),
-      r: $.switchOn(flags.recursive),
-      s: $.switchOn(flags.small)
+var flags = {
+    keep: {
+        name: "keep files",
+        option: 'k',
+        description: "keep (don't delete) input files",
+        active: false
     },
-    longOptions: [
-      {
-        'decompress': $.sameAs('d'),
-        'compress': $.sameAs('z'),
-        'keep': $.sameAs('k'),
-        'force': $.sameAs('f'),
-        'test': $.sameAs('t'),
-        'stdout': $.sameAs('c'),
-        'quiet': $.sameAs('q'),
-        'verbose': $.sameAs('v'),
-        'small': $.sameAs('s')
-      }, 'recursive:', $.sameAs('r'), {
-        'fast': $.sameAs('1'),
-        'best': $.sameAs('9')
-      }
-    ]
-  };
-  for (i$ = '1'; i$ <= '9'; ++i$) {
-    i = i$;
-    optionsParser.shortOptions[i] = $.setblocksize(i);
-  }
-  $.generate(optionsParser);
-  defaultComponentData = function(){
+    force: {
+        name: "force",
+        option: 'f',
+        description: "overwrite existing output files",
+        active: false
+    },
+    test: {
+        name: "test",
+        option: 't',
+        description: "test compressed file integrity",
+        active: false
+    },
+    stdout: {
+        name: "stdout",
+        option: 'c',
+        description: "output to standard out",
+        active: false
+    },
+    quiet: {
+        name: "quiet",
+        option: 'q',
+        description: "suppress noncritical error messages",
+        active: false
+    },
+    verbose: {
+        name: "verbose",
+        option: 'v',
+        description: "overwrite existing output files",
+        active: false
+    },
+    recursive: {
+        name: "recursive",
+        option: 'v',
+        description: "overwrite existing output files",
+        active: false
+    },
+    small: {
+        name: "small",
+        option: 's',
+        description: "use less memory (at most 2500k)",
+        active: false
+    }
+};
+
+var config = {
+    selectors: selectors,
+    flags: flags
+};
+
+var bzipData = new parserModule.ParserData(config);
+
+var shortOptions = {
+    k: $.switchOn(flags.keep),
+    f: $.switchOn(flags.force),
+    t: $.switchOn(flags.test),
+    c: $.switchOn(flags.stdout),
+    q: $.switchOn(flags.quiet),
+    v: $.switchOn(flags.verbose),
+    r: $.switchOn(flags.recursive),
+    s: $.switchOn(flags.small),
+    1: $.select(selectors.ratio, selectors.ratio.options[1]),
+    2: $.select(selectors.ratio, selectors.ratio.options[2]),
+    3: $.select(selectors.ratio, selectors.ratio.options[3]),
+    4: $.select(selectors.ratio, selectors.ratio.options[4]),
+    5: $.select(selectors.ratio, selectors.ratio.options[5]),
+    6: $.select(selectors.ratio, selectors.ratio.options[6]),
+    7: $.select(selectors.ratio, selectors.ratio.options[7]),
+    8: $.select(selectors.ratio, selectors.ratio.options[8]),
+    9: $.select(selectors.ratio, selectors.ratio.options[9])
+};
+
+var longOptions = {
+    'decompress': $.sameAs('d'),
+    'compress': $.sameAs('z'),
+    'keep': $.sameAs('k'),
+    'force': $.sameAs('f'),
+    'test': $.sameAs('t'),
+    'stdout': $.sameAs('c'),
+    'quiet': $.sameAs('q'),
+    'verbose': $.sameAs('v'),
+    'small': $.sameAs('s'),
+    'fast': $.sameAs('1'),
+    'best': $.sameAs('9')
+};
+
+var optionsParser = {
+    shortOptions: shortOptions,
+    longOptions: longOptions
+};
+
+$.generate(optionsParser);
+
+function defaultComponentData() {
     return {
-      type: 'command',
-      exec: "gzip",
-      flags: {
-        "decompress": false,
-        "keep files": false,
-        "force": false,
-        "test": false,
-        "stdout": false,
-        "quiet": false,
-        "verbose": false,
-        "small": false,
-        "recursive": false
-      },
-      files: []
+        type: 'command',
+        exec: "gzip",
+        flags: bzipData.componentFlags,
+        selectors: bzipData.componentSelectors,
+        files: []
     };
-  };
-  exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-  exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
-}).call(this);
+}
+;
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
+exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+//# sourceMappingURL=gzip.js.map

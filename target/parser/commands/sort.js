@@ -1,46 +1,182 @@
-/*
-  -b, --ignore-leading-blanks  ignorar espaços iniciais
-  -d, --dictionary-order      considerar apenas espaços e car. alfanuméricos
-  -f, --ignore-case           ignorar capitalização de letras
-  -g, --general-numeric-sort  compare according to general numerical value
-  -i, --ignore-nonprinting    consider only printable characters
-  -M, --month-sort            compare (unknown) < 'JAN' < ... < 'DEC'
-  -h, --human-numeric-sort compara números humanamente legíveis (ex: 2K 1G)
-  -n, --numeric-sort          comparar de acordo com o valor numérico da expressão
-  -R, --random-sort           ordenar por "hash" aleatório de chaves
-      --random-source=FICHEIRO    obter bytes aleatórios de um FICHEIRO
-  -r, --reverse               inverter o resultado das comparações
-      --sort=PALAVRA ordenar de acordo com PALAVRA:
-                                general-numeric -g, human-numeric -h, mês -M,
-                                numérico -n, aleatório -R, versão -V
-  -V, --version-sort ordenação natural dos números (de versão) dentro do texto
+var $ = require("../utils/optionsParser");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
 
+var nullstr = null;
 
-      --batch-size=NMERGE   fundir pelo menos NMERGE entradas de uma só vez;
-                            para mais, usar ficheiros temporários
-  -c, --check, --check=diagnose-first  verifica por entrada ordenada; não ordena
-  -C, --check=quiet, --check=silent  semelhante a -c, mas não relata a primeira linha inválida
-      --compress-program=PROG  comprime temporários com PROG;
-                              descomprime-os com PROG -d
-      --debug               anota a parte da linha usada para ordenação,
-                              e avisa sobre uso questionável de stderr
-      --files0-from=F       lê entrada a partir dos arquivos especificados por
-                            nomes no arquivo F terminados com NUL;
-                            Se F for - então lê nomes a partir da entrada padrão
-  -k, --key=KEYDEF          sort via a key; KEYDEF gives location and type
-  -m, --merge               merge already sorted files; do not sort
-  -o, --output=FICHEIRO     resultado no FICHEIRO em vez da saída padrão
-  -s, --stable              estabilizar desactivando comparações de recurso
-  -S, --buffer-size=TAMANHO usar TAMANHO para memória principal temporária
-  -t, --field-separator=SEP  usar SEP ao invés da transição de não-vazios para vazios
-  -T, --temporary-directory=DIR  usar DIR para arquivos temporários, não $TMPDIR ou /tmp;
-                              múltiplas opções especificam múltiplos diretórios
-      --parallel=N          altera o número de tipos executados simultaneamente a N
-  -u, --unique              com -c, verifica por ordenação estrita;
-                              sem -c, exibe apenas a primeira de uma execução igual
-  -z, --zero-terminated     terminar linhas com byte 0, não nova linha
+var selectors = {
+    action: {
+        name: 'action',
+        description: 'action to exectute',
+        options: {
+            sort: {
+                name: 'sort',
+                option: nullstr,
+                description: 'sort',
+                defaut: true
+            },
+            check: {
+                name: 'check',
+                option: 'c',
+                description: 'sort by number'
+            },
+            silentCheck: {
+                name: 'quiet check',
+                option: 'g',
+                description: 'print line numbers on all lines'
+            },
+            merge: {
+                name: 'merge files',
+                option: 'm',
+                description: 'print line numbers on all lines'
+            }
+        }
+    },
+    sort: {
+        name: 'sort',
+        description: 'sort according to option',
+        options: {
+            text: {
+                name: 'text',
+                option: nullstr,
+                description: 'sort by text',
+                defaut: true
+            },
+            numeric: {
+                name: 'numeric',
+                option: 'n',
+                description: 'sort by number'
+            },
+            generalNumeric: {
+                name: 'general numeric',
+                option: 'g',
+                description: 'print line numbers on all lines'
+            },
+            humanNumeric: {
+                name: 'human numeric',
+                option: 'h',
+                description: 'print line numbers on non empty lines'
+            },
+            Month: {
+                name: 'month',
+                option: 'M',
+                description: 'print line numbers on non empty lines'
+            },
+            random: {
+                name: 'random',
+                option: 'R',
+                description: 'print line numbers on non empty lines'
+            },
+            version: {
+                name: 'version',
+                option: 'V',
+                description: 'print line numbers on non empty lines'
+            }
+        }
+    }
+};
 
-*/
-(function(){
+var flags = {
+    reverse: {
+        name: "reverse",
+        option: 'r',
+        description: "print TAB characters like ^I",
+        active: false
+    },
+    unique: {
+        name: "unique",
+        option: 'u',
+        description: "suppress repeated empty output lines",
+        active: false
+    },
+    ignoreCase: {
+        name: "ignore case",
+        option: 'E',
+        description: "print $ after each line",
+        active: false
+    },
+    ignoreNonprinting: {
+        name: "ignore non-printing chars",
+        option: 'v',
+        description: "use ^ and M- notation, except for LFD and TAB",
+        active: false
+    },
+    ignoreLeadingBlanks: {
+        name: "ignore leading blanks",
+        option: 's',
+        description: "suppress repeated empty output lines",
+        active: false
+    }
+};
 
-}).call(this);
+var parameters = {
+    key: {
+        name: 'key',
+        option: 'k',
+        type: "string",
+        description: "filter entries by anything other than the content",
+        defaultValue: ""
+    }
+};
+
+var config = {
+    selectors: selectors,
+    flags: flags,
+    parameters: parameters
+};
+
+var bzipData = new parserModule.ParserData(config);
+
+var optionsParser = {
+    shortOptions: {
+        b: $.switchOn(flags.ignoreLeadingBlanks),
+        d: $.ignore,
+        f: $.switchOn(flags.ignoreCase),
+        g: $.select(selectors.sort, selectors.sort.options.generalNumeric),
+        i: $.switchOn(flags.ignoreNonprinting),
+        M: $.select(selectors.sort, selectors.sort.options.Month),
+        h: $.select(selectors.sort, selectors.sort.options.humanNumeric),
+        n: $.select(selectors.sort, selectors.sort.options.numeric),
+        R: $.select(selectors.sort, selectors.sort.options.random),
+        r: $.switchOn(flags.reverse),
+        V: $.select(selectors.sort, selectors.sort.options.version),
+        c: $.select(selectors.action, selectors.action.options.check),
+        C: $.select(selectors.action, selectors.action.options.silentCheck),
+        k: $.setParameter(parameters.key.name),
+        m: $.select(selectors.action, selectors.action.options.merge),
+        o: $.ignore,
+        s: $.ignore,
+        S: $.ignore,
+        t: $.ignore,
+        T: $.ignore,
+        u: $.switchOn(flags.unique),
+        z: $.ignore
+    },
+    longOptions: {
+        "ignore-leading-blanks": $.sameAs('b'),
+        "dictionary-order": $.ignore,
+        "ignore-case": $.sameAs('f'),
+        "general-numeric": $.sameAs('g'),
+        "ignore-nonprinting": $.sameAs('i'),
+        "month-sort": $.sameAs('M'),
+        "human-numeric-sort": $.sameAs('h'),
+        "numeric-sort": $.sameAs('n'),
+        "unique": $.sameAs('u')
+    }
+};
+$.generate(optionsParser);
+
+function defaultComponentData() {
+    return {
+        type: 'command',
+        exec: "sort",
+        flags: bzipData.componentFlags,
+        selectors: bzipData.componentSelectors,
+        files: []
+    };
+}
+;
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions, bzipData.parameterOptions);
+exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+//# sourceMappingURL=sort.js.map

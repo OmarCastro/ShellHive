@@ -1,33 +1,49 @@
-/*
--f arqprog              --file=arqprog
--F fs                   --field-separator=fs
--v var=val              --assign=var=val
-*/
-(function(){
-  var $, optionsParser, defaultComponentData;
-  $ = require("./_init.js");
-  optionsParser = {
+var $ = require("../utils/optionsParser");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
+
+var config = {};
+
+var awkData = new parserModule.ParserData(config);
+
+var optionsParser = {
     shortOptions: {
-      F: $.setParameter("field separator")
+        F: $.setParameter("field separator")
     },
     longOptions: {
-      'field-separator': $.sameAs('F')
+        "field-separator": $.sameAs('F')
     }
-  };
-  $.generate(optionsParser);
-  defaultComponentData = function(){
+};
+$.generate(optionsParser);
+
+var parameterOptions = {
+    "field separator": 'F'
+};
+
+function defaultComponentData() {
     return {
-      type: 'command',
-      exec: "awk",
-      parameters: {
-        "field separator": " "
-      },
-      script: ""
+        type: 'command',
+        exec: "awk",
+        parameters: {
+            "field separator": " "
+        },
+        script: ""
     };
-  };
-  exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData, {
-    string: function(component, str){
-      return component.script = str;
+}
+
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
+    string: function (component, str) {
+        component.script = str;
     }
-  });
-}).call(this);
+});
+
+exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions, parameterOptions, function (component, exec, flags, files, parameters) {
+    var script = component.script.replace('\"', "\\\"");
+    if (script) {
+        script = (/^[\n\ ]+$/.test(script)) ? '"' + script + '"' : '""';
+    }
+    exec.concat(parameters, script).join(' ');
+});
+
+exports.VisualSelectorOptions = awkData.visualSelectorOptions;
+//# sourceMappingURL=awk.js.map

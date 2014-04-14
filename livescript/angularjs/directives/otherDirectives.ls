@@ -1,3 +1,6 @@
+app.directive "elscope", ($document) ->
+  link:(scope, element) !->
+    scope.scopedElement = element
 
 /*
 ##sidebar
@@ -62,74 +65,4 @@ app.directive 'sidebarMacroComponent',  ->
       </li>"""
 # */
 
-
-
-
-##dropdownSelect
-activeDrop = null;
-
-app.directive('dropdownSelect', ['$document', ($document) ->
-  restrict: 'A'
-  replace: true
-  scope:
-      dropdownSelect: '='
-      dropdownModel: '='
-      dropdownOnchange: '&'
-
-  controller: ['$scope', '$element', '$attrs', ($scope, $element, $attrs) ->
-      this.select = (selected) !->
-          $scope.dropdownModel = selected
-          $scope.dropdownOnchange({ selected: selected })
-      body = $document.find("body")
-      body.bind("click", !->
-          $element.removeClass('active')
-          activeDrop := null
-      )
-      $element.bind('click', (event) !->
-          event.stopPropagation()
-          if activeDrop && activeDrop != $element
-            activeDrop.removeClass('active')
-            activeDrop := null
-          $element.toggleClass('active')
-          activeDrop := $element
-      )
-
-      return
-  ]
-
-  template:
-      """
-      <div class='wrap-dd-select'>
-          <span class='selected'>{{dropdownModel}}</span>
-          <ul class='dropdown'>
-              <li ng-repeat='item in dropdownSelect'
-                  class='dropdown-item'
-                  dropdown-select-item='item'>
-              </li>
-          </ul>
-      </div>
-      """
-])
-
-app.directive('dropdownSelectItem', [ ->
-    return {
-        require: '^dropdownSelect'
-        replace: true
-        scope:
-            dropdownSelectItem: '='
-
-        link: (scope, element, attrs, dropdownSelectCtrl) !->
-            scope.selectItem = !->
-                dropdownSelectCtrl.select scope.dropdownSelectItem
-
-        template: """
-            <li>
-                <a href='' class='dropdown-item'
-                    ng-click='selectItem()'>
-                    {{dropdownSelectItem}}
-                </a>
-            </li>"""
-    }
-
-])
 

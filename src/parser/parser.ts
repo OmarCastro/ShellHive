@@ -63,7 +63,7 @@ var parserCommand = {
    * @return the visual representation of the object
    */
   function parseAST(ast, tracker = {id: 0}){
-    var components, connections, LastCommandComponent, CommandComponent, i$, len$, index, commandNode, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
+    var components, connections, LastCommandComponent, CommandComponent, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
     
     var graph = new Graph(); 
     
@@ -72,9 +72,8 @@ var parserCommand = {
     var firstMainComponent = null
     LastCommandComponent = null;
     CommandComponent = null;
-    for (i$ = 0, len$ = ast.length; i$ < len$; ++i$) {
-      index = i$;
-      commandNode = ast[i$];
+    for(var index = 0, _ref=ast, length=_ref.length;index<length;++index){
+      var commandNode = _ref[index];
       exec = commandNode.exec, args = commandNode.args;
       nodeParser = parserCommand[exec];
       if (nodeParser.parseCommand) {
@@ -131,8 +130,10 @@ var parserCommand = {
    */
   function indexComponents(visualData:GraphData){ 
     var result:any = {}
-    visualData.components.forEach(value => result[value.id] = value);
-    return result;
+    for(var i = 0, _ref=visualData.components, length=_ref.length;i<length;++i){
+      var value = _ref[i];
+      result[value.id] = value
+    }
   };
 
 

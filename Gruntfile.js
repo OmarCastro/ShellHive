@@ -26,6 +26,18 @@
           }
         }
       },
+      ts: {
+        common: {
+          src: ['src/**/*.ts'], 
+          outDir: 'target/',
+          options: {
+            module: 'commonjs',
+            target: 'es5',
+            fast:false,
+            verbose: true
+          }
+        }
+      },
       livescript: {
         home_js: {
           files: {
@@ -37,25 +49,15 @@
             'public/js/helper.ls.js': ['livescript/helper/*.ls']
           }
         },
-        grunt: {
-          files: {
-            'Gruntfile.js': ['livescript/grunt.ls']
-          }
-        },
         parser: {
           files: {
             'target/parser/parser.js': ['src/parser/parser.ls']
           }
         },
-        utilities: {
-          expand: true,
-          flatten: true,
-          cwd: 'src/parser/utils/',
-          src: ['*.ls'],
-          dest: 'target/parser/utils/',
-          ext: '.js'
-        },
         commands: {
+          options: {
+            bare: true
+          },
           expand: true,
           flatten: true,
           cwd: 'src/parser/commands/',
@@ -80,6 +82,14 @@
           }
         },
         demo: {
+          options: {
+            bare: true
+          },
+          files: {
+            'public/reports/js5/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit2.ls', 'livescript/angularjs/directives/*.ls']
+          }
+        },
+        demoServer: {
           options: {
             bare: true
           },
@@ -113,11 +123,11 @@
         },
         report: {
           files: ['livescript/weeklyReport/*.ls', 'livescript/angularjs/**/*.ls'],
-          tasks: ['livescript:report', 'livescript:demo']
+          tasks: ['livescript:report', 'livescript:demoServer']
         },
-        parserCommands: {
-          files: ['src/parser/**/*.ls'],
-          tasks: ['newer:livescript:parser', 'newer:livescript:commands', 'newer:livescript:utilities', 'shell:glueParser']
+        parser: {
+          files: ['src/**/*.ts','src/parser/**/*.ls'],
+          tasks: ['ts:common','newer:livescript:commands', 'shell:glueParser']
         },
         html: {
           files: ['elements/*.jade'],
@@ -131,14 +141,11 @@
           files: ['livescript/helper/*.ls'],
           tasks: ['livescript:helper_js']
         },
-        gruntfile: {
-          files: ['livescript/grunt.ls'],
-          tasks: ['livescript:grunt']
-        }
       }
     };
     grunt.initConfig(config);
     grunt.loadNpmTasks('grunt-newer');
+    grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-stylus');

@@ -16,7 +16,7 @@ class Iterator{
   public rest(){return this.argList.slice(this.index) }
 }
 
-export var parseShortOptions = (options,componentData,argsNodeIterator) => {
+export function parseShortOptions(options,componentData,argsNodeIterator){
   var option,
       shortOptions = options.shortOptions,
       iter = new Iterator(argsNodeIterator.current.slice(1))
@@ -53,6 +53,7 @@ export var parseLongOptions = function(options, componentData, argsNodeIterator)
     activates flags (flags)
   */
 export var switchOn = function(...flags:any[]){
+    flags = flags.map(flag => {return (flag.name) ? flag.name : flag});
     return function(Component, state, substate){
       flags.forEach(flag => {Component.flags[flag] = true});
       return false;
@@ -76,12 +77,19 @@ export var setParameter = function(param){
     paramFn.param = param;
     return paramFn
   };
-  /**
-    set the selector _key_ with the value _value_
-  */
-export var select = function(key:string, value:string){
+/**
+  set the selector _key_ with the value _value_
+*/
+export function select(key:{name:string}, value:{name:string});
+export function select(key:string, value:string);
+export function select(key:any, value:any){
+    if(key.name){key = key.name}
+    if(value.name){value = value.name}
     return function(Component){
-      Component.selectors[key] = value;
+      Component.selectors[key] = {
+        type:"option",
+        name:value
+      }
     };
   };
 
@@ -91,13 +99,16 @@ export var select = function(key:string, value:string){
 export function ignore(){};
 
 
-export var selectParameter = function(key, value){
+export var selectParameter = function(key:string, value:string){
     var paramFn:any = function(Component, state, substate){
       var parameselectParameterter;
       parameselectParameterter = substate.hasNext()
         ? substate.rest()
         : state.next();
-      Component.selectors[key] = [value];
+      Component.selectors[key] = {
+        parameterName: value,
+        parameterValue: parameselectParameterter
+      };
       return true;
     };
     paramFn

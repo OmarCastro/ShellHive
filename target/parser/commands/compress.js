@@ -11,54 +11,54 @@
  -r   Recursive. If a filename is a directory, descend
 
 */
-(function(){
-  var $, flags, flagOptions, selectorOptions, optionsParser, defaultComponentData;
-  $ = require("./_init.js");
-  flags = {
-    force: 'force',
-    decompress: 'decompress',
-    stdout: 'stdout',
-    statistics: 'statistics',
-    'recursive': 'recursive'
+var $, parserModule, common, flags, flagOptions, selectorOptions, optionsParser, defaultComponentData;
+$ = require("../utils/optionsParser");
+parserModule = require("../utils/parserData");
+common = require("./_init");
+flags = {
+  force: 'force',
+  decompress: 'decompress',
+  stdout: 'stdout',
+  statistics: 'statistics',
+  'recursive': 'recursive'
+};
+flagOptions = {
+  'force': 'f',
+  'decompress': 'd',
+  'stdout': 'c',
+  'statistics': 'v',
+  'recursive': 'r'
+};
+selectorOptions = {};
+exports.VisualSelectorOptions = {};
+$.setblocksize = function(size){
+  return function(Component){
+    return Component.blockSize = size;
   };
-  flagOptions = {
-    'force': 'f',
-    'decompress': 'd',
-    'stdout': 'c',
-    'statistics': 'v',
-    'recursive': 'r'
+};
+optionsParser = {
+  shortOptions: {
+    d: $.switchOn(flags.decompress),
+    f: $.switchOn(flags.force),
+    c: $.switchOn(flags.stdout),
+    v: $.switchOn(flags.statistics),
+    r: $.switchOn(flags.recursive)
+  }
+};
+$.generate(optionsParser);
+defaultComponentData = function(){
+  return {
+    type: 'command',
+    exec: "compress",
+    flags: {
+      "decompress": false,
+      "force": false,
+      "stdout": false,
+      "statistics": false,
+      "recursive": false
+    },
+    files: []
   };
-  selectorOptions = {};
-  exports.VisualSelectorOptions = {};
-  $.setblocksize = function(size){
-    return function(Component){
-      return Component.blockSize = size;
-    };
-  };
-  optionsParser = {
-    shortOptions: {
-      d: $.switchOn(flags.decompress),
-      f: $.switchOn(flags.force),
-      c: $.switchOn(flags.stdout),
-      v: $.switchOn(flags.statistics),
-      r: $.switchOn(flags.recursive)
-    }
-  };
-  $.generate(optionsParser);
-  defaultComponentData = function(){
-    return {
-      type: 'command',
-      exec: "compress",
-      flags: {
-        "decompress": false,
-        "force": false,
-        "stdout": false,
-        "statistics": false,
-        "recursive": false
-      },
-      files: []
-    };
-  };
-  exports.parseCommand = $.commonParseCommand(optionsParser, defaultComponentData);
-  exports.parseComponent = $.commonParseComponent(flagOptions, selectorOptions);
-}).call(this);
+};
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
+exports.parseComponent = common.commonParseComponent(flagOptions, selectorOptions);

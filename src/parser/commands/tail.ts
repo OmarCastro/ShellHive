@@ -25,7 +25,8 @@ var selectors = {
         name:'default',
         type:'option',
         option: <string> null,
-        description:'default: show headers only if tailing multiple files'
+        description:'default: show headers only if tailing multiple files',
+        default:true
       },
       always:{
         name:'always',
@@ -42,20 +43,21 @@ var selectors = {
     }
   },
   NumOf:{
-    name:'print last',
+    name:'last',
     description: 'define if last number of lines or bytes',
     options:{
       lines:{
         name: 'lines',
         type: 'numeric parameter',
         option: "n",
-        default: 10
+        default: true,
+        defaultValue: 10
       },
       bytes:{
         name: 'bytes',
         type: 'numeric parameter',
         option: "b",
-        default: 10        
+        defaultValue: 10        
       }
     }
 
@@ -64,19 +66,20 @@ var selectors = {
 }
 
 
-
-
-var tailData = new parserModule.ParserData(config);
-
 var config = {
   selectors:selectors
 }
 
+var tailData = new parserModule.ParserData(config);
+
+
 
 var optionsParser = {
   shortOptions:{
-    q  :  $.select(selectors.showHeaders.name, selectors.showHeaders.options.never.name),
-    v  :  $.select(selectors.showHeaders.name, selectors.showHeaders.options.always.name)
+    q : $.select(selectors.showHeaders.name, selectors.showHeaders.options.never.name),
+    v : $.select(selectors.showHeaders.name, selectors.showHeaders.options.always.name),
+    n : $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name),
+    b : $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
   },
   longOptions:{
     quiet :   $.sameAs("q"),
@@ -89,14 +92,35 @@ $.generate(optionsParser)
 
 
 var defaultComponentData = function(){
-  var ref$;
+
+  var componentSelectors = {}
+  for (var key in selectors) {
+    if(!selectors.hasOwnProperty(key)){
+      continue;
+    }
+    var value = selectors[key]
+    for (var optionName in value.options){
+      var option = value.options[optionName]
+      if(option.default){
+        console.log(key);
+        var valueObj = {
+          name:option.name,
+          type:option.type,
+        }
+        if(option.defaultValue){
+          valueObj['value'] = option.defaultValue
+        }
+        componentSelectors[value.name] = valueObj
+        break;
+      }
+    }
+  }
+
   return {
     type: 'command',
     exec: 'tail',
     flags: {},
-    selectors: {
-      "show headers":"default"
-    },
+    selectors: componentSelectors,
     files: []
   };
 };
@@ -104,3 +128,4 @@ var defaultComponentData = function(){
 
 export var parseCommand   = common.commonParseCommand(optionsParser,defaultComponentData)
 export var parseComponent = common.commonParseComponent(tailData.flagOptions,tailData.selectorOptions)
+export var VisualSelectorOptions = tailData.visualSelectorOptions;

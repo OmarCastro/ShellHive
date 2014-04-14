@@ -213,7 +213,10 @@ parseFlagsAndSelectors = function(component, options):string{
     value = flags[key];
     if (value) {
       flag = flagOptions[key];
-      if (flag[0] !== '-') {
+      if(!flag){
+        //crash and burn (should not happen)
+        throw [key,"doesn't exist in ",flagOptions].join('');
+      } else if (flag[0] !== '-') {
         sFlags.push(flag);
       } else {
         lFlags.push(flag);
@@ -224,12 +227,15 @@ parseFlagsAndSelectors = function(component, options):string{
   if (component.selectors) {
     for (key in selectors = component.selectors) {
       value = selectors[key];
-      if ((that = selectorOptions[key][value]) != null) {
-        val = that;
-        if (val[0] !== '-') {
-          sFlags.push(val);
+      var optionValue = selectorOptions[key][value.name]
+      if (optionValue != null) {
+        if(!optionValue) {
+          //crash and burn (should not happen)
+          throw [key,".",value,"doesn't exist in ",selectorOptions].join('');          
+        } else if (optionValue[0] !== '-') {
+          sFlags.push(optionValue);
         } else {
-          lFlags.push(val);
+          lFlags.push(optionValue);
         }
       }
     }

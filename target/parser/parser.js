@@ -1,13 +1,18 @@
-(function(){
-  var parser, astBuilder, parserCommand, implementedCommands, res$, key, VisualSelectorOptions, isImplemented, indexComponents, createMacro, join$ = [].join;
-  parser = {};
-  astBuilder = require('./ast-builder/ast-builder');
-  parserCommand = {
+var parser = {};
+
+var astBuilder = require('./ast-builder/ast-builder');
+
+var GraphModule = require("../common/graph");
+var Graph = GraphModule.Graph;
+var GraphComponent = GraphModule.GraphComponent;
+
+var parserCommand = {
     awk: require('./commands/awk'),
     cat: require('./commands/cat'),
     ls: require('./commands/ls'),
     grep: require('./commands/grep'),
     bunzip2: require('./commands/bunzip2'),
+    diff: require('./commands/diff'),
     bzcat: require('./commands/bzcat'),
     bzip2: require('./commands/bzip2'),
     compress: require('./commands/compress'),
@@ -18,276 +23,264 @@
     tail: require('./commands/tail'),
     tr: require('./commands/tr'),
     tee: require('./commands/tee')
-  };
-  res$ = [];
-  for (key in parserCommand) {
-    if (key !== 'tee') {
-      res$.push(key);
-    }
-  }
-  implementedCommands = res$;
-  VisualSelectorOptions = {
-    cat: parserCommand.cat.VisualSelectorOptions,
-    grep: parserCommand.grep.VisualSelectorOptions,
-    ls: parserCommand.ls.VisualSelectorOptions,
-    bunzip2: parserCommand.gzip.VisualSelectorOptions,
-    bzcat: parserCommand.gzip.VisualSelectorOptions,
-    bzip2: parserCommand.gzip.VisualSelectorOptions,
-    gzip: parserCommand.gzip.VisualSelectorOptions,
-    gunzip: parserCommand.gzip.VisualSelectorOptions,
-    zcat: parserCommand.gzip.VisualSelectorOptions,
-    head: parserCommand.head.VisualSelectorOptions,
-    tail: parserCommand.tail.VisualSelectorOptions,
-    compress: parserCommand.compress.VisualSelectorOptions
-  };
-  function getPositionBoundaries(components){
-    var xs, ys, xe, ye, i$, len$, component, position, px, py, xy;
-    xs = components[0].position.x;
-    ys = components[0].position.y;
-    xe = xs;
-    ye = ye;
-    for (i$ = 0, len$ = components.length; i$ < len$; ++i$) {
-      component = components[i$];
-      position = component.position;
-      px = position.x;
-      py = position.y;
-      if (px < xs) {
-        xs = px;
-      }
-      if (px < xy) {
-        xy = py;
-      }
-      if (px > xe) {
-        xe = px;
-      }
-      if (px > xe) {
-        xe = py;
-      }
-    }
-    return {
-      xs: xs,
-      ys: ys,
-      xe: xe,
-      ye: ye
-    };
-  }
-  isImplemented = function(command){
-    return parserCommand.command != null;
-  };
-  /**
-   * Parses the syntax of the command and
-   * transforms into an Abstract Syntax Tree
-   * @param command command
-   * @return the resulting AST
-   */
-  function generateAST(command){
+};
+var implementedCommands = [];
+var VisualSelectorOptions = {};
+for (var key in parserCommand) {
+    implementedCommands.push(key);
+    VisualSelectorOptions[key] = parserCommand[key].VisualSelectorOptions;
+}
+
+function isImplemented(command) {
+    return parserCommand[command] != null;
+}
+;
+
+function generateAST(command) {
     return astBuilder.parse(command);
-  }
-  /**
-   * Parses the Abstract Syntax Tree
-   * and transforms it to a graph representation format
-   * that can be used in the visual application
-   *
-   * @param ast - the Abstract Syntax Tree
-   * @param tracker - and tracker the tracks the id of a component
-   * @returns the visual representation of the object
-   */
-  function parseAST(ast, tracker){
-    var components, connections, LastCommandComponent, CommandComponent, i$, len$, index, commandNode, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
+}
+
+function parseAST(ast, tracker) {
+    if (typeof tracker === "undefined") { tracker = { id: 0 }; }
+    var components, connections, LastCommandComponent, CommandComponent, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
+
+    var graph = new Graph();
+
     components = [];
     connections = [];
-    ({
-      firstMainComponent: null
-    });
+    var firstMainComponent = null;
     LastCommandComponent = null;
     CommandComponent = null;
-    tracker == null && (tracker = {
-      id: 0,
-      x: 0,
-      y: 0
-    });
-    for (i$ = 0, len$ = ast.length; i$ < len$; ++i$) {
-      index = i$;
-      commandNode = ast[i$];
-      exec = commandNode.exec, args = commandNode.args;
-      nodeParser = parserCommand[exec];
-      if (nodeParser.parseCommand) {
-        if (exec === 'tee') {
-          return nodeParser.parseCommand(args, parser, tracker, LastCommandComponent, ast.slice(index + 1), firstMainComponent, components, connections);
+    for (var index = 0, _ref = ast, length = _ref.length; index < length; ++index) {
+        var commandNode = _ref[index];
+        exec = commandNode.exec, args = commandNode.args;
+        nodeParser = parserCommand[exec];
+        if (nodeParser.parseCommand) {
+            if (exec === 'tee') {
+                return nodeParser.parseCommand(args, parser, tracker, LastCommandComponent, ast.slice(index + 1), firstMainComponent, components, connections);
+            }
+            result_aux = nodeParser.parseCommand(args, parser, tracker, LastCommandComponent);
+            result = null;
+            if (result_aux instanceof Array) {
+                result = result_aux[1];
+            } else {
+                result = result_aux;
+            }
+            components = components.concat(result.components);
+            connections = connections.concat(result.connections);
+            CommandComponent = result.mainComponent;
+            if (LastCommandComponent) {
+                comp = LastCommandComponent instanceof Array ? LastCommandComponent[1] : LastCommandComponent;
+                connections.push({
+                    startNode: comp.id,
+                    startPort: 'output',
+                    endNode: CommandComponent.id,
+                    endPort: 'input'
+                });
+            }
+            if (result_aux instanceof Array) {
+                LastCommandComponent = [result_aux[0], CommandComponent];
+            } else {
+                LastCommandComponent = CommandComponent;
+            }
+            if (CommandComponent === void 8) {
+                "mi";
+            }
+            if (index < 1) {
+                firstMainComponent = CommandComponent.id;
+            }
         }
-        result_aux = nodeParser.parseCommand(args, parser, tracker, LastCommandComponent);
-        result = null;
-        if (result_aux instanceof Array) {
-          result = result_aux[1];
-        } else {
-          result = result_aux;
-        }
-        components = components.concat(result.components);
-        connections = connections.concat(result.connections);
-        CommandComponent = result.mainComponent;
-        if (LastCommandComponent) {
-          comp = LastCommandComponent instanceof Array ? LastCommandComponent[1] : LastCommandComponent;
-          connections.push({
-            startNode: comp.id,
-            startPort: 'output',
-            endNode: CommandComponent.id,
-            endPort: 'input'
-          });
-        }
-        if (result_aux instanceof Array) {
-          LastCommandComponent = [result_aux[0], CommandComponent];
-        } else {
-          LastCommandComponent = CommandComponent;
-        }
-        if (CommandComponent === void 8) {
-          "mi";
-        }
-        if (index < 1) {
-          firstMainComponent = CommandComponent.id;
-        }
-      }
     }
     return {
-      firstMainComponent: firstMainComponent,
-      counter: tracker.id,
-      components: components,
-      connections: connections
+        firstMainComponent: firstMainComponent,
+        counter: tracker.id,
+        components: components,
+        connections: connections
     };
-  }
-  /**
-   * parses the command
-   */
-  function parseCommand(command){
+}
+
+function parseCommand(command) {
     return parseAST(generateAST(command));
-  }
-  /**
-   * Creates an index of the components
-   */
-  indexComponents = function(visualData){
-    var i$, ref$, len$, comp, results$ = {};
-    for (i$ = 0, len$ = (ref$ = visualData.components).length; i$ < len$; ++i$) {
-      comp = ref$[i$];
-      results$[comp.id] = comp;
+}
+
+function indexComponents(visualData) {
+    var result = {};
+    for (var i = 0, _ref = visualData.components, length = _ref.length; i < length; ++i) {
+        var value = _ref[i];
+        result[value.id] = value;
     }
-    return results$;
-  };
-  function parseVisualData(VisualData){
+}
+;
+
+function parseVisualData(VisualData) {
     var indexedComponentList, initialComponent;
     if (VisualData.components.length < 1) {
-      return '';
+        return '';
     }
     indexedComponentList = indexComponents(VisualData);
     initialComponent = indexedComponentList[VisualData.firstMainComponent];
-    if (initialComponent === null) {
-      return;
+    if (!initialComponent) {
+        return '';
     }
     return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
-  }
-  function parseComponent(component, visualData, componentIndex, mapOfParsedComponents){
+}
+function parseComponent(component, visualData, componentIndex, mapOfParsedComponents) {
     switch (component.type) {
-    case 'command':
-      return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
-    case 'subgraph':
-      return '';
-    default:
-      return '';
+        case 'command':
+            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+        case 'subgraph':
+            return compileMacro(component.macro);
+        default:
+            return '';
     }
-  }
-  function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents){
-    var commands, isFirst, i$, ref$, len$, connection, outputs, res$, endNodeId, j$, ref1$, len1$, component, endNode, nextcommands, comm, to$, i;
-    commands = [];
+}
+function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
+    var isFirst, i$, ref$, len$, connection, parsedCommand, parsedCommandIndex, endNodeId, j$, ref1$, len1$, component, endNode, comm, to$, i, command;
+    var commands = [];
     do {
-      isFirst = true;
-      for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
-        connection = ref$[i$];
-        if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
-          isFirst = false;
-          currentComponent = componentIndex[connection.startNode];
-          break;
+        isFirst = true;
+
+        for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
+            connection = ref$[i$];
+            if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
+                isFirst = false;
+                currentComponent = componentIndex[connection.startNode];
+                break;
+            }
         }
-      }
-    } while (isFirst = false);
-    commands.push(parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents));
-    res$ = [];
-    for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
-      connection = ref$[i$];
-      if (connection.startNode === currentComponent.id && connection.startPort === 'output' && mapOfParsedComponents[connection.endNode] !== true) {
+    } while(isFirst = false);
+
+    parsedCommand = parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
+    parsedCommandIndex = commands.length;
+    commands.push(parsedCommand);
+
+    var outputs = [];
+    var stdErrors = [];
+    var exitCodes = [];
+
+    visualData.connections.filter(function (connection) {
+        return connection.startNode === currentComponent.id && mapOfParsedComponents[connection.endNode] !== true;
+    }).forEach(function (connection) {
         endNodeId = connection.endNode;
-        for (j$ = 0, len1$ = (ref1$ = visualData.components).length; j$ < len1$; ++j$) {
-          component = ref1$[j$];
-          if (component.id === endNodeId) {
-            endNode = component;
-            break;
-          }
+        endNode = componentIndex[endNodeId];
+        switch (connection.startPort) {
+            case 'output':
+                outputs.push(endNode);
+                break;
+            case 'error':
+                stdErrors.push(endNode);
+                break;
+            case 'retcode':
+                exitCodes.push(endNode);
+                break;
         }
-        res$.push(endNode);
-      }
-    }
-    outputs = res$;
-    res$ = [];
-    for (i$ = 0, len$ = outputs.length; i$ < len$; ++i$) {
-      component = outputs[i$];
-      res$.push(parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
-    }
-    nextcommands = res$;
+    });
+
+    var parselist = function (list) {
+        var result = [];
+        for (var index = 0, length = list.length; index < length; ++index) {
+            var component = list[index];
+            if (component.type === "file")
+                result.push(component.filename);
+            else {
+                result.push(parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
+            }
+        }
+        return result;
+    };
+
+    var nextcommands = parselist(outputs);
+    var nextErrcommands = parselist(stdErrors);
+    var nextExitcommands = parselist(exitCodes);
+
+    var teeResultArray = function (components, compiledComponents) {
+        var comm = ["tee"];
+        compiledComponents.forEach(function (compiledComponent, index) {
+            if (components[index].type) {
+                comm.push(compiledComponent);
+            } else {
+                comm.push(">((" + compiledComponent + ") &> /dev/null )");
+            }
+        });
+        return comm;
+    };
+
+    var teeResult = function (components, compiledComponents) {
+        return teeResultArray(components, compiledComponents).join(" ");
+    };
+
     if (nextcommands.length > 1) {
-      comm = "tee";
-      for (i$ = 0, to$ = nextcommands.length - 2; i$ <= to$; ++i$) {
-        i = i$;
-        comm += " >(" + nextcommands[i] + ")";
-      }
-      commands.push(comm);
-      commands.push(nextcommands[nextcommands.length - 1]);
+        comm = teeResultArray(outputs, nextcommands);
+        comm.pop();
+        commands.push(comm.join(" "));
+        commands.push(nextcommands[nextcommands.length - 1]);
     } else if (nextcommands.length === 1) {
-      commands.push(nextcommands[0]);
+        if (outputs[0].type === 'file') {
+            commands[parsedCommandIndex] += " > " + outputs[0].filename;
+        } else {
+            commands.push(nextcommands[0]);
+        }
     }
-    return join$.call(commands, " | ");
-  }
-  createMacro = function(name, description, fromMacro){
-    var x$, macroData;
+
+    if (nextErrcommands.length > 1) {
+        comm = teeResult(outputs, nextcommands);
+        commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
+    } else if (nextErrcommands.length === 1) {
+        if (stdErrors[0].type === 'file') {
+            commands[parsedCommandIndex] += " 2> " + stdErrors[0].filename;
+        } else {
+            commands[parsedCommandIndex] += " 2> >((" + nextErrcommands[0] + ") &> /dev/null )";
+        }
+    }
+
+    if (nextExitcommands.length > 1) {
+        comm = teeResult(outputs, nextcommands);
+        commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
+    } else if (nextExitcommands.length === 1) {
+        if (exitCodes[0].type === 'file') {
+            commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
+        } else {
+            commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";
+        }
+    }
+
+    return commands.join(" | ");
+}
+
+function createMacro(name, description, command, fromMacro) {
     if (fromMacro) {
-      x$ = macroData = JSON.parse(JSON.stringify(fromMacro));
-      x$.name = name;
-      x$.description = description;
-      return x$;
-    } else {
-      return macroData = {
-        name: name,
-        description: description,
-        entryComponent: null,
-        exitComponent: null,
-        counter: 0,
-        components: [],
-        connections: []
-      };
+        var result = JSON.parse(JSON.stringify(fromMacro));
+        result.name = name;
+        result.description = description;
+        return result;
     }
-  };
-  function compileMacro(macro){
+    var macroData = new GraphComponent(name, description);
+    if (command) {
+        macroData.setGraphData(parseCommand(command));
+    }
+    return macroData;
+}
+;
+
+function compileMacro(macro) {
     var indexedComponentList, initialComponent;
+    console.log("compling Macro");
     if (macro.entryComponent === null) {
-      throw "no component defined as Macro Entry";
-    }
-    if (macro.exitComponent === null) {
-      throw "no component defined as Macro Exit";
+        throw "no component defined as Macro Entry";
     }
     indexedComponentList = indexComponents(macro);
     initialComponent = indexedComponentList[macro.entryComponent];
-    return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
-  }
-  parser.generateAST = generateAST;
-  parser.parseAST = parseAST;
-  parser.astBuilder = astBuilder;
-  parser.parseCommand = parseCommand;
-  parser.parseComponent = parseComponent;
-  parser.implementedCommands = implementedCommands;
-  parser.parseVisualData = parseVisualData;
-  exports.generateAST = generateAST;
-  exports.parseAST = parseAST;
-  exports.astBuilder = astBuilder;
-  exports.parseCommand = parseCommand;
-  exports.parseComponent = parseComponent;
-  exports.implementedCommands = implementedCommands;
-  exports.parseVisualData = parseVisualData;
-  exports.createMacro = createMacro;
-  exports.VisualSelectorOptions = VisualSelectorOptions;
-}).call(this);
+    return parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
+}
+
+parser.generateAST = exports.generateAST = generateAST;
+parser.parseAST = exports.parseAST = parseAST;
+parser.astBuilder = exports.astBuilder = astBuilder;
+parser.parseCommand = exports.parseCommand = parseCommand;
+parser.parseComponent = exports.parseComponent = parseComponent;
+parser.implementedCommands = exports.implementedCommands = implementedCommands;
+parser.parseVisualData = exports.parseVisualData = parseVisualData;
+
+exports.createMacro = createMacro;
+exports.VisualSelectorOptions = VisualSelectorOptions;
+//# sourceMappingURL=parser.js.map
