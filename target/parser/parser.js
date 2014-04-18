@@ -109,6 +109,7 @@ function indexComponents(visualData) {
         var value = _ref[i];
         result[value.id] = value;
     }
+    return result;
 }
 ;
 

@@ -134,6 +134,7 @@ var parserCommand = {
       var value = _ref[i];
       result[value.id] = value
     }
+    return result;
   };
 
 

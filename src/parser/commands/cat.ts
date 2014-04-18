@@ -12,9 +12,9 @@ var selectors = {
     options:{
       noprint:{
         name:'do not print',
-        option: <string> null,
+        option: null,
         description:'do not print line numbers',
-        defaut:true
+        default:true
       },
       allLines:{
         name:'print all lines',

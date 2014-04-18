@@ -3,7 +3,6 @@ html
   head
     title Demo Week 5 - Omar Castro
     meta(charset="utf-8")
-    link(rel="stylesheet",href="css/dropdowns.css")
     link(rel="stylesheet",href="css/bootstrap.min.css")
     link(rel="stylesheet",href="css/ui-layout.css")
     link(rel="stylesheet",href="css/style.css")
@@ -16,20 +15,15 @@ html
               .visual-builder.border.data-flow(graph-model="res.visualData" options="options")
   script(src="js5/parser.js")
   script(src="js/jquery-2.1.0.min.js")
-  script(src="js/angular/angular.min.js")
+  script(src="js/angular.min.js")
   script(src="js/ui-bootstrap-tpls.min.js")
   script(src="js/ui-layout.min.js")
   script(src="js/pointerevents.min.js")
   script(src="js5/demoApp.js")
-  script(type="text/ng-template" id="myModalContent.html")
-    include MacroCreationModal.jade
-  script(type="text/ng-template" id="MacroEditModal.html")
-    include MacroEditModal.jade
-  script(type="text/ng-template" id="sidebarModel.html")
-    include sidebar.jade
-  script(type="text/ng-template" id="graphTemplate.html")
-    include graph.jade
-  script(type="text/ng-template" id="typeaheadTemplate.html")
-    a
-        span(bind-html-unsafe="match.label | typeaheadHighlight:query")
-        span.badge. 14
+  script(type="text/ng-template" id="myModalContent.html"): include MacroCreationModal.jade
+  script(type="text/ng-template" id="MacroEditModal.html"): include MacroEditModal.jade
+  script(type="text/ng-template" id="sidebarModel.html"): include sidebar.jade
+  script(type="text/ng-template" id="graphTemplate.html"): include graph.jade
+  script(type="text/ng-template" id="typeaheadTemplate.html"): a
+    span(bind-html-unsafe="match.label | typeaheadHighlight:query")
+    span.badge. 14

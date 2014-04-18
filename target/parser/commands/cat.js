@@ -11,7 +11,7 @@ var selectors = {
                 name: 'do not print',
                 option: null,
                 description: 'do not print line numbers',
-                defaut: true
+                default: true
             },
             allLines: {
                 name: 'print all lines',

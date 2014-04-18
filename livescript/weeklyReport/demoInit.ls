@@ -5,7 +5,7 @@ socket = io.connect!
 
 app.controller 'data-flow', ['$scope',($scope) ->
     console.log shellParser
-    AST = shellParser.generateAST """ ls -l | grep e """
+    AST = shellParser.generateAST """ diff <(zcat rev6/data.txt.gz) <(zcat rev18/data.txt.gz) """
     visualData = shellParser.parseAST AST
 
     $scope.isImplemented = isImplemented

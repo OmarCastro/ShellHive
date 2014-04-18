@@ -15,7 +15,8 @@
                 span.box(data-port="output")
         br
         br
-        pre {{data.filename}}
+        br
+        .filename(ng-bind="data.filename")
 
     div(ng-if="data.type == 'subgraph'")
         .title(title="{{data.macro.description}}") 
@@ -69,11 +70,15 @@
                 span.box(data-port="file{{$index}}")
                 input(type="text",ng-model="data.files[$index]" ng-if="isString(data.files[$index])")
                 span(ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])")
-                button(ng-click="data.files.splice($index,1)"). -
-                button(ng-click="swapPrevious(data.files,$index,data.id)",ng-if="$index"). &#11014;
-                button(ng-click="swapPrevious(data.files,$index + 1,data.id)",ng-if="$index != data.files.length -1 "). &#11015;
+                button.btn.btn-xs.btn-default(ng-click="data.files.splice($index,1)")
+                    span.glyphicon.glyphicon-remove
+                button.btn.btn-xs.btn-default(ng-click="swapPrevious(data.files,$index,data.id)",ng-if="$index")
+                    span.glyphicon.glyphicon-chevron-up
+                button.btn.btn-xs.btn-default(ng-click="swapPrevious(data.files,$index + 1,data.id)",ng-if="$index != data.files.length -1 ")
+                    span.glyphicon.glyphicon-chevron-down       
                 br
-            button(ng-click="data.files.push('')"). +
+            button.btn.btn-xs.btn-default(ng-click="data.files.push('')")
+                span.glyphicon.glyphicon-plus
             br
 
 

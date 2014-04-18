@@ -23,18 +23,18 @@
 
 export class ParserData{
   public selectorData:Dictionary<SelectorInfo>
-  public selectors:Dictionary<Dictionary<SelectorOptionInfo> >
-  public selectorOptions
-  public visualSelectorOptions
+  public selectors:Dictionary<Dictionary<SelectorOptionInfo> > = {}
+  public selectorOptions:any = {}
+  public visualSelectorOptions:any = {}
 
   public parameters:Dictionary<ParameterInfo>
-  public parameterOptions
+  public parameterOptions:any = {}
 
-  public shortOptions
-  public longOptions
+  public shortOptions:any = {}
+  public longOptions:any = {}
 
-  public flags:Dictionary<FlagInfo>;
-  public flagOptions;
+  public flags:Dictionary<FlagInfo>
+  public flagOptions:any = {}
 
 
   public constructor(config:Config = {}){
@@ -55,7 +55,7 @@ export class ParserData{
 
   private setParameters(parameters:any = {}){
     this.parameters = parameters
-    var parameterOptions = (this.parameterOptions = {});
+    var parameterOptions = this.parameterOptions;
     for (var key in parameters) {
       var value = parameters[key]
       parameterOptions[value.name] = value.option
@@ -66,10 +66,6 @@ export class ParserData{
     Generates data to be used in selection tasks
   */
   private setSelector(selectorData:Dictionary<SelectorInfo> = {}){
-    if(Object.keys(this.selectors).length > 0){
-      throw "you should not redefine the selectors multiple times";
-      
-    }
     this.selectorData = selectorData
     var selectors      = this.selectors;
     var selectorOptions= this.selectorOptions;
@@ -139,7 +135,7 @@ export class ParserData{
 
   public get componentSelectors():Dictionary<ComponentSelector>{
     var componentSelectors:Dictionary<ComponentSelector> = {}
-    var selectorData = this.selectorData
+    var selectorData = this.selectorData    
     for (var key in selectorData) {
       var value = selectorData[key]
       for (var optionName in value.options){

@@ -86,7 +86,7 @@
             bare: true
           },
           files: {
-            'public/reports/js5/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit2.ls', 'livescript/angularjs/directives/*.ls']
+            'public/reports/js5/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/angularjs/directives/*.ls']
           }
         },
         demoServer: {
@@ -94,7 +94,10 @@
             bare: true
           },
           files: {
-            'public/reports/js5/demoApp.js': ['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/angularjs/directives/*.ls']
+            'public/reports/js5/demoApp.js': 
+	      ['livescript/weeklyReport/init.ls',
+	       'livescript/weeklyReport/demoInit2.ls', 
+	       'livescript/angularjs/directives/*.ls']
           }
         }
       },

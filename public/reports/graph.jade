@@ -6,38 +6,31 @@
                 div.input-group.input-group-sm
                     span.input-group-addon.glyphicon.glyphicon-tasks
                     input.form-control(type="text" ng-model="popupText")
-            li.dropdown-header(ng-show="comms.length")
-                b command component
+            li.dropdown-header(ng-show="comms.length"): b command component
             li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms = (implementedCommands | filter:popupText)")
                 a(ng-click="graph.popupSubmit(foo)") {{foo}}
-            li.dropdown-header(ng-show="comms2.length && isRootView()")
-                b macro component
-
+            li.dropdown-header(ng-show="comms2.length && isRootView()"): b macro component
             li(ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms2 = (macroViewList() | filter:popupText)")
                 a(ng-click="graph.popupSubmit(foo)") {{foo}}
 
     .selectpopup.dropdown.open(ng-if="sel.open" ng-style="{transform:sel.transform, WebkitTransform:sel.transform, MsTransform:sel.transform}")
         ul.dropdown-menu
             li(ng-repeat="c in options[sel.data.exec][sel.name]")
-                a(ng-click="graph.selectSelection(c)")
-                    span(ng-bind="c")
+                a(ng-click="graph.selectSelection(c)"): span(ng-bind="c")
 
-div.navbar.navbar-default
-    div.collapse.navbar-collapse
+.navbar.navbar-default
+    .collapse.navbar-collapse
         ul.nav.navbar-nav
             li.dropdown
                 a(href="#" class="dropdown-toggle" data-toggle="dropdown")
                     | Macro 
                     b.caret
                 ul.dropdown-menu
-                    li 
-                        a(ng-click="newMacroModal()") New Macro
+                    li: a(ng-click="newMacroModal()") New Macro
                     li.divider
                     li.dropdown-header created Macros
                     li(ng-repeat="macro in graphModel.macroList")
                         a(ng-bind="macro" ng-click="macroEditModal(macro)")
-
-
             li.dropdown
                 a(href="#" class="dropdown-toggle" data-toggle="dropdown")
                     | Add Command 
@@ -45,20 +38,22 @@ div.navbar.navbar-default
                 ul.dropdown-menu
                     li(ng-repeat="command in implementedCommands") 
                         a(ng-click="newCommandAtTopLeft(command)", ng-bind="command")
-            li
-                a(href="#" ng-click="shell = true; $emit('runCommand', [])") run
-            li
-                a(href="#" ng-click="shell = !shell") toogle shell
-            li
-                a(href="#" ng-click="toRootView()") View Root
-                    
+
+            li.dropdown
+                a(href="#" class="dropdown-toggle" data-toggle="dropdown")
+                    | View
+                    b.caret
+                ul.dropdown-menu
+                    li: a(href="#" ng-click="shell = !shell") Toogle shell
+                    li: a(href="#" ng-click="toRootView()") View Root
+
+            li: a(href="#" ng-click="shell = true; $emit('runCommand', [])")
+                span.glyphicon.glyphicon-play &nbsp;
+                span Run
         ul.nav.navbar-nav.navbar-right
-            li
-                a(href="#" ng-click="showTips = !showTips") Docs
-            li
-                a(href="#") Username
-            li 
-                span.glyphicon.glyphicon-user
+            li: a(href="#" ng-click="showTips = !showTips") Docs
+            li: a(href="#") Username
+            li: span.glyphicon.glyphicon-user.user-icon
 
 
 .tips(ng-if="showTips")
@@ -112,13 +107,10 @@ div.navbar.navbar-default
 div.layout(ui-layout)
     div.toplayout
         div.background
-            svg(touch-action="none")
-                g.edges
-                    path.emptyEdge
-                    path.back(connector,ng-repeat="edge in visualData.connections")
-                    path(connector,ng-repeat="edge in visualData.connections")
-
-
+            svg(touch-action="none"): g.edges
+                path.emptyEdge
+                path.back(connector,ng-repeat="edge in visualData.connections")
+                path(connector,ng-repeat="edge in visualData.connections")
             .workspace(touch-action="none")
                 .nodes
                     include ccomponent.jade

@@ -2,13 +2,22 @@ var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
 
-var config = {};
-
+var config = {
+    parameters: {
+        separator: {
+            name: 'field separator',
+            option: 'F',
+            type: "string",
+            description: "filter entries by anything other than the content",
+            defaultValue: ""
+        }
+    }
+};
 var awkData = new parserModule.ParserData(config);
 
 var optionsParser = {
     shortOptions: {
-        F: $.setParameter("field separator")
+        F: $.setParameter(config.parameters.separator.name)
     },
     longOptions: {
         "field-separator": $.sameAs('F')
@@ -16,17 +25,11 @@ var optionsParser = {
 };
 $.generate(optionsParser);
 
-var parameterOptions = {
-    "field separator": 'F'
-};
-
 function defaultComponentData() {
     return {
         type: 'command',
         exec: "awk",
-        parameters: {
-            "field separator": " "
-        },
+        parameters: awkData.componentParameters,
         script: ""
     };
 }
@@ -37,7 +40,7 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
     }
 });
 
-exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions, parameterOptions, function (component, exec, flags, files, parameters) {
+exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions, awkData.parameterOptions, function (component, exec, flags, files, parameters) {
     var script = component.script.replace('\"', "\\\"");
     if (script) {
         script = (/^[\n\ ]+$/.test(script)) ? '"' + script + '"' : '""';
