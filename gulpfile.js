@@ -1,12 +1,14 @@
 var gulp        = require('gulp');
     gutil       = require('gulp-util'),
-    source = require('vinyl-source-stream'),
-    watchify = require('watchify'),
-	tsc         = require('gulp-tsc'),
-	ls          = require('gulp-livescript'),
+    source      = require('vinyl-source-stream'),
+    watchify    = require('watchify'),
+    tsc         = require('gulp-tsc'),
+    ls          = require('gulp-livescript'),
+    newer       = require('gulp-newer');
     tinylr      = require('tiny-lr'),
+    runSequence = require('run-sequence');
     mocha       = require('gulp-mocha'),
-	livereload  = require('gulp-livereload'), // Livereload plugin needed: https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
+    livereload  = require('gulp-livereload'), // Livereload plugin needed: https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
     server      = tinylr();
 
 
@@ -15,6 +17,7 @@ var gulp        = require('gulp');
 gulp.task('ts', function () {
   return gulp
     .src('src/**/*.ts')
+    .pipe(newer('target'))
     .pipe(tsc({target:'ES5', module: 'commonjs', sourcemap: true, outDir: 'target'}))
     .on('error', gutil.log)
     .pipe(gulp.dest('target'));
@@ -29,17 +32,21 @@ gulp.task('ls', function() {
 });
 
 gulp.task('mocha', function() {
-  return gulp.src('test/**/*.js')
+  return gulp.src('test/test.js')
     .pipe(mocha({reporter: 'nyan', require:["should"]}))
-    .on('error', gutil.log);
+    .on('error', function (error) {
+      var errorText = (error.plugin) ? error : error.stack;
+      gutil.beep();
+      gutil.log(gutil.colors.yellow(errorText));
+    });
 }); 
 
 gulp.task('watchify', function () {
-  var bundler = watchify('target/parser/shellParser.js');
+  var bundler = watchify('./target/parser/shellParser.js');
   // Optionally, you can apply transforms
   // and other configuration options on the
   // bundler just as you would with browserify
-  bundler.transform('brfs')
+  //bundler.transform('brfs')
 
   bundler.on('update', rebundle)
 
@@ -47,6 +54,7 @@ gulp.task('watchify', function () {
     return bundler.bundle()
       .pipe(source('parser.js'))
       .pipe(gulp.dest('./public/js'))
+      .pipe(gulp.dest('./public/reports/js5'))
   }
 
   return rebundle()
@@ -54,8 +62,8 @@ gulp.task('watchify', function () {
 
 
 gulp.task('watch', function () {
-   gulp.watch('src/**/*.ts',['ts','mocha']);
-   gulp.watch('src/**/*.ls',['ls','mocha']);
+   gulp.watch('src/**/*.ts',function(event) { runSequence('ts','mocha') });
+   gulp.watch('src/**/*.ls',function(event) { runSequence('ls','mocha') });
    gulp.watch('test/**/*.js',['mocha']);
 });
 

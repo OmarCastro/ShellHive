@@ -4,7 +4,17 @@ var astBuilder = require('./ast-builder/ast-builder');
 
 var GraphModule = require("../common/graph");
 var Graph = GraphModule.Graph;
+exports.Graph = Graph;
 var GraphComponent = GraphModule.GraphComponent;
+exports.GraphComponent = GraphComponent;
+var Component = GraphModule.Component;
+exports.Component = Component;
+var Connection = GraphModule.Connection;
+exports.Connection = Connection;
+var FileComponent = GraphModule.FileComponent;
+exports.FileComponent = FileComponent;
+var CommandComponent = GraphModule.CommandComponent;
+exports.CommandComponent = CommandComponent;
 
 var parserCommand = {
     awk: require('./commands/awk'),
@@ -57,12 +67,11 @@ function generateAST(command) {
 */
 function parseAST(ast, tracker) {
     if (typeof tracker === "undefined") { tracker = { id: 0 }; }
-    var components, connections, LastCommandComponent, CommandComponent, exec, args, result_aux, result, comp, firstMainComponent;
+    var LastCommandComponent, CommandComponent, exec, args, result_aux, result, comp, firstMainComponent;
 
-    var graph = new Graph();
-
-    components = [];
-    connections = [];
+    var graph = new exports.Graph();
+    var components = graph.components;
+    var connections = graph.connections;
     var firstMainComponent = null;
     LastCommandComponent = null;
     CommandComponent = null;
@@ -75,6 +84,7 @@ function parseAST(ast, tracker) {
                 return nodeParser.parseCommand(args, parser, tracker, LastCommandComponent, ast.slice(index + 1), firstMainComponent, components, connections);
             }
             result_aux = nodeParser.parseCommand(args, parser, tracker, LastCommandComponent);
+
             result = null;
             if (result_aux instanceof Array) {
                 result = result_aux[1];
@@ -83,35 +93,28 @@ function parseAST(ast, tracker) {
             }
             components = components.concat(result.components);
             connections = connections.concat(result.connections);
-            CommandComponent = result.mainComponent;
+            CommandComponent = result.firstMainComponent;
             if (LastCommandComponent) {
                 comp = LastCommandComponent instanceof Array ? LastCommandComponent[1] : LastCommandComponent;
-                connections.push({
-                    startNode: comp.id,
-                    startPort: 'output',
-                    endNode: CommandComponent.id,
-                    endPort: 'input'
-                });
+                var connection = new GraphModule.Connection(comp, 'output', CommandComponent, 'input');
+                connections.push(connection);
             }
             if (result_aux instanceof Array) {
                 LastCommandComponent = [result_aux[0], CommandComponent];
             } else {
                 LastCommandComponent = CommandComponent;
             }
-            if (CommandComponent === void 8) {
-                "mi";
-            }
             if (index < 1) {
                 firstMainComponent = CommandComponent.id;
             }
         }
     }
-    return {
-        firstMainComponent: firstMainComponent,
-        counter: tracker.id,
-        components: components,
-        connections: connections
-    };
+
+    graph.connections = connections;
+    graph.components = components;
+    graph.firstMainComponent = firstMainComponent;
+    graph.counter = tracker.id;
+    return graph;
 }
 
 /**
@@ -281,7 +284,7 @@ function createMacro(name, description, command, fromMacro) {
         result.description = description;
         return result;
     }
-    var macroData = new GraphComponent(name, description);
+    var macroData = new exports.GraphComponent(name, description);
     if (command) {
         macroData.setGraphData(parseCommand(command));
     }

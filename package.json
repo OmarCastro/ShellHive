@@ -10,7 +10,8 @@
     "nedb": "~0.10.4"
   },
   "scripts": {
-    "watch": "grunt watch --verbose"
+    "watch": "gulp",
+    "test": "gulp mocha"
   },
   "devDependencies": {
     "jison": "~0.4.13",
@@ -25,6 +26,8 @@
     "gulp-tsc": "~0.7.0",
     "gulp-stylus": "~0.2.1",
     "watchify": "~0.7.2",
-    "vinyl-source-stream": "~0.1.1"
+    "vinyl-source-stream": "~0.1.1",
+    "gulp-newer": "~0.3.0",
+    "run-sequence": "~0.3.6"
   }
 }

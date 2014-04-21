@@ -1,10 +1,11 @@
 var parseFlagsAndSelectors, join$ = [].join;
 
 var optionsParser = require("../utils/optionsParser");
-var ComponentConnections = require("../utils/componentConnections");
 
 var GraphModule = require("../../common/graph");
 var Boundary = GraphModule.Boundary;
+var Graph = GraphModule.Graph;
+var Connection = GraphModule.Connection;
 
 var FileComponent = GraphModule.FileComponent;
 
@@ -61,14 +62,13 @@ function addFileComponent(componentData, connections, filename, id) {
     var newComponent = new FileComponent(filename);
     newComponent.id = id;
 
-    connections.addConnectionToInputPort("file" + (componentData.files.length), {
-        id: id,
-        port: 'output'
-    });
+    var inputPort = "file" + (componentData.files.length);
+    connections.push(new Connection(newComponent, 'output', componentData, inputPort));
 
     componentData.files.push(filename);
     return newComponent;
 }
+exports.addFileComponent = addFileComponent;
 ;
 
 /*var commonNodeParsing = {
@@ -84,8 +84,8 @@ return addFileComponent(options, options.iterator.current);
 };*/
 function commonParseCommand(optionsParserData, defaultComponentData, argNodeParsing) {
     return function (argsNode, parser, tracker, previousCommand) {
-        var componentData, stdoutRedirection, stderrRedirection, result, iter, argNode, newComponent, inputPort, subresult, ref$, y;
-        componentData = defaultComponentData();
+        var stdoutRedirection, stderrRedirection, argNode, newComponent, inputPort, subresult, ref$, y;
+        var componentData = defaultComponentData();
 
         var boundaries = [];
         if (previousCommand) {
@@ -95,13 +95,11 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                 boundaries.push(Boundary.createFromComponent(previousCommand));
             }
         }
-        var connections = new ComponentConnections(componentData);
-        result = {
-            components: [componentData],
-            connections: [],
-            mainComponent: componentData
-        };
-        iter = new Iterator(argsNode);
+        var result = new Graph();
+        result.components = [componentData];
+
+        result.firstMainComponent = componentData;
+        var iter = new Iterator(argsNode);
         while (argNode = iter.next()) {
             switch (exports.typeOf(argNode)) {
                 case 'shortOptions':
@@ -111,33 +109,40 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                     optionsParser.parseLongOptions(optionsParserData, componentData, iter);
                     break;
                 case 'string':
+                    var addfile = true;
                     if (argNodeParsing && argNodeParsing.string) {
-                        argNodeParsing.string(componentData, argNode);
-                    } else {
-                        newComponent = addFileComponent(componentData, connections, argNode, tracker.id++);
+                        addfile = argNodeParsing.string(componentData, argNode) == "continue";
+                    }
+                    if (addfile) {
+                        newComponent = exports.addFileComponent(componentData, result.connections, argNode, tracker.id++);
                         result.components.push(newComponent);
                         boundaries.push(Boundary.createFromComponent(newComponent));
                     }
                     break;
+
                 case 'inFromProcess':
                     subresult = parser.parseAST(argNode[1], tracker);
                     boundaries.push(Boundary.createFromComponents(subresult.components));
                     result.components = result.components.concat(subresult.components);
                     result.connections = result.connections.concat(subresult.connections);
                     inputPort = "file" + componentData.files.length;
-                    connections.addConnectionToInputPort(inputPort, {
-                        id: tracker.id - 1,
-                        port: 'output'
-                    });
+
+                    var subComponents = subresult.components;
+                    for (var i = subComponents.length - 1; i >= 0; i--) {
+                        if (subComponents[i].id == tracker.id - 1) {
+                            result.connections.push(new Connection(subComponents[i], 'output', componentData, inputPort));
+                            break;
+                        }
+                    }
+
                     componentData.files.push(["pipe", tracker.id - 1]);
+
                     break;
                 case 'outTo':
                     newComponent = new FileComponent(argNode[1]);
                     newComponent.id = tracker.id;
-                    connections.addConnectionFromOutputPort({
-                        id: tracker.id,
-                        port: 'input'
-                    });
+                    result.connections.push(new Connection(componentData, 'output', newComponent, 'input'));
+
                     tracker.id++;
                     result.components.push(newComponent);
                     stdoutRedirection = newComponent;
@@ -146,10 +151,12 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                     console.log('errTo!!');
                     newComponent = new FileComponent(argNode[1]);
                     newComponent.id = tracker.id;
-                    connections.addConnectionFromErrorPort({
-                        id: tracker.id,
-                        port: 'input'
-                    });
+                    result.connections.push(new Connection(componentData, 'error', newComponent, 'input'));
+
+                    //connections.addConnectionFromErrorPort({
+                    //  id: tracker.id,
+                    //  port: 'input'
+                    //});
                     tracker.id++;
                     result.components.push(newComponent);
                     stderrRedirection = newComponent;
@@ -170,7 +177,8 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                 y: bbox[1].y + y
             };
         }
-        result.connections = result.connections.concat(connections.toConnectionList());
+
+        //result.connections = result.connections.concat(connections.toConnectionList());
         tracker.id++;
         return [bbox[0], result];
     };

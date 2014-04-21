@@ -192,4 +192,49 @@ function generate(parser) {
     }
 }
 exports.generate = generate;
+
+function optionParserFromConfig(config) {
+    var longOptions = {};
+    var shortOptions = {};
+    var opt;
+
+    for (var key in config.flags || {}) {
+        var flag = config.flags[key];
+        opt = exports.switchOn(flag);
+        shortOptions[flag.option] = opt;
+        if (flag.longOption) {
+            if (flag.longOption instanceof Array) {
+                flag.longOption.forEach(function (option) {
+                    return longOptions[option] = opt;
+                });
+            } else {
+                longOptions[flag.longOption] = opt;
+            }
+        }
+    }
+    for (var key in config.selectors || {}) {
+        var selector = config.selectors[key];
+        var options = selector.options;
+        for (var optionkey in options) {
+            var option = options[optionkey];
+            opt = exports.select(selector, option);
+            shortOptions[option.option] = opt;
+            if (option.longOption) {
+                if (option.longOption instanceof Array) {
+                    option.longOption.forEach(function (option) {
+                        return longOptions[option] = opt;
+                    });
+                } else {
+                    longOptions[option.longOption] = opt;
+                }
+            }
+        }
+    }
+
+    return {
+        longOptions: longOptions,
+        shortOptions: shortOptions
+    };
+}
+exports.optionParserFromConfig = optionParserFromConfig;
 //# sourceMappingURL=optionsParser.js.map

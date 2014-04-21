@@ -17,7 +17,14 @@ word constituent character.  Similarly, it must be either at the end of the line
 digits, and the underscore."]
 - ["x","--line-regexp","Select only those matches that exactly match the whole line."]
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
+var GraphModule = require("../../common/graph");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
 
@@ -121,66 +128,31 @@ var config = {
 
 var grepCommandData = new parserModule.ParserData(config);
 
+var GrepComponent = (function (_super) {
+    __extends(GrepComponent, _super);
+    function GrepComponent() {
+        _super.apply(this, arguments);
+        this.exec = "grep";
+        this.files = [];
+        this.pattern = null;
+    }
+    return GrepComponent;
+})(GraphModule.CommandComponent);
+
 function defaultComponentData() {
-    var componentFlags = {};
-    var componentSelectors = {};
-
-    for (var key in flags) {
-        var value = flags[key];
-        componentFlags[value.name] = value.active;
-    }
-
-    for (var key in selectors) {
-        if (!selectors.hasOwnProperty(key)) {
-            continue;
-        }
-        var value = selectors[key];
-        for (var optionName in value.options) {
-            var option = value.options[optionName];
-            if (option.default) {
-                console.log(key);
-                var valueObj = {
-                    name: option.name,
-                    type: option.type
-                };
-                if (option.defaultValue) {
-                    valueObj['value'] = option.defaultValue;
-                }
-                componentSelectors[value.name] = valueObj;
-                console.info("componentSelectors ", componentSelectors);
-                break;
-            }
-        }
-    }
-
-    return {
-        type: 'command',
-        exec: "grep",
-        flags: componentFlags,
-        selectors: componentSelectors,
-        pattern: null,
-        files: []
-    };
+    var graph = new GrepComponent();
+    graph.selectors = grepCommandData.componentSelectors;
+    graph.flags = grepCommandData.componentFlags;
+    return graph;
 }
 ;
 
-/*
-defaultComponentData = ->
-type:\command
-exec:"grep",
-flags:{-"ignore case",-"invert match"}
-selectors:
-\patternType : patternTypeSelector.basicRegex
-\match :       matchSelector.default
-pattern: null
-files:[]
-*/
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
     string: function (component, str) {
         if (component.pattern == null) {
             component.pattern = str;
         } else {
-            component.files.push(str);
+            return "continue";
         }
     }
 });

@@ -3,11 +3,11 @@ declare var exports:any;
 var parseFlagsAndSelectors, join$ = [].join;
 
 import optionsParser = require("../utils/optionsParser");
-import ComponentConnections = require("../utils/componentConnections");
 
 import GraphModule = require("../../common/graph");
 import Boundary = GraphModule.Boundary;
 import Graph = GraphModule.Graph;
+import Connection = GraphModule.Connection;
 import Component = GraphModule.Component;
 import FileComponent = GraphModule.FileComponent;
 
@@ -73,14 +73,12 @@ export function typeOf(arg:any):string{
 /**
   Adds a file component to the
 */
-function addFileComponent(componentData, connections, filename, id:number){
+export function addFileComponent(componentData, connections, filename, id:number){
   var newComponent = new FileComponent(filename)
   newComponent.id = id
-
-  connections.addConnectionToInputPort("file" + (componentData.files.length),{
-    id: id,
-    port: 'output'
-  });
+  
+  var inputPort = "file" + (componentData.files.length);
+  connections.push(new Connection(newComponent, 'output', componentData, inputPort));
 
   componentData.files.push(filename);
   return newComponent
@@ -102,10 +100,9 @@ function addFileComponent(componentData, connections, filename, id:number){
 
 export function commonParseCommand(optionsParserData, defaultComponentData, argNodeParsing?){
   return function(argsNode, parser, tracker, previousCommand){
-    var componentData,
-      stdoutRedirection:Component, 
-      stderrRedirection:Component, result, iter, argNode, newComponent, inputPort, subresult, ref$, y;
-    componentData = defaultComponentData();
+    var  stdoutRedirection:Component, 
+      stderrRedirection:Component, argNode, newComponent, inputPort, subresult, ref$, y;
+    var componentData = defaultComponentData();
     
     var boundaries:Boundary[] = [];
     if (previousCommand) {
@@ -115,13 +112,11 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         boundaries.push(Boundary.createFromComponent(previousCommand));
       }
     }
-    var connections:ComponentConnections = new ComponentConnections(componentData);
-    result = {
-      components: [componentData],
-      connections: [],
-      mainComponent: componentData
-    };
-    iter = new Iterator(argsNode);
+    var result = new Graph()
+    result.components = [componentData];
+
+    result.firstMainComponent = componentData
+    var iter = new Iterator(argsNode);
     while (argNode = iter.next()) {
       switch (typeOf(argNode)) {
       case 'shortOptions':
@@ -131,34 +126,41 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         optionsParser.parseLongOptions(optionsParserData, componentData, iter);
         break;
       case 'string':
+        var addfile = true
         if (argNodeParsing && argNodeParsing.string) {
-          argNodeParsing.string(componentData, argNode);
-        } else {
-          newComponent = addFileComponent(componentData,connections,argNode,
+          addfile = argNodeParsing.string(componentData, argNode) == "continue";
+        } 
+        if(addfile){
+          newComponent = addFileComponent(componentData,result.connections,argNode,
             tracker.id++);
           result.components.push(newComponent);
           boundaries.push(Boundary.createFromComponent(newComponent));
         }
         break;
+
       case 'inFromProcess':
         subresult = parser.parseAST(argNode[1], tracker);
         boundaries.push(Boundary.createFromComponents(subresult.components));
         result.components = result.components.concat(subresult.components);
         result.connections = result.connections.concat(subresult.connections);
         inputPort = "file" + componentData.files.length;
-        connections.addConnectionToInputPort(inputPort, {
-          id: tracker.id - 1,
-          port: 'output'
-        });
+
+        var subComponents = subresult.components
+        for (var i = subComponents.length - 1; i >= 0; i--) {
+          if(subComponents[i].id == tracker.id - 1){
+            result.connections.push(new Connection(subComponents[i], 'output', componentData, inputPort));
+            break;
+          }
+        }
+
         componentData.files.push(["pipe", tracker.id - 1]);
+
         break;
       case 'outTo':
         newComponent = new FileComponent(argNode[1])
         newComponent.id = tracker.id
-        connections.addConnectionFromOutputPort({
-          id: tracker.id,
-          port: 'input'
-        });
+        result.connections.push(new Connection(componentData, 'output', newComponent, 'input'));
+
         tracker.id++;
         result.components.push(newComponent);
         stdoutRedirection = newComponent;
@@ -167,10 +169,13 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         console.log('errTo!!');
         newComponent = new FileComponent(argNode[1])
         newComponent.id = tracker.id
-        connections.addConnectionFromErrorPort({
-          id: tracker.id,
-          port: 'input'
-        });
+        result.connections.push(new Connection(componentData, 'error', newComponent, 'input'));
+
+        //connections.addConnectionFromErrorPort({
+        //  id: tracker.id,
+        //  port: 'input'
+        //});
+
         tracker.id++;
         result.components.push(newComponent);
         stderrRedirection = newComponent;
@@ -191,7 +196,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         y: bbox[1].y + y
       };
     }
-    result.connections = result.connections.concat(connections.toConnectionList());
+    //result.connections = result.connections.concat(connections.toConnectionList());
     tracker.id++;
     return [bbox[0], result];
   };

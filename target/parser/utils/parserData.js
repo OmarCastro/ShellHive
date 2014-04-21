@@ -130,7 +130,6 @@ var ParserData = (function () {
                 for (var optionName in value.options) {
                     var option = value.options[optionName];
                     if (option.default) {
-                        console.log(key);
                         var valueObj = {
                             name: option.name,
                             type: option.type

@@ -5,13 +5,15 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var Graph = (function () {
-    function Graph(components, connections, firstMainComponent) {
+    function Graph(components, connections, firstMainComponent, counter) {
         if (typeof components === "undefined") { components = []; }
         if (typeof connections === "undefined") { connections = []; }
         if (typeof firstMainComponent === "undefined") { firstMainComponent = null; }
+        if (typeof counter === "undefined") { counter = 0; }
         this.components = components;
         this.connections = connections;
         this.firstMainComponent = firstMainComponent;
+        this.counter = counter;
     }
     /**
     transforms to JSON, JSON.stringify() will
@@ -81,6 +83,7 @@ var CommandComponent = (function (_super) {
     __extends(CommandComponent, _super);
     function CommandComponent() {
         _super.apply(this, arguments);
+        this.type = "command";
     }
     return CommandComponent;
 })(Component);
@@ -133,9 +136,24 @@ var Connection = (function () {
         this.endComponent = endComponent;
         this.endPort = endPort;
     }
+    Object.defineProperty(Connection.prototype, "startNode", {
+        get: function () {
+            return this.startComponent.id;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection.prototype, "endNode", {
+        get: function () {
+            return this.endComponent.id;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
     Connection.prototype.toJSON = function () {
         return JSON.stringify({
-            startNode: this.startComponent.id,
+            startNode: this.startNode,
             startPort: this.startPort,
             endNode: this.endComponent.id,
             endPort: this.endPort

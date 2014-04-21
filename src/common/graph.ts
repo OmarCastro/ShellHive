@@ -1,8 +1,9 @@
 export class Graph{
 	public constructor(
 	public components:Component[] = [],
-	public connections:any[] = [],
-	public firstMainComponent:Component = null
+	public connections:Connection[] = [],
+	public firstMainComponent:Component = null,
+  public counter:number = 0
 	){}
 	/**
 		transforms to JSON, JSON.stringify() will 
@@ -60,7 +61,10 @@ export class Component{
 	A command component
 */
 export class CommandComponent extends Component{
-
+    public type:string = "command"
+    public flags:any
+    public selectors:any
+    public exec:string
 }
 /**
 	A file component
@@ -112,9 +116,12 @@ export class Connection{
 		public endPort:string
 		){}
 
+  public get startNode():number{return this.startComponent.id;}
+  public get endNode():number{return this.endComponent.id;}
+
 	public toJSON():string{
 		return JSON.stringify({
-			startNode: this.startComponent.id,
+			startNode: this.startNode,
 			startPort: this.startPort,
 			endNode: this.endComponent.id,
 			endPort: this.endPort

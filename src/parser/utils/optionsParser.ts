@@ -170,3 +170,44 @@ export function generate(parser){
     }
   }
 }
+
+export function optionParserFromConfig(config){
+  var longOptions:any = {}
+  var shortOptions:any = {}
+  var opt:any
+
+  for(var key in config.flags || {}){
+    var flag = config.flags[key];
+    opt = switchOn(flag);
+    shortOptions[flag.option] = opt;
+    if(flag.longOption){
+      if(flag.longOption instanceof Array){
+        flag.longOption.forEach(option => longOptions[option] = opt)
+      } else {
+        longOptions[flag.longOption] = opt
+      }
+    }
+  }
+  for(var key in config.selectors || {}){
+    var selector = config.selectors[key];
+    var options = selector.options;
+    for(var optionkey in options){
+      var option = options[optionkey];
+      opt = select(selector,option);
+      shortOptions[option.option] = opt;
+      if(option.longOption){
+        if(option.longOption instanceof Array){
+          option.longOption.forEach(option => longOptions[option] = opt)
+        } else {
+          longOptions[option.longOption] = opt
+        }
+      }
+    }
+  }
+
+
+  return {
+    longOptions:longOptions,
+    shortOptions:shortOptions
+  }
+}

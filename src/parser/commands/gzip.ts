@@ -14,6 +14,7 @@
 */
 
 import $ = require("../utils/optionsParser");
+import GraphModule = require("../../common/graph");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
 
@@ -26,6 +27,7 @@ var selectors = {
       1:{
         name:'1 - fast',
         option: '1',
+        longOption: 'fast',
         description:'compress the received data'
       },
       2:{
@@ -67,6 +69,7 @@ var selectors = {
       9:{
         name:'9 - best',
         option: '9',
+        longOption: 'best',
         description:'decompress the received data'
       }
     }
@@ -78,47 +81,55 @@ var flags = {
   keep: {
     name: "keep files",
     option: 'k',
+    longOption: 'keep',
     description: "keep (don't delete) input files",
     active: false
   },
   force:{
     name: "force",
     option: 'f',
+    longOption: 'force',
     description: "overwrite existing output files",
     active: false
   },
   test:{
     name: "test",
     option: 't',
+    longOption: 'test',
     description: "test compressed file integrity",
     active: false
   },
   stdout: {
     name: "stdout",
     option: 'c',
+    longOption: 'stdout',
     description: "output to standard out",
     active: false
   },
   quiet: {
     name: "quiet",
     option: 'q',
+    longOption: 'quiet',
     description: "suppress noncritical error messages",
     active: false
   },
   verbose:{
     name: "verbose",
     option: 'v',
+    longOption: 'verbose',
     description: "overwrite existing output files",    
     active: false
   },
   recursive:{
     name: "recursive",
+    longOption: 'recursive',
     option: 'v',
     description: "overwrite existing output files",    
     active: false
   },
   small: {
     name: "small",
+    longOption: 'small',
     option: 's',
     description: "use less memory (at most 2500k)",
     active: false
@@ -133,63 +144,22 @@ var config:parserModule.Config = {
 
 
 
-var bzipData = new parserModule.ParserData(config);
+var gzipData = new parserModule.ParserData(config);
+var optionsParser = $.optionParserFromConfig(config)
 
-
-
-var shortOptions = {
-  k: $.switchOn(flags.keep),
-  f: $.switchOn(flags.force),
-  t: $.switchOn(flags.test),
-  c: $.switchOn(flags.stdout),
-  q: $.switchOn(flags.quiet),
-  v: $.switchOn(flags.verbose),
-  r: $.switchOn(flags.recursive),
-  s: $.switchOn(flags.small),
-  1: $.select(selectors.ratio,selectors.ratio.options[1]),
-  2: $.select(selectors.ratio,selectors.ratio.options[2]),
-  3: $.select(selectors.ratio,selectors.ratio.options[3]),
-  4: $.select(selectors.ratio,selectors.ratio.options[4]),
-  5: $.select(selectors.ratio,selectors.ratio.options[5]),
-  6: $.select(selectors.ratio,selectors.ratio.options[6]),
-  7: $.select(selectors.ratio,selectors.ratio.options[7]),
-  8: $.select(selectors.ratio,selectors.ratio.options[8]),
-  9: $.select(selectors.ratio,selectors.ratio.options[9])
+class GZipComponent extends GraphModule.CommandComponent {
+  public exec:string = "gzip"
+  public files: any[] = []
 }
 
-var longOptions = {
-  'decompress': $.sameAs('d'),
-  'compress': $.sameAs('z'),
-  'keep': $.sameAs('k'),
-  'force': $.sameAs('f'),
-  'test': $.sameAs('t'),
-  'stdout': $.sameAs('c'),
-  'quiet': $.sameAs('q'),
-  'verbose': $.sameAs('v'),
-  'small': $.sameAs('s'),
-  'fast': $.sameAs('1'),
-  'best': $.sameAs('9')
-}
-
-
-
-var optionsParser = {
-  shortOptions: shortOptions,
-  longOptions: longOptions
-};
-
-
-$.generate(optionsParser);
 
 function defaultComponentData(){
-  return {
-    type: 'command',
-    exec: "gzip",
-    flags: bzipData.componentFlags,
-    selectors: bzipData.componentSelectors,
-    files: []
-  };
+  var graph = new GZipComponent();
+  graph.selectors = gzipData.componentSelectors
+  graph.flags = gzipData.componentFlags
+  return graph;
 };
+
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
-export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
+export var VisualSelectorOptions = gzipData.visualSelectorOptions;
