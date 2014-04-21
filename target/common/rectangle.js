@@ -1,3 +1,6 @@
+/**
+A rectangle class
+*/
 var Rectangle = (function () {
     function Rectangle() {
         this.x = 0;
@@ -46,6 +49,10 @@ var Rectangle = (function () {
         configurable: true
     });
 
+    /**
+    expands the rectangle by doing the union beteen this
+    and the other rectangle
+    */
     Rectangle.prototype.expand = function (other) {
         var x = Math.min(this.x, other.x);
         var y = Math.min(this.y, other.y);
@@ -58,11 +65,13 @@ var Rectangle = (function () {
         this.height = h;
     };
 
+    /** translates the rectangle by X and Y */
     Rectangle.prototype.translateXY = function (x, y) {
         this.x += x;
         this.y += y;
     };
 
+    /** translates the rectangle by a point object, it should include x and y */
     Rectangle.prototype.translatePoint = function (point) {
         this.x += point.x;
         this.y += point.y;

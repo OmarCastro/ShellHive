@@ -1,3 +1,13 @@
+/*
+-c, --bytes=[-]K         print the first K bytes of each file;
+with the leading '-', print all but the last
+K bytes of each file
+-n, --lines=[-]K         print the first K lines instead of the first 10;
+with the leading '-', print all but the last
+K lines of each file
+-q, --quiet, --silent    nuncar mostrar cabeçalhos com nomes de ficheiros
+-v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
+*/
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");

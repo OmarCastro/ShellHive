@@ -1,3 +1,8 @@
+/*
+-f arqprog              --file=arqprog
+-F fs                   --field-separator=fs
+-v var=val              --assign=var=val
+*/
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");

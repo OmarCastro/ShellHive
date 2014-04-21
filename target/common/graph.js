@@ -13,6 +13,10 @@ var Graph = (function () {
         this.connections = connections;
         this.firstMainComponent = firstMainComponent;
     }
+    /**
+    transforms to JSON, JSON.stringify() will
+    call this function if it exists
+    */
     Graph.prototype.toJSON = function () {
         var jsonObj = {};
         jsonObj.components = this.components;
@@ -21,6 +25,9 @@ var Graph = (function () {
         return JSON.stringify(jsonObj);
     };
 
+    /*
+    expands with other graph
+    */
     Graph.prototype.expands = function (other) {
         this.components.concat(other.components);
         this.connections.concat(other.connections);
@@ -57,6 +64,7 @@ var IndexedGraph = (function () {
 })();
 exports.IndexedGraph = IndexedGraph;
 
+//============= COMPONENTS ===========
 var Component = (function () {
     function Component() {
         this.position = { x: 0, y: 0 };
@@ -66,6 +74,9 @@ var Component = (function () {
 })();
 exports.Component = Component;
 
+/**
+A command component
+*/
 var CommandComponent = (function (_super) {
     __extends(CommandComponent, _super);
     function CommandComponent() {
@@ -75,6 +86,9 @@ var CommandComponent = (function (_super) {
 })(Component);
 exports.CommandComponent = CommandComponent;
 
+/**
+A file component
+*/
 var FileComponent = (function (_super) {
     __extends(FileComponent, _super);
     function FileComponent(filename) {
@@ -86,6 +100,9 @@ var FileComponent = (function (_super) {
 })(Component);
 exports.FileComponent = FileComponent;
 
+/**
+A macro Component
+*/
 var GraphComponent = (function (_super) {
     __extends(GraphComponent, _super);
     function GraphComponent(name, description) {
@@ -108,6 +125,7 @@ var GraphComponent = (function (_super) {
 })(Component);
 exports.GraphComponent = GraphComponent;
 
+//========   ==========
 var Connection = (function () {
     function Connection(startComponent, startPort, endComponent, endPort) {
         this.startComponent = startComponent;
@@ -127,6 +145,7 @@ var Connection = (function () {
 })();
 exports.Connection = Connection;
 
+//========   ==========
 var Boundary = (function () {
     function Boundary(left, rigth, top, bottom, components) {
         if (typeof left === "undefined") { left = 0; }
@@ -198,6 +217,9 @@ var Boundary = (function () {
         return Boundary.createFromComponents(components);
     };
 
+    /**
+    arranges the layout
+    */
     Boundary.arrangeLayout = function (boundaries) {
         var maxX = 0;
         var prevBound = null;

@@ -1,3 +1,17 @@
+/*
+-d --decompress     force decompression
+-z --compress       force compression
+-k --keep           keep (don't delete) input files
+-f --force          overwrite existing output files
+-t --test           test compressed file integrity
+-c --stdout         output to standard out
+-q --quiet          suppress noncritical error messages
+-v --verbose        be verbose (a 2nd -v gives more)
+-s --small          use less memory (at most 2500k)
+-1 .. -9            set block size to 100k .. 900k
+--fast              alias for -1
+--best              alias for -9
+*/
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");

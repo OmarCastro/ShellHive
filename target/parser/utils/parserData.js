@@ -1,3 +1,22 @@
+/**
+CompilerData gives information to be used
+to compile the AST to a data repersentation
+of a command
+There are 6 types of options
+simple string:
+a simple argument, each command treats them differently
+selection:
+there exists a list of arguments that the command will choose
+one of them to use, if no selection argument is added the command uses the default one
+parameters:
+an argument that includes a parameter
+numeric paramters:
+an argument that includes a parameter that is limited to numbers
+selection with parameters:
+a selection argument which one or more of them is a parameter
+flags:
+a flag in the command
+*/
 var ParserData = (function () {
     function ParserData(config) {
         if (typeof config === "undefined") { config = {}; }
@@ -32,6 +51,9 @@ var ParserData = (function () {
         }
     };
 
+    /**
+    Generates data to be used in selection tasks
+    */
     ParserData.prototype.setSelector = function (selectorData) {
         if (typeof selectorData === "undefined") { selectorData = {}; }
         this.selectorData = selectorData;
@@ -68,10 +90,19 @@ var ParserData = (function () {
         return this;
     };
 
+    /**
+    Sets the options for the normal options
+    of a command, normally a one character option
+    */
     ParserData.prototype.setShortOptions = function (options) {
         this.shortOptions = options;
     };
 
+    /**
+    Sets the options for the long variants of the options
+    of a command, normally a an argument prefixed with 2
+    hypens
+    */
     ParserData.prototype.setLongOptions = function (options) {
         this.longOptions = options;
     };

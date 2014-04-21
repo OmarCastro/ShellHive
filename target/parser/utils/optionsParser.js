@@ -52,6 +52,9 @@ exports.parseLongOptions = function (options, componentData, argsNodeIterator) {
     }
 };
 
+/**
+activates flags (flags)
+*/
 exports.switchOn = function () {
     var flags = [];
     for (var _i = 0; _i < (arguments.length - 0); _i++) {
@@ -68,6 +71,9 @@ exports.switchOn = function () {
     };
 };
 
+/**
+set parameter (param)
+*/
 exports.setParameter = function (param) {
     var paramFn = function (Component, state, substate) {
         var hasNext, parameter;
@@ -100,6 +106,9 @@ function select(key, value) {
 exports.select = select;
 ;
 
+/**
+function to ignore errors when using this option
+*/
 function ignore() {
 }
 exports.ignore = ignore;

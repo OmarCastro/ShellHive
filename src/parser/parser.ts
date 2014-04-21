@@ -6,6 +6,7 @@ interface GraphData{
   connections:any[];
 }
 
+
 var parser:any = {};
 
 
@@ -35,7 +36,7 @@ var parserCommand = {
     tee: require('./commands/tee')
   };
   var implementedCommands:any[] = [];
-  var VisualSelectorOptions = {}
+  export var VisualSelectorOptions = {}
   for (var key in parserCommand) {
       implementedCommands.push(key);
       VisualSelectorOptions[key] = parserCommand[key].VisualSelectorOptions
@@ -63,7 +64,7 @@ var parserCommand = {
    * @return the visual representation of the object
    */
   function parseAST(ast, tracker = {id: 0}){
-    var components, connections, LastCommandComponent, CommandComponent, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
+    var components, connections, LastCommandComponent, CommandComponent, exec, args, result_aux, result, comp, firstMainComponent;
     
     var graph = new Graph(); 
     
@@ -75,7 +76,7 @@ var parserCommand = {
     for(var index = 0, _ref=ast, length=_ref.length;index<length;++index){
       var commandNode = _ref[index];
       exec = commandNode.exec, args = commandNode.args;
-      nodeParser = parserCommand[exec];
+      var nodeParser = parserCommand[exec];
       if (nodeParser.parseCommand) {
         if (exec === 'tee') {
           return nodeParser.parseCommand(args, parser, tracker, LastCommandComponent, ast.slice(index + 1), firstMainComponent, components, connections);
@@ -125,6 +126,9 @@ var parserCommand = {
   function parseCommand(command){
     return parseAST(generateAST(command));
   }
+
+
+
   /**
    * Creates an index of the components
    */
@@ -151,6 +155,8 @@ var parserCommand = {
     }
     return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
   }
+
+
   function parseComponent(component, visualData:GraphData, componentIndex, mapOfParsedComponents){
     switch (component.type) {
     case 'command':
@@ -161,6 +167,10 @@ var parserCommand = {
       return '';
     }
   }
+
+  /**
+    Parse visual data from Component
+  */
   function parseVisualDatafromComponent(currentComponent, visualData:GraphData, componentIndex, mapOfParsedComponents){
     var isFirst, i$, ref$, len$, connection, parsedCommand, parsedCommandIndex, endNodeId, j$, ref1$, len1$, component, endNode, comm, to$, i, command;
     var commands:any[] = [];
@@ -206,7 +216,6 @@ var parserCommand = {
 
 
 
-    /** mimi */
     var parselist = function(list:any[]):any[]{
       var result:any[] = []
       for (var index = 0, length = list.length; index < length; ++index) {
@@ -283,7 +292,7 @@ var parserCommand = {
     return commands.join(" | ");
   }
 
-  function createMacro (name, description, command, fromMacro){
+export function createMacro (name, description, command, fromMacro){
     if (fromMacro) {
 
       var result = JSON.parse(JSON.stringify(fromMacro)); 
@@ -320,6 +329,3 @@ var parserCommand = {
   parser.parseComponent = exports.parseComponent = parseComponent;
   parser.implementedCommands = exports.implementedCommands = implementedCommands;
   parser.parseVisualData = exports.parseVisualData = parseVisualData;
-
-  exports.createMacro = createMacro;
-  exports.VisualSelectorOptions = VisualSelectorOptions;

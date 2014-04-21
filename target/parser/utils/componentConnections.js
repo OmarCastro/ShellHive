@@ -1,3 +1,8 @@
+/**
+ComponentConnections
+this class saves the connections to the component
+while its ID is not yet identified
+*/
 var ComponentConnections = (function () {
     function ComponentConnections(component) {
         this.component = component;

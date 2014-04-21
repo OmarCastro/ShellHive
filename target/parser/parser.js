@@ -25,10 +25,10 @@ var parserCommand = {
     tee: require('./commands/tee')
 };
 var implementedCommands = [];
-var VisualSelectorOptions = {};
+exports.VisualSelectorOptions = {};
 for (var key in parserCommand) {
     implementedCommands.push(key);
-    VisualSelectorOptions[key] = parserCommand[key].VisualSelectorOptions;
+    exports.VisualSelectorOptions[key] = parserCommand[key].VisualSelectorOptions;
 }
 
 function isImplemented(command) {
@@ -36,13 +36,28 @@ function isImplemented(command) {
 }
 ;
 
+/**
+* Parses the syntax of the command and
+* transforms into an Abstract Syntax Tree
+* @param command command
+* @return the resulting AST
+*/
 function generateAST(command) {
     return astBuilder.parse(command);
 }
 
+/**
+* Parses the Abstract Syntax Tree
+* and transforms it to a graph representation format
+* that can be used in the visual application
+*
+* @param ast - the Abstract Syntax Tree
+* @param tracker - and tracker the tracks the id of a component
+* @return the visual representation of the object
+*/
 function parseAST(ast, tracker) {
     if (typeof tracker === "undefined") { tracker = { id: 0 }; }
-    var components, connections, LastCommandComponent, CommandComponent, exec, args, nodeParser, result_aux, result, comp, firstMainComponent;
+    var components, connections, LastCommandComponent, CommandComponent, exec, args, result_aux, result, comp, firstMainComponent;
 
     var graph = new Graph();
 
@@ -54,7 +69,7 @@ function parseAST(ast, tracker) {
     for (var index = 0, _ref = ast, length = _ref.length; index < length; ++index) {
         var commandNode = _ref[index];
         exec = commandNode.exec, args = commandNode.args;
-        nodeParser = parserCommand[exec];
+        var nodeParser = parserCommand[exec];
         if (nodeParser.parseCommand) {
             if (exec === 'tee') {
                 return nodeParser.parseCommand(args, parser, tracker, LastCommandComponent, ast.slice(index + 1), firstMainComponent, components, connections);
@@ -99,10 +114,16 @@ function parseAST(ast, tracker) {
     };
 }
 
+/**
+* parses the command
+*/
 function parseCommand(command) {
     return parseAST(generateAST(command));
 }
 
+/**
+* Creates an index of the components
+*/
 function indexComponents(visualData) {
     var result = {};
     for (var i = 0, _ref = visualData.components, length = _ref.length; i < length; ++i) {
@@ -125,6 +146,7 @@ function parseVisualData(VisualData) {
     }
     return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
 }
+
 function parseComponent(component, visualData, componentIndex, mapOfParsedComponents) {
     switch (component.type) {
         case 'command':
@@ -135,6 +157,10 @@ function parseComponent(component, visualData, componentIndex, mapOfParsedCompon
             return '';
     }
 }
+
+/**
+Parse visual data from Component
+*/
 function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
     var isFirst, i$, ref$, len$, connection, parsedCommand, parsedCommandIndex, endNodeId, j$, ref1$, len1$, component, endNode, comm, to$, i, command;
     var commands = [];
@@ -261,6 +287,7 @@ function createMacro(name, description, command, fromMacro) {
     }
     return macroData;
 }
+exports.createMacro = createMacro;
 ;
 
 function compileMacro(macro) {
@@ -281,7 +308,4 @@ parser.parseCommand = exports.parseCommand = parseCommand;
 parser.parseComponent = exports.parseComponent = parseComponent;
 parser.implementedCommands = exports.implementedCommands = implementedCommands;
 parser.parseVisualData = exports.parseVisualData = parseVisualData;
-
-exports.createMacro = createMacro;
-exports.VisualSelectorOptions = VisualSelectorOptions;
 //# sourceMappingURL=parser.js.map

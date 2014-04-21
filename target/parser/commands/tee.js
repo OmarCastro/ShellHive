@@ -1,48 +1,30 @@
-var $, Boundary;
-$ = require("./_init.js");
-Boundary = require("./_graphlayout");
+var $ = require("./_init");
+var Graph = require("../../common/graph");
+var Boundary = Graph.Boundary;
 
+/**
+Arranges the nodes using a hierarchical layout
+*/
 function arrangeLayout(previousCommand, boundaries) {
-    var maxX, minY, prevBound, components, translateX, i$, len$, boundary, translateY, x, y;
-    maxX = 0;
-    minY = previousCommand.position.y - (boundaries.length - 1) * 250;
+    var maxX = 0;
+    var minY = previousCommand.position.y - (boundaries.length - 1) * 250;
     if (minY < 0) {
         previousCommand.position.y -= minY;
         minY = 0;
     }
-    prevBound = null;
-    components = [];
-    translateX = previousCommand.position.x + 500;
-    for (i$ = 0, len$ = boundaries.length; i$ < len$; ++i$) {
-        boundary = boundaries[i$];
-        translateY = prevBound ? prevBound.bottom - boundary.top : minY;
+    var prevBound = null;
+    var translateX = previousCommand.position.x + 500;
+    boundaries.forEach(function (boundary) {
+        var translateY = prevBound ? prevBound.bottom - boundary.top : minY;
         boundary.translateXY(translateX, translateY);
         prevBound = boundary;
-    }
-    x = (function () {
-        switch (boundaries.length) {
-            case 0:
-                return 0;
-            default:
-                return maxX + 500;
-        }
-    }());
-    return y = (function () {
-        switch (boundaries.length) {
-            case 0:
-                return 0;
-            case 1:
-                return prevBound.bottom;
-            default:
-                return prevBound.bottom;
-        }
-    }());
+    });
 }
 function connector(parser, previousCommand, result, boundaries, tracker) {
     return function (commandList) {
         var subresult, i$, ref$, len$, sub;
         subresult = parser.parseAST(commandList, tracker);
-        boundaries.push(Boundary.fromComponents(subresult.components));
+        boundaries.push(Boundary.createFromComponents(subresult.components));
         for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
             sub = ref$[i$];
             result.components.push(sub);
@@ -59,7 +41,7 @@ function connector(parser, previousCommand, result, boundaries, tracker) {
         });
     };
 }
-exports.parseCommand = function (argsNode, parser, tracker, previousCommand, nextcommands, firstMainComponent, components, connections) {
+function parseCommand(argsNode, parser, tracker, previousCommand, nextcommands, firstMainComponent, components, connections) {
     var boundaries, result, connectTo, i$, len$, argNode;
     boundaries = [];
     result = {
@@ -84,5 +66,7 @@ exports.parseCommand = function (argsNode, parser, tracker, previousCommand, nex
     arrangeLayout(previousCommand, boundaries);
     result.counter = tracker.id;
     return result;
-};
+}
+exports.parseCommand = parseCommand;
+;
 //# sourceMappingURL=tee.js.map

@@ -44,6 +44,19 @@ function typeOf(arg) {
 }
 exports.typeOf = typeOf;
 
+/*getComponentById = function(visualData, id){
+var i$, ref$, len$, x;
+for (i$ = 0, len$ = (ref$ = visualData.components).length; i$ < len$; ++i$) {
+x = ref$[i$];
+if (x.id === id) {
+return x;
+}
+}
+return null;
+};*/
+/**
+Adds a file component to the
+*/
 function addFileComponent(componentData, connections, filename, id) {
     var newComponent = new FileComponent(filename);
     newComponent.id = id;
@@ -58,6 +71,17 @@ function addFileComponent(componentData, connections, filename, id) {
 }
 ;
 
+/*var commonNodeParsing = {
+string: function(options){
+return addFileComponent(options, options.iterator.current);
+},
+shortOptions: function(options){
+return addFileComponent(options, options.iterator.current);
+},
+longOption: function(options){
+return addFileComponent(options, options.iterator.current);
+}
+};*/
 function commonParseCommand(optionsParserData, defaultComponentData, argNodeParsing) {
     return function (argsNode, parser, tracker, previousCommand) {
         var componentData, stdoutRedirection, stderrRedirection, result, iter, argNode, newComponent, inputPort, subresult, ref$, y;
