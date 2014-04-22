@@ -85,12 +85,8 @@ function parseAST(ast, tracker) {
             }
             result_aux = nodeParser.parseCommand(args, parser, tracker, LastCommandComponent);
 
-            result = null;
-            if (result_aux instanceof Array) {
-                result = result_aux[1];
-            } else {
-                result = result_aux;
-            }
+            result = (result_aux instanceof Array) ? result_aux[1] : result_aux;
+
             components = components.concat(result.components);
             connections = connections.concat(result.connections);
             CommandComponent = result.firstMainComponent;
@@ -99,13 +95,9 @@ function parseAST(ast, tracker) {
                 var connection = new GraphModule.Connection(comp, 'output', CommandComponent, 'input');
                 connections.push(connection);
             }
-            if (result_aux instanceof Array) {
-                LastCommandComponent = [result_aux[0], CommandComponent];
-            } else {
-                LastCommandComponent = CommandComponent;
-            }
+            LastCommandComponent = (result_aux instanceof Array) ? [result_aux[0], CommandComponent] : CommandComponent;
             if (index < 1) {
-                firstMainComponent = CommandComponent.id;
+                firstMainComponent = CommandComponent;
             }
         }
     }

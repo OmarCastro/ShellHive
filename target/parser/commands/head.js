@@ -8,9 +8,16 @@ K lines of each file
 -q, --quiet, --silent    nuncar mostrar cabeçalhos com nomes de ficheiros
 -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     showHeaders: {
@@ -27,13 +34,15 @@ var selectors = {
             always: {
                 name: 'always',
                 option: "v",
+                longOption: "verbose",
                 type: 'option',
                 description: 'always show headers'
             },
             never: {
                 name: 'never',
                 type: 'option',
-                option: "v",
+                option: "q",
+                longOption: ['quiet', 'silent'],
                 description: 'no not show headers'
             }
         }
@@ -65,54 +74,29 @@ var config = {
 
 var headData = new parserModule.ParserData(config);
 
-var optionsParser = {
-    shortOptions: {
-        q: $.select(selectors.showHeaders.name, selectors.showHeaders.options.never.name),
-        v: $.select(selectors.showHeaders.name, selectors.showHeaders.options.always.name),
-        n: $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name),
-        b: $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
-    },
-    longOptions: {
-        quiet: $.sameAs("q"),
-        silent: $.sameAs("q"),
-        verbose: $.sameAs("v")
+var optionsParser = $.optionParserFromConfig(config);
+optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
+optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
+
+var lsCommandData = new parserModule.ParserData(config);
+
+var HeadComponent = (function (_super) {
+    __extends(HeadComponent, _super);
+    function HeadComponent() {
+        _super.apply(this, arguments);
+        this.exec = "head";
+        this.files = [];
     }
-};
+    return HeadComponent;
+})(GraphModule.CommandComponent);
 
-$.generate(optionsParser);
-
-var defaultComponentData = function () {
-    var componentSelectors = {};
-    for (var key in selectors) {
-        if (!selectors.hasOwnProperty(key)) {
-            continue;
-        }
-        var value = selectors[key];
-        for (var optionName in value.options) {
-            var option = value.options[optionName];
-            if (option.default) {
-                console.log(key);
-                var valueObj = {
-                    name: option.name,
-                    type: option.type
-                };
-                if (option.defaultValue) {
-                    valueObj['value'] = option.defaultValue;
-                }
-                componentSelectors[value.name] = valueObj;
-                break;
-            }
-        }
-    }
-
-    return {
-        type: 'command',
-        exec: 'head',
-        flags: {},
-        selectors: componentSelectors,
-        files: []
-    };
-};
+function defaultComponentData() {
+    var component = new HeadComponent();
+    component.selectors = headData.componentSelectors;
+    component.flags = headData.componentFlags;
+    return component;
+}
+;
 
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(headData.flagOptions, headData.selectorOptions);

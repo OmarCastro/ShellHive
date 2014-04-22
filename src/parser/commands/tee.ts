@@ -1,6 +1,8 @@
 import $ = require("./_init");
-import Graph = require("../../common/graph")
-import Boundary = Graph.Boundary;
+import GraphModule = require("../../common/graph")
+import Graph = GraphModule.Graph;
+import Boundary = GraphModule.Boundary;
+import Connection = GraphModule.Connection;
 /**
   Arranges the nodes using a hierarchical layout
 */
@@ -19,39 +21,29 @@ function arrangeLayout(previousCommand, boundaries:Boundary[]){
     prevBound = boundary;
   });
 }
-function connector(parser, previousCommand, result, boundaries, tracker){
+function connector(parser, previousCommand, result:Graph, boundaries, tracker){
   return function(commandList){
-    var subresult, i$, ref$, len$, sub;
-    subresult = parser.parseAST(commandList, tracker);
+    var subresult:Graph = parser.parseAST(commandList, tracker);
     boundaries.push(Boundary.createFromComponents(subresult.components));
-    for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
-      sub = ref$[i$];
-      result.components.push(sub);
-    }
-    for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
-      sub = ref$[i$];
-      result.connections.push(sub);
-    }
-    result.connections.push({
-      startNode: previousCommand.id,
-      startPort: 'output',
-      endNode: subresult.firstMainComponent,
-      endPort: 'input'
-    });
+    result.components = result.components.concat(subresult.components);
+    result.connections = result.connections.concat(subresult.connections);
+    result.connections.push(new Connection(previousCommand,'output',subresult.firstMainComponent,'input'))
   };
 }
+
 export function parseCommand(argsNode, parser, tracker, previousCommand, nextcommands, firstMainComponent, components, connections){
-  var boundaries, result, connectTo, i$, len$, argNode;
+  var boundaries:any[], i$, len$, argNode;
   boundaries = [];
-  result = {
-    firstMainComponent: firstMainComponent,
-    components: components,
-    connections: connections
-  };
+
+  var result = new Graph();
+  result.firstMainComponent = firstMainComponent;
+  result.components  = components;
+  result.connections = connections;
+  
   if (previousCommand instanceof Array) {
     previousCommand = previousCommand[1];
   }
-  connectTo = connector(parser, previousCommand, result, boundaries, tracker);
+  var connectTo = connector(parser, previousCommand, result, boundaries, tracker);
   for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
     argNode = argsNode[i$];
     switch ($.typeOf(argNode)) {

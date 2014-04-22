@@ -81,4 +81,44 @@ describe('Graph test', function(){
       graph.components[1].exec.should.equal("cat");
     })
   })
+
+  describe('redirection test', function(){
+    it('should create a component for each output redirection', function(){
+      var command = 'cat file1.txt > file2.txt 2> file3.txt';
+      var graph = parser.parseCommand(command)
+      graph.should.be.an.instanceof(parser.Graph)
+      graph.components.length.should.equal(4)
+      graph.connections.length.should.equal(3)
+
+      graph.components.forEach(function(component){
+        component.should.be.an.instanceof(parser.Component)
+      })      
+
+      graph.connections.forEach(function(connection){
+        connection.should.be.an.instanceof(parser.Connection)
+      })
+      
+      graph.components[0].exec.should.equal("cat");
+      graph.components[1].should.be.an.instanceof(parser.FileComponent)
+      graph.components[2].should.be.an.instanceof(parser.FileComponent)
+      graph.components[3].should.be.an.instanceof(parser.FileComponent)
+    })
+  })
+
+  describe('tee test', function(){
+    it('should create a tree by using a tee command', function(){
+      var command = 'cat | tee >(cat | tee >(cat) >(cat)) >(cat | tee >(cat) >(cat) | cat) | cat';
+      var graph = parser.parseCommand(command)
+      graph.should.be.an.instanceof(parser.Graph)
+      graph.components.length.should.equal(9)
+      graph.connections.length.should.equal(8)
+      graph.components.forEach(function(component){
+        component.should.be.an.instanceof(parser.Component)
+        component.exec.should.equal("cat");
+      })      
+      graph.connections.forEach(function(connection){
+        connection.should.be.an.instanceof(parser.Connection)
+      })
+    })
+  })
 })

@@ -15,6 +15,8 @@
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
+
 
 var selectors = {
   showHeaders:{
@@ -31,13 +33,15 @@ var selectors = {
       always:{
         name:'always',
         option: "v",
+        longOption:"verbose",
         type:'option',
         description:'always show headers'
       },
       never:{
         name:'never',
         type:'option',
-        option: "v",
+        option: "q",
+        longOption:['quiet','silent'],
         description:'no not show headers'        
       }
     }
@@ -73,56 +77,21 @@ var config = {
 var tailData = new parserModule.ParserData(config);
 
 
+var optionsParser = $.optionParserFromConfig(config);
+optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name)
+optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
 
-var optionsParser = {
-  shortOptions:{
-    q : $.select(selectors.showHeaders.name, selectors.showHeaders.options.never.name),
-    v : $.select(selectors.showHeaders.name, selectors.showHeaders.options.always.name),
-    n : $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name),
-    b : $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
-  },
-  longOptions:{
-    quiet :   $.sameAs("q"),
-    silent :  $.sameAs("q"),
-    verbose : $.sameAs("v")
-  }
+
+class TailComponent extends GraphModule.CommandComponent {
+  public exec:string = "tail"
+  public files: any[] = []
 }
 
-$.generate(optionsParser)
-
-
-var defaultComponentData = function(){
-
-  var componentSelectors = {}
-  for (var key in selectors) {
-    if(!selectors.hasOwnProperty(key)){
-      continue;
-    }
-    var value = selectors[key]
-    for (var optionName in value.options){
-      var option = value.options[optionName]
-      if(option.default){
-        console.log(key);
-        var valueObj = {
-          name:option.name,
-          type:option.type,
-        }
-        if(option.defaultValue){
-          valueObj['value'] = option.defaultValue
-        }
-        componentSelectors[value.name] = valueObj
-        break;
-      }
-    }
-  }
-
-  return {
-    type: 'command',
-    exec: 'tail',
-    flags: {},
-    selectors: componentSelectors,
-    files: []
-  };
+function defaultComponentData(){
+  var component = new TailComponent();
+  component.selectors = tailData.componentSelectors
+  component.flags = tailData.componentFlags
+  return component;
 };
 
 

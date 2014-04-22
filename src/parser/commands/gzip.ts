@@ -154,10 +154,10 @@ class GZipComponent extends GraphModule.CommandComponent {
 
 
 function defaultComponentData(){
-  var graph = new GZipComponent();
-  graph.selectors = gzipData.componentSelectors
-  graph.flags = gzipData.componentFlags
-  return graph;
+  var component = new GZipComponent();
+  component.selectors = gzipData.componentSelectors
+  component.flags = gzipData.componentFlags
+  return component;
 };
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);

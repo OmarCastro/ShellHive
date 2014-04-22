@@ -1,9 +1,7 @@
 import $ = require("../utils/optionsParser");
-
 import parserModule = require("../utils/parserData");
-
 import common = require("./_init");
-
+import GraphModule = require("../../common/graph");
 import SelectorInfo = parserModule.SelectorInfo;
 
 
@@ -357,16 +355,21 @@ var config:parserModule.Config = {
 
 var lsCommandData = new parserModule.ParserData(config);
 
-function defaultComponentData(){    
-  return {
-    type: 'command',
-    exec: "ls",
-    flags: lsCommandData.componentFlags,
-    selectors: lsCommandData.componentSelectors,
-    parameters:lsCommandData.componentParameters,
-    files: []
-  };
+
+class LsComponent extends GraphModule.CommandComponent {
+  public exec:string = "ls"
+  public files: any[] = []
+}
+
+
+function defaultComponentData(){
+  var component = new LsComponent();
+  component.selectors = lsCommandData.componentSelectors
+  component.flags = lsCommandData.componentFlags
+  component.parameters = lsCommandData.componentParameters
+  return component;
 };
+
 
 
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)

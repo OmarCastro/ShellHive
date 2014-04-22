@@ -1373,15 +1373,9 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                     stdoutRedirection = newComponent;
                     break;
                 case 'errTo':
-                    console.log('errTo!!');
                     newComponent = new FileComponent(argNode[1]);
                     newComponent.id = tracker.id;
                     result.connections.push(new Connection(componentData, 'error', newComponent, 'input'));
-
-                    //connections.addConnectionFromErrorPort({
-                    //  id: tracker.id,
-                    //  port: 'input'
-                    //});
                     tracker.id++;
                     result.components.push(newComponent);
                     stderrRedirection = newComponent;
@@ -2920,10 +2914,10 @@ var GZipComponent = (function (_super) {
 })(GraphModule.CommandComponent);
 
 function defaultComponentData() {
-    var graph = new GZipComponent();
-    graph.selectors = gzipData.componentSelectors;
-    graph.flags = gzipData.componentFlags;
-    return graph;
+    var component = new GZipComponent();
+    component.selectors = gzipData.componentSelectors;
+    component.flags = gzipData.componentFlags;
+    return component;
 }
 ;
 
@@ -2943,9 +2937,16 @@ K lines of each file
 -q, --quiet, --silent    nuncar mostrar cabeçalhos com nomes de ficheiros
 -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     showHeaders: {
@@ -2962,13 +2963,15 @@ var selectors = {
             always: {
                 name: 'always',
                 option: "v",
+                longOption: "verbose",
                 type: 'option',
                 description: 'always show headers'
             },
             never: {
                 name: 'never',
                 type: 'option',
-                option: "v",
+                option: "q",
+                longOption: ['quiet', 'silent'],
                 description: 'no not show headers'
             }
         }
@@ -3000,66 +3003,46 @@ var config = {
 
 var headData = new parserModule.ParserData(config);
 
-var optionsParser = {
-    shortOptions: {
-        q: $.select(selectors.showHeaders.name, selectors.showHeaders.options.never.name),
-        v: $.select(selectors.showHeaders.name, selectors.showHeaders.options.always.name),
-        n: $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name),
-        b: $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
-    },
-    longOptions: {
-        quiet: $.sameAs("q"),
-        silent: $.sameAs("q"),
-        verbose: $.sameAs("v")
+var optionsParser = $.optionParserFromConfig(config);
+optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
+optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
+
+var lsCommandData = new parserModule.ParserData(config);
+
+var HeadComponent = (function (_super) {
+    __extends(HeadComponent, _super);
+    function HeadComponent() {
+        _super.apply(this, arguments);
+        this.exec = "head";
+        this.files = [];
     }
-};
+    return HeadComponent;
+})(GraphModule.CommandComponent);
 
-$.generate(optionsParser);
-
-var defaultComponentData = function () {
-    var componentSelectors = {};
-    for (var key in selectors) {
-        if (!selectors.hasOwnProperty(key)) {
-            continue;
-        }
-        var value = selectors[key];
-        for (var optionName in value.options) {
-            var option = value.options[optionName];
-            if (option.default) {
-                console.log(key);
-                var valueObj = {
-                    name: option.name,
-                    type: option.type
-                };
-                if (option.defaultValue) {
-                    valueObj['value'] = option.defaultValue;
-                }
-                componentSelectors[value.name] = valueObj;
-                break;
-            }
-        }
-    }
-
-    return {
-        type: 'command',
-        exec: 'head',
-        flags: {},
-        selectors: componentSelectors,
-        files: []
-    };
-};
+function defaultComponentData() {
+    var component = new HeadComponent();
+    component.selectors = headData.componentSelectors;
+    component.flags = headData.componentFlags;
+    return component;
+}
+;
 
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(headData.flagOptions, headData.selectorOptions);
 exports.VisualSelectorOptions = headData.visualSelectorOptions;
 //# sourceMappingURL=head.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],18:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],18:[function(require,module,exports){
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
-
 var parserModule = require("../utils/parserData");
-
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     sort: {
@@ -3405,15 +3388,22 @@ var config = {
 
 var lsCommandData = new parserModule.ParserData(config);
 
+var LsComponent = (function (_super) {
+    __extends(LsComponent, _super);
+    function LsComponent() {
+        _super.apply(this, arguments);
+        this.exec = "ls";
+        this.files = [];
+    }
+    return LsComponent;
+})(GraphModule.CommandComponent);
+
 function defaultComponentData() {
-    return {
-        type: 'command',
-        exec: "ls",
-        flags: lsCommandData.componentFlags,
-        selectors: lsCommandData.componentSelectors,
-        parameters: lsCommandData.componentParameters,
-        files: []
-    };
+    var component = new LsComponent();
+    component.selectors = lsCommandData.componentSelectors;
+    component.flags = lsCommandData.componentFlags;
+    component.parameters = lsCommandData.componentParameters;
+    return component;
 }
 ;
 
@@ -3422,7 +3412,7 @@ exports.parseComponent = common.commonParseComponent(lsCommandData.flagOptions, 
 exports.VisualSelectorOptions = lsCommandData.visualSelectorOptions;
 //# sourceMappingURL=ls.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],19:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],19:[function(require,module,exports){
 /*
 -c, --bytes=[-]K         print the first K bytes of each file;
 with the leading '-', print all but the last
@@ -3433,9 +3423,16 @@ K lines of each file
 -q, --quiet, --silent    nuncar mostrar cabeçalhos com nomes de ficheiros
 -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     showHeaders: {
@@ -3452,13 +3449,15 @@ var selectors = {
             always: {
                 name: 'always',
                 option: "v",
+                longOption: "verbose",
                 type: 'option',
                 description: 'always show headers'
             },
             never: {
                 name: 'never',
                 type: 'option',
-                option: "v",
+                option: "q",
+                longOption: ['quiet', 'silent'],
                 description: 'no not show headers'
             }
         }
@@ -3490,64 +3489,39 @@ var config = {
 
 var tailData = new parserModule.ParserData(config);
 
-var optionsParser = {
-    shortOptions: {
-        q: $.select(selectors.showHeaders.name, selectors.showHeaders.options.never.name),
-        v: $.select(selectors.showHeaders.name, selectors.showHeaders.options.always.name),
-        n: $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name),
-        b: $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
-    },
-    longOptions: {
-        quiet: $.sameAs("q"),
-        silent: $.sameAs("q"),
-        verbose: $.sameAs("v")
+var optionsParser = $.optionParserFromConfig(config);
+optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
+optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
+
+var TailComponent = (function (_super) {
+    __extends(TailComponent, _super);
+    function TailComponent() {
+        _super.apply(this, arguments);
+        this.exec = "tail";
+        this.files = [];
     }
-};
+    return TailComponent;
+})(GraphModule.CommandComponent);
 
-$.generate(optionsParser);
-
-var defaultComponentData = function () {
-    var componentSelectors = {};
-    for (var key in selectors) {
-        if (!selectors.hasOwnProperty(key)) {
-            continue;
-        }
-        var value = selectors[key];
-        for (var optionName in value.options) {
-            var option = value.options[optionName];
-            if (option.default) {
-                console.log(key);
-                var valueObj = {
-                    name: option.name,
-                    type: option.type
-                };
-                if (option.defaultValue) {
-                    valueObj['value'] = option.defaultValue;
-                }
-                componentSelectors[value.name] = valueObj;
-                break;
-            }
-        }
-    }
-
-    return {
-        type: 'command',
-        exec: 'tail',
-        flags: {},
-        selectors: componentSelectors,
-        files: []
-    };
-};
+function defaultComponentData() {
+    var component = new TailComponent();
+    component.selectors = tailData.componentSelectors;
+    component.flags = tailData.componentFlags;
+    return component;
+}
+;
 
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(tailData.flagOptions, tailData.selectorOptions);
 exports.VisualSelectorOptions = tailData.visualSelectorOptions;
 //# sourceMappingURL=tail.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],20:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],20:[function(require,module,exports){
 var $ = require("./_init");
-var Graph = require("../../common/graph");
-var Boundary = Graph.Boundary;
+var GraphModule = require("../../common/graph");
+var Graph = GraphModule.Graph;
+var Boundary = GraphModule.Boundary;
+var Connection = GraphModule.Connection;
 
 /**
 Arranges the nodes using a hierarchical layout
@@ -3569,37 +3543,27 @@ function arrangeLayout(previousCommand, boundaries) {
 }
 function connector(parser, previousCommand, result, boundaries, tracker) {
     return function (commandList) {
-        var subresult, i$, ref$, len$, sub;
-        subresult = parser.parseAST(commandList, tracker);
+        var subresult = parser.parseAST(commandList, tracker);
         boundaries.push(Boundary.createFromComponents(subresult.components));
-        for (i$ = 0, len$ = (ref$ = subresult.components).length; i$ < len$; ++i$) {
-            sub = ref$[i$];
-            result.components.push(sub);
-        }
-        for (i$ = 0, len$ = (ref$ = subresult.connections).length; i$ < len$; ++i$) {
-            sub = ref$[i$];
-            result.connections.push(sub);
-        }
-        result.connections.push({
-            startNode: previousCommand.id,
-            startPort: 'output',
-            endNode: subresult.firstMainComponent,
-            endPort: 'input'
-        });
+        result.components = result.components.concat(subresult.components);
+        result.connections = result.connections.concat(subresult.connections);
+        result.connections.push(new Connection(previousCommand, 'output', subresult.firstMainComponent, 'input'));
     };
 }
+
 function parseCommand(argsNode, parser, tracker, previousCommand, nextcommands, firstMainComponent, components, connections) {
-    var boundaries, result, connectTo, i$, len$, argNode;
+    var boundaries, i$, len$, argNode;
     boundaries = [];
-    result = {
-        firstMainComponent: firstMainComponent,
-        components: components,
-        connections: connections
-    };
+
+    var result = new Graph();
+    result.firstMainComponent = firstMainComponent;
+    result.components = components;
+    result.connections = connections;
+
     if (previousCommand instanceof Array) {
         previousCommand = previousCommand[1];
     }
-    connectTo = connector(parser, previousCommand, result, boundaries, tracker);
+    var connectTo = connector(parser, previousCommand, result, boundaries, tracker);
     for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
         argNode = argsNode[i$];
         switch ($.typeOf(argNode)) {
@@ -3904,12 +3868,8 @@ function parseAST(ast, tracker) {
             }
             result_aux = nodeParser.parseCommand(args, parser, tracker, LastCommandComponent);
 
-            result = null;
-            if (result_aux instanceof Array) {
-                result = result_aux[1];
-            } else {
-                result = result_aux;
-            }
+            result = (result_aux instanceof Array) ? result_aux[1] : result_aux;
+
             components = components.concat(result.components);
             connections = connections.concat(result.connections);
             CommandComponent = result.firstMainComponent;
@@ -3918,13 +3878,9 @@ function parseAST(ast, tracker) {
                 var connection = new GraphModule.Connection(comp, 'output', CommandComponent, 'input');
                 connections.push(connection);
             }
-            if (result_aux instanceof Array) {
-                LastCommandComponent = [result_aux[0], CommandComponent];
-            } else {
-                LastCommandComponent = CommandComponent;
-            }
+            LastCommandComponent = (result_aux instanceof Array) ? [result_aux[0], CommandComponent] : CommandComponent;
             if (index < 1) {
-                firstMainComponent = CommandComponent.id;
+                firstMainComponent = CommandComponent;
             }
         }
     }

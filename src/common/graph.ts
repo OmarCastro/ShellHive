@@ -64,6 +64,7 @@ export class CommandComponent extends Component{
     public type:string = "command"
     public flags:any
     public selectors:any
+    public parameters:any
     public exec:string
 }
 /**

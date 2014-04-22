@@ -1,8 +1,13 @@
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
-
 var parserModule = require("../utils/parserData");
-
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     sort: {
@@ -348,15 +353,22 @@ var config = {
 
 var lsCommandData = new parserModule.ParserData(config);
 
+var LsComponent = (function (_super) {
+    __extends(LsComponent, _super);
+    function LsComponent() {
+        _super.apply(this, arguments);
+        this.exec = "ls";
+        this.files = [];
+    }
+    return LsComponent;
+})(GraphModule.CommandComponent);
+
 function defaultComponentData() {
-    return {
-        type: 'command',
-        exec: "ls",
-        flags: lsCommandData.componentFlags,
-        selectors: lsCommandData.componentSelectors,
-        parameters: lsCommandData.componentParameters,
-        files: []
-    };
+    var component = new LsComponent();
+    component.selectors = lsCommandData.componentSelectors;
+    component.flags = lsCommandData.componentFlags;
+    component.parameters = lsCommandData.componentParameters;
+    return component;
 }
 ;
 

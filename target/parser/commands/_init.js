@@ -148,15 +148,9 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                     stdoutRedirection = newComponent;
                     break;
                 case 'errTo':
-                    console.log('errTo!!');
                     newComponent = new FileComponent(argNode[1]);
                     newComponent.id = tracker.id;
                     result.connections.push(new Connection(componentData, 'error', newComponent, 'input'));
-
-                    //connections.addConnectionFromErrorPort({
-                    //  id: tracker.id,
-                    //  port: 'input'
-                    //});
                     tracker.id++;
                     result.components.push(newComponent);
                     stderrRedirection = newComponent;
