@@ -66,6 +66,7 @@ export class CommandComponent extends Component{
     public selectors:any
     public parameters:any
     public exec:string
+    public files:any[]
 }
 /**
 	A file component

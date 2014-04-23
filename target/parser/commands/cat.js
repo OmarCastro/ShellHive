@@ -93,6 +93,7 @@ var CatComponent = (function (_super) {
     }
     return CatComponent;
 })(GraphModule.CommandComponent);
+exports.CatComponent = CatComponent;
 
 function defaultComponentData() {
     var graph = new CatComponent();

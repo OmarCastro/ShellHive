@@ -11,7 +11,7 @@
   },
   "scripts": {
     "watch": "gulp",
-    "test": "gulp mocha"
+    "test": "mocha test/test.js"
   },
   "devDependencies": {
     "jison": "~0.4.13",

@@ -1,5 +1,3 @@
-var parseFlagsAndSelectors, join$ = [].join;
-
 var optionsParser = require("../utils/optionsParser");
 
 var GraphModule = require("../../common/graph");
@@ -180,7 +178,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
 exports.commonParseCommand = commonParseCommand;
 ;
 
-parseFlagsAndSelectors = function (component, options) {
+function parseFlagsAndSelectors(component, options) {
     var key, selectors, value, flag, flags, that, val;
     var flagOptions = options.flagOptions;
     var selectorOptions = options.selectorOptions;
@@ -230,7 +228,8 @@ parseFlagsAndSelectors = function (component, options) {
         return sFlags.join(' ');
     } else
         return "";
-};
+}
+;
 
 function commonParseComponent(flagOptions, selectorOptions, parameterOptions, beforeJoin) {
     var options;
@@ -239,47 +238,43 @@ function commonParseComponent(flagOptions, selectorOptions, parameterOptions, be
         selectorOptions: selectorOptions,
         parameterOptions: parameterOptions
     };
+
     return function (component, visualData, componentIndex, mapOfParsedComponents, parseComponent) {
-        var exec, flags, parameters, res$, key, ref$, value, files, i$, len$, file, subCommand;
-        exec = [component.exec];
+        var exec = [component.exec];
         mapOfParsedComponents[component.id] = true;
-        flags = parseFlagsAndSelectors(component, options);
-        res$ = [];
-        for (key in ref$ = component.parameters) {
-            value = ref$[key];
+        var flags = parseFlagsAndSelectors(component, options);
+
+        var parameters = [];
+        var Componentparameters = component.parameters;
+
+        for (var key in Componentparameters) {
+            var value = Componentparameters[key];
             if (value) {
+                var result = "-" + parameterOptions[key] + value;
                 if (value.indexOf(" ") >= 0) {
-                    res$.push("\"-" + parameterOptions[key] + value + "\"");
-                } else {
-                    res$.push("-" + parameterOptions[key] + value);
+                    result = '"' + result + '"';
                 }
+                parameters.push(result);
             }
         }
-        parameters = res$;
-        if (component.files) {
-            res$ = [];
-            for (i$ = 0, len$ = (ref$ = component.files).length; i$ < len$; ++i$) {
-                file = ref$[i$];
-                if (file instanceof Array) {
-                    subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
-                    res$.push("<(" + subCommand + ")");
-                } else if (file.indexOf(" ") >= 0) {
-                    res$.push("\"" + file + "\"");
-                } else {
-                    res$.push(file);
-                }
-            }
-            files = res$;
-        } else {
-            files = [];
-        }
+
+        var files = !component.files ? [] : component.files.map(function (file) {
+            if (file instanceof Array) {
+                var subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
+                return "<(" + subCommand + ")";
+            } else if (file.indexOf(" ") >= 0) {
+                return '"' + file + '"';
+            } else
+                return file;
+        });
+
         if (parameters.length > 0) {
-            parameters = join$.call(parameters, ' ');
+            parameters = parameters.join(' ');
         }
         if (beforeJoin) {
             return beforeJoin(component, exec, flags, files, parameters);
         } else {
-            return join$.call(exec.concat(flags, parameters, files), ' ');
+            return exec.concat(flags, parameters, files).join(' ');
         }
     };
 }

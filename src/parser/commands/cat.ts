@@ -87,7 +87,7 @@ longOptions['show-all'] = shortOptions['A']
 longOptions['number'] = shortOptions['n']
 
 
-class CatComponent extends GraphModule.CommandComponent {
+export class CatComponent extends GraphModule.CommandComponent {
   public exec:string = "cat"
   public files: any[] = []
 }

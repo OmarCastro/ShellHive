@@ -1,7 +1,5 @@
 declare var exports:any;
 
-var parseFlagsAndSelectors, join$ = [].join;
-
 import optionsParser = require("../utils/optionsParser");
 
 import GraphModule = require("../../common/graph");
@@ -9,6 +7,7 @@ import Boundary = GraphModule.Boundary;
 import Graph = GraphModule.Graph;
 import Connection = GraphModule.Connection;
 import Component = GraphModule.Component;
+import CommandComponent = GraphModule.CommandComponent;
 import FileComponent = GraphModule.FileComponent;
 
 class Iterator{
@@ -198,7 +197,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
 
 
 
-parseFlagsAndSelectors = function(component, options):string{
+function parseFlagsAndSelectors(component:CommandComponent, options):string{
   var key, selectors, value, flag, flags, that, val;
   var flagOptions = options.flagOptions; 
   var selectorOptions = options.selectorOptions;
@@ -260,47 +259,40 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
     selectorOptions: selectorOptions,
     parameterOptions: parameterOptions
   };
+
   return function(component, visualData, componentIndex, mapOfParsedComponents, parseComponent){
-    var exec, flags, parameters, res$, key, ref$, value, files, i$, len$, file, subCommand;
-    exec = [component.exec];
+    var exec:any[] = [component.exec];
     mapOfParsedComponents[component.id] = true;
-    flags = parseFlagsAndSelectors(component, options);
-    res$ = [];
-    for (key in ref$ = component.parameters) {
-      value = ref$[key];
+    var flags = parseFlagsAndSelectors(component, options);
+    
+    var parameters:any = [];
+    var Componentparameters = component.parameters;
+
+    for (var key in Componentparameters) {
+      var value = Componentparameters[key];
       if (value) {
-        if (value.indexOf(" ") >= 0) {
-          res$.push("\"-" + parameterOptions[key] + value + "\"");
-        } else {
-          res$.push("-" + parameterOptions[key] + value);
-        }
+        var result = "-" + parameterOptions[key] + value;
+        if (value.indexOf(" ") >= 0){ result = '"'+ result +'"' }
+        parameters.push(result)
       }
     }
-    parameters = res$;
-    if (component.files) {
-      res$ = [];
-      for (i$ = 0, len$ = (ref$ = component.files).length; i$ < len$; ++i$) {
-        file = ref$[i$];
+
+    var files = !component.files ? [] : component.files.map(file => {
         if (file instanceof Array) {
-          subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
-          res$.push("<(" + subCommand + ")");
-        } else if (file.indexOf(" ") >= 0) {
-          res$.push("\"" + file + "\"");
-        } else {
-          res$.push(file);
-        }
-      }
-      files = res$;
-    } else {
-      files = [];
-    }
+          var subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
+          return "<(" + subCommand + ")"
+        } else if (file.indexOf(" ") >= 0) { return '"' + file + '"'; }
+        else return file;
+
+      });
+
     if (parameters.length > 0) {
-      parameters = join$.call(parameters, ' ');
+      parameters = parameters.join(' ');
     }
     if (beforeJoin) {
       return beforeJoin(component, exec, flags, files, parameters);
     } else {
-      return join$.call(exec.concat(flags, parameters, files), ' ');
+      return exec.concat(flags, parameters, files).join(' ');
     }
   };
 };
