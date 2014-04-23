@@ -12,37 +12,49 @@
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var flags = {
     keep: {
         name: "keep files",
         option: 'k',
+        longOption: 'keep',
         description: "keep (don't delete) input files",
         active: false
     },
     force: {
         name: "force",
         option: 'f',
+        longOption: 'force',
         description: "overwrite existing output files",
         active: false
     },
     quiet: {
         name: "quiet",
         option: 'q',
+        longOption: 'quiet',
         description: "suppress noncritical error messages",
         active: false
     },
     verbose: {
         name: "verbose",
         option: 'v',
+        longOption: 'verbose',
         description: "overwrite existing output files",
         active: false
     },
     recursive: {
         name: "recursive",
+        longOption: 'recursive',
         option: 'v',
         description: "overwrite existing output files",
         active: false
@@ -53,42 +65,28 @@ var config = {
     flags: flags
 };
 
-var bzipData = new parserModule.ParserData(config);
+var optionsParser = $.optionParserFromConfig(config);
+var zcatData = new parserModule.ParserData(config);
 
-var shortOptions = {
-    k: $.switchOn(flags.keep),
-    f: $.switchOn(flags.force),
-    q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    r: $.switchOn(flags.recursive)
-};
-
-var longOptions = {
-    'keep': $.sameAs('k'),
-    'force': $.sameAs('f'),
-    'test': $.sameAs('t'),
-    'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v')
-};
-
-var optionsParser = {
-    shortOptions: shortOptions,
-    longOptions: longOptions
-};
-
-$.generate(optionsParser);
+var ZcatComponent = (function (_super) {
+    __extends(ZcatComponent, _super);
+    function ZcatComponent() {
+        _super.apply(this, arguments);
+        this.exec = "zcat";
+        this.files = [];
+    }
+    return ZcatComponent;
+})(GraphModule.CommandComponent);
 
 function defaultComponentData() {
-    return {
-        type: 'command',
-        exec: "zcat",
-        flags: bzipData.componentFlags,
-        selectors: bzipData.componentSelectors,
-        files: []
-    };
+    var component = new ZcatComponent();
+    component.selectors = zcatData.componentSelectors;
+    component.flags = zcatData.componentFlags;
+    return component;
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
-exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.parseComponent = common.commonParseComponent(zcatData.flagOptions, zcatData.selectorOptions);
+exports.VisualSelectorOptions = zcatData.visualSelectorOptions;
 //# sourceMappingURL=zcat.js.map

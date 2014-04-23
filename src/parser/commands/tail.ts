@@ -69,7 +69,6 @@ var selectors = {
   }
 }
 
-
 var config = {
   selectors:selectors
 }

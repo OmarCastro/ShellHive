@@ -131,9 +131,16 @@ FILES  are  `FILE1  FILE2'  or  `DIR1  DIR2'  or `DIR FILE...' or `FILE... DIR'.
 is  `-', read standard input.  Exit status is 0 if inputs are the same, 1 if differ‐
 ent, 2 if trouble.
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     format: {
@@ -143,17 +150,20 @@ var selectors = {
             normal: {
                 name: 'normal',
                 option: null,
+                longOption: 'normal',
                 description: 'do not print line numbers',
                 default: true
             },
             RCS: {
                 name: 'RCS',
                 option: 'n',
+                longOption: 'rcs',
                 description: 'print line numbers on all lines'
             },
             edScript: {
                 name: 'ed script',
                 option: 'e',
+                longOption: 'ed',
                 description: 'print line numbers on non empty lines'
             }
         }
@@ -164,18 +174,21 @@ var flags = {
     ignoreCase: {
         name: "ignore case",
         option: 'i',
+        longOption: 'ignore-case',
         description: "print TAB characters like ^I",
         active: false
     },
     ignoreBlankLines: {
         name: "ignore blank lines",
         option: 'B',
+        longOption: 'ignore-blank-lines',
         description: "use ^ and M- notation, except for LFD and TAB",
         active: false
     },
     ignoreSpaceChange: {
         name: "ignore space change",
         option: 'b',
+        longOption: 'ignore-blank-sapce',
         description: "suppress repeated empty output lines",
         active: false
     }
@@ -188,40 +201,33 @@ var config = {
 
 var bzipData = new parserModule.ParserData(config);
 
-var optionsParser = {
-    shortOptions: {
-        b: $.switchOn(flags.ignoreSpaceChange),
-        B: $.switchOn(flags.ignoreBlankLines),
-        i: $.switchOn(flags.ignoreCase),
-        q: $.ignore,
-        e: $.select(selectors.format, selectors.format.options.edScript),
-        n: $.select(selectors.format, selectors.format.options.RCS)
-    },
-    longOptions: {
-        "normal": $.select(selectors.format, selectors.format.options.normal),
-        "ed": $.select(selectors.format, selectors.format.options.edScript),
-        "rcs": $.select(selectors.format, selectors.format.options.RCS),
-        "ignore-blank-lines": $.sameAs('B'),
-        "ignore-space-change": $.sameAs('b'),
-        "ignore-case": $.sameAs('i'),
-        "brief": $.sameAs('q')
-    }
-};
+var optionsParser = $.optionParserFromConfig(config);
 
-$.generate(optionsParser);
+var shortOptions = optionsParser.shortOptions;
+shortOptions['q'] = $.ignore;
+
+var longOptions = optionsParser.shortOptions;
+longOptions['brief'] = shortOptions['q'];
+
+var DiffComponent = (function (_super) {
+    __extends(DiffComponent, _super);
+    function DiffComponent() {
+        _super.apply(this, arguments);
+        this.exec = "diff";
+        this.files = [];
+    }
+    return DiffComponent;
+})(GraphModule.CommandComponent);
+exports.DiffComponent = DiffComponent;
 
 function defaultComponentData() {
-    console.log("imiokijiuh");
-
-    return {
-        type: 'command',
-        exec: "diff",
-        flags: bzipData.componentFlags,
-        selectors: bzipData.componentSelectors,
-        files: []
-    };
+    var graph = new DiffComponent();
+    graph.selectors = bzipData.componentSelectors;
+    graph.flags = bzipData.componentFlags;
+    return graph;
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;

@@ -16,6 +16,7 @@
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
 
 
 
@@ -23,33 +24,38 @@ var flags = {
   keep: {
     name: "keep files",
     option: 'k',
+    longOption: 'keep',
     description: "keep (don't delete) input files",
     active: false
   },
   force:{
     name: "force",
     option: 'f',
+    longOption: 'force',
     description: "overwrite existing output files",
     active: false
   },
   quiet: {
     name: "quiet",
     option: 'q',
+    longOption: 'quiet',
     description: "suppress noncritical error messages",
     active: false
   },
   verbose:{
     name: "verbose",
     option: 'v',
+    longOption: 'verbose',
     description: "overwrite existing output files",    
     active: false
   },
   recursive:{
     name: "recursive",
+    longOption: 'recursive',
     option: 'v',
     description: "overwrite existing output files",    
     active: false
-  },
+  }
 }
 
 
@@ -58,46 +64,23 @@ var config:parserModule.Config = {
 }
 
 
-
-var bzipData = new parserModule.ParserData(config);
-
-
-
-var shortOptions = {
-  k: $.switchOn(flags.keep),
-  f: $.switchOn(flags.force),
-  q: $.switchOn(flags.quiet),
-  v: $.switchOn(flags.verbose),
-  r: $.switchOn(flags.recursive)
-}
-
-var longOptions = {
-  'keep': $.sameAs('k'),
-  'force': $.sameAs('f'),
-  'test': $.sameAs('t'),
-  'quiet': $.sameAs('q'),
-  'verbose': $.sameAs('v'),
-}
-
-
-
-var optionsParser = {
-  shortOptions: shortOptions,
-  longOptions: longOptions
-};
-
+var optionsParser = $.optionParserFromConfig(config)
+var gunzipData = new parserModule.ParserData(config);
 
 $.generate(optionsParser);
 
+class GunzipComponent extends GraphModule.CommandComponent {
+  public exec:string = "gunzip"
+  public files: any[] = []
+}
+
+
 function defaultComponentData(){
-  return {
-    type: 'command',
-    exec: "gunzip",
-    flags: bzipData.componentFlags,
-    selectors: bzipData.componentSelectors,
-    files: []
-  };
+  var component = new GunzipComponent();
+  component.selectors = gunzipData.componentSelectors
+  component.flags = gunzipData.componentFlags
+  return component;
 };
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
-export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var parseComponent = common.commonParseComponent(gunzipData.flagOptions, gunzipData.selectorOptions);
+export var VisualSelectorOptions = gunzipData.visualSelectorOptions;

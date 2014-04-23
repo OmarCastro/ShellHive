@@ -10,6 +10,8 @@
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
+
 
 var config = {
   parameters:{
@@ -33,19 +35,34 @@ var optionsParser = {
     "field-separator" : $.sameAs('F')  
   }
 }
+
 $.generate(optionsParser)
 
+
+class AwkComponent extends GraphModule.CommandComponent {
+  public exec:string = "awk"
+  public script:string = ""
+  public files: any[] = []
+}
+
+
 function defaultComponentData(){
+  var component = new AwkComponent();
+  component.parameters = awkData.componentParameters  
+  return component;
+};
+
+/*function defaultComponentData(){
   return{
     type:'command',
     exec:"awk",
     parameters:awkData.componentParameters,
     script: ""
   }
-}
+}*/
 
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
-    string: (component, str) => {
+    string: (component:AwkComponent, str) => {
         component.script = str;
       }
     })

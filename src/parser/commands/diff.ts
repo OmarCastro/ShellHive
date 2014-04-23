@@ -213,6 +213,7 @@ DESCRIPTION
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
 
 
 
@@ -224,17 +225,20 @@ var selectors = {
       normal:{
         name:'normal',
         option:null,
+        longOption:'normal',
         description:'do not print line numbers',
         default:true
       },
       RCS:{
         name:'RCS',
         option: 'n',
+        longOption:'rcs',
         description:'print line numbers on all lines'
       },
       edScript:{
         name:'ed script',
         option: 'e',
+        longOption:'ed',
         description:'print line numbers on non empty lines'
       }
     }
@@ -247,18 +251,21 @@ var flags = {
   ignoreCase: {
     name: "ignore case",
     option: 'i',
+    longOption: 'ignore-case',
     description: "print TAB characters like ^I",
     active: false
   },
   ignoreBlankLines:{
     name: "ignore blank lines",
     option: 'B',
+    longOption: 'ignore-blank-lines',
     description: "use ^ and M- notation, except for LFD and TAB",
     active: false
   },
   ignoreSpaceChange: {
     name: "ignore space change",
     option: 'b',
+    longOption: 'ignore-blank-sapce',
     description: "suppress repeated empty output lines",
     active: false
   },
@@ -271,41 +278,28 @@ var config:parserModule.Config = {
 
 var bzipData = new parserModule.ParserData(config);
 
+var optionsParser = $.optionParserFromConfig(config);
 
-var optionsParser = {
-  shortOptions:{
-    b: $.switchOn(flags.ignoreSpaceChange),
-    B: $.switchOn(flags.ignoreBlankLines),
-    i: $.switchOn(flags.ignoreCase),
-    q: $.ignore,
-    e: $.select(selectors.format,selectors.format.options.edScript),
-    n: $.select(selectors.format,selectors.format.options.RCS)
-  },
-  longOptions:{
-    "normal":  $.select(selectors.format,selectors.format.options.normal),
-    "ed":      $.select(selectors.format,selectors.format.options.edScript),
-    "rcs":     $.select(selectors.format,selectors.format.options.RCS),
-    "ignore-blank-lines": $.sameAs('B'),
-    "ignore-space-change": $.sameAs('b'),
-    "ignore-case":  $.sameAs('i'),
-    "brief":        $.sameAs('q'),
-  }
+var shortOptions = optionsParser.shortOptions
+    shortOptions['q'] = $.ignore;
+
+var longOptions = optionsParser.shortOptions
+    longOptions['brief'] = shortOptions['q']
+
+
+export class DiffComponent extends GraphModule.CommandComponent {
+  public exec:string = "diff"
+  public files: any[] = []
 }
 
-$.generate(optionsParser)
 
 function defaultComponentData(){
-  console.log("imiokijiuh");
-
-  
-  return {
-    type: 'command',
-    exec: "diff",
-    flags: bzipData.componentFlags,
-    selectors: bzipData.componentSelectors,
-    files: []
-  };
+  var graph = new DiffComponent();
+  graph.selectors = bzipData.componentSelectors
+  graph.flags = bzipData.componentFlags
+  return graph;
 };
+
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;

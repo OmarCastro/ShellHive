@@ -12,11 +12,9 @@ var gulp        = require('gulp');
     server      = tinylr();
 
 
-
-
 gulp.task('ts', function () {
   return gulp
-    .src('src/**/*.ts')
+    .src('src/**/*.ts', {read: false})
     .pipe(newer('target'))
     .pipe(tsc({target:'ES5', module: 'commonjs', sourcemap: true, outDir: 'target'}))
     .on('error', gutil.log)
