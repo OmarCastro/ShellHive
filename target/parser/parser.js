@@ -55,6 +55,7 @@ function isImplemented(command) {
 function generateAST(command) {
     return astBuilder.parse(command);
 }
+exports.generateAST = generateAST;
 
 /**
 * Parses the Abstract Syntax Tree
@@ -108,13 +109,15 @@ function parseAST(ast, tracker) {
     graph.counter = tracker.id;
     return graph;
 }
+exports.parseAST = parseAST;
 
 /**
 * parses the command
 */
 function parseCommand(command) {
-    return parseAST(generateAST(command));
+    return exports.parseAST(exports.generateAST(command));
 }
+exports.parseCommand = parseCommand;
 
 /**
 * Creates an index of the components
@@ -127,6 +130,7 @@ function indexComponents(visualData) {
     }
     return result;
 }
+exports.indexComponents = indexComponents;
 ;
 
 function parseVisualData(VisualData) {
@@ -134,46 +138,45 @@ function parseVisualData(VisualData) {
     if (VisualData.components.length < 1) {
         return '';
     }
-    indexedComponentList = indexComponents(VisualData);
-    initialComponent = indexedComponentList[VisualData.firstMainComponent];
+    indexedComponentList = exports.indexComponents(VisualData);
+    initialComponent = VisualData.firstMainComponent;
     if (!initialComponent) {
         return '';
     }
-    return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
+    return exports.parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
 }
+exports.parseVisualData = parseVisualData;
 
 function parseComponent(component, visualData, componentIndex, mapOfParsedComponents) {
     switch (component.type) {
         case 'command':
-            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
+            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, exports.parseVisualDatafromComponent);
         case 'subgraph':
             return compileMacro(component.macro);
         default:
             return '';
     }
 }
+exports.parseComponent = parseComponent;
 
 /**
 Parse visual data from Component
 */
 function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
-    var isFirst, i$, ref$, len$, connection, parsedCommand, parsedCommandIndex, endNodeId, j$, ref1$, len1$, component, endNode, comm, to$, i, command;
     var commands = [];
     do {
-        isFirst = true;
-
-        for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
-            connection = ref$[i$];
+        var isFirst = visualData.connections.every(function (connection) {
             if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
                 isFirst = false;
                 currentComponent = componentIndex[connection.startNode];
-                break;
+                return false;
             }
-        }
-    } while(isFirst = false);
+            return true;
+        });
+    } while(isFirst == false);
 
-    parsedCommand = parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
-    parsedCommandIndex = commands.length;
+    var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
+    var parsedCommandIndex = commands.length;
     commands.push(parsedCommand);
 
     var outputs = [];
@@ -183,8 +186,8 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     visualData.connections.filter(function (connection) {
         return connection.startNode === currentComponent.id && mapOfParsedComponents[connection.endNode] !== true;
     }).forEach(function (connection) {
-        endNodeId = connection.endNode;
-        endNode = componentIndex[endNodeId];
+        var endNodeId = connection.endNode;
+        var endNode = componentIndex[endNodeId];
         switch (connection.startPort) {
             case 'output':
                 outputs.push(endNode);
@@ -205,7 +208,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
             if (component.type === "file")
                 result.push(component.filename);
             else {
-                result.push(parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
+                result.push(exports.parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
             }
         }
         return result;
@@ -227,12 +230,12 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         return comm;
     };
 
-    var teeResult = function (components, compiledComponents) {
+    function teeResult(components, compiledComponents) {
         return teeResultArray(components, compiledComponents).join(" ");
-    };
+    }
 
     if (nextcommands.length > 1) {
-        comm = teeResultArray(outputs, nextcommands);
+        var comm = teeResultArray(outputs, nextcommands);
         comm.pop();
         commands.push(comm.join(" "));
         commands.push(nextcommands[nextcommands.length - 1]);
@@ -268,6 +271,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
 
     return commands.join(" | ");
 }
+exports.parseVisualDatafromComponent = parseVisualDatafromComponent;
 
 function createMacro(name, description, command, fromMacro) {
     if (fromMacro) {
@@ -278,7 +282,7 @@ function createMacro(name, description, command, fromMacro) {
     }
     var macroData = new exports.GraphComponent(name, description);
     if (command) {
-        macroData.setGraphData(parseCommand(command));
+        macroData.setGraphData(exports.parseCommand(command));
     }
     return macroData;
 }
@@ -291,16 +295,17 @@ function compileMacro(macro) {
     if (macro.entryComponent === null) {
         throw "no component defined as Macro Entry";
     }
-    indexedComponentList = indexComponents(macro);
+    indexedComponentList = exports.indexComponents(macro);
     initialComponent = indexedComponentList[macro.entryComponent];
-    return parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
+    return exports.parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
 }
 
-parser.generateAST = exports.generateAST = generateAST;
-parser.parseAST = exports.parseAST = parseAST;
-parser.astBuilder = exports.astBuilder = astBuilder;
-parser.parseCommand = exports.parseCommand = parseCommand;
-parser.parseComponent = exports.parseComponent = parseComponent;
-parser.implementedCommands = exports.implementedCommands = implementedCommands;
-parser.parseVisualData = exports.parseVisualData = parseVisualData;
+parser.generateAST = exports.generateAST;
+parser.parseAST = exports.parseAST;
+parser.astBuilder = astBuilder;
+parser.parseCommand = exports.parseCommand;
+parser.parseComponent = exports.parseComponent;
+parser.implementedCommands = implementedCommands;
+parser.parseVisualData = exports.parseVisualData;
+exports.parseGraph = exports.parseVisualData;
 //# sourceMappingURL=parser.js.map

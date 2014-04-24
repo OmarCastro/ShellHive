@@ -12,9 +12,16 @@
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     action: {
@@ -131,23 +138,21 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
-function defaultComponentData() {
-    var componentFlags = {};
-
-    for (var key in flags) {
-        var value = flags[key];
-        componentFlags[value.name] = value.active;
+var BunzipComponent = (function (_super) {
+    __extends(BunzipComponent, _super);
+    function BunzipComponent() {
+        _super.apply(this, arguments);
+        this.exec = "bunzip2";
+        this.files = [];
     }
+    return BunzipComponent;
+})(GraphModule.CommandComponent);
 
-    return {
-        type: 'command',
-        exec: "bunzip2",
-        flags: componentFlags,
-        selectors: {
-            action: selectors.action.options.decompress.name
-        },
-        files: []
-    };
+function defaultComponentData() {
+    var component = new BunzipComponent();
+    component.selectors = bzipData.componentSelectors;
+    component.flags = bzipData.componentFlags;
+    return component;
 }
 ;
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);

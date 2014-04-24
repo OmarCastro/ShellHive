@@ -83,8 +83,10 @@ var CommandComponent = (function (_super) {
     __extends(CommandComponent, _super);
     function CommandComponent() {
         _super.apply(this, arguments);
-        this.type = "command";
+        this.type = CommandComponent.type;
+        this.exec = null;
     }
+    CommandComponent.type = "command";
     return CommandComponent;
 })(Component);
 exports.CommandComponent = CommandComponent;

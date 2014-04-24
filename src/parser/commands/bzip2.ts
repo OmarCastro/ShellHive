@@ -16,6 +16,7 @@
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
 
 
 var selectors = {
@@ -31,6 +32,61 @@ var selectors = {
       decompress:{
         name:'decompress',
         option: 'd',
+        longOption: "decompress",
+        description:'decompress the received data'
+      }
+    }
+  },
+  ratio:{
+    name: 'ratio',
+    description: 'compress ratio of the algorithm',
+    options:{
+      1:{
+        name:'1 - fast',
+        option: '1',
+        longOption: 'fast',
+        description:'compress the received data'
+      },
+      2:{
+        name:'2',
+        option: '2',
+        description:'decompress the received data'
+      },
+      3:{
+        name:'3',
+        option: '3',
+        description:'decompress the received data'
+      },
+      4:{
+        name:'4',
+        option: '4',
+        description:'decompress the received data'
+      },
+      5:{
+        name:'5',
+        option: '5',
+        description:'decompress the received data'
+      },
+      6:{
+        name:'6',
+        option: '6',
+        description:'decompress the received data',
+        default: true
+      },
+      7:{
+        name:'7',
+        option: '7',
+        description:'decompress the received data'
+      },
+      8:{
+        name:'8',
+        option: '8',
+        description:'decompress the received data'
+      },
+      9:{
+        name:'9 - best',
+        option: '9',
+        longOption: 'best',
         description:'decompress the received data'
       }
     }
@@ -44,41 +100,48 @@ var flags = {
   keep: {
     name: "keep files",
     option: 'k',
+    longOption: 'keep',
     description: "keep (don't delete) input files",
     active: false
   },
   force:{
     name: "force",
     option: 'f',
+    longOption: 'force',
     description: "overwrite existing output files",
     active: false
   },
   test:{
     name: "test",
     option: 't',
+    longOption: 'test',
     description: "test compressed file integrity",
     active: false
   },
   stdout: {
     name: "stdout",
     option: 'c',
+    longOption: 'stdout',
     description: "output to standard out",
     active: false
   },
   quiet: {
     name: "quiet",
     option: 'q',
+    longOption: 'quiet',
     description: "suppress noncritical error messages",
     active: false
   },
   verbose:{
     name: "verbose",
     option: 'v',
+    longOption: 'verbose',
     description: "overwrite existing output files",    
     active: false
   },
   small: {
     name: "small",
+    longOption: 'small',
     option: 's',
     description: "use less memory (at most 2500k)",
     active: false
@@ -95,18 +158,10 @@ var config:parserModule.Config = {
 
 var bzipData = new parserModule.ParserData(config);
 
+var optionsParser = $.optionParserFromConfig(config)
 
-
+/*
 var shortOptions = {
-  d: $.select(selectors.action.name, actionOptions.decompress.name),
-  z: $.select(selectors.action.name, actionOptions.compress.name),
-  k: $.switchOn(flags.keep.name),
-  f: $.switchOn(flags.force.name),
-  t: $.switchOn(flags.test.name),
-  c: $.switchOn(flags.stdout.name),
-  q: $.switchOn(flags.quiet.name),
-  v: $.switchOn(flags.verbose.name),
-  s: $.switchOn(flags.small.name),
   1: $.ignore,
   2: $.ignore,
   3: $.ignore,
@@ -130,60 +185,22 @@ var longOptions = {
   'small': $.sameAs('s'),
   'fast': $.sameAs('1'),
   'best': $.sameAs('9')
+}*/
+
+
+class BZipComponent extends GraphModule.CommandComponent {
+  public exec:string = "bzip2"
+  public files: any[] = []
 }
 
 
-
-var optionsParser = {
-  shortOptions: shortOptions,
-  longOptions: longOptions
-};
-
-
-$.generate(optionsParser);
-
 function defaultComponentData(){
-  var componentFlags = {}
-  var componentSelectors = {}
-
-  for (var key in flags) {
-    var value = flags[key]
-    componentFlags[value.name] = value.active
-  }
-
-    for (var key in selectors) {
-    if(!selectors.hasOwnProperty(key)){
-      continue;
-    }
-    var value = selectors[key]
-    for (var optionName in value.options){
-      var option = value.options[optionName]
-      if(option.default){
-        console.log(key);
-        var valueObj = {
-          name:option.name,
-          type:option.type,
-        }
-        if(option.defaultValue){
-          valueObj['value'] = option.defaultValue
-        }
-        componentSelectors[value.name] = valueObj
-        console.info("componentSelectors ",componentSelectors);
-        break;
-      }
-    }
-  }
-
-  return {
-    type: 'command',
-    exec: "bzip2",
-    flags: componentFlags,
-    selectors: {
-      action: selectors.action.options.compress.name
-    },
-    files: []
-  };
+  var component = new BZipComponent();
+  component.selectors = bzipData.componentSelectors
+  component.flags = bzipData.componentFlags
+  return component;
 };
+
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;

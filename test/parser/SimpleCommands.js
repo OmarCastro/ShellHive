@@ -20,9 +20,9 @@ function classname(classObject){
 describe('command test', function(){
 
   describe('Awk test', function(){
-    it('should create a components with class CatComponent', function(){
+    it('should create a components with class AwkComponent', function(){
       var command = 'awk "mimi"';
-      var graph = parser.parseCommand(command)
+      var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("AwkComponent")
       graph.components[0].exec.should.equal("awk")
 
@@ -31,6 +31,21 @@ describe('command test', function(){
       graph.components[0].should.have.properties({
         "script": "mimi"
       })
+
+
+      var resultCommand = parser.parseVisualData(graph)
+      gutil.log(resultCommand)
+
+
+
+      var reGraph = shouldBeAGraph(parser.parseCommand(resultCommand))
+            gutil.log(graph.components[0].files.__instrumented_miss);
+
+      reGraph.components[0].files.should.eql(graph.components[0].files);
+
+
+
+
     })
   })
 
@@ -90,16 +105,56 @@ describe('command test', function(){
     })
   })
 
-  describe('Zcat test', function(){
-    it('should create a components with class ZcatComponent', function(){
-      var command = "zcat";
+  describe('Bzip test', function(){
+    it('should create a components with class BZipComponent', function(){
+      var command = "bzip2";
       var graph = shouldBeAGraph(parser.parseCommand(command))
-      classname(graph.components[0]).should.equal("ZcatComponent")
-      graph.components[0].exec.should.equal("zcat")
+      classname(graph.components[0]).should.equal("BZipComponent")
+      graph.components[0].exec.should.equal("bzip2")
 
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
+    })
+  })
+
+  describe('Bzcat test', function(){
+    it('should create a components with class BzcatComponent', function(){
+      var command = "bzcat";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("BzcatComponent")
+      graph.components[0].exec.should.equal("bzcat")
+
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      graph.components[0].flags.should.have.properties({})
+    })
+  })
+
+  describe('Bunzip test', function(){
+    it('should create a components with class BunzipComponent', function(){
+      var command = "bunzip2";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("BunzipComponent")
+      graph.components[0].exec.should.equal("bunzip2")
+
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      graph.components[0].flags.should.have.properties({})
+    })
+  })
+
+    describe('Diff test', function(){
+    it('should create a components with class HeadComponent', function(){
+      var command = "diff";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("DiffComponent")
+      graph.components[0].exec.should.equal("diff")
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      //graph.components[0].selectors.should.have.properties({
+      //  last: { type: 'numeric parameter', name: 'lines', value:10 }
+      //})
     })
   })
 

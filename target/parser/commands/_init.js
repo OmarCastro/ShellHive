@@ -1,6 +1,6 @@
 var optionsParser = require("../utils/optionsParser");
-
 var GraphModule = require("../../common/graph");
+
 var Boundary = GraphModule.Boundary;
 var Graph = GraphModule.Graph;
 var Connection = GraphModule.Connection;

@@ -8,6 +8,7 @@ var gulp        = require('gulp');
     tinylr      = require('tiny-lr'),
     runSequence = require('run-sequence');
     mocha       = require('gulp-mocha'),
+    cover       = require('gulp-coverage');
     livereload  = require('gulp-livereload'), // Livereload plugin needed: https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
     server      = tinylr();
 
@@ -38,6 +39,18 @@ gulp.task('mocha', function() {
       gutil.log(gutil.colors.yellow(errorText));
     });
 }); 
+gulp.task('coverage', function() {
+
+gulp.src('test/test.js', { read: false })
+  .pipe(cover.instrument({
+    pattern: ['target/**/commands/[_a-g]*.js','target/parser/parser.js'],
+    debugDirectory: 'debug'
+  }))
+  .pipe(mocha({reporter: 'dot', require:["should"]}))
+  .pipe(cover.report({
+    outFile: 'coverage.html'
+  }));
+});  
 
 gulp.task('watchify', function () {
   var bundler = watchify('./target/parser/shellParser.js');

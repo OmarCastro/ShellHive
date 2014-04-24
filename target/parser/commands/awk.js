@@ -71,11 +71,11 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 });
 
 exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions, awkData.parameterOptions, function (component, exec, flags, files, parameters) {
-    var script = component.script.replace('\"', "\\\"");
+    var script = component.script.replace('"', '\\"');
     if (script) {
-        script = (/^[\n\ ]+$/.test(script)) ? '"' + script + '"' : '""';
+        script = (/^[\n\ ]+$/.test(script)) ? '"' + script + '"' : script;
     }
-    exec.concat(parameters, script).join(' ');
+    return exec.concat(parameters, script).join(' ');
 });
 
 exports.VisualSelectorOptions = awkData.visualSelectorOptions;

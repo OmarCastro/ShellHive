@@ -16,6 +16,7 @@
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
 
 
 var selectors = {
@@ -142,23 +143,17 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
+class BunzipComponent extends GraphModule.CommandComponent {
+  public exec:string = "bunzip2"
+  public files: any[] = []
+}
+
+
 function defaultComponentData(){
-  var componentFlags = {}
-
-  for (var key in flags) {
-    var value = flags[key]
-    componentFlags[value.name] = value.active
-  }
-
-  return {
-    type: 'command',
-    exec: "bunzip2",
-    flags: componentFlags,
-    selectors: {
-      action: selectors.action.options.decompress.name
-    },
-    files: []
-  };
+  var component = new BunzipComponent();
+  component.selectors = bzipData.componentSelectors
+  component.flags = bzipData.componentFlags
+  return component;
 };
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);

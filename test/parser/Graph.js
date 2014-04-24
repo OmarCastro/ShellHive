@@ -8,8 +8,8 @@ function isConnection(connection){ return connection instanceof Connection; }
 
 function shouldBeAGraph(graph){
   graph.should.be.an.instanceof(parser.Graph)
-  graph.components.should.matchEach(isComponent);
-  graph.connections.should.matchEach(isConnection);
+  //graph.components.should.matchEach(isComponent);
+  //graph.connections.should.matchEach(isConnection);
 }
 
 describe('Graph test', function(){

@@ -1,8 +1,7 @@
-declare var exports:any;
 
 import optionsParser = require("../utils/optionsParser");
-
 import GraphModule = require("../../common/graph");
+
 import Boundary = GraphModule.Boundary;
 import Graph = GraphModule.Graph;
 import Connection = GraphModule.Connection;
@@ -252,7 +251,7 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
 };
 
 
-export function commonParseComponent(flagOptions, selectorOptions, parameterOptions?, beforeJoin?){
+export function commonParseComponent(flagOptions, selectorOptions, parameterOptions?, beforeJoin?:(component, exec, flags, files, parameters)=>string){
   var options;
   options = {
     flagOptions: flagOptions,
