@@ -34,14 +34,9 @@ describe('command test', function(){
 
 
       var resultCommand = parser.parseVisualData(graph)
-      gutil.log(resultCommand)
-
-
 
       var reGraph = shouldBeAGraph(parser.parseCommand(resultCommand))
-            gutil.log(graph.components[0].files.__instrumented_miss);
-
-      reGraph.components[0].files.should.eql(graph.components[0].files);
+      reGraph.components[0].should.eql(graph.components[0]);
 
 
 

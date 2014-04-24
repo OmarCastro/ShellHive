@@ -32,7 +32,7 @@ gulp.task('ls', function() {
 
 gulp.task('mocha', function() {
   return gulp.src('test/test.js')
-    .pipe(mocha({reporter: 'nyan', require:["should"]}))
+    .pipe(mocha({reporter: 'spec', require:["should"]}))
     .on('error', function (error) {
       var errorText = (error.plugin) ? error : error.stack;
       gutil.beep();
@@ -46,7 +46,7 @@ gulp.src('test/test.js', { read: false })
     pattern: ['target/**/commands/[_a-g]*.js','target/parser/parser.js'],
     debugDirectory: 'debug'
   }))
-  .pipe(mocha({reporter: 'dot', require:["should"]}))
+  .pipe(mocha({reporter: 'spec', require:["should"]}))
   .pipe(cover.report({
     outFile: 'coverage.html'
   }));
