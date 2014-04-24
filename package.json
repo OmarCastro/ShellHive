@@ -11,7 +11,8 @@
   },
   "scripts": {
     "watch": "gulp",
-    "test": "mocha test/test.js"
+    "test": "gulp coverage",
+    "badge": "coverage-badge `coverage-percentage ./coverage/lcov.info --lcov` badge.png"
   },
   "devDependencies": {
     "jison": "~0.4.13",
@@ -31,6 +32,9 @@
     "mocha": "~1.18.2",
     "gulp-coverage": "~0.1.20",
     "should": "~3.3.1",
-    "gulp-mocha": "~0.4.1"
+    "gulp-mocha": "~0.4.1",
+    "gulp-istanbul": "~0.1.1",
+    "coverage-badge": "0.0.5",
+    "coverage-percentage": "0.0.2"
   }
 }
