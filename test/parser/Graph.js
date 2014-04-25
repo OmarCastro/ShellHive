@@ -9,8 +9,12 @@ function isConnection(connection){ return connection instanceof Connection; }
 
 function shouldBeAGraph(graph){
   graph.should.be.an.instanceof(parser.Graph)
-  //graph.components.should.matchEach(isComponent);
-  //graph.connections.should.matchEach(isConnection);
+  graph.components.should.matchEach(isComponent);
+  graph.connections.should.matchEach(isConnection);
+  graph.toJSON().should.eql({
+    components: graph.components,
+    connections: graph.connections
+  })
 }
 
 
@@ -19,12 +23,11 @@ function shouldBeAGraph(graph){
 
 describe('Graph test', function(){
 
-describe('typeOf test', function(){
+  describe('typeOf test', function(){
     it('should work', function(){
       parserinit.typeOf("").should.equal("string");
-   })
-})
-  
+    })
+  })
   describe('basic cat test', function(){
     it('should create 3 components', function(){
     	var command = "cat -s -A file1.txt file2.txt";
@@ -60,6 +63,13 @@ describe('typeOf test', function(){
       graph.components[0].exec.should.equal("grep");
       graph.components[1].exec.should.equal("cat");
       graph.components[7].exec.should.equal("gzip");
+
+      graph.connections[1].toJSON().should.eql({
+        startNode:  graph.components[0].id,
+        startPort:  "output",
+        endNode: graph.components[1].id,
+        endPort: "input"
+      })
 
       //var flags = graph.components[0].flags;
 

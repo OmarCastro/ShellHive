@@ -20,26 +20,25 @@ var Graph = (function () {
     call this function if it exists
     */
     Graph.prototype.toJSON = function () {
-        var jsonObj = {};
-        jsonObj.components = this.components;
-        jsonObj.connections = this.connections;
-        jsonObj.firstMainComponent = this.firstMainComponent;
-        return JSON.stringify(jsonObj);
+        return {
+            components: this.components,
+            connections: this.connections
+        };
     };
 
     /*
     expands with other graph
     */
     Graph.prototype.expands = function (other) {
-        this.components.concat(other.components);
-        this.connections.concat(other.connections);
+        this.concatComponents(other.components);
+        this.concatConnections(other.connections);
     };
 
     Graph.prototype.concatComponents = function (components) {
-        this.components.concat(components);
+        this.components = this.components.concat(components);
     };
     Graph.prototype.concatConnections = function (connections) {
-        this.connections.concat(connections);
+        this.connections = this.connections.concat(connections);
     };
     return Graph;
 })();
@@ -72,6 +71,7 @@ var Component = (function () {
         this.position = { x: 0, y: 0 };
         this.id = 0;
     }
+    Component.type = "abrstract component";
     return Component;
 })();
 exports.Component = Component;
@@ -112,20 +112,28 @@ var GraphComponent = (function (_super) {
     __extends(GraphComponent, _super);
     function GraphComponent(name, description) {
         _super.call(this);
-        this.type = "macro";
+        this.name = name;
+        this.description = description;
         this.entryComponent = null;
         this.exitComponent = null;
         this.counter = 0;
         this.components = [];
         this.connections = [];
-        this.name = name;
-        this.description = description;
     }
+    Object.defineProperty(GraphComponent.prototype, "type", {
+        get: function () {
+            return GraphComponent.type;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
     GraphComponent.prototype.setGraphData = function (graphData) {
         this.components = graphData.components;
         this.connections = graphData.connections;
         this.entryComponent = graphData.firstMainComponent;
     };
+    GraphComponent.type = "macro";
     return GraphComponent;
 })(Component);
 exports.GraphComponent = GraphComponent;
@@ -154,12 +162,12 @@ var Connection = (function () {
     });
 
     Connection.prototype.toJSON = function () {
-        return JSON.stringify({
+        return {
             startNode: this.startNode,
             startPort: this.startPort,
             endNode: this.endComponent.id,
             endPort: this.endPort
-        });
+        };
     };
     return Connection;
 })();
@@ -168,11 +176,6 @@ exports.Connection = Connection;
 //========   ==========
 var Boundary = (function () {
     function Boundary(left, rigth, top, bottom, components) {
-        if (typeof left === "undefined") { left = 0; }
-        if (typeof rigth === "undefined") { rigth = 0; }
-        if (typeof top === "undefined") { top = 0; }
-        if (typeof bottom === "undefined") { bottom = 0; }
-        if (typeof components === "undefined") { components = null; }
         this.left = left;
         this.rigth = rigth;
         this.top = top;
@@ -217,7 +220,6 @@ var Boundary = (function () {
     };
 
     Boundary.translate = function (boundary, x, y) {
-        if (typeof y === "undefined") { y = 0; }
         boundary.left += x;
         boundary.rigth += x;
         boundary.top += y;
@@ -232,9 +234,6 @@ var Boundary = (function () {
     Boundary.prototype.translateXY = function (x, y) {
         if (typeof y === "undefined") { y = 0; }
         Boundary.translate(this, x, y);
-    };
-    Boundary.getBoundaries = function (components) {
-        return Boundary.createFromComponents(components);
     };
 
     /**

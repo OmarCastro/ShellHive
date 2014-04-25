@@ -118,8 +118,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
       case 'inFromProcess':
         subresult = parser.parseAST(argNode[1], tracker);
         boundaries.push(Boundary.createFromComponents(subresult.components));
-        result.components = result.components.concat(subresult.components);
-        result.connections = result.connections.concat(subresult.connections);
+        result.expands(subresult);
         inputPort = "file" + componentData.files.length;
 
         var subComponents = subresult.components

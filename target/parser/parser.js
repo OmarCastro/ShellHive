@@ -16,6 +16,8 @@ exports.FileComponent = FileComponent;
 var CommandComponent = GraphModule.CommandComponent;
 exports.CommandComponent = CommandComponent;
 
+var IndexedGraph = GraphModule.IndexedGraph;
+
 var parserCommand = {
     awk: require('./commands/awk'),
     cat: require('./commands/cat'),
@@ -120,26 +122,12 @@ function parseCommand(command) {
 }
 exports.parseCommand = parseCommand;
 
-/**
-* Creates an index of the components
-*/
-function indexComponents(visualData) {
-    var result = {};
-    for (var i = 0, _ref = visualData.components, length = _ref.length; i < length; ++i) {
-        var value = _ref[i];
-        result[value.id] = value;
-    }
-    return result;
-}
-exports.indexComponents = indexComponents;
-;
-
 function parseVisualData(VisualData) {
     var indexedComponentList, initialComponent;
     if (VisualData.components.length < 1) {
         return '';
     }
-    indexedComponentList = exports.indexComponents(VisualData);
+    indexedComponentList = new IndexedGraph(VisualData);
     initialComponent = VisualData.firstMainComponent;
     if (!initialComponent) {
         return '';
@@ -169,14 +157,14 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         var isFirst = visualData.connections.every(function (connection) {
             if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
                 isFirst = false;
-                currentComponent = componentIndex[connection.startNode];
+                currentComponent = componentIndex.components[connection.startNode];
                 return false;
             }
             return true;
         });
     } while(isFirst == false);
 
-    var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
+    var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex.components, mapOfParsedComponents);
     var parsedCommandIndex = commands.length;
     commands.push(parsedCommand);
 
@@ -188,7 +176,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         return connection.startNode === currentComponent.id && mapOfParsedComponents[connection.endNode] !== true;
     }).forEach(function (connection) {
         var endNodeId = connection.endNode;
-        var endNode = componentIndex[endNodeId];
+        var endNode = componentIndex.components[endNodeId];
         switch (connection.startPort) {
             case 'output':
                 outputs.push(endNode);
@@ -296,7 +284,7 @@ function compileMacro(macro) {
     if (macro.entryComponent === null) {
         throw "no component defined as Macro Entry";
     }
-    indexedComponentList = exports.indexComponents(macro);
+    indexedComponentList = new IndexedGraph(macro);
     initialComponent = indexedComponentList[macro.entryComponent];
     return exports.parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
 }

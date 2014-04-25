@@ -115,26 +115,13 @@ export function parseCommand(command){
 
 
 
-/**
- * Creates an index of the components
- */
-export function indexComponents(visualData:Graph){ 
-  var result:any = {}
-  for(var i = 0, _ref=visualData.components, length=_ref.length;i<length;++i){
-    var value = _ref[i];
-    result[value.id] = value
-  }
-  return result;
-};
-
-
 
 export function parseVisualData(VisualData:Graph){
   var indexedComponentList, initialComponent;
   if (VisualData.components.length < 1) {
     return '';
   }
-  indexedComponentList = indexComponents(VisualData);
+  indexedComponentList = new IndexedGraph(VisualData);
   initialComponent = VisualData.firstMainComponent;
   if (!initialComponent) {
     return '';
@@ -155,16 +142,10 @@ export function parseComponent(component, visualData:Graph, componentIndex, mapO
 }
 
 
-
-
-
-
-
-
 /**
   Parse visual data from Component
 */
-export function parseVisualDatafromComponent(currentComponent, visualData:Graph, componentIndex, mapOfParsedComponents){
+export function parseVisualDatafromComponent(currentComponent, visualData:Graph, componentIndex:IndexedGraph, mapOfParsedComponents){
   var commands:any[] = [];
   do {
     var isFirst = visualData.connections.every((connection)=>{
@@ -173,7 +154,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
       && connection.endPort === 'input' 
       && mapOfParsedComponents[connection.startNode] !== true) {
         isFirst = false;
-        currentComponent = componentIndex[connection.startNode];
+        currentComponent = componentIndex.components[connection.startNode];
         return false;
       }
       return true;
@@ -182,7 +163,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
 
 
 
-  var parsedCommand = parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
+  var parsedCommand = parseComponent(currentComponent, visualData, componentIndex.components, mapOfParsedComponents);
   var parsedCommandIndex = commands.length;
   commands.push(parsedCommand);
 
@@ -195,7 +176,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
         && mapOfParsedComponents[connection.endNode] !== true
   }).forEach((connection)=>{
       var endNodeId = connection.endNode;
-      var endNode = componentIndex[endNodeId]
+      var endNode = componentIndex.components[endNodeId]
       switch(connection.startPort){
         case 'output':  outputs.push(endNode)  ; break;
         case 'error':   stdErrors.push(endNode); break;
@@ -316,7 +297,7 @@ function compileMacro(macro){
   if (macro.entryComponent === null) {
     throw "no component defined as Macro Entry";
   }
-  indexedComponentList = indexComponents(macro);
+  indexedComponentList = new IndexedGraph(macro);
   initialComponent = indexedComponentList[macro.entryComponent];
   return parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
 }

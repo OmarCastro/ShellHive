@@ -10,6 +10,10 @@ function shouldBeAGraph(commandResult){
   commandResult.should.be.an.instanceof(parser.Graph)
   commandResult.components.should.matchEach(isComponent);
   commandResult.connections.should.matchEach(isConnection);
+  commandResult.toJSON().should.eql({
+    components: commandResult.components,
+    connections: commandResult.connections
+  })
   return commandResult
 }
 
