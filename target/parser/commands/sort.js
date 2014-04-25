@@ -176,6 +176,7 @@ function defaultComponentData() {
     };
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions, bzipData.parameterOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;

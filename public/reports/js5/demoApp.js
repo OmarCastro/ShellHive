@@ -40,7 +40,7 @@ app.controller('data-flow', [
   '$scope', function($scope){
     var AST, visualData;
     console.log(shellParser);
-    AST = shellParser.generateAST(" diff <(zcat rev6/data.txt.gz) <(zcat rev18/data.txt.gz) ");
+    AST = shellParser.generateAST('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)');
     visualData = shellParser.parseAST(AST);
     $scope.isImplemented = isImplemented;
     $scope.options = SelectionOptions;

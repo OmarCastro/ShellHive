@@ -1,9 +1,12 @@
 var optionsParser = require("../utils/optionsParser");
 var Iterator = optionsParser.Iterator;
 
+var parser = require("../parser");
+
 var GraphModule = require("../../common/graph");
 var Boundary = GraphModule.Boundary;
 var Graph = GraphModule.Graph;
+
 var Connection = GraphModule.Connection;
 
 var FileComponent = GraphModule.FileComponent;
@@ -216,7 +219,7 @@ function commonParseComponent(flagOptions, selectorOptions, parameterOptions, be
         parameterOptions: parameterOptions
     };
 
-    return function (component, visualData, componentIndex, mapOfParsedComponents, parseComponent) {
+    return function (component, visualData, componentIndex, mapOfParsedComponents) {
         var exec = [component.exec];
         mapOfParsedComponents[component.id] = true;
         var flags = parseFlagsAndSelectors(component, options);
@@ -236,7 +239,7 @@ function commonParseComponent(flagOptions, selectorOptions, parameterOptions, be
 
         var files = !component.files ? [] : component.files.map(function (file) {
             if (file instanceof Array) {
-                var subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
+                var subCommand = parser.parseVisualDatafromComponent(componentIndex.components[file[1]], visualData, componentIndex, mapOfParsedComponents);
                 return "<(" + subCommand + ")";
             } else if (file.indexOf(" ") >= 0) {
                 return '"' + file + '"';

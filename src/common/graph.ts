@@ -73,7 +73,8 @@ export class CommandComponent extends Component{
 	A file component
 */
 export class FileComponent extends Component{
-    public type:string = "file"
+    public static type:string = "file"
+    public type:string = FileComponent.type
     public filename:string
 
     public constructor(filename:string){

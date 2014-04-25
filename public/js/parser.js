@@ -306,26 +306,25 @@ var Graph = (function () {
     call this function if it exists
     */
     Graph.prototype.toJSON = function () {
-        var jsonObj = {};
-        jsonObj.components = this.components;
-        jsonObj.connections = this.connections;
-        jsonObj.firstMainComponent = this.firstMainComponent;
-        return JSON.stringify(jsonObj);
+        return {
+            components: this.components,
+            connections: this.connections
+        };
     };
 
     /*
     expands with other graph
     */
     Graph.prototype.expands = function (other) {
-        this.components.concat(other.components);
-        this.connections.concat(other.connections);
+        this.concatComponents(other.components);
+        this.concatConnections(other.connections);
     };
 
     Graph.prototype.concatComponents = function (components) {
-        this.components.concat(components);
+        this.components = this.components.concat(components);
     };
     Graph.prototype.concatConnections = function (connections) {
-        this.connections.concat(connections);
+        this.connections = this.connections.concat(connections);
     };
     return Graph;
 })();
@@ -358,6 +357,7 @@ var Component = (function () {
         this.position = { x: 0, y: 0 };
         this.id = 0;
     }
+    Component.type = "abrstract component";
     return Component;
 })();
 exports.Component = Component;
@@ -369,8 +369,10 @@ var CommandComponent = (function (_super) {
     __extends(CommandComponent, _super);
     function CommandComponent() {
         _super.apply(this, arguments);
-        this.type = "command";
+        this.type = CommandComponent.type;
+        this.exec = null;
     }
+    CommandComponent.type = "command";
     return CommandComponent;
 })(Component);
 exports.CommandComponent = CommandComponent;
@@ -382,9 +384,10 @@ var FileComponent = (function (_super) {
     __extends(FileComponent, _super);
     function FileComponent(filename) {
         _super.call(this);
-        this.type = "file";
+        this.type = FileComponent.type;
         this.filename = filename;
     }
+    FileComponent.type = "file";
     return FileComponent;
 })(Component);
 exports.FileComponent = FileComponent;
@@ -396,20 +399,28 @@ var GraphComponent = (function (_super) {
     __extends(GraphComponent, _super);
     function GraphComponent(name, description) {
         _super.call(this);
-        this.type = "macro";
+        this.name = name;
+        this.description = description;
         this.entryComponent = null;
         this.exitComponent = null;
         this.counter = 0;
         this.components = [];
         this.connections = [];
-        this.name = name;
-        this.description = description;
     }
+    Object.defineProperty(GraphComponent.prototype, "type", {
+        get: function () {
+            return GraphComponent.type;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
     GraphComponent.prototype.setGraphData = function (graphData) {
         this.components = graphData.components;
         this.connections = graphData.connections;
         this.entryComponent = graphData.firstMainComponent;
     };
+    GraphComponent.type = "macro";
     return GraphComponent;
 })(Component);
 exports.GraphComponent = GraphComponent;
@@ -438,12 +449,12 @@ var Connection = (function () {
     });
 
     Connection.prototype.toJSON = function () {
-        return JSON.stringify({
+        return {
             startNode: this.startNode,
             startPort: this.startPort,
             endNode: this.endComponent.id,
             endPort: this.endPort
-        });
+        };
     };
     return Connection;
 })();
@@ -452,11 +463,6 @@ exports.Connection = Connection;
 //========   ==========
 var Boundary = (function () {
     function Boundary(left, rigth, top, bottom, components) {
-        if (typeof left === "undefined") { left = 0; }
-        if (typeof rigth === "undefined") { rigth = 0; }
-        if (typeof top === "undefined") { top = 0; }
-        if (typeof bottom === "undefined") { bottom = 0; }
-        if (typeof components === "undefined") { components = null; }
         this.left = left;
         this.rigth = rigth;
         this.top = top;
@@ -501,7 +507,6 @@ var Boundary = (function () {
     };
 
     Boundary.translate = function (boundary, x, y) {
-        if (typeof y === "undefined") { y = 0; }
         boundary.left += x;
         boundary.rigth += x;
         boundary.top += y;
@@ -516,9 +521,6 @@ var Boundary = (function () {
     Boundary.prototype.translateXY = function (x, y) {
         if (typeof y === "undefined") { y = 0; }
         Boundary.translate(this, x, y);
-    };
-    Boundary.getBoundaries = function (components) {
-        return Boundary.createFromComponents(components);
     };
 
     /**
@@ -1223,35 +1225,18 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }).call(this,require("/home/omar/thesis/flownix/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
 },{"/home/omar/thesis/flownix/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":2,"fs":1,"path":3}],6:[function(require,module,exports){
-var parseFlagsAndSelectors, join$ = [].join;
-
 var optionsParser = require("../utils/optionsParser");
+var Iterator = optionsParser.Iterator;
+
+var parser = require("../parser");
 
 var GraphModule = require("../../common/graph");
 var Boundary = GraphModule.Boundary;
 var Graph = GraphModule.Graph;
+
 var Connection = GraphModule.Connection;
 
 var FileComponent = GraphModule.FileComponent;
-
-var Iterator = (function () {
-    function Iterator(ArgList) {
-        this.index = 0;
-        this.argList = ArgList;
-        this.length = ArgList.length;
-        this.current = ArgList[0];
-    }
-    Iterator.prototype.hasNext = function () {
-        return this.index !== this.length;
-    };
-    Iterator.prototype.next = function () {
-        return this.current = this.argList[this.index++];
-    };
-    Iterator.prototype.rest = function () {
-        return this.argList.slice(this.index);
-    };
-    return Iterator;
-})();
 
 
 function typeOf(arg) {
@@ -1266,7 +1251,8 @@ function typeOf(arg) {
         }
     } else if (arg instanceof Array) {
         return arg[0];
-    }
+    } else
+        return 'string';
 }
 exports.typeOf = typeOf;
 
@@ -1314,18 +1300,15 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
 
         var boundaries = [];
         if (previousCommand) {
-            if (previousCommand instanceof Array) {
-                boundaries.push(previousCommand[0]);
-            } else {
-                boundaries.push(Boundary.createFromComponent(previousCommand));
-            }
+            boundaries.push(previousCommand[0]);
         }
         var result = new Graph();
         result.components = [componentData];
 
         result.firstMainComponent = componentData;
         var iter = new Iterator(argsNode);
-        while (argNode = iter.next()) {
+        while (iter.hasNext()) {
+            var argNode = iter.next();
             switch (exports.typeOf(argNode)) {
                 case 'shortOptions':
                     optionsParser.parseShortOptions(optionsParserData, componentData, iter);
@@ -1348,8 +1331,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                 case 'inFromProcess':
                     subresult = parser.parseAST(argNode[1], tracker);
                     boundaries.push(Boundary.createFromComponents(subresult.components));
-                    result.components = result.components.concat(subresult.components);
-                    result.connections = result.connections.concat(subresult.connections);
+                    result.expands(subresult);
                     inputPort = "file" + componentData.files.length;
 
                     var subComponents = subresult.components;
@@ -1405,7 +1387,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
 exports.commonParseCommand = commonParseCommand;
 ;
 
-parseFlagsAndSelectors = function (component, options) {
+function parseFlagsAndSelectors(component, options) {
     var key, selectors, value, flag, flags, that, val;
     var flagOptions = options.flagOptions;
     var selectorOptions = options.selectorOptions;
@@ -1418,13 +1400,11 @@ parseFlagsAndSelectors = function (component, options) {
         value = flags[key];
         if (value) {
             flag = flagOptions[key];
-            if (!flag) {
+
+            /* istanbul ignore if */ if (!flag) {
                 throw [key, "doesn't exist in ", flagOptions].join('');
-            } else if (flag[0] !== '-') {
+            } else
                 sFlags.push(flag);
-            } else {
-                lFlags.push(flag);
-            }
         }
     }
 
@@ -1433,7 +1413,7 @@ parseFlagsAndSelectors = function (component, options) {
             value = selectors[key];
             var optionValue = selectorOptions[key][value.name];
             if (optionValue != null) {
-                if (!optionValue) {
+                /* istanbul ignore if */ if (!optionValue) {
                     throw [key, ".", value, "doesn't exist in ", selectorOptions].join('');
                 } else if (optionValue[0] !== '-') {
                     sFlags.push(optionValue);
@@ -1452,10 +1432,11 @@ parseFlagsAndSelectors = function (component, options) {
     } else if (containsSFlags) {
         return "-" + sFlags.join('');
     } else if (containsLFlags) {
-        return sFlags.join(' ');
+        return lFlags.join(' ');
     } else
         return "";
-};
+}
+;
 
 function commonParseComponent(flagOptions, selectorOptions, parameterOptions, beforeJoin) {
     var options;
@@ -1464,47 +1445,42 @@ function commonParseComponent(flagOptions, selectorOptions, parameterOptions, be
         selectorOptions: selectorOptions,
         parameterOptions: parameterOptions
     };
-    return function (component, visualData, componentIndex, mapOfParsedComponents, parseComponent) {
-        var exec, flags, parameters, res$, key, ref$, value, files, i$, len$, file, subCommand;
-        exec = [component.exec];
+
+    return function (component, visualData, componentIndex, mapOfParsedComponents) {
+        var exec = [component.exec];
         mapOfParsedComponents[component.id] = true;
-        flags = parseFlagsAndSelectors(component, options);
-        res$ = [];
-        for (key in ref$ = component.parameters) {
-            value = ref$[key];
+        var flags = parseFlagsAndSelectors(component, options);
+        var parameters = [];
+        var Componentparameters = component.parameters;
+
+        for (var key in Componentparameters) {
+            var value = Componentparameters[key];
             if (value) {
+                var result = "-" + parameterOptions[key] + value;
                 if (value.indexOf(" ") >= 0) {
-                    res$.push("\"-" + parameterOptions[key] + value + "\"");
-                } else {
-                    res$.push("-" + parameterOptions[key] + value);
+                    result = '"' + result + '"';
                 }
+                parameters.push(result);
             }
         }
-        parameters = res$;
-        if (component.files) {
-            res$ = [];
-            for (i$ = 0, len$ = (ref$ = component.files).length; i$ < len$; ++i$) {
-                file = ref$[i$];
-                if (file instanceof Array) {
-                    subCommand = parseComponent(componentIndex[file[1]], visualData, componentIndex, mapOfParsedComponents);
-                    res$.push("<(" + subCommand + ")");
-                } else if (file.indexOf(" ") >= 0) {
-                    res$.push("\"" + file + "\"");
-                } else {
-                    res$.push(file);
-                }
-            }
-            files = res$;
-        } else {
-            files = [];
-        }
+
+        var files = !component.files ? [] : component.files.map(function (file) {
+            if (file instanceof Array) {
+                var subCommand = parser.parseVisualDatafromComponent(componentIndex.components[file[1]], visualData, componentIndex, mapOfParsedComponents);
+                return "<(" + subCommand + ")";
+            } else if (file.indexOf(" ") >= 0) {
+                return '"' + file + '"';
+            } else
+                return file;
+        });
+
         if (parameters.length > 0) {
-            parameters = join$.call(parameters, ' ');
+            parameters = parameters.join(' ');
         }
         if (beforeJoin) {
             return beforeJoin(component, exec, flags, files, parameters);
         } else {
-            return join$.call(exec.concat(flags, parameters, files), ' ');
+            return exec.concat(flags, parameters, files).join(' ');
         }
     };
 }
@@ -1517,15 +1493,22 @@ exports.switchOn = optionsParser.switchOn;
 exports.select = optionsParser.select;
 //# sourceMappingURL=_init.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25}],7:[function(require,module,exports){
+},{"../../common/graph":4,"../parser":24,"../utils/optionsParser":26}],7:[function(require,module,exports){
 /*
 -f arqprog              --file=arqprog
 -F fs                   --field-separator=fs
 -v var=val              --assign=var=val
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var config = {
     parameters: {
@@ -1548,16 +1531,26 @@ var optionsParser = {
         "field-separator": $.sameAs('F')
     }
 };
+
 $.generate(optionsParser);
 
+var AwkComponent = (function (_super) {
+    __extends(AwkComponent, _super);
+    function AwkComponent() {
+        _super.apply(this, arguments);
+        this.exec = "awk";
+        this.script = "";
+        this.files = [];
+    }
+    return AwkComponent;
+})(GraphModule.CommandComponent);
+
 function defaultComponentData() {
-    return {
-        type: 'command',
-        exec: "awk",
-        parameters: awkData.componentParameters,
-        script: ""
-    };
+    var component = new AwkComponent();
+    component.parameters = awkData.componentParameters;
+    return component;
 }
+;
 
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
     string: function (component, str) {
@@ -1566,17 +1559,17 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 });
 
 exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions, awkData.parameterOptions, function (component, exec, flags, files, parameters) {
-    var script = component.script.replace('\"', "\\\"");
+    var script = component.script.replace('"', '\\"');
     if (script) {
-        script = (/^[\n\ ]+$/.test(script)) ? '"' + script + '"' : '""';
+        script = (/[\n\ ]/.test(script)) ? '"' + script + '"' : script;
     }
-    exec.concat(parameters, script).join(' ');
+    return exec.concat(parameters, script).join(' ');
 });
 
 exports.VisualSelectorOptions = awkData.visualSelectorOptions;
 //# sourceMappingURL=awk.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],8:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],8:[function(require,module,exports){
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -1591,9 +1584,16 @@ exports.VisualSelectorOptions = awkData.visualSelectorOptions;
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     action: {
@@ -1710,23 +1710,21 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
-function defaultComponentData() {
-    var componentFlags = {};
-
-    for (var key in flags) {
-        var value = flags[key];
-        componentFlags[value.name] = value.active;
+var BunzipComponent = (function (_super) {
+    __extends(BunzipComponent, _super);
+    function BunzipComponent() {
+        _super.apply(this, arguments);
+        this.exec = "bunzip2";
+        this.files = [];
     }
+    return BunzipComponent;
+})(GraphModule.CommandComponent);
 
-    return {
-        type: 'command',
-        exec: "bunzip2",
-        flags: componentFlags,
-        selectors: {
-            action: selectors.action.options.decompress.name
-        },
-        files: []
-    };
+function defaultComponentData() {
+    var component = new BunzipComponent();
+    component.selectors = bzipData.componentSelectors;
+    component.flags = bzipData.componentFlags;
+    return component;
 }
 ;
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
@@ -1734,7 +1732,7 @@ exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipD
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 //# sourceMappingURL=bunzip2.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],9:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],9:[function(require,module,exports){
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -1749,9 +1747,16 @@ exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     action: {
@@ -1868,31 +1873,30 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
-function defaultComponentData() {
-    var componentFlags = {};
-
-    for (var key in flags) {
-        var value = flags[key];
-        componentFlags[value.name] = value.active;
+var BzcatComponent = (function (_super) {
+    __extends(BzcatComponent, _super);
+    function BzcatComponent() {
+        _super.apply(this, arguments);
+        this.exec = "bzcat";
+        this.files = [];
     }
+    return BzcatComponent;
+})(GraphModule.CommandComponent);
 
-    return {
-        type: 'command',
-        exec: "bzcat",
-        flags: componentFlags,
-        selectors: {
-            action: selectors.action.options.decompress.name
-        },
-        files: []
-    };
+function defaultComponentData() {
+    var component = new BzcatComponent();
+    component.selectors = bzipData.componentSelectors;
+    component.flags = bzipData.componentFlags;
+    return component;
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 //# sourceMappingURL=bzcat.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],10:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],10:[function(require,module,exports){
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -1907,9 +1911,16 @@ exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     action: {
@@ -1924,6 +1935,61 @@ var selectors = {
             decompress: {
                 name: 'decompress',
                 option: 'd',
+                longOption: "decompress",
+                description: 'decompress the received data'
+            }
+        }
+    },
+    ratio: {
+        name: 'ratio',
+        description: 'compress ratio of the algorithm',
+        options: {
+            1: {
+                name: '1 - fast',
+                option: '1',
+                longOption: 'fast',
+                description: 'compress the received data'
+            },
+            2: {
+                name: '2',
+                option: '2',
+                description: 'decompress the received data'
+            },
+            3: {
+                name: '3',
+                option: '3',
+                description: 'decompress the received data'
+            },
+            4: {
+                name: '4',
+                option: '4',
+                description: 'decompress the received data'
+            },
+            5: {
+                name: '5',
+                option: '5',
+                description: 'decompress the received data'
+            },
+            6: {
+                name: '6',
+                option: '6',
+                description: 'decompress the received data',
+                default: true
+            },
+            7: {
+                name: '7',
+                option: '7',
+                description: 'decompress the received data'
+            },
+            8: {
+                name: '8',
+                option: '8',
+                description: 'decompress the received data'
+            },
+            9: {
+                name: '9 - best',
+                option: '9',
+                longOption: 'best',
                 description: 'decompress the received data'
             }
         }
@@ -1936,41 +2002,48 @@ var flags = {
     keep: {
         name: "keep files",
         option: 'k',
+        longOption: 'keep',
         description: "keep (don't delete) input files",
         active: false
     },
     force: {
         name: "force",
         option: 'f',
+        longOption: 'force',
         description: "overwrite existing output files",
         active: false
     },
     test: {
         name: "test",
         option: 't',
+        longOption: 'test',
         description: "test compressed file integrity",
         active: false
     },
     stdout: {
         name: "stdout",
         option: 'c',
+        longOption: 'stdout',
         description: "output to standard out",
         active: false
     },
     quiet: {
         name: "quiet",
         option: 'q',
+        longOption: 'quiet',
         description: "suppress noncritical error messages",
         active: false
     },
     verbose: {
         name: "verbose",
         option: 'v',
+        longOption: 'verbose',
         description: "overwrite existing output files",
         active: false
     },
     small: {
         name: "small",
+        longOption: 'small',
         option: 's',
         description: "use less memory (at most 2500k)",
         active: false
@@ -1984,97 +2057,57 @@ var config = {
 
 var bzipData = new parserModule.ParserData(config);
 
+var optionsParser = $.optionParserFromConfig(config);
+
+/*
 var shortOptions = {
-    d: $.select(selectors.action.name, actionOptions.decompress.name),
-    z: $.select(selectors.action.name, actionOptions.compress.name),
-    k: $.switchOn(flags.keep.name),
-    f: $.switchOn(flags.force.name),
-    t: $.switchOn(flags.test.name),
-    c: $.switchOn(flags.stdout.name),
-    q: $.switchOn(flags.quiet.name),
-    v: $.switchOn(flags.verbose.name),
-    s: $.switchOn(flags.small.name),
-    1: $.ignore,
-    2: $.ignore,
-    3: $.ignore,
-    4: $.ignore,
-    5: $.ignore,
-    6: $.ignore,
-    7: $.ignore,
-    8: $.ignore,
-    9: $.ignore
-};
-
+1: $.ignore,
+2: $.ignore,
+3: $.ignore,
+4: $.ignore,
+5: $.ignore,
+6: $.ignore,
+7: $.ignore,
+8: $.ignore,
+9: $.ignore,
+}
 var longOptions = {
-    'decompress': $.sameAs('d'),
-    'compress': $.sameAs('z'),
-    'keep': $.sameAs('k'),
-    'force': $.sameAs('f'),
-    'test': $.sameAs('t'),
-    'stdout': $.sameAs('c'),
-    'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v'),
-    'small': $.sameAs('s'),
-    'fast': $.sameAs('1'),
-    'best': $.sameAs('9')
-};
-
-var optionsParser = {
-    shortOptions: shortOptions,
-    longOptions: longOptions
-};
-
-$.generate(optionsParser);
+'decompress': $.sameAs('d'),
+'compress': $.sameAs('z'),
+'keep': $.sameAs('k'),
+'force': $.sameAs('f'),
+'test': $.sameAs('t'),
+'stdout': $.sameAs('c'),
+'quiet': $.sameAs('q'),
+'verbose': $.sameAs('v'),
+'small': $.sameAs('s'),
+'fast': $.sameAs('1'),
+'best': $.sameAs('9')
+}*/
+var BZipComponent = (function (_super) {
+    __extends(BZipComponent, _super);
+    function BZipComponent() {
+        _super.apply(this, arguments);
+        this.exec = "bzip2";
+        this.files = [];
+    }
+    return BZipComponent;
+})(GraphModule.CommandComponent);
 
 function defaultComponentData() {
-    var componentFlags = {};
-    var componentSelectors = {};
-
-    for (var key in flags) {
-        var value = flags[key];
-        componentFlags[value.name] = value.active;
-    }
-
-    for (var key in selectors) {
-        if (!selectors.hasOwnProperty(key)) {
-            continue;
-        }
-        var value = selectors[key];
-        for (var optionName in value.options) {
-            var option = value.options[optionName];
-            if (option.default) {
-                console.log(key);
-                var valueObj = {
-                    name: option.name,
-                    type: option.type
-                };
-                if (option.defaultValue) {
-                    valueObj['value'] = option.defaultValue;
-                }
-                componentSelectors[value.name] = valueObj;
-                console.info("componentSelectors ", componentSelectors);
-                break;
-            }
-        }
-    }
-
-    return {
-        type: 'command',
-        exec: "bzip2",
-        flags: componentFlags,
-        selectors: {
-            action: selectors.action.options.compress.name
-        },
-        files: []
-    };
+    var component = new BZipComponent();
+    component.selectors = bzipData.componentSelectors;
+    component.flags = bzipData.componentFlags;
+    return component;
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 //# sourceMappingURL=bzip2.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],11:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],11:[function(require,module,exports){
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2170,6 +2203,7 @@ var CatComponent = (function (_super) {
     }
     return CatComponent;
 })(GraphModule.CommandComponent);
+exports.CatComponent = CatComponent;
 
 function defaultComponentData() {
     var graph = new CatComponent();
@@ -2184,72 +2218,194 @@ exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipD
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 //# sourceMappingURL=cat.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],12:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],12:[function(require,module,exports){
 /*
- -d   If given, decompression is done instead.
- -c   Write output on stdout, don't remove original.
- -b   Parameter limits the max number of bits/code.
- -f   Forces output file to be generated, even if one already.
-      exists, and even if no space is saved by compressing.
-      If -f is not used, the user will be prompted if stdin is.
-      a tty, otherwise, the output file will not be overwritten.
- -v   Write compression statistics.
- -V   Output vesion and compile options.
- -r   Recursive. If a filename is a directory, descend
-
+-d   If given, decompression is done instead.
+-c   Write output on stdout, don't remove original.
+-b   Parameter limits the max number of bits/code.
+-f   Forces output file to be generated, even if one already.
+exists, and even if no space is saved by compressing.
+If -f is not used, the user will be prompted if stdin is.
+a tty, otherwise, the output file will not be overwritten.
+-v   Write compression statistics.
+-V   Output vesion and compile options.
+-r   Recursive. If a filename is a directory, descend
 */
-var $, parserModule, common, flags, flagOptions, selectorOptions, optionsParser, defaultComponentData;
-$ = require("../utils/optionsParser");
-parserModule = require("../utils/parserData");
-common = require("./_init");
-flags = {
-  force: 'force',
-  decompress: 'decompress',
-  stdout: 'stdout',
-  statistics: 'statistics',
-  'recursive': 'recursive'
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
-flagOptions = {
-  'force': 'f',
-  'decompress': 'd',
-  'stdout': 'c',
-  'statistics': 'v',
-  'recursive': 'r'
-};
-selectorOptions = {};
-exports.VisualSelectorOptions = {};
-$.setblocksize = function(size){
-  return function(Component){
-    return Component.blockSize = size;
-  };
-};
-optionsParser = {
-  shortOptions: {
-    d: $.switchOn(flags.decompress),
-    f: $.switchOn(flags.force),
-    c: $.switchOn(flags.stdout),
-    v: $.switchOn(flags.statistics),
-    r: $.switchOn(flags.recursive)
-  }
-};
-$.generate(optionsParser);
-defaultComponentData = function(){
-  return {
-    type: 'command',
-    exec: "compress",
-    flags: {
-      "decompress": false,
-      "force": false,
-      "stdout": false,
-      "statistics": false,
-      "recursive": false
+var $ = require("../utils/optionsParser");
+var GraphModule = require("../../common/graph");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
+
+var flags = {
+    // keep: {
+    //   name: "keep files",
+    //   option: 'k',
+    //   description: "keep (don't delete) input files",
+    //   active: false
+    // },
+    force: {
+        name: "force",
+        option: 'f',
+        description: "overwrite existing output files",
+        active: false
     },
-    files: []
-  };
+    decompress: {
+        name: "decompress",
+        option: 'd',
+        description: "decompress instead of compress",
+        active: false
+    },
+    stdout: {
+        name: "stdout",
+        option: 'c',
+        description: "output to standard out",
+        active: false
+    },
+    // quiet: {
+    //   name: "quiet",
+    //   option: 'q',
+    //   longOption: 'quiet',
+    //   description: "suppress noncritical error messages",
+    //   active: false
+    // },
+    statistics: {
+        name: "statistics",
+        option: 'v',
+        description: "overwrite existing output files",
+        active: false
+    },
+    recursive: {
+        name: "recursive",
+        option: 'r',
+        description: "Recursive. If a filename is a directory, descend",
+        active: false
+    }
 };
+
+var config = {
+    flags: flags
+};
+
+var gzipData = new parserModule.ParserData(config);
+var optionsParser = $.optionParserFromConfig(config);
+
+var CompressComponent = (function (_super) {
+    __extends(CompressComponent, _super);
+    function CompressComponent() {
+        _super.apply(this, arguments);
+        this.exec = "compress";
+        this.files = [];
+    }
+    return CompressComponent;
+})(GraphModule.CommandComponent);
+
+function defaultComponentData() {
+    var component = new CompressComponent();
+    component.selectors = gzipData.componentSelectors;
+    component.flags = gzipData.componentFlags;
+    return component;
+}
+;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = common.commonParseComponent(flagOptions, selectorOptions);
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],13:[function(require,module,exports){
+exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
+exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
+//# sourceMappingURL=compress.js.map
+
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],13:[function(require,module,exports){
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var $ = require("../utils/optionsParser");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
+var GraphModule = require("../../common/graph");
+
+var config = {
+    parameters: {
+        date: {
+            name: 'date',
+            option: 'd',
+            type: "string",
+            description: "filter entries by anything other than the content",
+            defaultValue: ""
+        }
+    },
+    flags: {
+        utc: {
+            name: "UTC",
+            option: 'u',
+            longOption: ['utc', 'universal'],
+            description: "overwrite existing output files",
+            active: false
+        }
+    }
+};
+var dateData = new parserModule.ParserData(config);
+
+var optionsParser = $.optionParserFromConfig(config);
+optionsParser.shortOptions['d'] = $.setParameter(config.parameters.date.name);
+optionsParser.longOptions['date'] = optionsParser.shortOptions['d'];
+
+var DateComponent = (function (_super) {
+    __extends(DateComponent, _super);
+    function DateComponent() {
+        _super.apply(this, arguments);
+        this.exec = "date";
+    }
+    return DateComponent;
+})(GraphModule.CommandComponent);
+
+function defaultComponentData() {
+    var component = new DateComponent();
+    component.flags = dateData.componentFlags;
+    component.parameters = dateData.componentParameters;
+    return component;
+}
+;
+
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
+    string: function (component, str) {
+        component.parameters.date = str;
+    }
+});
+exports.parseComponent = common.commonParseComponent(dateData.flagOptions, dateData.selectorOptions, dateData.parameterOptions);
+exports.VisualSelectorOptions = dateData.visualSelectorOptions;
+/*DESCRIPTION
+Display the current time in the given FORMAT, or set the system date.
+-d, --date=STRING
+display time described by STRING, not 'now'
+-f, --file=DATEFILE
+like --date once for each line of DATEFILE
+-I[TIMESPEC], --iso-8601[=TIMESPEC]
+output date/time in ISO 8601 format.  TIMESPEC='date' for date only (the default), 'hours', 'minutes', 'seconds', or 'ns' for date and time to the indicated precision.
+-r, --reference=FILE
+display the last modification time of FILE
+-R, --rfc-2822
+output date and time in RFC 2822 format.  Example: Mon, 07 Aug 2006 12:34:56 -0600
+--rfc-3339=TIMESPEC
+output date and time in RFC 3339 format.  TIMESPEC='date', 'seconds', or 'ns' for date and time to the indicated precision.  Date and time components are separated by a sin‐
+gle space: 2006-08-07 12:34:56-06:00
+-s, --set=STRING
+set time described by STRING
+-u, --utc, --universal
+print or set Coordinated Universal Time
+--help display this help and exit
+--version
+output version information and exit
+*/
+//# sourceMappingURL=date.js.map
+
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],14:[function(require,module,exports){
 /*
 NAME
 diff - compare files line by line
@@ -2383,9 +2539,16 @@ FILES  are  `FILE1  FILE2'  or  `DIR1  DIR2'  or `DIR FILE...' or `FILE... DIR'.
 is  `-', read standard input.  Exit status is 0 if inputs are the same, 1 if differ‐
 ent, 2 if trouble.
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var selectors = {
     format: {
@@ -2395,17 +2558,20 @@ var selectors = {
             normal: {
                 name: 'normal',
                 option: null,
+                longOption: 'normal',
                 description: 'do not print line numbers',
                 default: true
             },
             RCS: {
                 name: 'RCS',
                 option: 'n',
+                longOption: 'rcs',
                 description: 'print line numbers on all lines'
             },
             edScript: {
                 name: 'ed script',
                 option: 'e',
+                longOption: 'ed',
                 description: 'print line numbers on non empty lines'
             }
         }
@@ -2416,18 +2582,21 @@ var flags = {
     ignoreCase: {
         name: "ignore case",
         option: 'i',
+        longOption: 'ignore-case',
         description: "print TAB characters like ^I",
         active: false
     },
     ignoreBlankLines: {
         name: "ignore blank lines",
         option: 'B',
+        longOption: 'ignore-blank-lines',
         description: "use ^ and M- notation, except for LFD and TAB",
         active: false
     },
     ignoreSpaceChange: {
         name: "ignore space change",
         option: 'b',
+        longOption: 'ignore-blank-sapce',
         description: "suppress repeated empty output lines",
         active: false
     }
@@ -2440,46 +2609,39 @@ var config = {
 
 var bzipData = new parserModule.ParserData(config);
 
-var optionsParser = {
-    shortOptions: {
-        b: $.switchOn(flags.ignoreSpaceChange),
-        B: $.switchOn(flags.ignoreBlankLines),
-        i: $.switchOn(flags.ignoreCase),
-        q: $.ignore,
-        e: $.select(selectors.format, selectors.format.options.edScript),
-        n: $.select(selectors.format, selectors.format.options.RCS)
-    },
-    longOptions: {
-        "normal": $.select(selectors.format, selectors.format.options.normal),
-        "ed": $.select(selectors.format, selectors.format.options.edScript),
-        "rcs": $.select(selectors.format, selectors.format.options.RCS),
-        "ignore-blank-lines": $.sameAs('B'),
-        "ignore-space-change": $.sameAs('b'),
-        "ignore-case": $.sameAs('i'),
-        "brief": $.sameAs('q')
-    }
-};
+var optionsParser = $.optionParserFromConfig(config);
 
-$.generate(optionsParser);
+var shortOptions = optionsParser.shortOptions;
+shortOptions['q'] = $.ignore;
+
+var longOptions = optionsParser.shortOptions;
+longOptions['brief'] = shortOptions['q'];
+
+var DiffComponent = (function (_super) {
+    __extends(DiffComponent, _super);
+    function DiffComponent() {
+        _super.apply(this, arguments);
+        this.exec = "diff";
+        this.files = [];
+    }
+    return DiffComponent;
+})(GraphModule.CommandComponent);
+exports.DiffComponent = DiffComponent;
 
 function defaultComponentData() {
-    console.log("imiokijiuh");
-
-    return {
-        type: 'command',
-        exec: "diff",
-        flags: bzipData.componentFlags,
-        selectors: bzipData.componentSelectors,
-        files: []
-    };
+    var graph = new DiffComponent();
+    graph.selectors = bzipData.componentSelectors;
+    graph.flags = bzipData.componentFlags;
+    return graph;
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
 //# sourceMappingURL=diff.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],14:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],15:[function(require,module,exports){
 /*
 grep:
 Matcher Selection:
@@ -2631,8 +2793,8 @@ function defaultComponentData() {
 
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
     string: function (component, str) {
-        if (component.pattern == null) {
-            component.pattern = str;
+        if (component.pattern === null) {
+            component.pattern = str || "";
         } else {
             return "continue";
         }
@@ -2640,10 +2802,11 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 });
 
 exports.parseComponent = common.commonParseComponent(grepCommandData.flagOptions, grepCommandData.selectorOptions, null, function (component, exec, flags, files) {
-    var pattern = component.pattern;
-    if (pattern) {
-        pattern = (pattern.indexOf(" ") >= 0) ? '"' + pattern + '"' : pattern;
-    }
+    var pattern = component.pattern || "";
+    pattern = (pattern.indexOf(" ") >= 0) ? '"' + pattern + '"' : pattern;
+
+    //console.error(pattern + " - " + files.length );
+    //console.error(!!pattern + " - " + !!files.length );
     if (pattern && files.length) {
         return exec.concat(flags, pattern, files).join(' ');
     } else if (pattern) {
@@ -2657,7 +2820,7 @@ exports.parseComponent = common.commonParseComponent(grepCommandData.flagOptions
 exports.VisualSelectorOptions = grepCommandData.visualSelectorOptions;
 //# sourceMappingURL=grep.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],15:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],16:[function(require,module,exports){
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -2672,37 +2835,49 @@ exports.VisualSelectorOptions = grepCommandData.visualSelectorOptions;
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var flags = {
     keep: {
         name: "keep files",
         option: 'k',
+        longOption: 'keep',
         description: "keep (don't delete) input files",
         active: false
     },
     force: {
         name: "force",
         option: 'f',
+        longOption: 'force',
         description: "overwrite existing output files",
         active: false
     },
     quiet: {
         name: "quiet",
         option: 'q',
+        longOption: 'quiet',
         description: "suppress noncritical error messages",
         active: false
     },
     verbose: {
         name: "verbose",
         option: 'v',
+        longOption: 'verbose',
         description: "overwrite existing output files",
         active: false
     },
     recursive: {
         name: "recursive",
+        longOption: 'recursive',
         option: 'v',
         description: "overwrite existing output files",
         active: false
@@ -2713,47 +2888,34 @@ var config = {
     flags: flags
 };
 
-var bzipData = new parserModule.ParserData(config);
-
-var shortOptions = {
-    k: $.switchOn(flags.keep),
-    f: $.switchOn(flags.force),
-    q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    r: $.switchOn(flags.recursive)
-};
-
-var longOptions = {
-    'keep': $.sameAs('k'),
-    'force': $.sameAs('f'),
-    'test': $.sameAs('t'),
-    'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v')
-};
-
-var optionsParser = {
-    shortOptions: shortOptions,
-    longOptions: longOptions
-};
+var optionsParser = $.optionParserFromConfig(config);
+var gunzipData = new parserModule.ParserData(config);
 
 $.generate(optionsParser);
 
+var GunzipComponent = (function (_super) {
+    __extends(GunzipComponent, _super);
+    function GunzipComponent() {
+        _super.apply(this, arguments);
+        this.exec = "gunzip";
+        this.files = [];
+    }
+    return GunzipComponent;
+})(GraphModule.CommandComponent);
+
 function defaultComponentData() {
-    return {
-        type: 'command',
-        exec: "gunzip",
-        flags: bzipData.componentFlags,
-        selectors: bzipData.componentSelectors,
-        files: []
-    };
+    var component = new GunzipComponent();
+    component.selectors = gunzipData.componentSelectors;
+    component.flags = gunzipData.componentFlags;
+    return component;
 }
 ;
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
-exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.parseComponent = common.commonParseComponent(gunzipData.flagOptions, gunzipData.selectorOptions);
+exports.VisualSelectorOptions = gunzipData.visualSelectorOptions;
 //# sourceMappingURL=gunzip.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],16:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],17:[function(require,module,exports){
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -2926,7 +3088,7 @@ exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipD
 exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
 //# sourceMappingURL=gzip.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],17:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],18:[function(require,module,exports){
 /*
 -c, --bytes=[-]K         print the first K bytes of each file;
 with the leading '-', print all but the last
@@ -3004,8 +3166,8 @@ var config = {
 var headData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
-optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
+optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
+optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
 
 var lsCommandData = new parserModule.ParserData(config);
 
@@ -3032,7 +3194,7 @@ exports.parseComponent = common.commonParseComponent(headData.flagOptions, headD
 exports.VisualSelectorOptions = headData.visualSelectorOptions;
 //# sourceMappingURL=head.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],18:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],19:[function(require,module,exports){
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -3313,78 +3475,68 @@ var parameters = {
     }
 };
 
-var optionsParser = {
-    shortOptions: {
-        a: $.select(selectors.show, selectors.show.options.all),
-        A: $.select(selectors.show, selectors.show.options.almostAll),
-        b: $.select(selectors.quotingStyle, selectors.quotingStyle.options.escape),
-        B: $.switchOn(flags.ignoreBackups),
-        c: $.ignore,
-        C: $.ignore,
-        d: $.ignore,
-        D: $.ignore,
-        f: $.ignore,
-        F: $.select(selectors.indicatorStyle, selectors.indicatorStyle.options.classify),
-        g: $.switchOn(flags.noPrintOwner),
-        G: $.switchOn(flags.noPrintGroup),
-        h: $.switchOn(flags.humanReadable),
-        H: $.ignore,
-        i: $.ignore,
-        I: $.setParameter(parameters.ignore.name),
-        k: $.ignore,
-        l: $.select(selectors.format, selectors.format.options.long),
-        L: $.ignore,
-        m: $.select(selectors.format, selectors.format.options.commas),
-        n: $.switchOn(flags.numericID),
-        N: $.ignore,
-        o: $.ignore,
-        p: $.select(selectors.indicatorStyle, selectors.indicatorStyle.options.slash),
-        q: $.ignore,
-        Q: $.ignore,
-        r: $.switchOn(flags.reverse),
-        R: $.ignore,
-        s: $.ignore,
-        S: $.select(selectors.sort, selectors.sort.options.size),
-        t: $.select(selectors.sort, selectors.sort.options.time),
-        T: $.ignore,
-        u: $.ignore,
-        U: $.select(selectors.sort, selectors.sort.options.noSort),
-        v: $.select(selectors.sort, selectors.sort.options.extension),
-        w: $.ignore,
-        x: $.ignore,
-        X: $.select(selectors.sort, selectors.sort.options.size),
-        Z: $.switchOn(flags.context),
-        1: $.ignore
-    },
-    longOptions: {
-        "all": $.sameAs('a'),
-        "almost-all": $.sameAs('A'),
-        "escape": $.sameAs('b'),
-        "directory": $.sameAs('d'),
-        "classify": $.sameAs('F'),
-        "no-group": $.sameAs('G'),
-        "human-readable": $.sameAs('h'),
-        "inode": $.sameAs('i'),
-        "kibibytes": $.sameAs('k'),
-        "dereference": $.sameAs('l'),
-        "numeric-uid-gid": $.sameAs('n'),
-        "literal": $.sameAs('N'),
-        "indicator-style=slash": $.sameAs('p'),
-        "hide-control-chars": $.sameAs('q'),
-        "quote-name": $.sameAs('Q'),
-        "reverse": $.sameAs('r'),
-        "recursive": $.sameAs('R'),
-        "size": $.sameAs('S'),
-        "context": $.sameAs('Z')
-    }
-};
-$.generate(optionsParser);
-
 var config = {
     selectors: selectors,
     flags: flags,
     parameters: parameters
 };
+
+var optionsParser = $.optionParserFromConfig(config);
+var shortOptions = optionsParser.shortOptions;
+
+function extend(option, additional) {
+    for (var i in additional) {
+        option[i] = additional[i];
+    }
+}
+
+extend(optionsParser.shortOptions, {
+    c: $.ignore,
+    C: $.ignore,
+    d: $.ignore,
+    D: $.ignore,
+    f: $.ignore,
+    H: $.ignore,
+    i: $.ignore,
+    I: $.setParameter(parameters.ignore.name),
+    k: $.ignore,
+    L: $.ignore,
+    N: $.ignore,
+    o: $.ignore,
+    q: $.ignore,
+    Q: $.ignore,
+    R: $.ignore,
+    s: $.ignore,
+    T: $.ignore,
+    u: $.ignore,
+    w: $.ignore,
+    x: $.ignore,
+    1: $.ignore
+});
+
+extend(optionsParser.longOptions, {
+    "all": $.sameAs('a'),
+    "almost-all": $.sameAs('A'),
+    "escape": $.sameAs('b'),
+    "directory": $.sameAs('d'),
+    "classify": $.sameAs('F'),
+    "no-group": $.sameAs('G'),
+    "human-readable": $.sameAs('h'),
+    "inode": $.sameAs('i'),
+    "kibibytes": $.sameAs('k'),
+    "dereference": $.sameAs('l'),
+    "numeric-uid-gid": $.sameAs('n'),
+    "literal": $.sameAs('N'),
+    "indicator-style=slash": $.sameAs('p'),
+    "hide-control-chars": $.sameAs('q'),
+    "quote-name": $.sameAs('Q'),
+    "reverse": $.sameAs('r'),
+    "recursive": $.sameAs('R'),
+    "size": $.sameAs('S'),
+    "context": $.sameAs('Z')
+});
+
+$.generate(optionsParser);
 
 var lsCommandData = new parserModule.ParserData(config);
 
@@ -3412,7 +3564,7 @@ exports.parseComponent = common.commonParseComponent(lsCommandData.flagOptions, 
 exports.VisualSelectorOptions = lsCommandData.visualSelectorOptions;
 //# sourceMappingURL=ls.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],19:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],20:[function(require,module,exports){
 /*
 -c, --bytes=[-]K         print the first K bytes of each file;
 with the leading '-', print all but the last
@@ -3490,8 +3642,8 @@ var config = {
 var tailData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
-optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
+optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
+optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
 
 var TailComponent = (function (_super) {
     __extends(TailComponent, _super);
@@ -3516,7 +3668,7 @@ exports.parseComponent = common.commonParseComponent(tailData.flagOptions, tailD
 exports.VisualSelectorOptions = tailData.visualSelectorOptions;
 //# sourceMappingURL=tail.js.map
 
-},{"../../common/graph":4,"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],20:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],21:[function(require,module,exports){
 var $ = require("./_init");
 var GraphModule = require("../../common/graph");
 var Graph = GraphModule.Graph;
@@ -3547,7 +3699,7 @@ function connector(parser, previousCommand, result, boundaries, tracker) {
         boundaries.push(Boundary.createFromComponents(subresult.components));
         result.components = result.components.concat(subresult.components);
         result.connections = result.connections.concat(subresult.connections);
-        result.connections.push(new Connection(previousCommand, 'output', subresult.firstMainComponent, 'input'));
+        result.connections.push(new Connection(previousCommand, "output", subresult.firstMainComponent, 'input'));
     };
 }
 
@@ -3560,21 +3712,17 @@ function parseCommand(argsNode, parser, tracker, previousCommand, nextcommands, 
     result.components = components;
     result.connections = connections;
 
-    if (previousCommand instanceof Array) {
-        previousCommand = previousCommand[1];
-    }
-    var connectTo = connector(parser, previousCommand, result, boundaries, tracker);
+    var connectTo = connector(parser, previousCommand[1], result, boundaries, tracker);
     for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
         argNode = argsNode[i$];
-        switch ($.typeOf(argNode)) {
-            case 'outToProcess':
-                connectTo(argNode[1]);
+        if ($.typeOf(argNode) == 'outToProcess') {
+            connectTo(argNode[1]);
         }
     }
     if (nextcommands.length) {
         connectTo(nextcommands);
     }
-    arrangeLayout(previousCommand, boundaries);
+    arrangeLayout(previousCommand[1], boundaries);
     result.counter = tracker.id;
     return result;
 }
@@ -3582,109 +3730,97 @@ exports.parseCommand = parseCommand;
 ;
 //# sourceMappingURL=tee.js.map
 
-},{"../../common/graph":4,"./_init":6}],21:[function(require,module,exports){
-/*  -c, -C, --complement usa o complemento de SET1
-  -d, --delete apaga caracteres em SET1, não traduz
-  -s, --squeeze-repeats substitui cada sequência de entrada de um caractere repetido
-                            que esteja listado em SET1 com uma única ocorrência
-                            deste caractere
-  -t, --truncate-set1 primeiro truncar SET1 para tamanho do SET2
-      --help     exibir esta ajuda e sair
-      --version  mostrar a informação de versão e sair
+},{"../../common/graph":4,"./_init":6}],22:[function(require,module,exports){
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var $ = require("../utils/optionsParser");
+var GraphModule = require("../../common/graph");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
 
-SETs são especificados como cadeias de caracteres. A maioria
-auro-representa-se. Sequências interpretadas são:
-
-  \NNN            carácter com valor octal NNN (1 a 3 dígitos octais)
-  \\              backslash (barra invertida)
-  \a              BEL audível
-  \b              backspace (espaço atrás)
-  \f              form feed
-  \n              nova linha
-  \r              return (enter)
-  \t              tab horizontal
-  \v              tab vertical
-  CAR1-CAR2       todos os caracteres de CAR1 a CAR2 por ordem crescente
-  [CAR*]          em SET2, cópias de CAR até tamanho de SET1
-  [CAR*REP]       REP cópias de CAR, REP octal se começar por 0
-  [:alnum:]       todas as letras e dígitos
-  [:alpha:]       todas as letras                                                                                                                                                               
-  [:blank:]       todos os espaços brancos horizontais                                                                                                                                          
-  [:cntrl:]       todos os caracteres de controlo                                                                                                                                               
-  [:digit:]       todos os dígitos                                                                                                                                                              
-  [:graph:]       todos os caracteres mostráveis, excluindo space (espaço)                                                                                                                      
-  [:lower:]       todas as letras minúsculas                                                                                                                                                    
-  [:print:]       todos os caracteres mostráveis, incluindo space (espaço)                                                                                                                      
-  [:punct:]       todos os caracteres de pontuação                                                                                                                                              
-  [:space:]       todos os espaços brancos horizontais e verticais                                                                                                                              
-  [:upper:]       todas as letras maiúsculas                                                                                                                                                    
-  [:xdigit:]      todos os dígitos hexadecimais                                                                                                                                                 
-  [=CAR=]         todos os caracteres equivalentes a CAR  
-*/
-var $, parserModule, common, flags, selectorOptions, flagOptions, optionsParser, defaultComponentData, join$ = [].join;
-$ = require("../utils/optionsParser");
-parserModule = require("../utils/parserData");
-common = require("./_init");
-flags = {
-  'complement': 'complement',
-  'delete': 'delete',
-  squeeze: "squeeze repeats",
-  truncate: "truncate set1"
-};
-selectorOptions = {};
-exports.VisualSelectorOptions = {};
-flagOptions = {
-  'complement': 'c',
-  'delete': 'd',
-  "squeeze repeats": 's',
-  "truncate set1": 't'
-};
-optionsParser = {
-  shortOptions: {
-    c: $.switchOn(flags.complement),
-    C: $.switchOn(flags.complement),
-    d: $.switchOn(flags['delete']),
-    s: $.switchOn(flags.squeeze),
-    t: $.switchOn(flags.truncate)
-  },
-  longOptions: {
-    'complement': $.sameAs('c'),
-    'delete': $.sameAs('d'),
-    'squeeze-repeats': $.sameAs('s'),
-    'truncate-set1': $.sameAs('t')
-  }
-};
-$.generate(optionsParser);
-defaultComponentData = function(){
-  return {
-    type: 'command',
-    exec: 'tr',
-    flags: {
-      "complement": false,
-      "delete": false,
-      "squeeze repeats": false,
-      "truncate set1": false
+var flags = {
+    complement: {
+        name: "complement",
+        option: 'c',
+        longOption: 'show-tabs',
+        description: "use SET1 complemet",
+        active: false
     },
-    set1: "",
-    set2: ""
-  };
-};
-exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
-  string: function(component, str){
-    var set1, set2;
-    if (set1 === "") {
-      set1 = str;
-    } else {
-      set2 = str;
+    delete: {
+        name: "delete",
+        option: 'd',
+        longOption: 'delete',
+        description: "delete characters in SET1, do not translate",
+        active: false
+    },
+    squeeze: {
+        name: "squeeze repeats",
+        option: 's',
+        longOption: 'squeeze-repeats',
+        description: "replace each input sequence of a repeated character that is  listed  in  SET1 with a single occurrence of that character",
+        active: false
+    },
+    truncate: {
+        name: "truncate set1",
+        option: 't',
+        longOption: 'truncate-set1',
+        description: "suppress repeated empty output lines",
+        active: false
     }
-  }
+};
+
+var config = {
+    flags: flags
+};
+
+var bzipData = new parserModule.ParserData(config);
+
+var optionsParser = $.optionParserFromConfig(config);
+
+var shortOptions = optionsParser.shortOptions;
+shortOptions['C'] = $.switchOn(flags.complement);
+
+var TrComponent = (function (_super) {
+    __extends(TrComponent, _super);
+    function TrComponent() {
+        _super.apply(this, arguments);
+        this.exec = "tr";
+        this.set1 = "";
+        this.set2 = "";
+    }
+    return TrComponent;
+})(GraphModule.CommandComponent);
+exports.TrComponent = TrComponent;
+
+function defaultComponentData() {
+    var component = new TrComponent();
+    component.selectors = bzipData.componentSelectors;
+    component.flags = bzipData.componentFlags;
+    return component;
+}
+;
+
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
+    string: function (component, str) {
+        if (component.set1 == "") {
+            component.set1 = str;
+        } else {
+            component.set2 = str;
+        }
+        ;
+    }
 });
-exports.parseComponent = common.commonParseComponent(flagOptions, selectorOptions, null, function(component, exec, flags, files){
-  var set1, set2;
-  set1 = component.set1, set2 = component.set2;
-  return join$.call(exec.concat(flags, set1, set2), ' ');
+exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions, bzipData.parameterOptions, function (component, exec, flags, files) {
+    return exec.concat(flags, component.set1, component.set2).join(' ');
 });
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],22:[function(require,module,exports){
+exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+//# sourceMappingURL=tr.js.map
+
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],23:[function(require,module,exports){
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -3699,37 +3835,49 @@ exports.parseComponent = common.commonParseComponent(flagOptions, selectorOption
 --fast              alias for -1
 --best              alias for -9
 */
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var $ = require("../utils/optionsParser");
 var parserModule = require("../utils/parserData");
 var common = require("./_init");
+var GraphModule = require("../../common/graph");
 
 var flags = {
     keep: {
         name: "keep files",
         option: 'k',
+        longOption: 'keep',
         description: "keep (don't delete) input files",
         active: false
     },
     force: {
         name: "force",
         option: 'f',
+        longOption: 'force',
         description: "overwrite existing output files",
         active: false
     },
     quiet: {
         name: "quiet",
         option: 'q',
+        longOption: 'quiet',
         description: "suppress noncritical error messages",
         active: false
     },
     verbose: {
         name: "verbose",
         option: 'v',
+        longOption: 'verbose',
         description: "overwrite existing output files",
         active: false
     },
     recursive: {
         name: "recursive",
+        longOption: 'recursive',
         option: 'v',
         description: "overwrite existing output files",
         active: false
@@ -3740,47 +3888,33 @@ var config = {
     flags: flags
 };
 
-var bzipData = new parserModule.ParserData(config);
+var optionsParser = $.optionParserFromConfig(config);
+var zcatData = new parserModule.ParserData(config);
 
-var shortOptions = {
-    k: $.switchOn(flags.keep),
-    f: $.switchOn(flags.force),
-    q: $.switchOn(flags.quiet),
-    v: $.switchOn(flags.verbose),
-    r: $.switchOn(flags.recursive)
-};
-
-var longOptions = {
-    'keep': $.sameAs('k'),
-    'force': $.sameAs('f'),
-    'test': $.sameAs('t'),
-    'quiet': $.sameAs('q'),
-    'verbose': $.sameAs('v')
-};
-
-var optionsParser = {
-    shortOptions: shortOptions,
-    longOptions: longOptions
-};
-
-$.generate(optionsParser);
+var ZcatComponent = (function (_super) {
+    __extends(ZcatComponent, _super);
+    function ZcatComponent() {
+        _super.apply(this, arguments);
+        this.exec = "zcat";
+        this.files = [];
+    }
+    return ZcatComponent;
+})(GraphModule.CommandComponent);
 
 function defaultComponentData() {
-    return {
-        type: 'command',
-        exec: "zcat",
-        flags: bzipData.componentFlags,
-        selectors: bzipData.componentSelectors,
-        files: []
-    };
+    var component = new ZcatComponent();
+    component.selectors = zcatData.componentSelectors;
+    component.flags = zcatData.componentFlags;
+    return component;
 }
 ;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
-exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.parseComponent = common.commonParseComponent(zcatData.flagOptions, zcatData.selectorOptions);
+exports.VisualSelectorOptions = zcatData.visualSelectorOptions;
 //# sourceMappingURL=zcat.js.map
 
-},{"../utils/optionsParser":25,"../utils/parserData":26,"./_init":6}],23:[function(require,module,exports){
+},{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],24:[function(require,module,exports){
 var parser = {};
 
 var astBuilder = require('./ast-builder/ast-builder');
@@ -3799,9 +3933,12 @@ exports.FileComponent = FileComponent;
 var CommandComponent = GraphModule.CommandComponent;
 exports.CommandComponent = CommandComponent;
 
+var IndexedGraph = GraphModule.IndexedGraph;
+
 var parserCommand = {
     awk: require('./commands/awk'),
     cat: require('./commands/cat'),
+    date: require('./commands/date'),
     ls: require('./commands/ls'),
     grep: require('./commands/grep'),
     bunzip2: require('./commands/bunzip2'),
@@ -3838,6 +3975,7 @@ function isImplemented(command) {
 function generateAST(command) {
     return astBuilder.parse(command);
 }
+exports.generateAST = generateAST;
 
 /**
 * Parses the Abstract Syntax Tree
@@ -3891,72 +4029,60 @@ function parseAST(ast, tracker) {
     graph.counter = tracker.id;
     return graph;
 }
+exports.parseAST = parseAST;
 
 /**
 * parses the command
 */
 function parseCommand(command) {
-    return parseAST(generateAST(command));
+    return exports.parseAST(exports.generateAST(command));
 }
-
-/**
-* Creates an index of the components
-*/
-function indexComponents(visualData) {
-    var result = {};
-    for (var i = 0, _ref = visualData.components, length = _ref.length; i < length; ++i) {
-        var value = _ref[i];
-        result[value.id] = value;
-    }
-    return result;
-}
-;
+exports.parseCommand = parseCommand;
 
 function parseVisualData(VisualData) {
     var indexedComponentList, initialComponent;
     if (VisualData.components.length < 1) {
         return '';
     }
-    indexedComponentList = indexComponents(VisualData);
-    initialComponent = indexedComponentList[VisualData.firstMainComponent];
+    indexedComponentList = new IndexedGraph(VisualData);
+    initialComponent = VisualData.firstMainComponent;
     if (!initialComponent) {
         return '';
     }
-    return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
+    return exports.parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
 }
+exports.parseVisualData = parseVisualData;
 
 function parseComponent(component, visualData, componentIndex, mapOfParsedComponents) {
     switch (component.type) {
-        case 'command':
-            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
-        case 'subgraph':
+        case exports.CommandComponent.type:
+            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
+        case exports.GraphComponent.type:
             return compileMacro(component.macro);
         default:
             return '';
     }
 }
+exports.parseComponent = parseComponent;
 
 /**
 Parse visual data from Component
 */
 function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
-    var isFirst, i$, ref$, len$, connection, parsedCommand, parsedCommandIndex, endNodeId, j$, ref1$, len1$, component, endNode, comm, to$, i, command;
     var commands = [];
     do {
-        isFirst = true;
-
-        for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
-            connection = ref$[i$];
+        var isFirst = visualData.connections.every(function (connection) {
             if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
                 isFirst = false;
-                currentComponent = componentIndex[connection.startNode];
-                break;
+                currentComponent = componentIndex.components[connection.startNode];
+                return false;
             }
-        }
-    } while(isFirst = false);
+            return true;
+        });
+    } while(isFirst == false);
 
-    parsedCommand = parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
-    parsedCommandIndex = commands.length;
+    var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
+    var parsedCommandIndex = commands.length;
     commands.push(parsedCommand);
 
     var outputs = [];
@@ -3966,8 +4092,8 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     visualData.connections.filter(function (connection) {
         return connection.startNode === currentComponent.id && mapOfParsedComponents[connection.endNode] !== true;
     }).forEach(function (connection) {
-        endNodeId = connection.endNode;
-        endNode = componentIndex[endNodeId];
+        var endNodeId = connection.endNode;
+        var endNode = componentIndex.components[endNodeId];
         switch (connection.startPort) {
             case 'output':
                 outputs.push(endNode);
@@ -3975,6 +4101,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
             case 'error':
                 stdErrors.push(endNode);
                 break;
+
             case 'retcode':
                 exitCodes.push(endNode);
                 break;
@@ -3985,10 +4112,10 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         var result = [];
         for (var index = 0, length = list.length; index < length; ++index) {
             var component = list[index];
-            if (component.type === "file")
+            if (component.type === exports.FileComponent.type)
                 result.push(component.filename);
             else {
-                result.push(parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
+                result.push(exports.parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
             }
         }
         return result;
@@ -4001,7 +4128,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     var teeResultArray = function (components, compiledComponents) {
         var comm = ["tee"];
         compiledComponents.forEach(function (compiledComponent, index) {
-            if (components[index].type) {
+            if (components[index].type === exports.FileComponent.type) {
                 comm.push(compiledComponent);
             } else {
                 comm.push(">((" + compiledComponent + ") &> /dev/null )");
@@ -4010,17 +4137,17 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         return comm;
     };
 
-    var teeResult = function (components, compiledComponents) {
+    function teeResult(components, compiledComponents) {
         return teeResultArray(components, compiledComponents).join(" ");
-    };
+    }
 
     if (nextcommands.length > 1) {
-        comm = teeResultArray(outputs, nextcommands);
+        var comm = teeResultArray(outputs, nextcommands);
         comm.pop();
         commands.push(comm.join(" "));
         commands.push(nextcommands[nextcommands.length - 1]);
     } else if (nextcommands.length === 1) {
-        if (outputs[0].type === 'file') {
+        if (outputs[0].type === exports.FileComponent.type) {
             commands[parsedCommandIndex] += " > " + outputs[0].filename;
         } else {
             commands.push(nextcommands[0]);
@@ -4031,7 +4158,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         comm = teeResult(outputs, nextcommands);
         commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
     } else if (nextErrcommands.length === 1) {
-        if (stdErrors[0].type === 'file') {
+        if (stdErrors[0].type === exports.FileComponent.type) {
             commands[parsedCommandIndex] += " 2> " + stdErrors[0].filename;
         } else {
             commands[parsedCommandIndex] += " 2> >((" + nextErrcommands[0] + ") &> /dev/null )";
@@ -4042,7 +4169,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         comm = teeResult(outputs, nextcommands);
         commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
     } else if (nextExitcommands.length === 1) {
-        if (exitCodes[0].type === 'file') {
+        if (exitCodes[0].type === exports.FileComponent.type) {
             commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
         } else {
             commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";
@@ -4051,6 +4178,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
 
     return commands.join(" | ");
 }
+exports.parseVisualDatafromComponent = parseVisualDatafromComponent;
 
 function createMacro(name, description, command, fromMacro) {
     if (fromMacro) {
@@ -4061,7 +4189,7 @@ function createMacro(name, description, command, fromMacro) {
     }
     var macroData = new exports.GraphComponent(name, description);
     if (command) {
-        macroData.setGraphData(parseCommand(command));
+        macroData.setGraphData(exports.parseCommand(command));
     }
     return macroData;
 }
@@ -4074,27 +4202,28 @@ function compileMacro(macro) {
     if (macro.entryComponent === null) {
         throw "no component defined as Macro Entry";
     }
-    indexedComponentList = indexComponents(macro);
+    indexedComponentList = new IndexedGraph(macro);
     initialComponent = indexedComponentList[macro.entryComponent];
-    return parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
+    return exports.parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
 }
 
-parser.generateAST = exports.generateAST = generateAST;
-parser.parseAST = exports.parseAST = parseAST;
-parser.astBuilder = exports.astBuilder = astBuilder;
-parser.parseCommand = exports.parseCommand = parseCommand;
-parser.parseComponent = exports.parseComponent = parseComponent;
-parser.implementedCommands = exports.implementedCommands = implementedCommands;
-parser.parseVisualData = exports.parseVisualData = parseVisualData;
+parser.generateAST = exports.generateAST;
+parser.parseAST = exports.parseAST;
+parser.astBuilder = astBuilder;
+parser.parseCommand = exports.parseCommand;
+parser.parseComponent = exports.parseComponent;
+parser.implementedCommands = implementedCommands;
+parser.parseVisualData = exports.parseVisualData;
+exports.parseGraph = exports.parseVisualData;
 //# sourceMappingURL=parser.js.map
 
-},{"../common/graph":4,"./ast-builder/ast-builder":5,"./commands/awk":7,"./commands/bunzip2":8,"./commands/bzcat":9,"./commands/bzip2":10,"./commands/cat":11,"./commands/compress":12,"./commands/diff":13,"./commands/grep":14,"./commands/gunzip":15,"./commands/gzip":16,"./commands/head":17,"./commands/ls":18,"./commands/tail":19,"./commands/tee":20,"./commands/tr":21,"./commands/zcat":22}],24:[function(require,module,exports){
+},{"../common/graph":4,"./ast-builder/ast-builder":5,"./commands/awk":7,"./commands/bunzip2":8,"./commands/bzcat":9,"./commands/bzip2":10,"./commands/cat":11,"./commands/compress":12,"./commands/date":13,"./commands/diff":14,"./commands/grep":15,"./commands/gunzip":16,"./commands/gzip":17,"./commands/head":18,"./commands/ls":19,"./commands/tail":20,"./commands/tee":21,"./commands/tr":22,"./commands/zcat":23}],25:[function(require,module,exports){
 (function (val) {
     val.shellParser = require("./parser");
 })(window);
 //# sourceMappingURL=shellParser.js.map
 
-},{"./parser":23}],25:[function(require,module,exports){
+},{"./parser":24}],26:[function(require,module,exports){
 var Iterator = (function () {
     function Iterator(ArgList) {
         this.index = 0;
@@ -4113,6 +4242,7 @@ var Iterator = (function () {
     };
     return Iterator;
 })();
+exports.Iterator = Iterator;
 
 function parseShortOptions(options, componentData, argsNodeIterator) {
     var option, shortOptions = options.shortOptions, iter = new Iterator(argsNodeIterator.current.slice(1));
@@ -4134,10 +4264,7 @@ exports.parseLongOptions = function (options, componentData, argsNodeIterator) {
         iter = new Iterator(optionStr);
         iter.index = indexOfSep + 1;
         optionKey = optionStr.slice(0, indexOfSep);
-        arg = longOptions[optionKey];
-        if (!arg) {
-            arg = longOptions[optionStr];
-        }
+        arg = longOptions[optionKey] || longOptions[optionStr];
         if (arg) {
             return arg(componentData, argsNodeIterator, iter);
         }
@@ -4203,6 +4330,33 @@ function select(key, value) {
 exports.select = select;
 ;
 
+exports.selectIfUnselected = function (key, value) {
+    var selections = [];
+    for (var _i = 0; _i < (arguments.length - 2); _i++) {
+        selections[_i] = arguments[_i + 2];
+    }
+    if (key.name) {
+        key = key.name;
+    }
+    if (value.name) {
+        value = value.name;
+    }
+    selections = selections.map(function (val) {
+        return val.name || val;
+    });
+    return function (Component) {
+        var selectorValue = Component.selectors[key].name;
+        if (selections.every(function (value) {
+            return selectorValue !== value;
+        })) {
+            Component.selectors[key] = {
+                type: "option",
+                name: value
+            };
+        }
+    };
+};
+
 /**
 function to ignore errors when using this option
 */
@@ -4226,57 +4380,9 @@ exports.selectParameter = function (key, value) {
     return paramFn;
 };
 
-exports.selectIfUnselected = function (key, value) {
-    var selections = [];
-    for (var _i = 0; _i < (arguments.length - 2); _i++) {
-        selections[_i] = arguments[_i + 2];
-    }
-    return function (Component) {
-        var selectorValue = Component.selectors[key];
-        if (selections.every(function (value) {
-            return selectorValue !== value;
-        })) {
-            Component.selectors[key] = value;
-        } else {
-            return false;
-        }
-    };
-};
-
 exports.sameAs = function (option) {
     return ['same', option];
 };
-
-function generateSelectors(options) {
-    var selectors = {};
-    var selectorType = {};
-    var selectorOptions = {};
-    var VisualSelectorOptions = {};
-    var subkey;
-    var key;
-    var subkeys;
-    for (key in options) {
-        subkeys = options[key];
-        selectors[key] = key;
-        var keySelectorType = selectorType[key] = {};
-        var keySelectorOption = selectorOptions[key] = {};
-        var VisualSelectorOption = VisualSelectorOptions[key] = [];
-        for (subkey in subkeys) {
-            var value = subkeys[subkey];
-            keySelectorType[subkey.replace(" ", "_")] = subkey;
-            keySelectorOption[subkey] = value;
-            VisualSelectorOption.push(value);
-        }
-    }
-    return {
-        selectors: selectors,
-        selectorType: selectorType,
-        selectorOptions: selectorOptions,
-        VisualSelectorOptions: VisualSelectorOptions
-    };
-}
-exports.generateSelectors = generateSelectors;
-;
 
 function generate(parser) {
     var key, val;
@@ -4315,7 +4421,13 @@ function optionParserFromConfig(config) {
         for (var optionkey in options) {
             var option = options[optionkey];
             opt = exports.select(selector, option);
-            shortOptions[option.option] = opt;
+            if (option.option) {
+                if (option.option[0] === "-") {
+                    longOptions[option.option.slice(2)] = opt;
+                } else {
+                    shortOptions[option.option] = opt;
+                }
+            }
             if (option.longOption) {
                 if (option.longOption instanceof Array) {
                     option.longOption.forEach(function (option) {
@@ -4336,7 +4448,7 @@ function optionParserFromConfig(config) {
 exports.optionParserFromConfig = optionParserFromConfig;
 //# sourceMappingURL=optionsParser.js.map
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /**
 CompilerData gives information to be used
 to compile the AST to a data repersentation
@@ -4358,7 +4470,6 @@ a flag in the command
 */
 var ParserData = (function () {
     function ParserData(config) {
-        if (typeof config === "undefined") { config = {}; }
         this.selectors = {};
         this.selectorOptions = {};
         this.visualSelectorOptions = {};
@@ -4416,6 +4527,8 @@ var ParserData = (function () {
         }
 
         visualSelectorOptions.$selector = selectors;
+
+        /* istanbul ignore next */
         visualSelectorOptions.$changeToValue = function (currSelector, key, value) {
             var toChange = selectors[key][value];
             currSelector.name = toChange.name;
@@ -4429,24 +4542,22 @@ var ParserData = (function () {
         return this;
     };
 
-    /**
-    Sets the options for the normal options
-    of a command, normally a one character option
-    */
-    ParserData.prototype.setShortOptions = function (options) {
-        this.shortOptions = options;
-    };
-
-    /**
-    Sets the options for the long variants of the options
-    of a command, normally a an argument prefixed with 2
-    hypens
-    */
-    ParserData.prototype.setLongOptions = function (options) {
-        this.longOptions = options;
-    };
-
     Object.defineProperty(ParserData.prototype, "componentFlags", {
+        /**
+        Sets the options for the normal options
+        of a command, normally a one character option
+        */
+        //public setShortOptions(options){
+        //  this.shortOptions = options
+        //}
+        /**
+        Sets the options for the long variants of the options
+        of a command, normally a an argument prefixed with 2
+        hypens
+        */
+        //public setLongOptions(options){
+        //  this.longOptions = options
+        //}
         get: function () {
             var componentFlags = {};
             var flags = this.flags;
@@ -4471,7 +4582,7 @@ var ParserData = (function () {
                     if (option.default) {
                         var valueObj = {
                             name: option.name,
-                            type: option.type
+                            type: option.type || "option"
                         };
                         if (option.defaultValue) {
                             valueObj['value'] = option.defaultValue;
@@ -4512,4 +4623,4 @@ exports.ParserData = ParserData;
 var SelectorOptionType = exports.SelectorOptionType;
 //# sourceMappingURL=parserData.js.map
 
-},{}]},{},[24])
+},{}]},{},[25])

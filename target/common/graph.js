@@ -98,9 +98,10 @@ var FileComponent = (function (_super) {
     __extends(FileComponent, _super);
     function FileComponent(filename) {
         _super.call(this);
-        this.type = "file";
+        this.type = FileComponent.type;
         this.filename = filename;
     }
+    FileComponent.type = "file";
     return FileComponent;
 })(Component);
 exports.FileComponent = FileComponent;

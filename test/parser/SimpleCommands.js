@@ -230,7 +230,7 @@ describe('command test', function(){
     describe('reparse compress', reparse('compress'));
   })
 
-    describe('Diff test', function(){
+    describe('`diff` test', function(){
     it('should create a component with class HeadComponent', function(){
       var command = "diff";
       var graph = shouldBeAGraph(parser.parseCommand(command))
@@ -242,8 +242,8 @@ describe('command test', function(){
       //  last: { type: 'numeric parameter', name: 'lines', value:10 }
       //})
     })
-    describe('reparse diff, two files', reparse('diff file1.txt file2.txt'));
-    describe('reparse diff, two processes', reparse('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)'));
+    describe('reparse diff, two files - ', reparse('diff file1.txt file2.txt'));
+    describe('reparse diff, two processes -', reparse('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)'));
   })
 
   describe('`ls` test', function(){
@@ -268,7 +268,6 @@ describe('command test', function(){
       })
       it('should parse the same graph after compiling to text', function(){
         var resultCommand = parser.parseVisualData(graph)
-        console.error(resultCommand);
         var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
         reGraph.should.eql(graph);
       });
@@ -326,21 +325,6 @@ describe('command test', function(){
       //})
     })
   })
-
-  describe('`diff` test', function(){
-    it('should create a component with class HeadComponent', function(){
-      var command = "diff";
-      var graph = shouldBeAGraph(parser.parseCommand(command))
-      classname(graph.components[0]).should.equal("DiffComponent")
-      graph.components[0].exec.should.equal("diff")
-      graph.components.should.have.length(1)
-      graph.connections.should.be.empty
-      //graph.components[0].selectors.should.have.properties({
-      //  last: { type: 'numeric parameter', name: 'lines', value:10 }
-      //})
-    })
-  })
-
 
   describe('`date` test', function(){
     it('should create a component with class DateComponent', function(){

@@ -15,11 +15,22 @@ function shouldBeAGraph(graph){
     components: graph.components,
     connections: graph.connections
   })
+  return graph;
 }
 
-
-
-
+function reparse(command){
+  return function(){
+    var graph
+    it('should sucessfully parse the command', function(){
+      graph = shouldBeAGraph(parser.parseCommand(command))
+    })
+    it('should parse the same graph after compiling to text', function(){
+      var resultCommand = parser.parseVisualData(graph)
+      var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
+      reGraph.should.eql(graph);
+    })
+  }
+}
 
 describe('Graph test', function(){
 
@@ -78,6 +89,7 @@ describe('Graph test', function(){
       //flags["show non-printing"].should.be.true;
 
     })
+    describe('reparse pipe', reparse('grep 2004 | cat uselessUseOfCat.txt | grep "oh really" | grep "yes really" | cat | cat | gzip'))
   })
 
   describe('process substitution test', function(){
@@ -91,6 +103,7 @@ describe('Graph test', function(){
       graph.components[0].exec.should.equal("cat");
       graph.components[1].exec.should.equal("cat");
     })
+    describe('reparse process substitution', reparse('cat <(cat <(grep "cat" cat.cat.txt) <(grep t2 txt.txt)) <(grep 1 min.txt) <(grep 2 max.txt) | cat - <(cat min.txt)'))
   })
 
   describe('redirection test', function(){
@@ -106,6 +119,8 @@ describe('Graph test', function(){
       graph.components[2].should.be.an.instanceof(parser.FileComponent)
       graph.components[3].should.be.an.instanceof(parser.FileComponent)
     })
+    describe('reparse redirection', reparse('cat file1.txt > file2.txt 2> file3.txt'))
+
   })
 
   describe('tee test', function(){
@@ -117,6 +132,15 @@ describe('Graph test', function(){
       graph.connections.should.have.length(8)
       graph.components.should.matchEach(function(component){
         component.exec.should.equal("cat");
+      })
+    })
+    describe('to text',function(){
+      it('should compile to text without errors', function(){
+        var command = 'cat | tee >(cat | tee >(cat) >(cat)) >(cat | tee >(cat) >(cat) | cat) | cat';
+        var graph = shouldBeAGraph(parser.parseCommand(command))
+        var result = parser.parseVisualData(graph)
+        console.error(result);
+        result.should.not.equal('');
       })
     })
     //it('should create a tree by using a tee command, using stderr instead', function(){

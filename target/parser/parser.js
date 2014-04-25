@@ -138,9 +138,9 @@ exports.parseVisualData = parseVisualData;
 
 function parseComponent(component, visualData, componentIndex, mapOfParsedComponents) {
     switch (component.type) {
-        case 'command':
-            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, exports.parseVisualDatafromComponent);
-        case 'subgraph':
+        case exports.CommandComponent.type:
+            return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
+        case exports.GraphComponent.type:
             return compileMacro(component.macro);
         default:
             return '';
@@ -164,7 +164,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         });
     } while(isFirst == false);
 
-    var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex.components, mapOfParsedComponents);
+    var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
     var parsedCommandIndex = commands.length;
     commands.push(parsedCommand);
 
@@ -184,6 +184,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
             case 'error':
                 stdErrors.push(endNode);
                 break;
+
             case 'retcode':
                 exitCodes.push(endNode);
                 break;
@@ -194,7 +195,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         var result = [];
         for (var index = 0, length = list.length; index < length; ++index) {
             var component = list[index];
-            if (component.type === "file")
+            if (component.type === exports.FileComponent.type)
                 result.push(component.filename);
             else {
                 result.push(exports.parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
@@ -210,7 +211,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     var teeResultArray = function (components, compiledComponents) {
         var comm = ["tee"];
         compiledComponents.forEach(function (compiledComponent, index) {
-            if (components[index].type) {
+            if (components[index].type === exports.FileComponent.type) {
                 comm.push(compiledComponent);
             } else {
                 comm.push(">((" + compiledComponent + ") &> /dev/null )");
@@ -229,7 +230,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         commands.push(comm.join(" "));
         commands.push(nextcommands[nextcommands.length - 1]);
     } else if (nextcommands.length === 1) {
-        if (outputs[0].type === 'file') {
+        if (outputs[0].type === exports.FileComponent.type) {
             commands[parsedCommandIndex] += " > " + outputs[0].filename;
         } else {
             commands.push(nextcommands[0]);
@@ -240,7 +241,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         comm = teeResult(outputs, nextcommands);
         commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
     } else if (nextErrcommands.length === 1) {
-        if (stdErrors[0].type === 'file') {
+        if (stdErrors[0].type === exports.FileComponent.type) {
             commands[parsedCommandIndex] += " 2> " + stdErrors[0].filename;
         } else {
             commands[parsedCommandIndex] += " 2> >((" + nextErrcommands[0] + ") &> /dev/null )";
@@ -251,7 +252,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
         comm = teeResult(outputs, nextcommands);
         commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
     } else if (nextExitcommands.length === 1) {
-        if (exitCodes[0].type === 'file') {
+        if (exitCodes[0].type === exports.FileComponent.type) {
             commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
         } else {
             commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";

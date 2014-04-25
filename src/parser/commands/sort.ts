@@ -1,8 +1,8 @@
-
-
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("./_init");
+import GraphModule = require("../../common/graph");
+
 
 var nullstr:string = null;
 
@@ -181,6 +181,8 @@ function defaultComponentData(){
     files: []
   };
 };
+
+
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions,bzipData.parameterOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;

@@ -132,9 +132,9 @@ export function parseVisualData(VisualData:Graph){
 
 export function parseComponent(component, visualData:Graph, componentIndex, mapOfParsedComponents){
   switch (component.type) {
-  case 'command':
-    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents, parseVisualDatafromComponent);
-  case 'subgraph':
+  case CommandComponent.type:
+    return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
+  case GraphComponent.type:
     return compileMacro(component.macro);
   default:
     return '';
@@ -163,7 +163,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
 
 
 
-  var parsedCommand = parseComponent(currentComponent, visualData, componentIndex.components, mapOfParsedComponents);
+  var parsedCommand = parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
   var parsedCommandIndex = commands.length;
   commands.push(parsedCommand);
 
@@ -180,6 +180,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
       switch(connection.startPort){
         case 'output':  outputs.push(endNode)  ; break;
         case 'error':   stdErrors.push(endNode); break;
+        /* instanbul ignore next */
         case 'retcode': exitCodes.push(endNode); break;
       }
   });
@@ -191,7 +192,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
     var result:any[] = []
     for (var index = 0, length = list.length; index < length; ++index) {
       var component = list[index];
-      if(component.type === "file")
+      if(component.type === FileComponent.type)
         result.push(component.filename);
       else{
         result.push(parseVisualDatafromComponent(component, visualData, componentIndex, mapOfParsedComponents));
@@ -207,7 +208,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
   var teeResultArray = function(components:any[],compiledComponents:any[]):string[]{
     var comm:string[] = ["tee"];
     compiledComponents.forEach((compiledComponent, index)=>{
-      if(components[index].type){
+      if(components[index].type === FileComponent.type){
         comm.push(compiledComponent);
       } else {
         comm.push(">(("+compiledComponent+") &> /dev/null )");       
@@ -226,7 +227,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
     commands.push(comm.join(" "));
     commands.push(nextcommands[nextcommands.length - 1]);
   } else if (nextcommands.length === 1) {
-    if (outputs[0].type === 'file') {
+    if (outputs[0].type === FileComponent.type) {
       commands[parsedCommandIndex] += " > " + outputs[0].filename;
     } else {
       commands.push(nextcommands[0]);
@@ -239,7 +240,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
     comm = teeResult(outputs,nextcommands);
     commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
   } else if (nextErrcommands.length === 1) {
-    if (stdErrors[0].type === 'file') {
+    if (stdErrors[0].type === FileComponent.type) {
       commands[parsedCommandIndex] += " 2> " + stdErrors[0].filename;
     } else {
       commands[parsedCommandIndex] += " 2> >((" + nextErrcommands[0] + ") &> /dev/null )";
@@ -252,7 +253,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
     comm = teeResult(outputs,nextcommands);
     commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
   } else if (nextExitcommands.length === 1) {
-    if (exitCodes[0].type === 'file') {
+    if (exitCodes[0].type === FileComponent.type) {
       commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
     } else {
       commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";
