@@ -41,7 +41,7 @@ function createsSame(command1, command2){
 
 
 describe('command test', function(){
-  describe('Awk test compile to component', function(){
+  describe('`awk` test', function(){
     it('should create a component with class AwkComponent', function(){
       var command = 'awk -Fmi "mimi"';
       var graph = shouldBeAGraph(parser.parseCommand(command))
@@ -61,8 +61,8 @@ describe('command test', function(){
     describe("reparse awk '$1 >200' employee.txt", reparse('awk \'$1 >200\' employee.txt'));
   })
 
-  describe('Cat test', function(){
-    it('should create a components with class CatComponent', function(){
+  describe('`cat` test', function(){
+    it('should create a component with class CatComponent', function(){
     	var command = "cat -sA";
     	var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("CatComponent")
@@ -77,16 +77,19 @@ describe('command test', function(){
       })
     })
     describe('reparse cat -sA file1.txt', reparse('cat -sA file1.txt'));
+    describe('reparse cat -n file1.txt', reparse('cat -n file1.txt'));
     describe('reparse cat -s "/home/super man/file1.txt"', reparse('cat -s "/home/super man/file1.txt"'));
     it('"cat -A" = "cat --show-tabs --show-ends --show-nonprinting"', 
       createsSame('cat -A', 'cat --show-tabs --show-ends --show-nonprinting'));
+    it('"cat -bn" = "cat -nb"', createsSame('cat -bn', 'cat -nb'));
+    it('"cat -bn" = "cat -b"', createsSame('cat -bn', 'cat -b'));
   })
 
 
 
 
-  describe('Grep test', function(){
-    it('should create a components with class GrepComponent', function(){
+  describe('`grep` test', function(){
+    it('should create a component with class GrepComponent', function(){
       var command = "grep -F";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("GrepComponent")
@@ -122,8 +125,8 @@ describe('command test', function(){
 
 
 
-  describe('Gzip test', function(){
-    it('should create a components with class GzipComponent', function(){
+  describe('`gzip` test', function(){
+    it('should create a component with class GzipComponent', function(){
       var command = "gzip";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("GZipComponent")
@@ -137,8 +140,8 @@ describe('command test', function(){
 
   })
 
-  describe('Gunzip test', function(){
-    it('should create a components with class GrepComponent', function(){
+  describe('`gunzip` test', function(){
+    it('should create a component with class GrepComponent', function(){
       var command = "gunzip";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("GunzipComponent")
@@ -152,8 +155,8 @@ describe('command test', function(){
 
   })
 
-  describe('Zcat test', function(){
-    it('should create a components with class ZcatComponent', function(){
+  describe('`zcat` test', function(){
+    it('should create a component with class ZcatComponent', function(){
       var command = "zcat";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("ZcatComponent")
@@ -166,8 +169,8 @@ describe('command test', function(){
     describe('reparse zcat file.txt.gz', reparse('zcat file.txt.gz'));
   })
 
-  describe('Bzip test', function(){
-    it('should create a components with class BZipComponent', function(){
+  describe('`bzip` test', function(){
+    it('should create a component with class BZipComponent', function(){
       var command = "bzip2";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("BZipComponent")
@@ -181,8 +184,8 @@ describe('command test', function(){
 
   })
 
-  describe('Bzcat test', function(){
-    it('should create a components with class BzcatComponent', function(){
+  describe('`bzcat` test', function(){
+    it('should create a component with class BzcatComponent', function(){
       var command = "bzcat";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("BzcatComponent")
@@ -195,8 +198,8 @@ describe('command test', function(){
     describe('reparse bzcat', reparse('bzcat'));
   })
 
-  describe('Bunzip test', function(){
-    it('should create a components with class BunzipComponent', function(){
+  describe('`bunzip` test', function(){
+    it('should create a component with class BunzipComponent', function(){
       var command = "bunzip2";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("BunzipComponent")
@@ -209,8 +212,8 @@ describe('command test', function(){
     describe('reparse bunzip2', reparse('bunzip2'));
   })
 
-  describe('Compress test', function(){
-    it('should create a components with class CompressComponent', function(){
+  describe('`compress` test', function(){
+    it('should create a component with class CompressComponent', function(){
       var command = "compress";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("CompressComponent")
@@ -224,7 +227,7 @@ describe('command test', function(){
   })
 
     describe('Diff test', function(){
-    it('should create a components with class HeadComponent', function(){
+    it('should create a component with class HeadComponent', function(){
       var command = "diff";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("DiffComponent")
@@ -239,8 +242,8 @@ describe('command test', function(){
     describe('reparse diff, two processes', reparse('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)'));
   })
 
-  describe('Ls test', function(){
-    it('should create a components with class LsComponent', function(){
+  describe('`ls` test', function(){
+    it('should create a component with class LsComponent', function(){
       var command = "ls";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("LsComponent")
@@ -271,8 +274,8 @@ describe('command test', function(){
       createsSame('ls -l --quoting-style=shell -v', 'ls -lv --quoting-style=shell'));
   })
 
-  describe('Tr test', function(){
-    it('should create a components with class TrComponent', function(){
+  describe('`tr` test', function(){
+    it('should create a component with class TrComponent', function(){
       var command = "tr man woman";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("TrComponent")
@@ -289,8 +292,8 @@ describe('command test', function(){
 
   })
 
-  describe('Tail test', function(){
-    it('should create a components with class TailComponent', function(){
+  describe('`tail` test', function(){
+    it('should create a component with class TailComponent', function(){
       var command = "tail -n10";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("TailComponent")
@@ -304,8 +307,8 @@ describe('command test', function(){
       //})
     })
   }),
-  describe('Head test', function(){
-    it('should create a components with class HeadComponent', function(){
+  describe('`head` test', function(){
+    it('should create a component with class HeadComponent', function(){
       var command = "head -n10";
       var graph = shouldBeAGraph(parser.parseCommand(command))
 
@@ -320,8 +323,8 @@ describe('command test', function(){
     })
   })
 
-  describe('Diff test', function(){
-    it('should create a components with class HeadComponent', function(){
+  describe('`diff` test', function(){
+    it('should create a component with class HeadComponent', function(){
       var command = "diff";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("DiffComponent")
@@ -332,5 +335,26 @@ describe('command test', function(){
       //  last: { type: 'numeric parameter', name: 'lines', value:10 }
       //})
     })
+  })
+
+
+  describe('`date` test', function(){
+    it('should create a component with class DateComponent', function(){
+      var command = "date";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("DateComponent")
+      graph.components[0].exec.should.equal("date")
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      //graph.components[0].selectors.should.have.properties({
+      //  last: { type: 'numeric parameter', name: 'lines', value:10 }
+      //})
+    })
+    describe('reparse date', reparse('date -u'));
+
+    it('should create the same graph', 
+      createsSame('date -d mimi', 'date mimi'));
+    it('should create the same graph', 
+      createsSame('date --utc', 'date --universal'));
   })
 })

@@ -37,7 +37,7 @@ export class ParserData{
   public flagOptions:any = {}
 
 
-  public constructor(config:Config = {}){
+  public constructor(config:Config){
     this.setFlags(config.flags);
     this.setParameters(config.parameters);
     this.setSelector(config.selectors);
@@ -89,6 +89,7 @@ export class ParserData{
 
 
     visualSelectorOptions.$selector = selectors
+    /* istanbul ignore next */
     visualSelectorOptions.$changeToValue = function (currSelector, key ,value) {
       var toChange = selectors[key][value];
       currSelector.name = toChange.name
@@ -107,18 +108,18 @@ export class ParserData{
     Sets the options for the normal options
     of a command, normally a one character option
   */
-  public setShortOptions(options){
-    this.shortOptions = options
-  }
+  //public setShortOptions(options){
+  //  this.shortOptions = options
+  //}
 
   /**
     Sets the options for the long variants of the options
     of a command, normally a an argument prefixed with 2
     hypens
   */
-  public setLongOptions(options){
-    this.longOptions = options
-  }
+  //public setLongOptions(options){
+  //  this.longOptions = options
+  //}
 
 
 

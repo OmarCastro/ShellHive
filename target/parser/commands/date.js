@@ -46,6 +46,7 @@ var DateComponent = (function (_super) {
 
 function defaultComponentData() {
     var component = new DateComponent();
+    component.flags = dateData.componentFlags;
     component.parameters = dateData.componentParameters;
     return component;
 }

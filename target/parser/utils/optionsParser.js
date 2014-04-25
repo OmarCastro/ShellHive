@@ -104,6 +104,33 @@ function select(key, value) {
 exports.select = select;
 ;
 
+exports.selectIfUnselected = function (key, value) {
+    var selections = [];
+    for (var _i = 0; _i < (arguments.length - 2); _i++) {
+        selections[_i] = arguments[_i + 2];
+    }
+    if (key.name) {
+        key = key.name;
+    }
+    if (value.name) {
+        value = value.name;
+    }
+    selections = selections.map(function (val) {
+        return val.name || val;
+    });
+    return function (Component) {
+        var selectorValue = Component.selectors[key].name;
+        if (selections.every(function (value) {
+            return selectorValue !== value;
+        })) {
+            Component.selectors[key] = {
+                type: "option",
+                name: value
+            };
+        }
+    };
+};
+
 /**
 function to ignore errors when using this option
 */
@@ -125,23 +152,6 @@ exports.selectParameter = function (key, value) {
     paramFn;
     paramFn.ptype = 'param';
     return paramFn;
-};
-
-exports.selectIfUnselected = function (key, value) {
-    var selections = [];
-    for (var _i = 0; _i < (arguments.length - 2); _i++) {
-        selections[_i] = arguments[_i + 2];
-    }
-    return function (Component) {
-        var selectorValue = Component.selectors[key];
-        if (selections.every(function (value) {
-            return selectorValue !== value;
-        })) {
-            Component.selectors[key] = value;
-        } else {
-            return false;
-        }
-    };
 };
 
 exports.sameAs = function (option) {

@@ -38,6 +38,7 @@ class DateComponent extends GraphModule.CommandComponent {
 
 function defaultComponentData(){
   var component = new DateComponent();
+  component.flags = dateData.componentFlags  
   component.parameters = dateData.componentParameters  
   return component;
 };

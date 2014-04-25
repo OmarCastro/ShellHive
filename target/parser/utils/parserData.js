@@ -19,7 +19,6 @@ a flag in the command
 */
 var ParserData = (function () {
     function ParserData(config) {
-        if (typeof config === "undefined") { config = {}; }
         this.selectors = {};
         this.selectorOptions = {};
         this.visualSelectorOptions = {};
@@ -77,6 +76,8 @@ var ParserData = (function () {
         }
 
         visualSelectorOptions.$selector = selectors;
+
+        /* istanbul ignore next */
         visualSelectorOptions.$changeToValue = function (currSelector, key, value) {
             var toChange = selectors[key][value];
             currSelector.name = toChange.name;
@@ -90,24 +91,22 @@ var ParserData = (function () {
         return this;
     };
 
-    /**
-    Sets the options for the normal options
-    of a command, normally a one character option
-    */
-    ParserData.prototype.setShortOptions = function (options) {
-        this.shortOptions = options;
-    };
-
-    /**
-    Sets the options for the long variants of the options
-    of a command, normally a an argument prefixed with 2
-    hypens
-    */
-    ParserData.prototype.setLongOptions = function (options) {
-        this.longOptions = options;
-    };
-
     Object.defineProperty(ParserData.prototype, "componentFlags", {
+        /**
+        Sets the options for the normal options
+        of a command, normally a one character option
+        */
+        //public setShortOptions(options){
+        //  this.shortOptions = options
+        //}
+        /**
+        Sets the options for the long variants of the options
+        of a command, normally a an argument prefixed with 2
+        hypens
+        */
+        //public setLongOptions(options){
+        //  this.longOptions = options
+        //}
         get: function () {
             var componentFlags = {};
             var flags = this.flags;

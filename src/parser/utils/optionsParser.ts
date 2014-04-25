@@ -90,6 +90,22 @@ export function select(key:any, value:any){
     };
   };
 
+export var selectIfUnselected = function(key, value, ...selections:any[]){
+  if(key.name){key = key.name}
+  if(value.name){value = value.name}
+  selections = selections.map(val => val.name || val);
+  return function(Component){
+    var selectorValue = Component.selectors[key].name;
+    if(selections.every(value => { return selectorValue !== value } )){
+      Component.selectors[key] = {
+        type:"option",
+        name:value
+      };
+    }
+  }
+};
+
+
 /**
   function to ignore errors when using this option
 */
@@ -113,16 +129,6 @@ export var selectParameter = function(key:string, value:string){
     return paramFn;
   };
 
-export var selectIfUnselected = function(key, value, ...selections:any[]){
-  return function(Component){
-    var selectorValue = Component.selectors[key];
-    if(selections.every(value => { return selectorValue !== value } )){
-      Component.selectors[key] = value;
-    } else {
-      return false
-    }
-  }
-};
 
 export var sameAs = function(option){ return ['same', option] }
 

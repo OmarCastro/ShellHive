@@ -77,8 +77,8 @@ var config = {
 var headData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name)
-optionsParser['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
+optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name)
+optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
 
 
 var lsCommandData = new parserModule.ParserData(config);

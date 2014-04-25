@@ -19,6 +19,7 @@ exports.CommandComponent = CommandComponent;
 var parserCommand = {
     awk: require('./commands/awk'),
     cat: require('./commands/cat'),
+    date: require('./commands/date'),
     ls: require('./commands/ls'),
     grep: require('./commands/grep'),
     bunzip2: require('./commands/bunzip2'),
