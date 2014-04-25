@@ -156,8 +156,8 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
   string: (component, str) => {
-    if(component.pattern == null){
-      component.pattern = str
+    if(component.pattern === null){
+      component.pattern = str || ""
     } else {
       return "continue";
     }
@@ -165,10 +165,10 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
 })
 
 export var parseComponent = common.commonParseComponent(grepCommandData.flagOptions,grepCommandData.selectorOptions, null, (component,exec:any[],flags,files:any[]) =>{
-  var pattern = component.pattern
-  if(pattern){
-    pattern = (pattern.indexOf(" ") >= 0) ? '"'+pattern+'"' : pattern
-  }
+  var pattern = component.pattern || ""
+  pattern = (pattern.indexOf(" ") >= 0) ? '"'+pattern+'"' : pattern
+  //console.error(pattern + " - " + files.length );
+  //console.error(!!pattern + " - " + !!files.length );
   if(pattern && files.length){return exec.concat(flags,pattern,files).join(' ')}
   else if(pattern){return exec.concat(flags,pattern,files).join(' ')}
   else if(files.length){return exec.concat(flags,'""',files).join(' ')}

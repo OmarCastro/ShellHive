@@ -17,11 +17,28 @@ function classname(classObject){
   return classObject.constructor.name;
 }
 
-describe('command test', function(){
+function reparse(command){
+  return function(){
+    var graph         = shouldBeAGraph(parser.parseCommand(command))
+    var resultCommand = parser.parseVisualData(graph)
+    var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
+    reGraph.should.eql(graph);
+  }
+}
 
-  describe('Awk test', function(){
-    it('should create a components with class AwkComponent', function(){
-      var command = 'awk "mimi"';
+function createsSame(command1, command2){
+  return function(){
+    var graph         = shouldBeAGraph(parser.parseCommand(command1))
+    var reGraph       = shouldBeAGraph(parser.parseCommand(command2))
+    reGraph.should.eql(graph);
+  }
+}
+
+
+describe('command test', function(){
+  describe('Awk test compile to component', function(){
+    it('should create a component with class AwkComponent', function(){
+      var command = 'awk -Fmi "mimi"';
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("AwkComponent")
       graph.components[0].exec.should.equal("awk")
@@ -29,19 +46,12 @@ describe('command test', function(){
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
       graph.components[0].should.have.properties({
-        "script": "mimi"
+        "script": "mimi",
+        parameters:{"field separator": "mi"}
       })
-
-
-      var resultCommand = parser.parseVisualData(graph)
-
-      var reGraph = shouldBeAGraph(parser.parseCommand(resultCommand))
-      reGraph.components[0].should.eql(graph.components[0]);
-
-
-
-
     })
+    it('should parse the same graph after compiling to text', reparse('awk "mimi"'));
+    it('should parse the same graph after compiling to text', reparse('awk -Fmi "mimi"'));
   })
 
   describe('Cat test', function(){
@@ -59,7 +69,13 @@ describe('command test', function(){
         "show non-printing": true
       })
     })
+    it('should parse the same graph after compiling to text', reparse('cat -sA file1.txt'));
+    it('"cat -A" = "cat --show-tabs --show-ends --show-nonprinting"', 
+      createsSame('cat -A', 'cat --show-tabs --show-ends --show-nonprinting'));
   })
+
+
+
 
   describe('Grep test', function(){
     it('should create a components with class GrepComponent', function(){
@@ -72,7 +88,29 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    it('should parse the same graph after compiling to text, without arguments', 
+      reparse('grep'));
+    it('should parse the same graph after compiling to text, only pattern',
+      reparse('grep mimi'));
+    it('should parse the same graph after compiling to text, only pattern ( with spaces )',
+      reparse('grep "mi mi"'));
+    it('should parse the same graph after compiling to text, only files',function(){
+    var command       = 'grep "" file1.txt file2.txt'
+    var graph         = shouldBeAGraph(parser.parseCommand(command))
+    graph.components.should.have.length(3)
+    var resultCommand = parser.parseVisualData(graph)
+    var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
+    reGraph.should.eql(graph);
   })
+    it('should parse the same graph after compiling to text, all arguments',
+      reparse('grep mimi file1.txt file3.txt'));
+    it('using long variants should create the same graph', 
+      createsSame('grep mimi -F', 'grep mimi --fixed-strings'));
+
+  })
+
+
+
 
   describe('Gzip test', function(){
     it('should create a components with class GzipComponent', function(){
@@ -85,6 +123,8 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    it('should parse the same graph after compiling to text', reparse('gzip'));
+
   })
 
   describe('Gunzip test', function(){
@@ -98,6 +138,23 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    it('should parse the same graph after compiling to text', reparse('gunzip'));
+
+  })
+
+  describe('Zcat test', function(){
+    it('should create a components with class ZcatComponent', function(){
+      var command = "zcat";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("ZcatComponent")
+      graph.components[0].exec.should.equal("zcat")
+
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      graph.components[0].flags.should.have.properties({})
+    })
+    it('should parse the same graph after compiling to text', reparse('zcat file.txt.gz'));
+
   })
 
   describe('Bzip test', function(){
@@ -139,6 +196,19 @@ describe('command test', function(){
     })
   })
 
+  describe('Compress test', function(){
+    it('should create a components with class CompressComponent', function(){
+      var command = "compress";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("CompressComponent")
+      graph.components[0].exec.should.equal("compress")
+
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      graph.components[0].flags.should.have.properties({})
+    })
+  })
+
     describe('Diff test', function(){
     it('should create a components with class HeadComponent', function(){
       var command = "diff";
@@ -165,6 +235,22 @@ describe('command test', function(){
       graph.components[0].flags.should.have.properties({})
     })
   })
+
+  describe('Tr test', function(){
+    it('should create a components with class TrComponent', function(){
+      var command = "tr man woman";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+      classname(graph.components[0]).should.equal("TrComponent")
+      graph.components[0].exec.should.equal("tr")
+
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      graph.components[0].flags.should.have.properties({})
+    })
+    it('should parse the same graph after compiling to text', reparse('tr man woman'));
+
+  })
+
   describe('Tail test', function(){
     it('should create a components with class TailComponent', function(){
       var command = "tail -n10";

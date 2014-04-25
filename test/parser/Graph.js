@@ -1,4 +1,5 @@
 var parser = require('../../target/parser/parser.js')
+var parserinit = require('../../target/parser/commands/_init.js')
 var Connection = parser.Connection
 var Component  = parser.Component
 
@@ -12,7 +13,18 @@ function shouldBeAGraph(graph){
   //graph.connections.should.matchEach(isConnection);
 }
 
+
+
+
+
 describe('Graph test', function(){
+
+describe('typeOf test', function(){
+    it('should work', function(){
+      parserinit.typeOf("").should.equal("string");
+   })
+})
+  
   describe('basic cat test', function(){
     it('should create 3 components', function(){
     	var command = "cat -s -A file1.txt file2.txt";

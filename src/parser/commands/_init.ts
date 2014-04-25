@@ -21,7 +21,7 @@ class Iterator{
     this.current = ArgList[0];
   }
 
-  public hasNext(){ return this.index !== this.length }
+  public hasNext(){ return this.index < this.length }
   public next(){return this.current = this.argList[this.index++] }
   public rest(){return this.argList.slice(this.index) }
 }
@@ -42,7 +42,7 @@ class Iterator{
 export function typeOf(arg:string):string;
 export function typeOf(arg:string[]):string;
 export function typeOf(arg:any):string{
-  if (typeof arg === 'string' && arg.length > 0) {
+  if (typeof arg === 'string' && arg.length > 0){
     if (arg[0] === '-' && arg.length > 1) {
       if (arg[1] === '-') { return 'longOption' }
       else return 'shortOptions'
@@ -52,7 +52,7 @@ export function typeOf(arg:any):string{
   }
   else if (arg instanceof Array) {
     return arg[0];
-  }
+  } else return 'string';
 }
 
 
@@ -114,8 +114,9 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
     result.components = [componentData];
 
     result.firstMainComponent = componentData
-    var iter = new Iterator(argsNode);
-    while (argNode = iter.next()) {
+    var iter = new Iterator(argsNode)
+    while (iter.hasNext()) {
+      var argNode = iter.next();
       switch (typeOf(argNode)) {
       case 'shortOptions':
         optionsParser.parseShortOptions(optionsParserData, componentData, iter);
@@ -209,8 +210,8 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
     value = flags[key];
     if (value) {
       flag = flagOptions[key];
+      /* istanbul ignore if */ 
       if(!flag){
-        //crash and burn (should not happen)
         throw [key,"doesn't exist in ",flagOptions].join('');
       } else if (flag[0] !== '-') {
         sFlags.push(flag);
@@ -225,8 +226,8 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
       value = selectors[key];
       var optionValue = selectorOptions[key][value.name]
       if (optionValue != null) {
+        /* istanbul ignore if */ 
         if(!optionValue) {
-          //crash and burn (should not happen)
           throw [key,".",value,"doesn't exist in ",selectorOptions].join('');          
         } else if (optionValue[0] !== '-') {
           sFlags.push(optionValue);

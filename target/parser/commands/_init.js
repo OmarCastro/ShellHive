@@ -15,7 +15,7 @@ var Iterator = (function () {
         this.current = ArgList[0];
     }
     Iterator.prototype.hasNext = function () {
-        return this.index !== this.length;
+        return this.index < this.length;
     };
     Iterator.prototype.next = function () {
         return this.current = this.argList[this.index++];
@@ -39,7 +39,8 @@ function typeOf(arg) {
         }
     } else if (arg instanceof Array) {
         return arg[0];
-    }
+    } else
+        return 'string';
 }
 exports.typeOf = typeOf;
 
@@ -98,7 +99,8 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
 
         result.firstMainComponent = componentData;
         var iter = new Iterator(argsNode);
-        while (argNode = iter.next()) {
+        while (iter.hasNext()) {
+            var argNode = iter.next();
             switch (exports.typeOf(argNode)) {
                 case 'shortOptions':
                     optionsParser.parseShortOptions(optionsParserData, componentData, iter);
@@ -191,7 +193,8 @@ function parseFlagsAndSelectors(component, options) {
         value = flags[key];
         if (value) {
             flag = flagOptions[key];
-            if (!flag) {
+
+            /* istanbul ignore if */ if (!flag) {
                 throw [key, "doesn't exist in ", flagOptions].join('');
             } else if (flag[0] !== '-') {
                 sFlags.push(flag);
@@ -206,7 +209,7 @@ function parseFlagsAndSelectors(component, options) {
             value = selectors[key];
             var optionValue = selectorOptions[key][value.name];
             if (optionValue != null) {
-                if (!optionValue) {
+                /* istanbul ignore if */ if (!optionValue) {
                     throw [key, ".", value, "doesn't exist in ", selectorOptions].join('');
                 } else if (optionValue[0] !== '-') {
                     sFlags.push(optionValue);

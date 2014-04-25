@@ -56,13 +56,9 @@ var flags = {
   }
 }
 
-
-
 var config:parserModule.Config = {
   flags:flags
 }
-
-
 
 var optionsParser = $.optionParserFromConfig(config)
 var zcatData = new parserModule.ParserData(config);

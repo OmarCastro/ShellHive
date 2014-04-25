@@ -149,8 +149,8 @@ function defaultComponentData() {
 
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
     string: function (component, str) {
-        if (component.pattern == null) {
-            component.pattern = str;
+        if (component.pattern === null) {
+            component.pattern = str || "";
         } else {
             return "continue";
         }
@@ -158,10 +158,11 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 });
 
 exports.parseComponent = common.commonParseComponent(grepCommandData.flagOptions, grepCommandData.selectorOptions, null, function (component, exec, flags, files) {
-    var pattern = component.pattern;
-    if (pattern) {
-        pattern = (pattern.indexOf(" ") >= 0) ? '"' + pattern + '"' : pattern;
-    }
+    var pattern = component.pattern || "";
+    pattern = (pattern.indexOf(" ") >= 0) ? '"' + pattern + '"' : pattern;
+
+    //console.error(pattern + " - " + files.length );
+    //console.error(!!pattern + " - " + !!files.length );
     if (pattern && files.length) {
         return exec.concat(flags, pattern, files).join(' ');
     } else if (pattern) {

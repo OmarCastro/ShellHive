@@ -143,7 +143,7 @@ export class ParserData{
         if(option.default){
           var valueObj = {
             name:option.name,
-            type:option.type,
+            type:option.type || "option",
           }
           if(option.defaultValue){
             valueObj['value'] = option.defaultValue

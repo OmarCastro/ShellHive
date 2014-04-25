@@ -1,64 +1,98 @@
 /*
- -d   If given, decompression is done instead.
- -c   Write output on stdout, don't remove original.
- -b   Parameter limits the max number of bits/code.
- -f   Forces output file to be generated, even if one already.
-      exists, and even if no space is saved by compressing.
-      If -f is not used, the user will be prompted if stdin is.
-      a tty, otherwise, the output file will not be overwritten.
- -v   Write compression statistics.
- -V   Output vesion and compile options.
- -r   Recursive. If a filename is a directory, descend
-
+-d   If given, decompression is done instead.
+-c   Write output on stdout, don't remove original.
+-b   Parameter limits the max number of bits/code.
+-f   Forces output file to be generated, even if one already.
+exists, and even if no space is saved by compressing.
+If -f is not used, the user will be prompted if stdin is.
+a tty, otherwise, the output file will not be overwritten.
+-v   Write compression statistics.
+-V   Output vesion and compile options.
+-r   Recursive. If a filename is a directory, descend
 */
-var $, parserModule, common, flags, flagOptions, selectorOptions, optionsParser, defaultComponentData;
-$ = require("../utils/optionsParser");
-parserModule = require("../utils/parserData");
-common = require("./_init");
-flags = {
-  force: 'force',
-  decompress: 'decompress',
-  stdout: 'stdout',
-  statistics: 'statistics',
-  'recursive': 'recursive'
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
-flagOptions = {
-  'force': 'f',
-  'decompress': 'd',
-  'stdout': 'c',
-  'statistics': 'v',
-  'recursive': 'r'
-};
-selectorOptions = {};
-exports.VisualSelectorOptions = {};
-$.setblocksize = function(size){
-  return function(Component){
-    return Component.blockSize = size;
-  };
-};
-optionsParser = {
-  shortOptions: {
-    d: $.switchOn(flags.decompress),
-    f: $.switchOn(flags.force),
-    c: $.switchOn(flags.stdout),
-    v: $.switchOn(flags.statistics),
-    r: $.switchOn(flags.recursive)
-  }
-};
-$.generate(optionsParser);
-defaultComponentData = function(){
-  return {
-    type: 'command',
-    exec: "compress",
-    flags: {
-      "decompress": false,
-      "force": false,
-      "stdout": false,
-      "statistics": false,
-      "recursive": false
+var $ = require("../utils/optionsParser");
+var GraphModule = require("../../common/graph");
+var parserModule = require("../utils/parserData");
+var common = require("./_init");
+
+var flags = {
+    // keep: {
+    //   name: "keep files",
+    //   option: 'k',
+    //   description: "keep (don't delete) input files",
+    //   active: false
+    // },
+    force: {
+        name: "force",
+        option: 'f',
+        description: "overwrite existing output files",
+        active: false
     },
-    files: []
-  };
+    decompress: {
+        name: "decompress",
+        option: 'd',
+        description: "decompress instead of compress",
+        active: false
+    },
+    stdout: {
+        name: "stdout",
+        option: 'c',
+        description: "output to standard out",
+        active: false
+    },
+    // quiet: {
+    //   name: "quiet",
+    //   option: 'q',
+    //   longOption: 'quiet',
+    //   description: "suppress noncritical error messages",
+    //   active: false
+    // },
+    statistics: {
+        name: "statistics",
+        option: 'v',
+        description: "overwrite existing output files",
+        active: false
+    },
+    recursive: {
+        name: "recursive",
+        option: 'r',
+        description: "Recursive. If a filename is a directory, descend",
+        active: false
+    }
 };
+
+var config = {
+    flags: flags
+};
+
+var gzipData = new parserModule.ParserData(config);
+var optionsParser = $.optionParserFromConfig(config);
+
+var CompressComponent = (function (_super) {
+    __extends(CompressComponent, _super);
+    function CompressComponent() {
+        _super.apply(this, arguments);
+        this.exec = "compress";
+        this.files = [];
+    }
+    return CompressComponent;
+})(GraphModule.CommandComponent);
+
+function defaultComponentData() {
+    var component = new CompressComponent();
+    component.selectors = gzipData.componentSelectors;
+    component.flags = gzipData.componentFlags;
+    return component;
+}
+;
+
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-exports.parseComponent = common.commonParseComponent(flagOptions, selectorOptions);
+exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
+exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
+//# sourceMappingURL=compress.js.map
