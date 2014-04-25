@@ -41,7 +41,11 @@ gulp.task('mocha', function() {
 }); 
 
 gulp.task('coverage', function() {
-  gulp.src(['target/**/commands/*.js','target/parser/parser.js'])
+  gulp.src([
+    'target/**/commands/*.js',
+    'target/**/utils/*.js',
+    'target/common/*.js',
+    'target/parser/parser.js'])
     .pipe(istanbul()) // Covering files
     .on('end', function () {
       gulp.src(['test/test.js'])

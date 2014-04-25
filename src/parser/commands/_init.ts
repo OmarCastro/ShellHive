@@ -1,30 +1,14 @@
 
 import optionsParser = require("../utils/optionsParser");
-import GraphModule = require("../../common/graph");
+import Iterator = optionsParser.Iterator;
 
+import GraphModule = require("../../common/graph");
 import Boundary = GraphModule.Boundary;
 import Graph = GraphModule.Graph;
 import Connection = GraphModule.Connection;
 import Component = GraphModule.Component;
 import CommandComponent = GraphModule.CommandComponent;
 import FileComponent = GraphModule.FileComponent;
-
-class Iterator{
-  index:number = 0;
-  argList:any[];
-  length:number;
-  current:any;
-
-  public constructor(ArgList:any[]){
-    this.argList = ArgList;
-    this.length = ArgList.length;
-    this.current = ArgList[0];
-  }
-
-  public hasNext(){ return this.index < this.length }
-  public next(){return this.current = this.argList[this.index++] }
-  public rest(){return this.argList.slice(this.index) }
-}
 
 
 /**
@@ -103,13 +87,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
     var componentData = defaultComponentData();
     
     var boundaries:Boundary[] = [];
-    if (previousCommand) {
-      if (previousCommand instanceof Array) {
-        boundaries.push(previousCommand[0]);
-      } else {
-        boundaries.push(Boundary.createFromComponent(previousCommand));
-      }
-    }
+    if (previousCommand) { boundaries.push(previousCommand[0]) }
     var result = new Graph()
     result.components = [componentData];
 
@@ -213,11 +191,7 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
       /* istanbul ignore if */ 
       if(!flag){
         throw [key,"doesn't exist in ",flagOptions].join('');
-      } else if (flag[0] !== '-') {
-        sFlags.push(flag);
-      } else {
-        lFlags.push(flag);
-      }
+      } else sFlags.push(flag);
     }
   }
 
@@ -229,7 +203,7 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
         /* istanbul ignore if */ 
         if(!optionValue) {
           throw [key,".",value,"doesn't exist in ",selectorOptions].join('');          
-        } else if (optionValue[0] !== '-') {
+        } else /* istanbul ignore else */ if (optionValue[0] !== '-') {
           sFlags.push(optionValue);
         } else {
           lFlags.push(optionValue);
@@ -246,7 +220,7 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
   } else if (containsSFlags) {
     return "-" + sFlags.join('');
   } else if (containsLFlags) {
-    return sFlags.join(' ');
+    return lFlags.join(' ');
   } else return "";
 
 };
@@ -264,7 +238,6 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
     var exec:any[] = [component.exec];
     mapOfParsedComponents[component.id] = true;
     var flags = parseFlagsAndSelectors(component, options);
-    
     var parameters:any = [];
     var Componentparameters = component.parameters;
 

@@ -88,14 +88,19 @@ argsWithCommSub
    | 's`' aux_commandline '`' {$$ = ["commandSubstitution",$2];};
 
 args
-  : '>(' commandline ')' {$$ = ["outToProcess",$2];}
-  | '<(' commandline ')' {$$ = ["inFromProcess",$2];}
-  | '>' str {$$ = ["outTo",$2];}
-  | '2>'str {$$ = ["errTo",$2];}
-  | '&>'str {$$ = ["out&errTo",$2];}   
-  | '<' str {$$ = ["inFrom",$2];}
+  : psubstitution
+  | '>' file {$$ = ["outTo",$2];}
+  | '2>'file {$$ = ["errTo",$2];}
+  | '&>'file {$$ = ["out&errTo",$2];}   
+  | '<' file {$$ = ["inFrom",$2];}
   | '2>&1' {$$ = ["errToOut"];}
   | str;
+
+file : psubstitution | str;
+
+psubstitution
+  : '>(' commandline ')' {$$ = ["outToProcess",$2];}
+  | '<(' commandline ')' {$$ = ["inFromProcess",$2];};
 
 exec:str;
 

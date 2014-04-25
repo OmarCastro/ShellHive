@@ -16,6 +16,7 @@ var Iterator = (function () {
     };
     return Iterator;
 })();
+exports.Iterator = Iterator;
 
 function parseShortOptions(options, componentData, argsNodeIterator) {
     var option, shortOptions = options.shortOptions, iter = new Iterator(argsNodeIterator.current.slice(1));
@@ -37,10 +38,7 @@ exports.parseLongOptions = function (options, componentData, argsNodeIterator) {
         iter = new Iterator(optionStr);
         iter.index = indexOfSep + 1;
         optionKey = optionStr.slice(0, indexOfSep);
-        arg = longOptions[optionKey];
-        if (!arg) {
-            arg = longOptions[optionStr];
-        }
+        arg = longOptions[optionKey] || longOptions[optionStr];
         if (arg) {
             return arg(componentData, argsNodeIterator, iter);
         }
@@ -150,37 +148,6 @@ exports.sameAs = function (option) {
     return ['same', option];
 };
 
-function generateSelectors(options) {
-    var selectors = {};
-    var selectorType = {};
-    var selectorOptions = {};
-    var VisualSelectorOptions = {};
-    var subkey;
-    var key;
-    var subkeys;
-    for (key in options) {
-        subkeys = options[key];
-        selectors[key] = key;
-        var keySelectorType = selectorType[key] = {};
-        var keySelectorOption = selectorOptions[key] = {};
-        var VisualSelectorOption = VisualSelectorOptions[key] = [];
-        for (subkey in subkeys) {
-            var value = subkeys[subkey];
-            keySelectorType[subkey.replace(" ", "_")] = subkey;
-            keySelectorOption[subkey] = value;
-            VisualSelectorOption.push(value);
-        }
-    }
-    return {
-        selectors: selectors,
-        selectorType: selectorType,
-        selectorOptions: selectorOptions,
-        VisualSelectorOptions: VisualSelectorOptions
-    };
-}
-exports.generateSelectors = generateSelectors;
-;
-
 function generate(parser) {
     var key, val;
     var longOptions = parser.longOptions, shortOptions = parser.shortOptions;
@@ -218,7 +185,13 @@ function optionParserFromConfig(config) {
         for (var optionkey in options) {
             var option = options[optionkey];
             opt = exports.select(selector, option);
-            shortOptions[option.option] = opt;
+            if (option.option) {
+                if (option.option[0] === "-") {
+                    longOptions[option.option.slice(2)] = opt;
+                } else {
+                    shortOptions[option.option] = opt;
+                }
+            }
             if (option.longOption) {
                 if (option.longOption instanceof Array) {
                     option.longOption.forEach(function (option) {

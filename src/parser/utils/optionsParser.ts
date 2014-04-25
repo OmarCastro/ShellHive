@@ -1,5 +1,5 @@
 
-class Iterator{
+export class Iterator{
   public index:number = 0;
   public argList:any[];
   public length:number;
@@ -35,10 +35,7 @@ export var parseLongOptions = function(options, componentData, argsNodeIterator)
       iter = new Iterator(optionStr);
       iter.index = indexOfSep + 1;
       optionKey = optionStr.slice(0, indexOfSep);
-      arg = longOptions[optionKey];
-      if (!arg) {
-        arg = longOptions[optionStr];
-      }
+      arg = longOptions[optionKey] || longOptions[optionStr];
       if (arg) {
         return arg(componentData, argsNodeIterator, iter);
       }
@@ -129,36 +126,6 @@ export var selectIfUnselected = function(key, value, ...selections:any[]){
 
 export var sameAs = function(option){ return ['same', option] }
 
-
-export function generateSelectors(options){
-  var selectors:any = {};
-  var selectorType:any = {};
-  var selectorOptions:any = {};
-  var VisualSelectorOptions:any = {};
-  var subkey:string;
-  var key:string;
-  var subkeys:{[s:string]:any};
-  for (key in options) {
-    subkeys = options[key];
-    selectors[key] = key;
-    var keySelectorType = selectorType[key] = {};
-    var keySelectorOption = selectorOptions[key] = {};
-    var VisualSelectorOption = VisualSelectorOptions[key] = [];
-    for (subkey in subkeys) {
-      var value = subkeys[subkey];
-      keySelectorType[subkey.replace(" ","_")] = subkey;
-      keySelectorOption[subkey] = value;
-      VisualSelectorOption.push(value);
-    }
-  }
-  return {
-    selectors: selectors,
-    selectorType: selectorType,
-    selectorOptions: selectorOptions,
-    VisualSelectorOptions: VisualSelectorOptions
-  };
-};
-
 export function generate(parser){
   var key, val
   var longOptions = parser.longOptions,
@@ -194,7 +161,13 @@ export function optionParserFromConfig(config){
     for(var optionkey in options){
       var option = options[optionkey];
       opt = select(selector,option);
-      shortOptions[option.option] = opt;
+      if(option.option){
+        if(option.option[0] === "-"){
+          longOptions[option.option.slice(2)] = opt;
+        } else {
+          shortOptions[option.option] = opt;
+        }
+      }
       if(option.longOption){
         if(option.longOption instanceof Array){
           option.longOption.forEach(option => longOptions[option] = opt)

@@ -56,14 +56,6 @@ function defaultComponentData() {
 }
 ;
 
-/*function defaultComponentData(){
-return{
-type:'command',
-exec:"awk",
-parameters:awkData.componentParameters,
-script: ""
-}
-}*/
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
     string: function (component, str) {
         component.script = str;
@@ -73,7 +65,7 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions, awkData.parameterOptions, function (component, exec, flags, files, parameters) {
     var script = component.script.replace('"', '\\"');
     if (script) {
-        script = (/^[\n\ ]+$/.test(script)) ? '"' + script + '"' : script;
+        script = (/[\n\ ]/.test(script)) ? '"' + script + '"' : script;
     }
     return exec.concat(parameters, script).join(' ');
 });

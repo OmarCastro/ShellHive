@@ -19,10 +19,15 @@ function classname(classObject){
 
 function reparse(command){
   return function(){
-    var graph         = shouldBeAGraph(parser.parseCommand(command))
-    var resultCommand = parser.parseVisualData(graph)
-    var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
-    reGraph.should.eql(graph);
+    var graph
+    it('should sucessfully parse the command', function(){
+      graph = shouldBeAGraph(parser.parseCommand(command))
+    });
+    it('should parse the same graph after compiling to text', function(){
+      var resultCommand = parser.parseVisualData(graph)
+      var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
+      reGraph.should.eql(graph);
+    });
   }
 }
 
@@ -50,8 +55,10 @@ describe('command test', function(){
         parameters:{"field separator": "mi"}
       })
     })
-    it('should parse the same graph after compiling to text', reparse('awk "mimi"'));
-    it('should parse the same graph after compiling to text', reparse('awk -Fmi "mimi"'));
+    describe("reparse awk \'{print;}\'", reparse('awk \'{print;}\''));
+    describe("reparse awk -F_ '{print $2,$5;}'", reparse("awk -F_ '{print $2,$5;}'"));
+    describe("reparse awk -F ' ' '{print $2,$5;}'", reparse("awk -F ' ' '{print $2,$5;}'"));
+    describe("reparse awk '$1 >200' employee.txt", reparse('awk \'$1 >200\' employee.txt'));
   })
 
   describe('Cat test', function(){
@@ -69,7 +76,8 @@ describe('command test', function(){
         "show non-printing": true
       })
     })
-    it('should parse the same graph after compiling to text', reparse('cat -sA file1.txt'));
+    describe('reparse cat -sA file1.txt', reparse('cat -sA file1.txt'));
+    describe('reparse cat -s "/home/super man/file1.txt"', reparse('cat -s "/home/super man/file1.txt"'));
     it('"cat -A" = "cat --show-tabs --show-ends --show-nonprinting"', 
       createsSame('cat -A', 'cat --show-tabs --show-ends --show-nonprinting'));
   })
@@ -88,23 +96,25 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
-    it('should parse the same graph after compiling to text, without arguments', 
-      reparse('grep'));
-    it('should parse the same graph after compiling to text, only pattern',
-      reparse('grep mimi'));
-    it('should parse the same graph after compiling to text, only pattern ( with spaces )',
-      reparse('grep "mi mi"'));
-    it('should parse the same graph after compiling to text, only files',function(){
-    var command       = 'grep "" file1.txt file2.txt'
-    var graph         = shouldBeAGraph(parser.parseCommand(command))
-    graph.components.should.have.length(3)
-    var resultCommand = parser.parseVisualData(graph)
-    var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
-    reGraph.should.eql(graph);
-  })
-    it('should parse the same graph after compiling to text, all arguments',
-      reparse('grep mimi file1.txt file3.txt'));
-    it('using long variants should create the same graph', 
+
+    describe('reparse grep without arguments', reparse('grep'));
+    describe('reparse grep, only pattern', reparse('grep mimi'));
+    describe('reparse grep, only pattern ( with spaces )', reparse('grep "mi mi"'));
+    describe('reparse grep, only files',function(){
+      var graph
+      var command       = 'grep "" file1.txt file2.txt'
+      it('should sucessfully parse the command', function(){
+        graph = shouldBeAGraph(parser.parseCommand(command))
+        graph.components.should.have.length(3)
+      })
+      it('should parse the same graph after compiling to text', function(){
+        var resultCommand = parser.parseVisualData(graph)
+        var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
+        reGraph.should.eql(graph);
+      });
+    })
+    describe('reparse grep, all arguments', reparse('grep mimi file1.txt file3.txt'));
+    it('should create the same graph using long option variants', 
       createsSame('grep mimi -F', 'grep mimi --fixed-strings'));
 
   })
@@ -123,7 +133,7 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
-    it('should parse the same graph after compiling to text', reparse('gzip'));
+    describe('reparse gzip', reparse('gzip'));
 
   })
 
@@ -138,7 +148,7 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
-    it('should parse the same graph after compiling to text', reparse('gunzip'));
+    describe('reparse gunzip', reparse('gunzip'));
 
   })
 
@@ -153,8 +163,7 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
-    it('should parse the same graph after compiling to text', reparse('zcat file.txt.gz'));
-
+    describe('reparse zcat file.txt.gz', reparse('zcat file.txt.gz'));
   })
 
   describe('Bzip test', function(){
@@ -168,6 +177,8 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    describe('reparse bzip2', reparse('bzip2'));
+
   })
 
   describe('Bzcat test', function(){
@@ -181,6 +192,7 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    describe('reparse bzcat', reparse('bzcat'));
   })
 
   describe('Bunzip test', function(){
@@ -194,6 +206,7 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    describe('reparse bunzip2', reparse('bunzip2'));
   })
 
   describe('Compress test', function(){
@@ -207,6 +220,7 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    describe('reparse compress', reparse('compress'));
   })
 
     describe('Diff test', function(){
@@ -221,6 +235,8 @@ describe('command test', function(){
       //  last: { type: 'numeric parameter', name: 'lines', value:10 }
       //})
     })
+    describe('reparse diff, two files', reparse('diff file1.txt file2.txt'));
+    describe('reparse diff, two processes', reparse('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)'));
   })
 
   describe('Ls test', function(){
@@ -234,6 +250,25 @@ describe('command test', function(){
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
+    describe('reparse ls, long option variant',function(){
+      var graph
+      var command       = 'ls --quoting-style=shell'
+      it('should sucessfully parse the command', function(){
+        graph = shouldBeAGraph(parser.parseCommand(command))
+        graph.components[0].selectors.should.have.properties({
+          "quoting style":{type:"option", name:"shell"}
+        });
+      })
+      it('should parse the same graph after compiling to text', function(){
+        var resultCommand = parser.parseVisualData(graph)
+        console.error(resultCommand);
+        var reGraph       = shouldBeAGraph(parser.parseCommand(resultCommand))
+        reGraph.should.eql(graph);
+      });
+    })
+    describe('reparse ls alternate variants', reparse('ls -l --quoting-style=shell -v'));
+    it('should create the same graph', 
+      createsSame('ls -l --quoting-style=shell -v', 'ls -lv --quoting-style=shell'));
   })
 
   describe('Tr test', function(){
@@ -245,9 +280,12 @@ describe('command test', function(){
 
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
-      graph.components[0].flags.should.have.properties({})
+      graph.components[0].should.have.properties({
+        "set1":"man",
+        "set2":"woman"
+      })
     })
-    it('should parse the same graph after compiling to text', reparse('tr man woman'));
+    describe('reparse tr', reparse('tr man woman'));
 
   })
 

@@ -1,30 +1,12 @@
 var optionsParser = require("../utils/optionsParser");
-var GraphModule = require("../../common/graph");
+var Iterator = optionsParser.Iterator;
 
+var GraphModule = require("../../common/graph");
 var Boundary = GraphModule.Boundary;
 var Graph = GraphModule.Graph;
 var Connection = GraphModule.Connection;
 
 var FileComponent = GraphModule.FileComponent;
-
-var Iterator = (function () {
-    function Iterator(ArgList) {
-        this.index = 0;
-        this.argList = ArgList;
-        this.length = ArgList.length;
-        this.current = ArgList[0];
-    }
-    Iterator.prototype.hasNext = function () {
-        return this.index < this.length;
-    };
-    Iterator.prototype.next = function () {
-        return this.current = this.argList[this.index++];
-    };
-    Iterator.prototype.rest = function () {
-        return this.argList.slice(this.index);
-    };
-    return Iterator;
-})();
 
 
 function typeOf(arg) {
@@ -88,11 +70,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
 
         var boundaries = [];
         if (previousCommand) {
-            if (previousCommand instanceof Array) {
-                boundaries.push(previousCommand[0]);
-            } else {
-                boundaries.push(Boundary.createFromComponent(previousCommand));
-            }
+            boundaries.push(previousCommand[0]);
         }
         var result = new Graph();
         result.components = [componentData];
@@ -196,11 +174,8 @@ function parseFlagsAndSelectors(component, options) {
 
             /* istanbul ignore if */ if (!flag) {
                 throw [key, "doesn't exist in ", flagOptions].join('');
-            } else if (flag[0] !== '-') {
+            } else
                 sFlags.push(flag);
-            } else {
-                lFlags.push(flag);
-            }
         }
     }
 
@@ -228,7 +203,7 @@ function parseFlagsAndSelectors(component, options) {
     } else if (containsSFlags) {
         return "-" + sFlags.join('');
     } else if (containsLFlags) {
-        return sFlags.join(' ');
+        return lFlags.join(' ');
     } else
         return "";
 }
@@ -246,7 +221,6 @@ function commonParseComponent(flagOptions, selectorOptions, parameterOptions, be
         var exec = [component.exec];
         mapOfParsedComponents[component.id] = true;
         var flags = parseFlagsAndSelectors(component, options);
-
         var parameters = [];
         var Componentparameters = component.parameters;
 

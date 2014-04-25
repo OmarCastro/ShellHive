@@ -27,7 +27,7 @@ function connector(parser, previousCommand, result:Graph, boundaries, tracker){
     boundaries.push(Boundary.createFromComponents(subresult.components));
     result.components = result.components.concat(subresult.components);
     result.connections = result.connections.concat(subresult.connections);
-    result.connections.push(new Connection(previousCommand,'output',subresult.firstMainComponent,'input'))
+    result.connections.push(new Connection(previousCommand, "output" ,subresult.firstMainComponent,'input'))
   };
 }
 
@@ -39,22 +39,18 @@ export function parseCommand(argsNode, parser, tracker, previousCommand, nextcom
   result.firstMainComponent = firstMainComponent;
   result.components  = components;
   result.connections = connections;
-  
-  if (previousCommand instanceof Array) {
-    previousCommand = previousCommand[1];
-  }
-  var connectTo = connector(parser, previousCommand, result, boundaries, tracker);
+ 
+  var connectTo = connector(parser, previousCommand[1], result, boundaries, tracker);
   for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
     argNode = argsNode[i$];
-    switch ($.typeOf(argNode)) {
-    case 'outToProcess':
-      connectTo(argNode[1]);
+    if($.typeOf(argNode) == 'outToProcess'){
+      connectTo(argNode[1])
     }
   }
   if (nextcommands.length) {
     connectTo(nextcommands);
   }
-  arrangeLayout(previousCommand, boundaries);
+  arrangeLayout(previousCommand[1], boundaries);
   result.counter = tracker.id;
   return result;
 };

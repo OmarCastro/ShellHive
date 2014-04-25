@@ -278,78 +278,68 @@ var parameters = {
     }
 };
 
-var optionsParser = {
-    shortOptions: {
-        a: $.select(selectors.show, selectors.show.options.all),
-        A: $.select(selectors.show, selectors.show.options.almostAll),
-        b: $.select(selectors.quotingStyle, selectors.quotingStyle.options.escape),
-        B: $.switchOn(flags.ignoreBackups),
-        c: $.ignore,
-        C: $.ignore,
-        d: $.ignore,
-        D: $.ignore,
-        f: $.ignore,
-        F: $.select(selectors.indicatorStyle, selectors.indicatorStyle.options.classify),
-        g: $.switchOn(flags.noPrintOwner),
-        G: $.switchOn(flags.noPrintGroup),
-        h: $.switchOn(flags.humanReadable),
-        H: $.ignore,
-        i: $.ignore,
-        I: $.setParameter(parameters.ignore.name),
-        k: $.ignore,
-        l: $.select(selectors.format, selectors.format.options.long),
-        L: $.ignore,
-        m: $.select(selectors.format, selectors.format.options.commas),
-        n: $.switchOn(flags.numericID),
-        N: $.ignore,
-        o: $.ignore,
-        p: $.select(selectors.indicatorStyle, selectors.indicatorStyle.options.slash),
-        q: $.ignore,
-        Q: $.ignore,
-        r: $.switchOn(flags.reverse),
-        R: $.ignore,
-        s: $.ignore,
-        S: $.select(selectors.sort, selectors.sort.options.size),
-        t: $.select(selectors.sort, selectors.sort.options.time),
-        T: $.ignore,
-        u: $.ignore,
-        U: $.select(selectors.sort, selectors.sort.options.noSort),
-        v: $.select(selectors.sort, selectors.sort.options.extension),
-        w: $.ignore,
-        x: $.ignore,
-        X: $.select(selectors.sort, selectors.sort.options.size),
-        Z: $.switchOn(flags.context),
-        1: $.ignore
-    },
-    longOptions: {
-        "all": $.sameAs('a'),
-        "almost-all": $.sameAs('A'),
-        "escape": $.sameAs('b'),
-        "directory": $.sameAs('d'),
-        "classify": $.sameAs('F'),
-        "no-group": $.sameAs('G'),
-        "human-readable": $.sameAs('h'),
-        "inode": $.sameAs('i'),
-        "kibibytes": $.sameAs('k'),
-        "dereference": $.sameAs('l'),
-        "numeric-uid-gid": $.sameAs('n'),
-        "literal": $.sameAs('N'),
-        "indicator-style=slash": $.sameAs('p'),
-        "hide-control-chars": $.sameAs('q'),
-        "quote-name": $.sameAs('Q'),
-        "reverse": $.sameAs('r'),
-        "recursive": $.sameAs('R'),
-        "size": $.sameAs('S'),
-        "context": $.sameAs('Z')
-    }
-};
-$.generate(optionsParser);
-
 var config = {
     selectors: selectors,
     flags: flags,
     parameters: parameters
 };
+
+var optionsParser = $.optionParserFromConfig(config);
+var shortOptions = optionsParser.shortOptions;
+
+function extend(option, additional) {
+    for (var i in additional) {
+        option[i] = additional[i];
+    }
+}
+
+extend(optionsParser.shortOptions, {
+    c: $.ignore,
+    C: $.ignore,
+    d: $.ignore,
+    D: $.ignore,
+    f: $.ignore,
+    H: $.ignore,
+    i: $.ignore,
+    I: $.setParameter(parameters.ignore.name),
+    k: $.ignore,
+    L: $.ignore,
+    N: $.ignore,
+    o: $.ignore,
+    q: $.ignore,
+    Q: $.ignore,
+    R: $.ignore,
+    s: $.ignore,
+    T: $.ignore,
+    u: $.ignore,
+    w: $.ignore,
+    x: $.ignore,
+    1: $.ignore
+});
+
+extend(optionsParser.longOptions, {
+    "all": $.sameAs('a'),
+    "almost-all": $.sameAs('A'),
+    "escape": $.sameAs('b'),
+    "directory": $.sameAs('d'),
+    "classify": $.sameAs('F'),
+    "no-group": $.sameAs('G'),
+    "human-readable": $.sameAs('h'),
+    "inode": $.sameAs('i'),
+    "kibibytes": $.sameAs('k'),
+    "dereference": $.sameAs('l'),
+    "numeric-uid-gid": $.sameAs('n'),
+    "literal": $.sameAs('N'),
+    "indicator-style=slash": $.sameAs('p'),
+    "hide-control-chars": $.sameAs('q'),
+    "quote-name": $.sameAs('Q'),
+    "reverse": $.sameAs('r'),
+    "recursive": $.sameAs('R'),
+    "size": $.sameAs('S'),
+    "context": $.sameAs('Z')
+});
+
+$.generate(optionsParser);
 
 var lsCommandData = new parserModule.ParserData(config);
 

@@ -1,1 +1,1 @@
-parallel 'find parser/commands/dev/{} -newer parser/commands/v/{.}.js\''
+cat 2> >(tee >(cat 2> >(tee >(cat) >(cat))) >(cat 2> >(tee >(cat) >(cat) | cat)) | cat)

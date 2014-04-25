@@ -52,15 +52,6 @@ function defaultComponentData(){
   return component;
 };
 
-/*function defaultComponentData(){
-  return{
-    type:'command',
-    exec:"awk",
-    parameters:awkData.componentParameters,
-    script: ""
-  }
-}*/
-
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
     string: (component:AwkComponent, str) => {
         component.script = str;
@@ -71,7 +62,7 @@ export var parseComponent = common.commonParseComponent(awkData.flagOptions, awk
   (component,exec,flags,files,parameters) => {
     var script = component.script.replace('"','\\"');
     if(script){
-      script = (/^[\n\ ]+$/.test(script)) ? '"'+script+'"' : script;
+      script = (/[\n\ ]/.test(script)) ? '"'+script+'"' : script;
     }    
     return exec.concat(parameters,script).join(' ');
   })

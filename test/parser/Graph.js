@@ -107,7 +107,17 @@ describe('typeOf test', function(){
       graph.connections.should.have.length(8)
       graph.components.should.matchEach(function(component){
         component.exec.should.equal("cat");
-      })      
+      })
     })
+    //it('should create a tree by using a tee command, using stderr instead', function(){
+    //  var command = 'cat 2> >(tee >(cat 2> >(tee >(cat) >(cat))) >(cat 2> >(tee >(cat) >(cat) | cat)) | cat)';
+    //  var graph = parser.parseCommand(command)
+    //  shouldBeAGraph(graph)
+    //  graph.components.should.have.length(9)
+    //  graph.connections.should.have.length(8)
+    //  graph.components.should.matchEach(function(component){
+    //    component.exec.should.equal("cat");
+    //  })       
+    //})
   })
 })
