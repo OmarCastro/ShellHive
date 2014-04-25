@@ -34,7 +34,7 @@
     "should": "~3.3.1",
     "gulp-mocha": "~0.4.1",
     "gulp-istanbul": "~0.1.1",
-    "coverage-badge": "0.0.5",
+    "coverage-badge": "git://github.com/ashaffer/node-coverage-badge#patch-1",
     "coverage-percentage": "0.0.2"
   }
 }
