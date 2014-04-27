@@ -43,6 +43,7 @@ var DateComponent = (function (_super) {
     }
     return DateComponent;
 })(GraphModule.CommandComponent);
+exports.DateComponent = DateComponent;
 
 function defaultComponentData() {
     var component = new DateComponent();
@@ -59,6 +60,7 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 });
 exports.parseComponent = common.commonParseComponent(dateData.flagOptions, dateData.selectorOptions, dateData.parameterOptions);
 exports.VisualSelectorOptions = dateData.visualSelectorOptions;
+exports.componentClass = DateComponent;
 /*DESCRIPTION
 Display the current time in the given FORMAT, or set the system date.
 -d, --date=STRING

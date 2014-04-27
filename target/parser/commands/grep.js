@@ -138,6 +138,7 @@ var GrepComponent = (function (_super) {
     }
     return GrepComponent;
 })(GraphModule.CommandComponent);
+exports.GrepComponent = GrepComponent;
 
 function defaultComponentData() {
     var graph = new GrepComponent();
@@ -174,4 +175,5 @@ exports.parseComponent = common.commonParseComponent(grepCommandData.flagOptions
 });
 
 exports.VisualSelectorOptions = grepCommandData.visualSelectorOptions;
+exports.componentClass = GrepComponent;
 //# sourceMappingURL=grep.js.map

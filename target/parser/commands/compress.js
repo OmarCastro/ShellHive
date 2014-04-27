@@ -83,6 +83,7 @@ var CompressComponent = (function (_super) {
     }
     return CompressComponent;
 })(GraphModule.CommandComponent);
+exports.CompressComponent = CompressComponent;
 
 function defaultComponentData() {
     var component = new CompressComponent();
@@ -95,4 +96,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
 exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
+exports.componentClass = CompressComponent;
 //# sourceMappingURL=compress.js.map

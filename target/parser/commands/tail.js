@@ -87,6 +87,7 @@ var TailComponent = (function (_super) {
     }
     return TailComponent;
 })(GraphModule.CommandComponent);
+exports.TailComponent = TailComponent;
 
 function defaultComponentData() {
     var component = new TailComponent();
@@ -99,4 +100,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(tailData.flagOptions, tailData.selectorOptions);
 exports.VisualSelectorOptions = tailData.visualSelectorOptions;
+exports.componentClass = TailComponent;
 //# sourceMappingURL=tail.js.map

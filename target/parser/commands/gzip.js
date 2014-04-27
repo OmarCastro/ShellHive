@@ -156,6 +156,7 @@ var GZipComponent = (function (_super) {
     }
     return GZipComponent;
 })(GraphModule.CommandComponent);
+exports.GZipComponent = GZipComponent;
 
 function defaultComponentData() {
     var component = new GZipComponent();
@@ -168,4 +169,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
 exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
+exports.componentClass = GZipComponent;
 //# sourceMappingURL=gzip.js.map

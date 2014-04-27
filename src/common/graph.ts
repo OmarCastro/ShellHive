@@ -12,9 +12,14 @@ export class Graph{
 	public toJSON(){
 		return {
       components: this.components,
-      connections: this.connections
+      connections: this.connections,
     }
 	}
+
+  public connect(startComponent:Component, outputPort:string, endComponent:Component, inputPort:string){
+    var connection = new Connection(startComponent,outputPort,endComponent,inputPort)
+    this.connections.push(connection);
+  }
 
 	/*
 		expands with other graph
@@ -48,7 +53,25 @@ export class IndexedGraph{
 	}
 }
 
+
+export class Macro extends Graph { 
+  constructor(
+    public name:string,
+    public description:string
+  ){super()}
+
+
+
+  public static fromGraph(name:string, description:string, graphData:Graph):Macro{
+    var newmacro = new Macro(name,description);
+    newmacro.components = graphData.components
+    newmacro.connections = graphData.connections
+    return newmacro;
+  }
+}
+
 //============= COMPONENTS ===========
+
 
 export class Component{
   public static type:string = "abrstract component"
@@ -88,27 +111,38 @@ export class FileComponent extends Component{
 	A macro Component
 */
 export class GraphComponent extends Component{
-    public static type:string = "macro"
+    public static type:string = "graph"
+    public type:string = GraphComponent.type
+
     public entryComponent:Component = null
     public exitComponent:Component = null
     public counter: number = 0
     public components:any[] = []
     public connections:any[] = []
 
-    public constructor(
+    constructor(
       public name:string,
       public description:string
     ){super();}
-
-    public get type() : string {
-      return GraphComponent.type;
-    }
 
     public setGraphData(graphData:Graph){
         this.components = graphData.components
         this.connections = graphData.connections
         this.entryComponent = graphData.firstMainComponent
     }
+}
+
+/**
+  A macro Component
+*/
+export class MacroComponent extends Component{
+    public static type:string = "macro"
+    public type:string = MacroComponent.type
+
+    constructor(
+      public macro:Macro
+    ){super();}
+
 }
 
 //========   ==========

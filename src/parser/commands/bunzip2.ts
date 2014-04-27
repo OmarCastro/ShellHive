@@ -143,7 +143,7 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
-class BunzipComponent extends GraphModule.CommandComponent {
+export class BunzipComponent extends GraphModule.CommandComponent {
   public exec:string = "bunzip2"
   public files: any[] = []
 }
@@ -158,3 +158,5 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var componentClass = BunzipComponent
+

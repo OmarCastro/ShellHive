@@ -6,13 +6,14 @@ var astBuilder:{parse:(string)=>any} = require('./ast-builder/ast-builder');
 
 import GraphModule = require("../common/graph");
 export import Graph = GraphModule.Graph
+export import Macro = GraphModule.Macro
 export import GraphComponent = GraphModule.GraphComponent
+export import MacroComponent = GraphModule.MacroComponent
 export import Component = GraphModule.Component
 export import Connection = GraphModule.Connection
 export import FileComponent = GraphModule.FileComponent
 export import CommandComponent = GraphModule.CommandComponent
-
-import IndexedGraph = GraphModule.IndexedGraph
+export import IndexedGraph = GraphModule.IndexedGraph
 
 
 var parserCommand = {
@@ -34,7 +35,9 @@ var parserCommand = {
   tr: require('./commands/tr'),
   tee: require('./commands/tee')
 };
+
 var implementedCommands:any[] = [];
+
 export var VisualSelectorOptions = {}
 for (var key in parserCommand) {
     implementedCommands.push(key);
@@ -62,7 +65,7 @@ export function generateAST(command:string){
  * @param tracker - and tracker the tracks the id of a component
  * @return the visual representation of the object
  */
-export function parseAST(ast, tracker = {id: 0}){
+export function parseAST(ast, tracker = {id: 0}):Graph{
   var LastCommandComponent, CommandComponent, exec, args, result_aux, result, comp, firstMainComponent;
   
   var graph = new Graph(); 
@@ -122,9 +125,15 @@ export function parseVisualData(VisualData:Graph){
     return '';
   }
   indexedComponentList = new IndexedGraph(VisualData);
-  initialComponent = VisualData.firstMainComponent;
-  if (!initialComponent) {
-    return '';
+  initialComponent = VisualData.firstMainComponent
+  if (!(initialComponent instanceof CommandComponent)) {
+    var ref = VisualData.components
+    for(var i = 0, len = ref.length; i < len; ++i){
+      if(ref[i] instanceof CommandComponent){
+        initialComponent = ref[i];
+        break;
+      }
+    }
   }
   return parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
 }
@@ -134,35 +143,37 @@ export function parseComponent(component, visualData:Graph, componentIndex, mapO
   switch (component.type) {
   case CommandComponent.type:
     return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
-  case GraphComponent.type:
-    return compileMacro(component.macro);
-  default:
-    return '';
+  case MacroComponent.type:
+    return parseVisualData(component.macro);
   }
 }
 
+
+/**
+  find the first component to be parsed
+*/
+export function findFirstComponent(currentComponent:Component, visualData:Graph, componentIndex:IndexedGraph, mapOfParsedComponents){
+  do {
+    var isFirst = visualData.connections.every((connection)=>{
+    if (connection.endComponent == currentComponent
+    && connection.startPort === 'output' 
+    && connection.endPort === 'input' 
+    && mapOfParsedComponents[connection.startNode] !== true) {
+      currentComponent = componentIndex.components[connection.startNode];
+      return false
+    }
+    return true;
+    });
+  } while (isFirst == false);
+  return currentComponent
+}
 
 /**
   Parse visual data from Component
 */
 export function parseVisualDatafromComponent(currentComponent, visualData:Graph, componentIndex:IndexedGraph, mapOfParsedComponents){
   var commands:any[] = [];
-  do {
-    var isFirst = visualData.connections.every((connection)=>{
-      if (connection.endNode === currentComponent.id 
-      && connection.startPort === 'output' 
-      && connection.endPort === 'input' 
-      && mapOfParsedComponents[connection.startNode] !== true) {
-        isFirst = false;
-        currentComponent = componentIndex.components[connection.startNode];
-        return false;
-      }
-      return true;
-    });
-  } while (isFirst == false);
-
-
-
+  currentComponent = findFirstComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents)
   var parsedCommand = parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
   var parsedCommandIndex = commands.length;
   commands.push(parsedCommand);
@@ -270,47 +281,73 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
 
 
 export function createMacro (name, description, command, fromMacro){
-  if (fromMacro) {
-
-    var result = JSON.parse(JSON.stringify(fromMacro)); 
-    result.name = name;
-    result.description = description;
-    return result;
-
-  } 
-  var macroData:GraphComponent = new GraphComponent(name,description);
-  if (command) {
-    macroData.setGraphData(parseCommand(command));
-  } 
-  return macroData;
+  if(fromMacro){
+    return Macro.fromGraph(name,description,cloneGraph(fromMacro));
+  } else if (command) {
+    return Macro.fromGraph(name,description,parseCommand(command));
+  } else return new Macro(name, description);
 };
 
-
-
-
-
-
-
-
-function compileMacro(macro){
-  var indexedComponentList, initialComponent;
-  console.log("compling Macro");
-  if (macro.entryComponent === null) {
-    throw "no component defined as Macro Entry";
-  }
-  indexedComponentList = new IndexedGraph(macro);
-  initialComponent = indexedComponentList[macro.entryComponent];
-  return parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
+/**
+  Creates a component based on the first word of the content
+  if the first word contains dots, create a file
+  if the first word is a command creates a command component instead
+*/
+export function createComponentDinamicText(text: string){
+  if(text === ""){ return null }
+  var words = text.replace("\n"," ").split(" ");
+  var firstWord = words[0];
+  if(firstWord.indexOf(".") > -1){
+    return new FileComponent(text)
+  } else if(isImplemented(firstWord)){
+    return parseCommand(text).components[0]
+  } else return null
+  
 }
 
+export function graphFromJson(json:string){
+  var jsonObj = JSON.parse(json);
+  var newGraph = new Graph();
+  var componentMap = {}
+  for(var i in jsonObj){
+      newGraph[i] = jsonObj[i]
+  }
+  var components = []
+  jsonObj.components.forEach(component => {
+    var newComponent; 
+    switch (component.type) {
+      case CommandComponent.type:
+        newComponent = new parserCommand[component.exec].componentClass
+        break;
+      case FileComponent.type:
+        newComponent = new FileComponent(component.filename)
+        break;
+      /* istanbul ignore next */
+      default: return;
+    }
+    for(var i in component){
+      newComponent[i] = component[i]
+    }
+    componentMap[newComponent.id] = newComponent
+    components.push(newComponent)
+    
+  })
+  newGraph.components = components;
+  newGraph.connections = [];
+  jsonObj.connections.forEach((connection) => {
+    newGraph.connect(
+      componentMap[connection.startNode], connection.startPort,
+      componentMap[connection.endNode], connection.endPort
+    );
+  })
+  newGraph.firstMainComponent = componentMap[<any> newGraph.firstMainComponent]
+  return newGraph;
+}
 
-
-
-
-
-
-
-
+export function cloneGraph(graph){
+  var json = JSON.stringify(graph);
+  return graphFromJson(json);
+}
 
 parser.generateAST =  generateAST;
 parser.parseAST = parseAST;

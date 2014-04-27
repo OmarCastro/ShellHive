@@ -147,7 +147,7 @@ var config:parserModule.Config = {
 var gzipData = new parserModule.ParserData(config);
 var optionsParser = $.optionParserFromConfig(config)
 
-class GZipComponent extends GraphModule.CommandComponent {
+export class GZipComponent extends GraphModule.CommandComponent {
   public exec:string = "gzip"
   public files: any[] = []
 }
@@ -163,3 +163,4 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
 export var VisualSelectorOptions = gzipData.visualSelectorOptions;
+export var componentClass = GZipComponent

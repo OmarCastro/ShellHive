@@ -77,6 +77,7 @@ var ZcatComponent = (function (_super) {
     }
     return ZcatComponent;
 })(GraphModule.CommandComponent);
+exports.ZcatComponent = ZcatComponent;
 
 function defaultComponentData() {
     var component = new ZcatComponent();
@@ -89,4 +90,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(zcatData.flagOptions, zcatData.selectorOptions);
 exports.VisualSelectorOptions = zcatData.visualSelectorOptions;
+exports.componentClass = ZcatComponent;
 //# sourceMappingURL=zcat.js.map

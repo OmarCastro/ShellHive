@@ -84,7 +84,7 @@ optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, select
 var lsCommandData = new parserModule.ParserData(config);
 
 
-class HeadComponent extends GraphModule.CommandComponent {
+export class HeadComponent extends GraphModule.CommandComponent {
   public exec:string = "head"
   public files: any[] = []
 }
@@ -99,3 +99,4 @@ function defaultComponentData(){
 export var parseCommand   = common.commonParseCommand(optionsParser,defaultComponentData)
 export var parseComponent = common.commonParseComponent(headData.flagOptions,headData.selectorOptions)
 export var VisualSelectorOptions = headData.visualSelectorOptions;
+export var componentClass = HeadComponent

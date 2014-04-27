@@ -138,7 +138,7 @@ var grepCommandData = new parserModule.ParserData(config);
 
 
 
-class GrepComponent extends GraphModule.CommandComponent {
+export class GrepComponent extends GraphModule.CommandComponent {
   public exec:string = "grep"
   public files: any[] = []
   public pattern:string = null
@@ -176,3 +176,4 @@ export var parseComponent = common.commonParseComponent(grepCommandData.flagOpti
 })
 
 export var VisualSelectorOptions = grepCommandData.visualSelectorOptions;
+export var componentClass = GrepComponent

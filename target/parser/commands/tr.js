@@ -85,4 +85,5 @@ exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipD
     return exec.concat(flags, component.set1, component.set2).join(' ');
 });
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = TrComponent;
 //# sourceMappingURL=tr.js.map

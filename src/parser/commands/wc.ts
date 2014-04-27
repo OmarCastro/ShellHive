@@ -60,7 +60,7 @@ var config:parserModule.Config = { flags:flags }
 var WcData = new parserModule.ParserData(config);
 var optionsParser = $.optionParserFromConfig(config);
 
-class WcComponent extends GraphModule.CommandComponent {
+export class WcComponent extends GraphModule.CommandComponent {
   public exec:string = "wc"
   public files: any[] = []
 }
@@ -75,3 +75,4 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(WcData.flagOptions, WcData.selectorOptions);
 export var VisualSelectorOptions = WcData.visualSelectorOptions;
+export var componentClass = WcComponent

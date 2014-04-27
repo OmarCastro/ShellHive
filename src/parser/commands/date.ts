@@ -32,7 +32,7 @@ optionsParser.shortOptions['d'] =  $.setParameter(config.parameters.date.name)
 optionsParser.longOptions['date'] =  optionsParser.shortOptions['d']
 
 
-class DateComponent extends GraphModule.CommandComponent {
+export class DateComponent extends GraphModule.CommandComponent {
   public exec:string = "date"
 }
 
@@ -48,6 +48,7 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
 })
 export var parseComponent = common.commonParseComponent(dateData.flagOptions, dateData.selectorOptions,dateData.parameterOptions)
 export var VisualSelectorOptions = dateData.visualSelectorOptions;
+export var componentClass = DateComponent
 
 
 /*DESCRIPTION

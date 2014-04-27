@@ -188,7 +188,7 @@ var longOptions = {
 }*/
 
 
-class BZipComponent extends GraphModule.CommandComponent {
+export class BZipComponent extends GraphModule.CommandComponent {
   public exec:string = "bzip2"
   public files: any[] = []
 }
@@ -204,3 +204,5 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var componentClass = BZipComponent
+

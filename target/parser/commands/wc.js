@@ -71,6 +71,7 @@ var WcComponent = (function (_super) {
     }
     return WcComponent;
 })(GraphModule.CommandComponent);
+exports.WcComponent = WcComponent;
 
 function defaultComponentData() {
     var graph = new WcComponent();
@@ -83,4 +84,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(WcData.flagOptions, WcData.selectorOptions);
 exports.VisualSelectorOptions = WcData.visualSelectorOptions;
+exports.componentClass = WcComponent;
 //# sourceMappingURL=wc.js.map

@@ -147,6 +147,7 @@ var BzcatComponent = (function (_super) {
     }
     return BzcatComponent;
 })(GraphModule.CommandComponent);
+exports.BzcatComponent = BzcatComponent;
 
 function defaultComponentData() {
     var component = new BzcatComponent();
@@ -159,4 +160,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = BzcatComponent;
 //# sourceMappingURL=bzcat.js.map

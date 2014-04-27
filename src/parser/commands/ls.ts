@@ -346,7 +346,7 @@ $.generate(optionsParser);
 var lsCommandData = new parserModule.ParserData(config);
 
 
-class LsComponent extends GraphModule.CommandComponent {
+export class LsComponent extends GraphModule.CommandComponent {
   public exec:string = "ls"
   public files: any[] = []
 }
@@ -365,3 +365,4 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
 export var parseComponent = common.commonParseComponent(lsCommandData.flagOptions,lsCommandData.selectorOptions,lsCommandData.parameterOptions)
 export var VisualSelectorOptions = lsCommandData.visualSelectorOptions;
+export var componentClass = LsComponent

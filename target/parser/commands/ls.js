@@ -352,6 +352,7 @@ var LsComponent = (function (_super) {
     }
     return LsComponent;
 })(GraphModule.CommandComponent);
+exports.LsComponent = LsComponent;
 
 function defaultComponentData() {
     var component = new LsComponent();
@@ -365,4 +366,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(lsCommandData.flagOptions, lsCommandData.selectorOptions, lsCommandData.parameterOptions);
 exports.VisualSelectorOptions = lsCommandData.visualSelectorOptions;
+exports.componentClass = LsComponent;
 //# sourceMappingURL=ls.js.map

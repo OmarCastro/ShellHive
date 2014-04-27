@@ -79,6 +79,7 @@ var GunzipComponent = (function (_super) {
     }
     return GunzipComponent;
 })(GraphModule.CommandComponent);
+exports.GunzipComponent = GunzipComponent;
 
 function defaultComponentData() {
     var component = new GunzipComponent();
@@ -90,4 +91,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(gunzipData.flagOptions, gunzipData.selectorOptions);
 exports.VisualSelectorOptions = gunzipData.visualSelectorOptions;
+exports.componentClass = GunzipComponent;
 //# sourceMappingURL=gunzip.js.map

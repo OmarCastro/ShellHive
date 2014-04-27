@@ -79,3 +79,4 @@ export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bz
 
   );
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var componentClass = TrComponent

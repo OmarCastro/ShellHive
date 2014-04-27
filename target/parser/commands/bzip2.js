@@ -194,6 +194,7 @@ var BZipComponent = (function (_super) {
     }
     return BZipComponent;
 })(GraphModule.CommandComponent);
+exports.BZipComponent = BZipComponent;
 
 function defaultComponentData() {
     var component = new BZipComponent();
@@ -206,4 +207,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = BZipComponent;
 //# sourceMappingURL=bzip2.js.map

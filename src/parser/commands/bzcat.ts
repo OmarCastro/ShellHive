@@ -144,7 +144,7 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
-class BzcatComponent extends GraphModule.CommandComponent {
+export class BzcatComponent extends GraphModule.CommandComponent {
   public exec:string = "bzcat"
   public files: any[] = []
 }
@@ -160,3 +160,5 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var componentClass = BzcatComponent
+

@@ -80,7 +80,7 @@ optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, select
 optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name)
 
 
-class TailComponent extends GraphModule.CommandComponent {
+export class TailComponent extends GraphModule.CommandComponent {
   public exec:string = "tail"
   public files: any[] = []
 }
@@ -96,3 +96,4 @@ function defaultComponentData(){
 export var parseCommand   = common.commonParseCommand(optionsParser,defaultComponentData)
 export var parseComponent = common.commonParseComponent(tailData.flagOptions,tailData.selectorOptions)
 export var VisualSelectorOptions = tailData.visualSelectorOptions;
+export var componentClass = TailComponent

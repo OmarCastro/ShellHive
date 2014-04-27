@@ -48,6 +48,7 @@ var AwkComponent = (function (_super) {
     }
     return AwkComponent;
 })(GraphModule.CommandComponent);
+exports.AwkComponent = AwkComponent;
 
 function defaultComponentData() {
     var component = new AwkComponent();
@@ -71,4 +72,5 @@ exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkDat
 });
 
 exports.VisualSelectorOptions = awkData.visualSelectorOptions;
+exports.componentClass = AwkComponent;
 //# sourceMappingURL=awk.js.map

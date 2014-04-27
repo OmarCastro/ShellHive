@@ -89,6 +89,7 @@ var HeadComponent = (function (_super) {
     }
     return HeadComponent;
 })(GraphModule.CommandComponent);
+exports.HeadComponent = HeadComponent;
 
 function defaultComponentData() {
     var component = new HeadComponent();
@@ -101,4 +102,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(headData.flagOptions, headData.selectorOptions);
 exports.VisualSelectorOptions = headData.visualSelectorOptions;
+exports.componentClass = HeadComponent;
 //# sourceMappingURL=head.js.map

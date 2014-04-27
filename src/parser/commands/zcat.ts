@@ -63,7 +63,7 @@ var config:parserModule.Config = {
 var optionsParser = $.optionParserFromConfig(config)
 var zcatData = new parserModule.ParserData(config);
 
-class ZcatComponent extends GraphModule.CommandComponent {
+export class ZcatComponent extends GraphModule.CommandComponent {
   public exec:string = "zcat"
   public files: any[] = []
 }
@@ -79,3 +79,4 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(zcatData.flagOptions, zcatData.selectorOptions);
 export var VisualSelectorOptions = zcatData.visualSelectorOptions;
+export var componentClass = ZcatComponent

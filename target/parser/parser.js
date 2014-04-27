@@ -5,8 +5,12 @@ var astBuilder = require('./ast-builder/ast-builder');
 var GraphModule = require("../common/graph");
 var Graph = GraphModule.Graph;
 exports.Graph = Graph;
+var Macro = GraphModule.Macro;
+exports.Macro = Macro;
 var GraphComponent = GraphModule.GraphComponent;
 exports.GraphComponent = GraphComponent;
+var MacroComponent = GraphModule.MacroComponent;
+exports.MacroComponent = MacroComponent;
 var Component = GraphModule.Component;
 exports.Component = Component;
 var Connection = GraphModule.Connection;
@@ -15,8 +19,8 @@ var FileComponent = GraphModule.FileComponent;
 exports.FileComponent = FileComponent;
 var CommandComponent = GraphModule.CommandComponent;
 exports.CommandComponent = CommandComponent;
-
 var IndexedGraph = GraphModule.IndexedGraph;
+exports.IndexedGraph = IndexedGraph;
 
 var parserCommand = {
     awk: require('./commands/awk'),
@@ -37,7 +41,9 @@ var parserCommand = {
     tr: require('./commands/tr'),
     tee: require('./commands/tee')
 };
+
 var implementedCommands = [];
+
 exports.VisualSelectorOptions = {};
 for (var key in parserCommand) {
     implementedCommands.push(key);
@@ -127,10 +133,16 @@ function parseVisualData(VisualData) {
     if (VisualData.components.length < 1) {
         return '';
     }
-    indexedComponentList = new IndexedGraph(VisualData);
+    indexedComponentList = new exports.IndexedGraph(VisualData);
     initialComponent = VisualData.firstMainComponent;
-    if (!initialComponent) {
-        return '';
+    if (!(initialComponent instanceof exports.CommandComponent)) {
+        var ref = VisualData.components;
+        for (var i = 0, len = ref.length; i < len; ++i) {
+            if (ref[i] instanceof exports.CommandComponent) {
+                initialComponent = ref[i];
+                break;
+            }
+        }
     }
     return exports.parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
 }
@@ -140,30 +152,35 @@ function parseComponent(component, visualData, componentIndex, mapOfParsedCompon
     switch (component.type) {
         case exports.CommandComponent.type:
             return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
-        case exports.GraphComponent.type:
-            return compileMacro(component.macro);
-        default:
-            return '';
+        case exports.MacroComponent.type:
+            return exports.parseVisualData(component.macro);
     }
 }
 exports.parseComponent = parseComponent;
 
 /**
-Parse visual data from Component
+find the first component to be parsed
 */
-function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
-    var commands = [];
+function findFirstComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
     do {
         var isFirst = visualData.connections.every(function (connection) {
-            if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
-                isFirst = false;
+            if (connection.endComponent == currentComponent && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
                 currentComponent = componentIndex.components[connection.startNode];
                 return false;
             }
             return true;
         });
     } while(isFirst == false);
+    return currentComponent;
+}
+exports.findFirstComponent = findFirstComponent;
 
+/**
+Parse visual data from Component
+*/
+function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
+    var commands = [];
+    currentComponent = exports.findFirstComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
     var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
     var parsedCommandIndex = commands.length;
     commands.push(parsedCommand);
@@ -265,30 +282,77 @@ exports.parseVisualDatafromComponent = parseVisualDatafromComponent;
 
 function createMacro(name, description, command, fromMacro) {
     if (fromMacro) {
-        var result = JSON.parse(JSON.stringify(fromMacro));
-        result.name = name;
-        result.description = description;
-        return result;
-    }
-    var macroData = new exports.GraphComponent(name, description);
-    if (command) {
-        macroData.setGraphData(exports.parseCommand(command));
-    }
-    return macroData;
+        return exports.Macro.fromGraph(name, description, exports.cloneGraph(fromMacro));
+    } else if (command) {
+        return exports.Macro.fromGraph(name, description, exports.parseCommand(command));
+    } else
+        return new exports.Macro(name, description);
 }
 exports.createMacro = createMacro;
 ;
 
-function compileMacro(macro) {
-    var indexedComponentList, initialComponent;
-    console.log("compling Macro");
-    if (macro.entryComponent === null) {
-        throw "no component defined as Macro Entry";
+/**
+Creates a component based on the first word of the content
+if the first word contains dots, create a file
+if the first word is a command creates a command component instead
+*/
+function createComponentDinamicText(text) {
+    if (text === "") {
+        return null;
     }
-    indexedComponentList = new IndexedGraph(macro);
-    initialComponent = indexedComponentList[macro.entryComponent];
-    return exports.parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
+    var words = text.replace("\n", " ").split(" ");
+    var firstWord = words[0];
+    if (firstWord.indexOf(".") > -1) {
+        return new exports.FileComponent(text);
+    } else if (isImplemented(firstWord)) {
+        return exports.parseCommand(text).components[0];
+    } else
+        return null;
 }
+exports.createComponentDinamicText = createComponentDinamicText;
+
+function graphFromJson(json) {
+    var jsonObj = JSON.parse(json);
+    var newGraph = new exports.Graph();
+    var componentMap = {};
+    for (var i in jsonObj) {
+        newGraph[i] = jsonObj[i];
+    }
+    var components = [];
+    jsonObj.components.forEach(function (component) {
+        var newComponent;
+        switch (component.type) {
+            case exports.CommandComponent.type:
+                newComponent = new parserCommand[component.exec].componentClass;
+                break;
+            case exports.FileComponent.type:
+                newComponent = new exports.FileComponent(component.filename);
+                break;
+
+            default:
+                return;
+        }
+        for (var i in component) {
+            newComponent[i] = component[i];
+        }
+        componentMap[newComponent.id] = newComponent;
+        components.push(newComponent);
+    });
+    newGraph.components = components;
+    newGraph.connections = [];
+    jsonObj.connections.forEach(function (connection) {
+        newGraph.connect(componentMap[connection.startNode], connection.startPort, componentMap[connection.endNode], connection.endPort);
+    });
+    newGraph.firstMainComponent = componentMap[newGraph.firstMainComponent];
+    return newGraph;
+}
+exports.graphFromJson = graphFromJson;
+
+function cloneGraph(graph) {
+    var json = JSON.stringify(graph);
+    return exports.graphFromJson(json);
+}
+exports.cloneGraph = cloneGraph;
 
 parser.generateAST = exports.generateAST;
 parser.parseAST = exports.parseAST;

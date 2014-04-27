@@ -147,6 +147,7 @@ var BunzipComponent = (function (_super) {
     }
     return BunzipComponent;
 })(GraphModule.CommandComponent);
+exports.BunzipComponent = BunzipComponent;
 
 function defaultComponentData() {
     var component = new BunzipComponent();
@@ -158,4 +159,5 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = BunzipComponent;
 //# sourceMappingURL=bunzip2.js.map

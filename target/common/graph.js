@@ -26,6 +26,11 @@ var Graph = (function () {
         };
     };
 
+    Graph.prototype.connect = function (startComponent, outputPort, endComponent, inputPort) {
+        var connection = new Connection(startComponent, outputPort, endComponent, inputPort);
+        this.connections.push(connection);
+    };
+
     /*
     expands with other graph
     */
@@ -64,6 +69,23 @@ var IndexedGraph = (function () {
     return IndexedGraph;
 })();
 exports.IndexedGraph = IndexedGraph;
+
+var Macro = (function (_super) {
+    __extends(Macro, _super);
+    function Macro(name, description) {
+        _super.call(this);
+        this.name = name;
+        this.description = description;
+    }
+    Macro.fromGraph = function (name, description, graphData) {
+        var newmacro = new Macro(name, description);
+        newmacro.components = graphData.components;
+        newmacro.connections = graphData.connections;
+        return newmacro;
+    };
+    return Macro;
+})(Graph);
+exports.Macro = Macro;
 
 //============= COMPONENTS ===========
 var Component = (function () {
@@ -115,29 +137,37 @@ var GraphComponent = (function (_super) {
         _super.call(this);
         this.name = name;
         this.description = description;
+        this.type = GraphComponent.type;
         this.entryComponent = null;
         this.exitComponent = null;
         this.counter = 0;
         this.components = [];
         this.connections = [];
     }
-    Object.defineProperty(GraphComponent.prototype, "type", {
-        get: function () {
-            return GraphComponent.type;
-        },
-        enumerable: true,
-        configurable: true
-    });
-
     GraphComponent.prototype.setGraphData = function (graphData) {
         this.components = graphData.components;
         this.connections = graphData.connections;
         this.entryComponent = graphData.firstMainComponent;
     };
-    GraphComponent.type = "macro";
+    GraphComponent.type = "graph";
     return GraphComponent;
 })(Component);
 exports.GraphComponent = GraphComponent;
+
+/**
+A macro Component
+*/
+var MacroComponent = (function (_super) {
+    __extends(MacroComponent, _super);
+    function MacroComponent(macro) {
+        _super.call(this);
+        this.macro = macro;
+        this.type = MacroComponent.type;
+    }
+    MacroComponent.type = "macro";
+    return MacroComponent;
+})(Component);
+exports.MacroComponent = MacroComponent;
 
 //========   ==========
 var Connection = (function () {

@@ -103,3 +103,5 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var componentClass = CatComponent
+

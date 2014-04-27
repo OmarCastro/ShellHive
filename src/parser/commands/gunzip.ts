@@ -69,7 +69,7 @@ var gunzipData = new parserModule.ParserData(config);
 
 $.generate(optionsParser);
 
-class GunzipComponent extends GraphModule.CommandComponent {
+export class GunzipComponent extends GraphModule.CommandComponent {
   public exec:string = "gunzip"
   public files: any[] = []
 }
@@ -84,3 +84,4 @@ function defaultComponentData(){
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(gunzipData.flagOptions, gunzipData.selectorOptions);
 export var VisualSelectorOptions = gunzipData.visualSelectorOptions;
+export var componentClass = GunzipComponent

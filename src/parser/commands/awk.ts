@@ -39,7 +39,7 @@ var optionsParser = {
 $.generate(optionsParser)
 
 
-class AwkComponent extends GraphModule.CommandComponent {
+export class AwkComponent extends GraphModule.CommandComponent {
   public exec:string = "awk"
   public script:string = ""
   public files: any[] = []
@@ -68,3 +68,4 @@ export var parseComponent = common.commonParseComponent(awkData.flagOptions, awk
   })
 
 export var VisualSelectorOptions = awkData.visualSelectorOptions;
+export var componentClass = AwkComponent
