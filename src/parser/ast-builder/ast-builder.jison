@@ -89,18 +89,26 @@ argsWithCommSub
 
 args
   : psubstitution
-  | '>' file {$$ = ["outTo",$2];}
-  | '2>'file {$$ = ["errTo",$2];}
-  | '&>'file {$$ = ["out&errTo",$2];}   
-  | '<' file {$$ = ["inFrom",$2];}
+  | '>'  outfile {$$ = ["outTo"+$2[0],$2[1]];}
+  | '2>' outfile {$$ = ["errTo"+$2[0],$2[1]];}
+  | '&>' outfile {$$ = ["out&errTo"+$2[0],$2[1]];}   
+  | '<'  infile {$$ = ["inFrom"+$2[0],$2[1]];}
   | '2>&1' {$$ = ["errToOut"];}
   | str;
 
 file : psubstitution | str;
 
-psubstitution
-  : '>(' commandline ')' {$$ = ["outToProcess",$2];}
-  | '<(' commandline ')' {$$ = ["inFromProcess",$2];};
+outfile 
+  : proc_sub_out {$$ = ["Process",$1[1]];} 
+  | str {$$ = ["File",$1];};
+
+infile 
+  : proc_sub_in {$$ = ["Process",$1[1]];} 
+  | str {$$ = ["File",$1];} ;
+
+psubstitution : proc_sub_out | proc_sub_in;
+proc_sub_out : '>(' commandline ')' {$$ = ["outToProcess",$2];};
+proc_sub_in : '<(' commandline ')' {$$ = ["inFromProcess",$2];};
 
 exec:str;
 

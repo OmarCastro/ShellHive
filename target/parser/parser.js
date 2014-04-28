@@ -201,7 +201,6 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
             case 'error':
                 stdErrors.push(endNode);
                 break;
-
             case 'retcode':
                 exitCodes.push(endNode);
                 break;
@@ -255,7 +254,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     }
 
     if (nextErrcommands.length > 1) {
-        comm = teeResult(outputs, nextcommands);
+        comm = teeResult(stdErrors, nextErrcommands);
         commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
     } else if (nextErrcommands.length === 1) {
         if (stdErrors[0].type === exports.FileComponent.type) {
@@ -266,11 +265,11 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     }
 
     if (nextExitcommands.length > 1) {
-        comm = teeResult(outputs, nextcommands);
+        comm = teeResult(exitCodes, nextExitcommands);
         commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
     } else if (nextExitcommands.length === 1) {
         if (exitCodes[0].type === exports.FileComponent.type) {
-            commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
+            commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + "))";
         } else {
             commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";
         }
@@ -319,7 +318,7 @@ function graphFromJson(json) {
         newGraph[i] = jsonObj[i];
     }
     var components = [];
-    jsonObj.components.forEach(function (component) {
+    jsonObj.components.forEach(function cloneComponent(component) {
         var newComponent;
         switch (component.type) {
             case exports.CommandComponent.type:
@@ -328,10 +327,13 @@ function graphFromJson(json) {
             case exports.FileComponent.type:
                 newComponent = new exports.FileComponent(component.filename);
                 break;
-
-            default:
-                return;
         }
+
+        /* istanbul ignore next */
+        if (!newComponent) {
+            return;
+        }
+
         for (var i in component) {
             newComponent[i] = component[i];
         }
@@ -340,7 +342,7 @@ function graphFromJson(json) {
     });
     newGraph.components = components;
     newGraph.connections = [];
-    jsonObj.connections.forEach(function (connection) {
+    jsonObj.connections.forEach(function connectCreatedComponents(connection) {
         newGraph.connect(componentMap[connection.startNode], connection.startPort, componentMap[connection.endNode], connection.endPort);
     });
     newGraph.firstMainComponent = componentMap[newGraph.firstMainComponent];

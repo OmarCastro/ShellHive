@@ -14,10 +14,10 @@ describe('AST test', function(){
     it('should create a component with the same title as the command', function(){
     	var command = "grep line < file1.txt > file2.txt 2> file3.txt &> file4.txt";
     	var ast = parser.generateAST(command)
-  		ast[0].args[1].should.eql(["inFrom","file1.txt"]);
-      ast[0].args[2].should.eql(["outTo","file2.txt"]);
-      ast[0].args[3].should.eql(["errTo","file3.txt"]);
-      ast[0].args[4].should.eql(["out&errTo","file4.txt"]);
+  		ast[0].args[1].should.eql(["inFromFile","file1.txt"]);
+      ast[0].args[2].should.eql(["outToFile","file2.txt"]);
+      ast[0].args[3].should.eql(["errToFile","file3.txt"]);
+      ast[0].args[4].should.eql(["out&errToFile","file4.txt"]);
     })
   })
   describe('quoted arguments test', function(){

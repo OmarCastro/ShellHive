@@ -35,6 +35,7 @@
     "gulp-mocha": "~0.4.1",
     "gulp-istanbul": "~0.1.1",
     "coverage-badge": "git://github.com/ashaffer/node-coverage-badge#patch-1",
-    "coverage-percentage": "0.0.2"
+    "coverage-percentage": "0.0.2",
+    "gulp-jison": "~1.0.0"
   }
 }

@@ -191,7 +191,6 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
       switch(connection.startPort){
         case 'output':  outputs.push(endNode)  ; break;
         case 'error':   stdErrors.push(endNode); break;
-        /* instanbul ignore next */
         case 'retcode': exitCodes.push(endNode); break;
       }
   });
@@ -248,7 +247,7 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
 
 
   if (nextErrcommands.length > 1) {
-    comm = teeResult(outputs,nextcommands);
+    comm = teeResult(stdErrors,nextErrcommands);
     commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
   } else if (nextErrcommands.length === 1) {
     if (stdErrors[0].type === FileComponent.type) {
@@ -258,14 +257,12 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
     }
   }
 
-
-
   if (nextExitcommands.length > 1) {
-    comm = teeResult(outputs,nextcommands);
+    comm = teeResult(exitCodes,nextExitcommands);
     commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
   } else if (nextExitcommands.length === 1) {
     if (exitCodes[0].type === FileComponent.type) {
-      commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
+      commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + "))";
     } else {
       commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";
     }
@@ -313,7 +310,7 @@ export function graphFromJson(json:string){
       newGraph[i] = jsonObj[i]
   }
   var components = []
-  jsonObj.components.forEach(component => {
+  jsonObj.components.forEach(function cloneComponent(component){
     var newComponent; 
     switch (component.type) {
       case CommandComponent.type:
@@ -322,9 +319,10 @@ export function graphFromJson(json:string){
       case FileComponent.type:
         newComponent = new FileComponent(component.filename)
         break;
-      /* istanbul ignore next */
-      default: return;
     }
+    /* istanbul ignore next */
+    if(!newComponent){ return; }
+
     for(var i in component){
       newComponent[i] = component[i]
     }
@@ -334,7 +332,7 @@ export function graphFromJson(json:string){
   })
   newGraph.components = components;
   newGraph.connections = [];
-  jsonObj.connections.forEach((connection) => {
+  jsonObj.connections.forEach(function connectCreatedComponents(connection){
     newGraph.connect(
       componentMap[connection.startNode], connection.startPort,
       componentMap[connection.endNode], connection.endPort

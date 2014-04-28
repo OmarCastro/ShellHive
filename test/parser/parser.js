@@ -57,6 +57,107 @@ describe('parser.js test', function(){
 
   })
 
+
+  describe('piping error in graph', function(){
+    it('should generate code to save return to text',function(){
+      var graph = parser.parseCommand("grep 'hello world' cenas.txt | grep mimi");
+      var fileindex = graph.components.length;
+      var newfile = new FileComponent("exit.txt")
+      newfile.id = graph.counter++;
+      graph.components.push(newfile);
+      graph.connect(graph.components[0],'error',newfile,'input');
+      var resultCode = parser.parseGraph(graph);
+      //resultCode.should.equal('(grep  "hello world" cenas.txt; (echo $? > exit.txt)) | grep  mimi')
+    })
+
+    it('should generate code to save return to command',function(){
+      var graph = parser.parseCommand("grep 'hello world' cenas.txt | grep mimi");
+      //var graph2 = parser.parseCommand("grep 0 > file.txt");
+      //graph.expand(graph2);
+      var graph2 = parser.parseCommand("grep 0 > file.txt");
+      graph.expand(graph2);
+      graph2.components.forEach(function(component){
+        component.id = graph.counter++;
+      })
+      graph.connect(graph.components[0],'error',graph2.components[0],'input');
+      console.error(parser.parseGraph(graph)); 
+
+      //parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+
+    })
+
+    it('should generate code to save return to 2 components',function(){
+      var graph = parser.parseCommand("grep 'hello world' cenas.txt | grep mimi");
+      //var graph2 = parser.parseCommand("grep 0 > file.txt");
+      //graph.expand(graph2);
+      var resultCode = parser.parseGraph(graph);
+      console.error(resultCode); 
+      var graph2 = parser.parseCommand("grep 0 > file.txt");
+      graph.expand(graph2);
+      graph2.components.forEach(function(component){
+        component.id = graph.counter++;
+      })
+      graph.connect(graph.components[0],'error',graph2.components[0],'input');
+      var newfile = new FileComponent("exit.txt")
+      newfile.id = graph.counter++;
+      graph.components.push(newfile);
+      graph.connect(graph.components[0],'error',newfile,'input');
+      console.error(parser.parseGraph(graph)); 
+
+      //parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+
+    })
+  })
+  describe('return code graph', function(){
+    it('should generate code to save return to text',function(){
+      var graph = parser.parseCommand("grep 'hello world' cenas.txt | grep mimi");
+      var fileindex = graph.components.length;
+      var newfile = new FileComponent("exit.txt")
+      newfile.id = graph.counter++;
+      graph.components.push(newfile);
+      graph.connect(graph.components[0],'retcode',newfile,'input');
+      var resultCode = parser.parseGraph(graph);
+      resultCode.should.equal('(grep  "hello world" cenas.txt; (echo $? > exit.txt)) | grep  mimi')
+    })
+
+    it('should generate code to save return to command',function(){
+      var graph = parser.parseCommand("grep 'hello world' cenas.txt | grep mimi");
+      //var graph2 = parser.parseCommand("grep 0 > file.txt");
+      //graph.expand(graph2);
+      var graph2 = parser.parseCommand("grep 0 > file.txt");
+      graph.expand(graph2);
+      graph2.components.forEach(function(component){
+        component.id = graph.counter++;
+      })
+      graph.connect(graph.components[0],'retcode',graph2.components[0],'input');
+      parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+
+    })
+
+    it('should generate code to save return to 2 components',function(){
+      var graph = parser.parseCommand("grep 'hello world' cenas.txt | grep mimi");
+      //var graph2 = parser.parseCommand("grep 0 > file.txt");
+      //graph.expand(graph2);
+      var resultCode = parser.parseGraph(graph);
+      console.error(resultCode); 
+      var graph2 = parser.parseCommand("grep 0 > file.txt");
+      graph.expand(graph2);
+      graph2.components.forEach(function(component){
+        component.id = graph.counter++;
+      })
+      graph.connect(graph.components[0],'retcode',graph2.components[0],'input');
+      var newfile = new FileComponent("exit.txt")
+      newfile.id = graph.counter++;
+      graph.components.push(newfile);
+      graph.connect(graph.components[0],'retcode',newfile,'input');
+      console.error(parser.parseGraph(graph)); 
+
+      //parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+
+    })
+
+  })
+
   describe('creating macros', function(){
     it('should create an empty macro',function(){
       var macro = parser.createMacro("mimi","mimimi");

@@ -248,7 +248,7 @@ describe('command test', function(){
 
   describe('`ls` test', function(){
     it('should create a component with class LsComponent', function(){
-      var command = "ls";
+      var command = "ls -1";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("LsComponent")
       graph.components[0].exec.should.equal("ls")

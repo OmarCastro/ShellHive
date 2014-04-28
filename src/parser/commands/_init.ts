@@ -121,7 +121,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
       case 'inFromProcess':
         subresult = parser.parseAST(argNode[1], tracker);
         boundaries.push(Boundary.createFromComponents(subresult.components));
-        result.expands(subresult);
+        result.expand(subresult);
         inputPort = "file" + componentData.files.length;
 
         var subComponents = subresult.components
@@ -135,7 +135,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         componentData.files.push(["pipe", tracker.id - 1]);
 
         break;
-      case 'outTo':
+      case 'outToFile':
         newComponent = new FileComponent(argNode[1])
         newComponent.id = tracker.id
         result.connections.push(new Connection(componentData, 'output', newComponent, 'input'));
@@ -144,7 +144,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         result.components.push(newComponent);
         stdoutRedirection = newComponent;
         break;
-      case 'errTo':
+      case 'errToFile':
         newComponent = new FileComponent(argNode[1])
         newComponent.id = tracker.id
         result.connections.push(new Connection(componentData, 'error', newComponent, 'input'));

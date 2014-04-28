@@ -24,9 +24,14 @@ export class Graph{
 	/*
 		expands with other graph
 	*/
-	public expands(other:Graph){
+	public expand(other:Graph){
 		this.concatComponents(other.components)
 		this.concatConnections(other.connections)
+    //if(this.counter){
+    //  other.components.forEach(component => {
+    //    component.id = this.counter++;
+    //  });
+    //}
 	}
 
 	public concatComponents(components){ this.components = this.components.concat(components) }

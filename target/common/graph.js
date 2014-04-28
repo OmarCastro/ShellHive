@@ -34,9 +34,14 @@ var Graph = (function () {
     /*
     expands with other graph
     */
-    Graph.prototype.expands = function (other) {
+    Graph.prototype.expand = function (other) {
         this.concatComponents(other.components);
         this.concatConnections(other.connections);
+        //if(this.counter){
+        //  other.components.forEach(component => {
+        //    component.id = this.counter++;
+        //  });
+        //}
     };
 
     Graph.prototype.concatComponents = function (components) {

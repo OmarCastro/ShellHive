@@ -6,12 +6,15 @@ var gulp        = require('gulp'),
     ls          = require('gulp-livescript'),
     newer       = require('gulp-newer'),
     tinylr      = require('tiny-lr'),
+    jison       = require('gulp-jison'),
     istanbul    = require('gulp-istanbul')
     runSequence = require('run-sequence'),
     mocha       = require('gulp-mocha'),
     livereload  = require('gulp-livereload'), // Livereload plugin needed: https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
     server      = tinylr();
 
+
+var jisonPath = 'src/parser/ast-builder/ast-builder.jison';
 
 gulp.task('ts', function () {
   return gulp
@@ -59,6 +62,12 @@ gulp.task('coverage', function() {
     });
 });  
 
+gulp.task('jison', function() {
+    return gulp.src(jisonPath)
+        .pipe(jison({ moduleType: 'commonjs' }))
+        .pipe(gulp.dest('target/parser/ast-builder/'));
+});
+
 gulp.task('watchify', function () {
   var bundler = watchify('./target/parser/shellParser.js');
   // Optionally, you can apply transforms
@@ -80,9 +89,10 @@ gulp.task('watchify', function () {
 
 
 gulp.task('watch', function () {
-   gulp.watch('src/**/*.ts',function(event) { runSequence('ts','coverage') });
-   gulp.watch('src/**/*.ls',function(event) { runSequence('ls','coverage') });
-   gulp.watch('test/**/*.js',['mocha']);
+  gulp.watch('src/**/*.ts',function(event) { runSequence('ts',   'coverage') });
+  gulp.watch('src/**/*.ls',function(event) { runSequence('ls',   'coverage') });
+  gulp.watch(jisonPath,    function(event) { runSequence('jison','coverage') });
+  gulp.watch('test/**/*.js',['coverage']);
 });
 
 gulp.task('default', ['ts','ls','mocha','watch']);//,'watchify']);
