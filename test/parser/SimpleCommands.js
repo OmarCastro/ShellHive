@@ -231,16 +231,14 @@ describe('command test', function(){
   })
 
     describe('`diff` test', function(){
-    it('should create a component with class HeadComponent', function(){
+    it('should create a component with class DiffComponent', function(){
       var command = "diff";
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("DiffComponent")
       graph.components[0].exec.should.equal("diff")
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
-      //graph.components[0].selectors.should.have.properties({
-      //  last: { type: 'numeric parameter', name: 'lines', value:10 }
-      //})
+
     })
     describe('reparse diff, two files - ', reparse('diff file1.txt file2.txt'));
     describe('reparse diff, two processes -', reparse('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)'));
@@ -305,9 +303,10 @@ describe('command test', function(){
 
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
-      //graph.components[0].selectors.should.have.properties({
-      //  last: { type: 'numeric parameter', name: 'lines', value:10 }
-      //})
+      graph.components[0].selectors.should.have.properties({
+        last: { type: 'numeric parameter', name: 'lines', value:10 }
+      })
+      parser.parseGraph(graph).should.equal(command);
     })
   }),
   describe('`head` test', function(){
@@ -320,9 +319,12 @@ describe('command test', function(){
 
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
-      //graph.components[0].selectors.should.have.properties({
-      //  last: { type: 'numeric parameter', name: 'lines', value:10 }
-      //})
+      graph.components[0].selectors.should.have.properties({
+        first: {
+          type: 'numeric parameter', name: 'lines',  value:10
+        }
+      })
+      parser.parseGraph(graph).should.equal(command);
     })
   })
 

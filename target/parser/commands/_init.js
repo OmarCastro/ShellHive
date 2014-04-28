@@ -188,6 +188,8 @@ function parseFlagsAndSelectors(component, options) {
             if (optionValue != null) {
                 /* istanbul ignore if */ if (!optionValue) {
                     throw [key, ".", value, "doesn't exist in ", selectorOptions].join('');
+                } else if (value.type == "numeric parameter") {
+                    lFlags.push("-" + optionValue + value.value);
                 } else if (optionValue[0] !== '-') {
                     sFlags.push(optionValue);
                 } else {

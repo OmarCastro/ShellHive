@@ -311,7 +311,11 @@ function createComponentDinamicText(text) {
 exports.createComponentDinamicText = createComponentDinamicText;
 
 function graphFromJson(json) {
-    var jsonObj = JSON.parse(json);
+    return exports.graphFromJsonObject(JSON.parse(json));
+}
+exports.graphFromJson = graphFromJson;
+
+function graphFromJsonObject(jsonObj) {
     var newGraph = new exports.Graph();
     var componentMap = {};
     for (var i in jsonObj) {
@@ -348,7 +352,7 @@ function graphFromJson(json) {
     newGraph.firstMainComponent = componentMap[newGraph.firstMainComponent];
     return newGraph;
 }
-exports.graphFromJson = graphFromJson;
+exports.graphFromJsonObject = graphFromJsonObject;
 
 function cloneGraph(graph) {
     var json = JSON.stringify(graph);

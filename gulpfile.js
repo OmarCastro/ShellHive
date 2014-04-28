@@ -9,6 +9,7 @@ var gulp        = require('gulp'),
     jison       = require('gulp-jison'),
     istanbul    = require('gulp-istanbul')
     runSequence = require('run-sequence'),
+    concat      = require('gulp-concat'),
     mocha       = require('gulp-mocha'),
     livereload  = require('gulp-livereload'), // Livereload plugin needed: https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
     server      = tinylr();
@@ -27,10 +28,11 @@ gulp.task('ts', function () {
 });
 
 gulp.task('ls', function() {
-  return gulp.src('src/**/*.ls')
+  return gulp.src(['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/angularjs/directives/*.ls'])
     .pipe(ls({bare: true}))
     .on('error', gutil.log)
-    .pipe(gulp.dest('target'));
+    .pipe(concat('demoApp.js'))
+    .pipe(gulp.dest('public/reports/js5/'));
 });
 
 gulp.task('mocha', function() {

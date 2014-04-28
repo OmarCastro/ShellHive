@@ -355,11 +355,7 @@ app.directive "graphModel", ($document) ->
         {data, name} = sel
         options[data.exec].$changeToValue(data.selectors[name],name,value)
         sel.open=false
-      ..removeComponent = (id) !->
-        console.log "removing component"
-        scope.visualData
-          ..components = [x for x in scope.visualData.components when x.id != id]
-          ..connections = [x for x in scope.visualData.connections when x.startNode != id and x.endNode != id]
+      ..removeComponent = (component) !-> scope.visualData.removeComponent(component)
       ..isFreeSpace = (elem) -> elem in [svgElem, workspace, nodesElem]
       ..updateScope = -> scope.$digest!
       ..getVisualData = -> scope.visualData

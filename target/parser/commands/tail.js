@@ -75,8 +75,6 @@ var config = {
 var tailData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
-optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
 
 var TailComponent = (function (_super) {
     __extends(TailComponent, _super);

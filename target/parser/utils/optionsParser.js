@@ -74,9 +74,8 @@ set parameter (param)
 */
 exports.setParameter = function (param) {
     var paramFn = function (Component, state, substate) {
-        var hasNext, parameter;
-        hasNext = substate.hasNext();
-        parameter = hasNext ? substate.rest() : state.next();
+        var hasNext = substate.hasNext();
+        var parameter = hasNext ? substate.rest() : state.next();
         Component.parameters[param] = parameter;
         return true;
     };
@@ -87,19 +86,31 @@ exports.setParameter = function (param) {
 };
 
 
-function select(key, value) {
+function select(key, value, type) {
+    if (typeof type === "undefined") { type = "option"; }
     if (key.name) {
         key = key.name;
     }
     if (value.name) {
         value = value.name;
     }
-    return function (Component) {
-        Component.selectors[key] = {
-            type: "option",
-            name: value
+    if (type == "option") {
+        return function (Component) {
+            Component.selectors[key] = {
+                type: type,
+                name: value
+            };
         };
-    };
+    } else if (type == "numeric parameter") {
+        return function (Component, state, substate) {
+            var parameter = substate.hasNext() ? substate.rest() : state.next();
+            Component.selectors[key] = {
+                type: type,
+                name: value,
+                value: +parameter
+            };
+        };
+    }
 }
 exports.select = select;
 ;
@@ -138,21 +149,6 @@ function ignore() {
 }
 exports.ignore = ignore;
 ;
-
-exports.selectParameter = function (key, value) {
-    var paramFn = function (Component, state, substate) {
-        var parameselectParameterter;
-        parameselectParameterter = substate.hasNext() ? substate.rest() : state.next();
-        Component.selectors[key] = {
-            parameterName: value,
-            parameterValue: parameselectParameterter
-        };
-        return true;
-    };
-    paramFn;
-    paramFn.ptype = 'param';
-    return paramFn;
-};
 
 exports.sameAs = function (option) {
     return ['same', option];
@@ -194,7 +190,7 @@ function optionParserFromConfig(config) {
         var options = selector.options;
         for (var optionkey in options) {
             var option = options[optionkey];
-            opt = exports.select(selector, option);
+            opt = exports.select(selector, option, option.type);
             if (option.option) {
                 if (option.option[0] === "-") {
                     longOptions[option.option.slice(2)] = opt;

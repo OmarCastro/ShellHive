@@ -49,7 +49,7 @@
     socket.on('runCommand', function(socketData){
       var command, x$, e;
       try {
-        command = parser.parseVisualData(socketData.visualData);
+        command = parser.parseVisualData(parser.graphFromJsonObject(socketData.visualData));
         socket.emit("commandCall", command);
         x$ = commandRunner.run(command);
         x$.onStdOut = function(data){
@@ -63,7 +63,7 @@
         };
       } catch (e$) {
         e = e$;
-        socket.emit("stderr", "error parsing the graph " + e);
+        socket.emit("stderr", "error parsing the graph - " + e.stack);
       }
     });
     /*

@@ -16,6 +16,42 @@ export class Graph{
     }
 	}
 
+  /**
+    in graph
+  */
+  public containsComponent(component:Component){
+    for(var i = 0, _ref=this.components, length=_ref.length;i<length;++i){
+      if( _ref[i] == component){ return true }
+    }
+    return false;
+  }
+
+  /**
+    removes the component of the graph and returns the connections related to it
+  */
+  public removeComponent(component:Component):Connection[]{
+    if(this.containsComponent(component)){
+      if(component == this.firstMainComponent){
+        this.firstMainComponent = null;
+      }
+      var returnlist:Connection[] = [];
+      var filteredlist:Connection[] = [];
+      for(var i = 0, _ref=this.connections, length=_ref.length;i<length;++i){
+        var connection = _ref[i];
+        if(connection.startComponent == component || connection.endComponent == component){
+          returnlist.push(connection);
+        } else {
+          filteredlist.push(connection);          
+        }
+      }
+
+      this.components.splice(this.components.indexOf(component),1);
+      this.connections = filteredlist;
+      return returnlist;
+    }
+    return null;
+  }
+
   public connect(startComponent:Component, outputPort:string, endComponent:Component, inputPort:string){
     var connection = new Connection(startComponent,outputPort,endComponent,inputPort)
     this.connections.push(connection);

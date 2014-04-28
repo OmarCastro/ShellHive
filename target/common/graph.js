@@ -26,6 +26,44 @@ var Graph = (function () {
         };
     };
 
+    /**
+    in graph
+    */
+    Graph.prototype.containsComponent = function (component) {
+        for (var i = 0, _ref = this.components, length = _ref.length; i < length; ++i) {
+            if (_ref[i] == component) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    /**
+    removes the component of the graph and returns the connections related to it
+    */
+    Graph.prototype.removeComponent = function (component) {
+        if (this.containsComponent(component)) {
+            if (component == this.firstMainComponent) {
+                this.firstMainComponent = null;
+            }
+            var returnlist = [];
+            var filteredlist = [];
+            for (var i = 0, _ref = this.connections, length = _ref.length; i < length; ++i) {
+                var connection = _ref[i];
+                if (connection.startComponent == component || connection.endComponent == component) {
+                    returnlist.push(connection);
+                } else {
+                    filteredlist.push(connection);
+                }
+            }
+
+            this.components.splice(this.components.indexOf(component), 1);
+            this.connections = filteredlist;
+            return returnlist;
+        }
+        return null;
+    };
+
     Graph.prototype.connect = function (startComponent, outputPort, endComponent, inputPort) {
         var connection = new Connection(startComponent, outputPort, endComponent, inputPort);
         this.connections.push(connection);

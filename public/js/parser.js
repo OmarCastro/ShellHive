@@ -312,12 +312,60 @@ var Graph = (function () {
         };
     };
 
+    /**
+    in graph
+    */
+    Graph.prototype.containsComponent = function (component) {
+        for (var i = 0, _ref = this.components, length = _ref.length; i < length; ++i) {
+            if (_ref[i] == component) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    /**
+    removes the component of the graph and returns the connections related to it
+    */
+    Graph.prototype.removeComponent = function (component) {
+        if (this.containsComponent(component)) {
+            if (component == this.firstMainComponent) {
+                this.firstMainComponent = null;
+            }
+            var returnlist = [];
+            var filteredlist = [];
+            for (var i = 0, _ref = this.connections, length = _ref.length; i < length; ++i) {
+                var connection = _ref[i];
+                if (connection.startComponent == component || connection.endComponent == component) {
+                    returnlist.push(connection);
+                } else {
+                    filteredlist.push(connection);
+                }
+            }
+
+            this.components.splice(this.components.indexOf(component), 1);
+            this.connections = filteredlist;
+            return returnlist;
+        }
+        return null;
+    };
+
+    Graph.prototype.connect = function (startComponent, outputPort, endComponent, inputPort) {
+        var connection = new Connection(startComponent, outputPort, endComponent, inputPort);
+        this.connections.push(connection);
+    };
+
     /*
     expands with other graph
     */
-    Graph.prototype.expands = function (other) {
+    Graph.prototype.expand = function (other) {
         this.concatComponents(other.components);
         this.concatConnections(other.connections);
+        //if(this.counter){
+        //  other.components.forEach(component => {
+        //    component.id = this.counter++;
+        //  });
+        //}
     };
 
     Graph.prototype.concatComponents = function (components) {
@@ -350,6 +398,23 @@ var IndexedGraph = (function () {
     return IndexedGraph;
 })();
 exports.IndexedGraph = IndexedGraph;
+
+var Macro = (function (_super) {
+    __extends(Macro, _super);
+    function Macro(name, description) {
+        _super.call(this);
+        this.name = name;
+        this.description = description;
+    }
+    Macro.fromGraph = function (name, description, graphData) {
+        var newmacro = new Macro(name, description);
+        newmacro.components = graphData.components;
+        newmacro.connections = graphData.connections;
+        return newmacro;
+    };
+    return Macro;
+})(Graph);
+exports.Macro = Macro;
 
 //============= COMPONENTS ===========
 var Component = (function () {
@@ -401,29 +466,37 @@ var GraphComponent = (function (_super) {
         _super.call(this);
         this.name = name;
         this.description = description;
+        this.type = GraphComponent.type;
         this.entryComponent = null;
         this.exitComponent = null;
         this.counter = 0;
         this.components = [];
         this.connections = [];
     }
-    Object.defineProperty(GraphComponent.prototype, "type", {
-        get: function () {
-            return GraphComponent.type;
-        },
-        enumerable: true,
-        configurable: true
-    });
-
     GraphComponent.prototype.setGraphData = function (graphData) {
         this.components = graphData.components;
         this.connections = graphData.connections;
         this.entryComponent = graphData.firstMainComponent;
     };
-    GraphComponent.type = "macro";
+    GraphComponent.type = "graph";
     return GraphComponent;
 })(Component);
 exports.GraphComponent = GraphComponent;
+
+/**
+A macro Component
+*/
+var MacroComponent = (function (_super) {
+    __extends(MacroComponent, _super);
+    function MacroComponent(macro) {
+        _super.call(this);
+        this.macro = macro;
+        this.type = MacroComponent.type;
+    }
+    MacroComponent.type = "macro";
+    return MacroComponent;
+})(Component);
+exports.MacroComponent = MacroComponent;
 
 //========   ==========
 var Connection = (function () {
@@ -631,12 +704,12 @@ exports.Boundary = Boundary;
     recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
   }
 */
-var astBuilder = (function(){
+var parser = (function(){
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"unixcode":3,"commandline":4,"EOF":5,"|":6,"command":7,"auxcommand":8,"argsWithCommSub":9,"exec":10,"aux_commandline":11,"aux_command":12,"aux_auxcommand":13,"args":14,"s`":15,"`":16,">(":17,")":18,"<(":19,">":20,"str":21,"2>":22,"&>":23,"<":24,"2>&1":25,"USTR":26,"STR":27,"STR2":28,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",6:"|",15:"s`",16:"`",17:">(",18:")",19:"<(",20:">",22:"2>",23:"&>",24:"<",25:"2>&1",26:"USTR",27:"STR",28:"STR2"},
-productions_: [0,[3,2],[4,3],[4,1],[7,1],[8,2],[8,1],[11,3],[11,1],[12,1],[13,2],[13,1],[9,1],[9,3],[14,3],[14,3],[14,2],[14,2],[14,2],[14,2],[14,1],[14,1],[10,1],[21,1],[21,1],[21,1]],
+symbols_: {"error":2,"unixcode":3,"commandline":4,"EOF":5,"|":6,"command":7,"auxcommand":8,"argsWithCommSub":9,"exec":10,"aux_commandline":11,"aux_command":12,"aux_auxcommand":13,"args":14,"s`":15,"`":16,"psubstitution":17,">":18,"outfile":19,"2>":20,"&>":21,"<":22,"infile":23,"2>&1":24,"str":25,"file":26,"proc_sub_out":27,"proc_sub_in":28,">(":29,")":30,"<(":31,"USTR":32,"STR":33,"STR2":34,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",6:"|",15:"s`",16:"`",18:">",20:"2>",21:"&>",22:"<",24:"2>&1",29:">(",30:")",31:"<(",32:"USTR",33:"STR",34:"STR2"},
+productions_: [0,[3,2],[4,3],[4,1],[7,1],[8,2],[8,1],[11,3],[11,1],[12,1],[13,2],[13,1],[9,1],[9,3],[14,1],[14,2],[14,2],[14,2],[14,2],[14,1],[14,1],[26,1],[26,1],[19,1],[19,1],[23,1],[23,1],[17,1],[17,1],[27,3],[28,3],[10,1],[25,1],[25,1],[25,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -666,29 +739,37 @@ case 11:this.$ = {exec: $$[$0], args:[]};
 break;
 case 13:this.$ = ["commandSubstitution",$$[$0-1]];
 break;
-case 14:this.$ = ["outToProcess",$$[$0-1]];
+case 15:this.$ = ["outTo"+$$[$0][0],$$[$0][1]];
 break;
-case 15:this.$ = ["inFromProcess",$$[$0-1]];
+case 16:this.$ = ["errTo"+$$[$0][0],$$[$0][1]];
 break;
-case 16:this.$ = ["outTo",$$[$0]];
+case 17:this.$ = ["out&errTo"+$$[$0][0],$$[$0][1]];
 break;
-case 17:this.$ = ["errTo",$$[$0]];
+case 18:this.$ = ["inFrom"+$$[$0][0],$$[$0][1]];
 break;
-case 18:this.$ = ["out&errTo",$$[$0]];
+case 19:this.$ = ["errToOut"];
 break;
-case 19:this.$ = ["inFrom",$$[$0]];
+case 23:this.$ = ["Process",$$[$0][1]];
 break;
-case 20:this.$ = ["errToOut"];
+case 24:this.$ = ["File",$$[$0]];
 break;
-case 23:this.$ = yytext.replace(/\\/g,"")
+case 25:this.$ = ["Process",$$[$0][1]];
 break;
-case 24:this.$ = yytext.slice(1,-1).replace(/\\\"/g,'"')
+case 26:this.$ = ["File",$$[$0]];
 break;
-case 25:this.$ = yytext.slice(1,-1).replace(/\\\'/g,"'")
+case 29:this.$ = ["outToProcess",$$[$0-1]];
+break;
+case 30:this.$ = ["inFromProcess",$$[$0-1]];
+break;
+case 32:this.$ = yytext.replace(/\\/g,"")
+break;
+case 33:this.$ = yytext.slice(1,-1).replace(/\\\"/g,'"')
+break;
+case 34:this.$ = yytext.slice(1,-1).replace(/\\\'/g,"'")
 break;
 }
 },
-table: [{3:1,4:2,7:3,8:4,10:5,21:6,26:[1,7],27:[1,8],28:[1,9]},{1:[3]},{5:[1,10],6:[1,11]},{5:[2,3],6:[2,3],9:12,14:13,15:[1,14],17:[1,15],18:[2,3],19:[1,16],20:[1,17],21:22,22:[1,18],23:[1,19],24:[1,20],25:[1,21],26:[1,7],27:[1,8],28:[1,9]},{5:[2,4],6:[2,4],15:[2,4],17:[2,4],18:[2,4],19:[2,4],20:[2,4],22:[2,4],23:[2,4],24:[2,4],25:[2,4],26:[2,4],27:[2,4],28:[2,4]},{5:[2,6],6:[2,6],15:[2,6],17:[2,6],18:[2,6],19:[2,6],20:[2,6],22:[2,6],23:[2,6],24:[2,6],25:[2,6],26:[2,6],27:[2,6],28:[2,6]},{5:[2,22],6:[2,22],15:[2,22],16:[2,22],17:[2,22],18:[2,22],19:[2,22],20:[2,22],22:[2,22],23:[2,22],24:[2,22],25:[2,22],26:[2,22],27:[2,22],28:[2,22]},{5:[2,23],6:[2,23],15:[2,23],16:[2,23],17:[2,23],18:[2,23],19:[2,23],20:[2,23],22:[2,23],23:[2,23],24:[2,23],25:[2,23],26:[2,23],27:[2,23],28:[2,23]},{5:[2,24],6:[2,24],15:[2,24],16:[2,24],17:[2,24],18:[2,24],19:[2,24],20:[2,24],22:[2,24],23:[2,24],24:[2,24],25:[2,24],26:[2,24],27:[2,24],28:[2,24]},{5:[2,25],6:[2,25],15:[2,25],16:[2,25],17:[2,25],18:[2,25],19:[2,25],20:[2,25],22:[2,25],23:[2,25],24:[2,25],25:[2,25],26:[2,25],27:[2,25],28:[2,25]},{1:[2,1]},{7:23,8:4,10:5,21:6,26:[1,7],27:[1,8],28:[1,9]},{5:[2,5],6:[2,5],15:[2,5],17:[2,5],18:[2,5],19:[2,5],20:[2,5],22:[2,5],23:[2,5],24:[2,5],25:[2,5],26:[2,5],27:[2,5],28:[2,5]},{5:[2,12],6:[2,12],15:[2,12],17:[2,12],18:[2,12],19:[2,12],20:[2,12],22:[2,12],23:[2,12],24:[2,12],25:[2,12],26:[2,12],27:[2,12],28:[2,12]},{10:27,11:24,12:25,13:26,21:6,26:[1,7],27:[1,8],28:[1,9]},{4:28,7:3,8:4,10:5,21:6,26:[1,7],27:[1,8],28:[1,9]},{4:29,7:3,8:4,10:5,21:6,26:[1,7],27:[1,8],28:[1,9]},{21:30,26:[1,7],27:[1,8],28:[1,9]},{21:31,26:[1,7],27:[1,8],28:[1,9]},{21:32,26:[1,7],27:[1,8],28:[1,9]},{21:33,26:[1,7],27:[1,8],28:[1,9]},{5:[2,20],6:[2,20],15:[2,20],16:[2,20],17:[2,20],18:[2,20],19:[2,20],20:[2,20],22:[2,20],23:[2,20],24:[2,20],25:[2,20],26:[2,20],27:[2,20],28:[2,20]},{5:[2,21],6:[2,21],15:[2,21],16:[2,21],17:[2,21],18:[2,21],19:[2,21],20:[2,21],22:[2,21],23:[2,21],24:[2,21],25:[2,21],26:[2,21],27:[2,21],28:[2,21]},{5:[2,2],6:[2,2],9:12,14:13,15:[1,14],17:[1,15],18:[2,2],19:[1,16],20:[1,17],21:22,22:[1,18],23:[1,19],24:[1,20],25:[1,21],26:[1,7],27:[1,8],28:[1,9]},{6:[1,35],16:[1,34]},{6:[2,8],14:36,16:[2,8],17:[1,15],19:[1,16],20:[1,17],21:22,22:[1,18],23:[1,19],24:[1,20],25:[1,21],26:[1,7],27:[1,8],28:[1,9]},{6:[2,9],16:[2,9],17:[2,9],19:[2,9],20:[2,9],22:[2,9],23:[2,9],24:[2,9],25:[2,9],26:[2,9],27:[2,9],28:[2,9]},{6:[2,11],16:[2,11],17:[2,11],19:[2,11],20:[2,11],22:[2,11],23:[2,11],24:[2,11],25:[2,11],26:[2,11],27:[2,11],28:[2,11]},{6:[1,11],18:[1,37]},{6:[1,11],18:[1,38]},{5:[2,16],6:[2,16],15:[2,16],16:[2,16],17:[2,16],18:[2,16],19:[2,16],20:[2,16],22:[2,16],23:[2,16],24:[2,16],25:[2,16],26:[2,16],27:[2,16],28:[2,16]},{5:[2,17],6:[2,17],15:[2,17],16:[2,17],17:[2,17],18:[2,17],19:[2,17],20:[2,17],22:[2,17],23:[2,17],24:[2,17],25:[2,17],26:[2,17],27:[2,17],28:[2,17]},{5:[2,18],6:[2,18],15:[2,18],16:[2,18],17:[2,18],18:[2,18],19:[2,18],20:[2,18],22:[2,18],23:[2,18],24:[2,18],25:[2,18],26:[2,18],27:[2,18],28:[2,18]},{5:[2,19],6:[2,19],15:[2,19],16:[2,19],17:[2,19],18:[2,19],19:[2,19],20:[2,19],22:[2,19],23:[2,19],24:[2,19],25:[2,19],26:[2,19],27:[2,19],28:[2,19]},{5:[2,13],6:[2,13],15:[2,13],17:[2,13],18:[2,13],19:[2,13],20:[2,13],22:[2,13],23:[2,13],24:[2,13],25:[2,13],26:[2,13],27:[2,13],28:[2,13]},{10:27,12:39,13:26,21:6,26:[1,7],27:[1,8],28:[1,9]},{6:[2,10],16:[2,10],17:[2,10],19:[2,10],20:[2,10],22:[2,10],23:[2,10],24:[2,10],25:[2,10],26:[2,10],27:[2,10],28:[2,10]},{5:[2,14],6:[2,14],15:[2,14],16:[2,14],17:[2,14],18:[2,14],19:[2,14],20:[2,14],22:[2,14],23:[2,14],24:[2,14],25:[2,14],26:[2,14],27:[2,14],28:[2,14]},{5:[2,15],6:[2,15],15:[2,15],16:[2,15],17:[2,15],18:[2,15],19:[2,15],20:[2,15],22:[2,15],23:[2,15],24:[2,15],25:[2,15],26:[2,15],27:[2,15],28:[2,15]},{6:[2,7],14:36,16:[2,7],17:[1,15],19:[1,16],20:[1,17],21:22,22:[1,18],23:[1,19],24:[1,20],25:[1,21],26:[1,7],27:[1,8],28:[1,9]}],
+table: [{3:1,4:2,7:3,8:4,10:5,25:6,32:[1,7],33:[1,8],34:[1,9]},{1:[3]},{5:[1,10],6:[1,11]},{5:[2,3],6:[2,3],9:12,14:13,15:[1,14],17:15,18:[1,16],20:[1,17],21:[1,18],22:[1,19],24:[1,20],25:21,27:22,28:23,29:[1,24],30:[2,3],31:[1,25],32:[1,7],33:[1,8],34:[1,9]},{5:[2,4],6:[2,4],15:[2,4],18:[2,4],20:[2,4],21:[2,4],22:[2,4],24:[2,4],29:[2,4],30:[2,4],31:[2,4],32:[2,4],33:[2,4],34:[2,4]},{5:[2,6],6:[2,6],15:[2,6],18:[2,6],20:[2,6],21:[2,6],22:[2,6],24:[2,6],29:[2,6],30:[2,6],31:[2,6],32:[2,6],33:[2,6],34:[2,6]},{5:[2,31],6:[2,31],15:[2,31],16:[2,31],18:[2,31],20:[2,31],21:[2,31],22:[2,31],24:[2,31],29:[2,31],30:[2,31],31:[2,31],32:[2,31],33:[2,31],34:[2,31]},{5:[2,32],6:[2,32],15:[2,32],16:[2,32],18:[2,32],20:[2,32],21:[2,32],22:[2,32],24:[2,32],29:[2,32],30:[2,32],31:[2,32],32:[2,32],33:[2,32],34:[2,32]},{5:[2,33],6:[2,33],15:[2,33],16:[2,33],18:[2,33],20:[2,33],21:[2,33],22:[2,33],24:[2,33],29:[2,33],30:[2,33],31:[2,33],32:[2,33],33:[2,33],34:[2,33]},{5:[2,34],6:[2,34],15:[2,34],16:[2,34],18:[2,34],20:[2,34],21:[2,34],22:[2,34],24:[2,34],29:[2,34],30:[2,34],31:[2,34],32:[2,34],33:[2,34],34:[2,34]},{1:[2,1]},{7:26,8:4,10:5,25:6,32:[1,7],33:[1,8],34:[1,9]},{5:[2,5],6:[2,5],15:[2,5],18:[2,5],20:[2,5],21:[2,5],22:[2,5],24:[2,5],29:[2,5],30:[2,5],31:[2,5],32:[2,5],33:[2,5],34:[2,5]},{5:[2,12],6:[2,12],15:[2,12],18:[2,12],20:[2,12],21:[2,12],22:[2,12],24:[2,12],29:[2,12],30:[2,12],31:[2,12],32:[2,12],33:[2,12],34:[2,12]},{10:30,11:27,12:28,13:29,25:6,32:[1,7],33:[1,8],34:[1,9]},{5:[2,14],6:[2,14],15:[2,14],16:[2,14],18:[2,14],20:[2,14],21:[2,14],22:[2,14],24:[2,14],29:[2,14],30:[2,14],31:[2,14],32:[2,14],33:[2,14],34:[2,14]},{19:31,25:33,27:32,29:[1,24],32:[1,7],33:[1,8],34:[1,9]},{19:34,25:33,27:32,29:[1,24],32:[1,7],33:[1,8],34:[1,9]},{19:35,25:33,27:32,29:[1,24],32:[1,7],33:[1,8],34:[1,9]},{23:36,25:38,28:37,31:[1,25],32:[1,7],33:[1,8],34:[1,9]},{5:[2,19],6:[2,19],15:[2,19],16:[2,19],18:[2,19],20:[2,19],21:[2,19],22:[2,19],24:[2,19],29:[2,19],30:[2,19],31:[2,19],32:[2,19],33:[2,19],34:[2,19]},{5:[2,20],6:[2,20],15:[2,20],16:[2,20],18:[2,20],20:[2,20],21:[2,20],22:[2,20],24:[2,20],29:[2,20],30:[2,20],31:[2,20],32:[2,20],33:[2,20],34:[2,20]},{5:[2,27],6:[2,27],15:[2,27],16:[2,27],18:[2,27],20:[2,27],21:[2,27],22:[2,27],24:[2,27],29:[2,27],30:[2,27],31:[2,27],32:[2,27],33:[2,27],34:[2,27]},{5:[2,28],6:[2,28],15:[2,28],16:[2,28],18:[2,28],20:[2,28],21:[2,28],22:[2,28],24:[2,28],29:[2,28],30:[2,28],31:[2,28],32:[2,28],33:[2,28],34:[2,28]},{4:39,7:3,8:4,10:5,25:6,32:[1,7],33:[1,8],34:[1,9]},{4:40,7:3,8:4,10:5,25:6,32:[1,7],33:[1,8],34:[1,9]},{5:[2,2],6:[2,2],9:12,14:13,15:[1,14],17:15,18:[1,16],20:[1,17],21:[1,18],22:[1,19],24:[1,20],25:21,27:22,28:23,29:[1,24],30:[2,2],31:[1,25],32:[1,7],33:[1,8],34:[1,9]},{6:[1,42],16:[1,41]},{6:[2,8],14:43,16:[2,8],17:15,18:[1,16],20:[1,17],21:[1,18],22:[1,19],24:[1,20],25:21,27:22,28:23,29:[1,24],31:[1,25],32:[1,7],33:[1,8],34:[1,9]},{6:[2,9],16:[2,9],18:[2,9],20:[2,9],21:[2,9],22:[2,9],24:[2,9],29:[2,9],31:[2,9],32:[2,9],33:[2,9],34:[2,9]},{6:[2,11],16:[2,11],18:[2,11],20:[2,11],21:[2,11],22:[2,11],24:[2,11],29:[2,11],31:[2,11],32:[2,11],33:[2,11],34:[2,11]},{5:[2,15],6:[2,15],15:[2,15],16:[2,15],18:[2,15],20:[2,15],21:[2,15],22:[2,15],24:[2,15],29:[2,15],30:[2,15],31:[2,15],32:[2,15],33:[2,15],34:[2,15]},{5:[2,23],6:[2,23],15:[2,23],16:[2,23],18:[2,23],20:[2,23],21:[2,23],22:[2,23],24:[2,23],29:[2,23],30:[2,23],31:[2,23],32:[2,23],33:[2,23],34:[2,23]},{5:[2,24],6:[2,24],15:[2,24],16:[2,24],18:[2,24],20:[2,24],21:[2,24],22:[2,24],24:[2,24],29:[2,24],30:[2,24],31:[2,24],32:[2,24],33:[2,24],34:[2,24]},{5:[2,16],6:[2,16],15:[2,16],16:[2,16],18:[2,16],20:[2,16],21:[2,16],22:[2,16],24:[2,16],29:[2,16],30:[2,16],31:[2,16],32:[2,16],33:[2,16],34:[2,16]},{5:[2,17],6:[2,17],15:[2,17],16:[2,17],18:[2,17],20:[2,17],21:[2,17],22:[2,17],24:[2,17],29:[2,17],30:[2,17],31:[2,17],32:[2,17],33:[2,17],34:[2,17]},{5:[2,18],6:[2,18],15:[2,18],16:[2,18],18:[2,18],20:[2,18],21:[2,18],22:[2,18],24:[2,18],29:[2,18],30:[2,18],31:[2,18],32:[2,18],33:[2,18],34:[2,18]},{5:[2,25],6:[2,25],15:[2,25],16:[2,25],18:[2,25],20:[2,25],21:[2,25],22:[2,25],24:[2,25],29:[2,25],30:[2,25],31:[2,25],32:[2,25],33:[2,25],34:[2,25]},{5:[2,26],6:[2,26],15:[2,26],16:[2,26],18:[2,26],20:[2,26],21:[2,26],22:[2,26],24:[2,26],29:[2,26],30:[2,26],31:[2,26],32:[2,26],33:[2,26],34:[2,26]},{6:[1,11],30:[1,44]},{6:[1,11],30:[1,45]},{5:[2,13],6:[2,13],15:[2,13],18:[2,13],20:[2,13],21:[2,13],22:[2,13],24:[2,13],29:[2,13],30:[2,13],31:[2,13],32:[2,13],33:[2,13],34:[2,13]},{10:30,12:46,13:29,25:6,32:[1,7],33:[1,8],34:[1,9]},{6:[2,10],16:[2,10],18:[2,10],20:[2,10],21:[2,10],22:[2,10],24:[2,10],29:[2,10],31:[2,10],32:[2,10],33:[2,10],34:[2,10]},{5:[2,29],6:[2,29],15:[2,29],16:[2,29],18:[2,29],20:[2,29],21:[2,29],22:[2,29],24:[2,29],29:[2,29],30:[2,29],31:[2,29],32:[2,29],33:[2,29],34:[2,29]},{5:[2,30],6:[2,30],15:[2,30],16:[2,30],18:[2,30],20:[2,30],21:[2,30],22:[2,30],24:[2,30],29:[2,30],30:[2,30],31:[2,30],32:[2,30],33:[2,30],34:[2,30]},{6:[2,7],14:43,16:[2,7],17:15,18:[1,16],20:[1,17],21:[1,18],22:[1,19],24:[1,20],25:21,27:22,28:23,29:[1,24],31:[1,25],32:[1,7],33:[1,8],34:[1,9]}],
 defaultActions: {10:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
@@ -1155,33 +1236,33 @@ performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:return 23
+case 0:return 21
 break;
-case 1:return 25
+case 1:return 24
 break;
-case 2:return 22
+case 2:return 20
 break;
-case 3:return 17
+case 3:return 29
 break;
-case 4:return 19
+case 4:return 31
 break;
-case 5:return 24
+case 5:return 22
 break;
-case 6:return 20
+case 6:return 18
 break;
 case 7:return '('
 break;
-case 8:return 18
+case 8:return 30
 break;
 case 9:return 15
 break;
 case 10:return 16
 break;
-case 11:return 27
+case 11:return 33
 break;
-case 12:return 28
+case 12:return 34
 break;
-case 13:return 26
+case 13:return 32
 break;
 case 14:return 6
 break;
@@ -1208,9 +1289,9 @@ return new Parser;
 
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = astBuilder;
-exports.Parser = astBuilder.Parser;
-exports.parse = function () { return astBuilder.parse.apply(astBuilder, arguments); };
+exports.parser = parser;
+exports.Parser = parser.Parser;
+exports.parse = function () { return parser.parse.apply(parser, arguments); };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
@@ -1331,7 +1412,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                 case 'inFromProcess':
                     subresult = parser.parseAST(argNode[1], tracker);
                     boundaries.push(Boundary.createFromComponents(subresult.components));
-                    result.expands(subresult);
+                    result.expand(subresult);
                     inputPort = "file" + componentData.files.length;
 
                     var subComponents = subresult.components;
@@ -1345,7 +1426,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                     componentData.files.push(["pipe", tracker.id - 1]);
 
                     break;
-                case 'outTo':
+                case 'outToFile':
                     newComponent = new FileComponent(argNode[1]);
                     newComponent.id = tracker.id;
                     result.connections.push(new Connection(componentData, 'output', newComponent, 'input'));
@@ -1354,7 +1435,7 @@ function commonParseCommand(optionsParserData, defaultComponentData, argNodePars
                     result.components.push(newComponent);
                     stdoutRedirection = newComponent;
                     break;
-                case 'errTo':
+                case 'errToFile':
                     newComponent = new FileComponent(argNode[1]);
                     newComponent.id = tracker.id;
                     result.connections.push(new Connection(componentData, 'error', newComponent, 'input'));
@@ -1544,6 +1625,7 @@ var AwkComponent = (function (_super) {
     }
     return AwkComponent;
 })(GraphModule.CommandComponent);
+exports.AwkComponent = AwkComponent;
 
 function defaultComponentData() {
     var component = new AwkComponent();
@@ -1567,6 +1649,7 @@ exports.parseComponent = common.commonParseComponent(awkData.flagOptions, awkDat
 });
 
 exports.VisualSelectorOptions = awkData.visualSelectorOptions;
+exports.componentClass = AwkComponent;
 //# sourceMappingURL=awk.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],8:[function(require,module,exports){
@@ -1719,6 +1802,7 @@ var BunzipComponent = (function (_super) {
     }
     return BunzipComponent;
 })(GraphModule.CommandComponent);
+exports.BunzipComponent = BunzipComponent;
 
 function defaultComponentData() {
     var component = new BunzipComponent();
@@ -1730,6 +1814,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = BunzipComponent;
 //# sourceMappingURL=bunzip2.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],9:[function(require,module,exports){
@@ -1882,6 +1967,7 @@ var BzcatComponent = (function (_super) {
     }
     return BzcatComponent;
 })(GraphModule.CommandComponent);
+exports.BzcatComponent = BzcatComponent;
 
 function defaultComponentData() {
     var component = new BzcatComponent();
@@ -1894,6 +1980,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = BzcatComponent;
 //# sourceMappingURL=bzcat.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],10:[function(require,module,exports){
@@ -2093,6 +2180,7 @@ var BZipComponent = (function (_super) {
     }
     return BZipComponent;
 })(GraphModule.CommandComponent);
+exports.BZipComponent = BZipComponent;
 
 function defaultComponentData() {
     var component = new BZipComponent();
@@ -2105,6 +2193,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = BZipComponent;
 //# sourceMappingURL=bzip2.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],11:[function(require,module,exports){
@@ -2216,6 +2305,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = CatComponent;
 //# sourceMappingURL=cat.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],12:[function(require,module,exports){
@@ -2304,6 +2394,7 @@ var CompressComponent = (function (_super) {
     }
     return CompressComponent;
 })(GraphModule.CommandComponent);
+exports.CompressComponent = CompressComponent;
 
 function defaultComponentData() {
     var component = new CompressComponent();
@@ -2316,6 +2407,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
 exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
+exports.componentClass = CompressComponent;
 //# sourceMappingURL=compress.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],13:[function(require,module,exports){
@@ -2364,6 +2456,7 @@ var DateComponent = (function (_super) {
     }
     return DateComponent;
 })(GraphModule.CommandComponent);
+exports.DateComponent = DateComponent;
 
 function defaultComponentData() {
     var component = new DateComponent();
@@ -2380,6 +2473,7 @@ exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponent
 });
 exports.parseComponent = common.commonParseComponent(dateData.flagOptions, dateData.selectorOptions, dateData.parameterOptions);
 exports.VisualSelectorOptions = dateData.visualSelectorOptions;
+exports.componentClass = DateComponent;
 /*DESCRIPTION
 Display the current time in the given FORMAT, or set the system date.
 -d, --date=STRING
@@ -2639,6 +2733,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions);
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = DiffComponent;
 //# sourceMappingURL=diff.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],15:[function(require,module,exports){
@@ -2782,6 +2877,7 @@ var GrepComponent = (function (_super) {
     }
     return GrepComponent;
 })(GraphModule.CommandComponent);
+exports.GrepComponent = GrepComponent;
 
 function defaultComponentData() {
     var graph = new GrepComponent();
@@ -2818,6 +2914,7 @@ exports.parseComponent = common.commonParseComponent(grepCommandData.flagOptions
 });
 
 exports.VisualSelectorOptions = grepCommandData.visualSelectorOptions;
+exports.componentClass = GrepComponent;
 //# sourceMappingURL=grep.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],16:[function(require,module,exports){
@@ -2902,6 +2999,7 @@ var GunzipComponent = (function (_super) {
     }
     return GunzipComponent;
 })(GraphModule.CommandComponent);
+exports.GunzipComponent = GunzipComponent;
 
 function defaultComponentData() {
     var component = new GunzipComponent();
@@ -2913,6 +3011,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(gunzipData.flagOptions, gunzipData.selectorOptions);
 exports.VisualSelectorOptions = gunzipData.visualSelectorOptions;
+exports.componentClass = GunzipComponent;
 //# sourceMappingURL=gunzip.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],17:[function(require,module,exports){
@@ -3074,6 +3173,7 @@ var GZipComponent = (function (_super) {
     }
     return GZipComponent;
 })(GraphModule.CommandComponent);
+exports.GZipComponent = GZipComponent;
 
 function defaultComponentData() {
     var component = new GZipComponent();
@@ -3086,6 +3186,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
 exports.VisualSelectorOptions = gzipData.visualSelectorOptions;
+exports.componentClass = GZipComponent;
 //# sourceMappingURL=gzip.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],18:[function(require,module,exports){
@@ -3166,8 +3267,6 @@ var config = {
 var headData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
-optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
 
 var lsCommandData = new parserModule.ParserData(config);
 
@@ -3180,6 +3279,7 @@ var HeadComponent = (function (_super) {
     }
     return HeadComponent;
 })(GraphModule.CommandComponent);
+exports.HeadComponent = HeadComponent;
 
 function defaultComponentData() {
     var component = new HeadComponent();
@@ -3192,6 +3292,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(headData.flagOptions, headData.selectorOptions);
 exports.VisualSelectorOptions = headData.visualSelectorOptions;
+exports.componentClass = HeadComponent;
 //# sourceMappingURL=head.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],19:[function(require,module,exports){
@@ -3549,6 +3650,7 @@ var LsComponent = (function (_super) {
     }
     return LsComponent;
 })(GraphModule.CommandComponent);
+exports.LsComponent = LsComponent;
 
 function defaultComponentData() {
     var component = new LsComponent();
@@ -3562,6 +3664,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(lsCommandData.flagOptions, lsCommandData.selectorOptions, lsCommandData.parameterOptions);
 exports.VisualSelectorOptions = lsCommandData.visualSelectorOptions;
+exports.componentClass = LsComponent;
 //# sourceMappingURL=ls.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],20:[function(require,module,exports){
@@ -3642,8 +3745,6 @@ var config = {
 var tailData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser.shortOptions['n'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.lines.name);
-optionsParser.shortOptions['b'] = $.selectParameter(selectors.NumOf.name, selectors.NumOf.options.bytes.name);
 
 var TailComponent = (function (_super) {
     __extends(TailComponent, _super);
@@ -3654,6 +3755,7 @@ var TailComponent = (function (_super) {
     }
     return TailComponent;
 })(GraphModule.CommandComponent);
+exports.TailComponent = TailComponent;
 
 function defaultComponentData() {
     var component = new TailComponent();
@@ -3666,6 +3768,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(tailData.flagOptions, tailData.selectorOptions);
 exports.VisualSelectorOptions = tailData.visualSelectorOptions;
+exports.componentClass = TailComponent;
 //# sourceMappingURL=tail.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],21:[function(require,module,exports){
@@ -3818,6 +3921,7 @@ exports.parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipD
     return exec.concat(flags, component.set1, component.set2).join(' ');
 });
 exports.VisualSelectorOptions = bzipData.visualSelectorOptions;
+exports.componentClass = TrComponent;
 //# sourceMappingURL=tr.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],23:[function(require,module,exports){
@@ -3900,6 +4004,7 @@ var ZcatComponent = (function (_super) {
     }
     return ZcatComponent;
 })(GraphModule.CommandComponent);
+exports.ZcatComponent = ZcatComponent;
 
 function defaultComponentData() {
     var component = new ZcatComponent();
@@ -3912,6 +4017,7 @@ function defaultComponentData() {
 exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 exports.parseComponent = common.commonParseComponent(zcatData.flagOptions, zcatData.selectorOptions);
 exports.VisualSelectorOptions = zcatData.visualSelectorOptions;
+exports.componentClass = ZcatComponent;
 //# sourceMappingURL=zcat.js.map
 
 },{"../../common/graph":4,"../utils/optionsParser":26,"../utils/parserData":27,"./_init":6}],24:[function(require,module,exports){
@@ -3922,8 +4028,12 @@ var astBuilder = require('./ast-builder/ast-builder');
 var GraphModule = require("../common/graph");
 var Graph = GraphModule.Graph;
 exports.Graph = Graph;
+var Macro = GraphModule.Macro;
+exports.Macro = Macro;
 var GraphComponent = GraphModule.GraphComponent;
 exports.GraphComponent = GraphComponent;
+var MacroComponent = GraphModule.MacroComponent;
+exports.MacroComponent = MacroComponent;
 var Component = GraphModule.Component;
 exports.Component = Component;
 var Connection = GraphModule.Connection;
@@ -3932,8 +4042,8 @@ var FileComponent = GraphModule.FileComponent;
 exports.FileComponent = FileComponent;
 var CommandComponent = GraphModule.CommandComponent;
 exports.CommandComponent = CommandComponent;
-
 var IndexedGraph = GraphModule.IndexedGraph;
+exports.IndexedGraph = IndexedGraph;
 
 var parserCommand = {
     awk: require('./commands/awk'),
@@ -3954,7 +4064,9 @@ var parserCommand = {
     tr: require('./commands/tr'),
     tee: require('./commands/tee')
 };
+
 var implementedCommands = [];
+
 exports.VisualSelectorOptions = {};
 for (var key in parserCommand) {
     implementedCommands.push(key);
@@ -4044,10 +4156,16 @@ function parseVisualData(VisualData) {
     if (VisualData.components.length < 1) {
         return '';
     }
-    indexedComponentList = new IndexedGraph(VisualData);
+    indexedComponentList = new exports.IndexedGraph(VisualData);
     initialComponent = VisualData.firstMainComponent;
-    if (!initialComponent) {
-        return '';
+    if (!(initialComponent instanceof exports.CommandComponent)) {
+        var ref = VisualData.components;
+        for (var i = 0, len = ref.length; i < len; ++i) {
+            if (ref[i] instanceof exports.CommandComponent) {
+                initialComponent = ref[i];
+                break;
+            }
+        }
     }
     return exports.parseVisualDatafromComponent(initialComponent, VisualData, indexedComponentList, {});
 }
@@ -4057,30 +4175,35 @@ function parseComponent(component, visualData, componentIndex, mapOfParsedCompon
     switch (component.type) {
         case exports.CommandComponent.type:
             return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
-        case exports.GraphComponent.type:
-            return compileMacro(component.macro);
-        default:
-            return '';
+        case exports.MacroComponent.type:
+            return exports.parseVisualData(component.macro);
     }
 }
 exports.parseComponent = parseComponent;
 
 /**
-Parse visual data from Component
+find the first component to be parsed
 */
-function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
-    var commands = [];
+function findFirstComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
     do {
         var isFirst = visualData.connections.every(function (connection) {
-            if (connection.endNode === currentComponent.id && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
-                isFirst = false;
+            if (connection.endComponent == currentComponent && connection.startPort === 'output' && connection.endPort === 'input' && mapOfParsedComponents[connection.startNode] !== true) {
                 currentComponent = componentIndex.components[connection.startNode];
                 return false;
             }
             return true;
         });
     } while(isFirst == false);
+    return currentComponent;
+}
+exports.findFirstComponent = findFirstComponent;
 
+/**
+Parse visual data from Component
+*/
+function parseVisualDatafromComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents) {
+    var commands = [];
+    currentComponent = exports.findFirstComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
     var parsedCommand = exports.parseComponent(currentComponent, visualData, componentIndex, mapOfParsedComponents);
     var parsedCommandIndex = commands.length;
     commands.push(parsedCommand);
@@ -4101,7 +4224,6 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
             case 'error':
                 stdErrors.push(endNode);
                 break;
-
             case 'retcode':
                 exitCodes.push(endNode);
                 break;
@@ -4155,7 +4277,7 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     }
 
     if (nextErrcommands.length > 1) {
-        comm = teeResult(outputs, nextcommands);
+        comm = teeResult(stdErrors, nextErrcommands);
         commands[parsedCommandIndex] += " 2> >((" + comm + ") &> /dev/null )";
     } else if (nextErrcommands.length === 1) {
         if (stdErrors[0].type === exports.FileComponent.type) {
@@ -4166,11 +4288,11 @@ function parseVisualDatafromComponent(currentComponent, visualData, componentInd
     }
 
     if (nextExitcommands.length > 1) {
-        comm = teeResult(outputs, nextcommands);
+        comm = teeResult(exitCodes, nextExitcommands);
         commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + comm + " &> /dev/null)";
     } else if (nextExitcommands.length === 1) {
         if (exitCodes[0].type === exports.FileComponent.type) {
-            commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + ")";
+            commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? > " + exitCodes[0].filename + "))";
         } else {
             commands[parsedCommandIndex] = "(" + commands[parsedCommandIndex] + "; (echo $? | " + nextExitcommands[0] + ") &> /dev/null)";
         }
@@ -4182,30 +4304,84 @@ exports.parseVisualDatafromComponent = parseVisualDatafromComponent;
 
 function createMacro(name, description, command, fromMacro) {
     if (fromMacro) {
-        var result = JSON.parse(JSON.stringify(fromMacro));
-        result.name = name;
-        result.description = description;
-        return result;
-    }
-    var macroData = new exports.GraphComponent(name, description);
-    if (command) {
-        macroData.setGraphData(exports.parseCommand(command));
-    }
-    return macroData;
+        return exports.Macro.fromGraph(name, description, exports.cloneGraph(fromMacro));
+    } else if (command) {
+        return exports.Macro.fromGraph(name, description, exports.parseCommand(command));
+    } else
+        return new exports.Macro(name, description);
 }
 exports.createMacro = createMacro;
 ;
 
-function compileMacro(macro) {
-    var indexedComponentList, initialComponent;
-    console.log("compling Macro");
-    if (macro.entryComponent === null) {
-        throw "no component defined as Macro Entry";
+/**
+Creates a component based on the first word of the content
+if the first word contains dots, create a file
+if the first word is a command creates a command component instead
+*/
+function createComponentDinamicText(text) {
+    if (text === "") {
+        return null;
     }
-    indexedComponentList = new IndexedGraph(macro);
-    initialComponent = indexedComponentList[macro.entryComponent];
-    return exports.parseVisualDatafromComponent(initialComponent, macro.VisualData, indexedComponentList, {});
+    var words = text.replace("\n", " ").split(" ");
+    var firstWord = words[0];
+    if (firstWord.indexOf(".") > -1) {
+        return new exports.FileComponent(text);
+    } else if (isImplemented(firstWord)) {
+        return exports.parseCommand(text).components[0];
+    } else
+        return null;
 }
+exports.createComponentDinamicText = createComponentDinamicText;
+
+function graphFromJson(json) {
+    return exports.graphFromJsonObject(JSON.parse(json));
+}
+exports.graphFromJson = graphFromJson;
+
+function graphFromJsonObject(jsonObj) {
+    var newGraph = new exports.Graph();
+    var componentMap = {};
+    for (var i in jsonObj) {
+        newGraph[i] = jsonObj[i];
+    }
+    var components = [];
+    jsonObj.components.forEach(function cloneComponent(component) {
+        var newComponent;
+        switch (component.type) {
+            case exports.CommandComponent.type:
+                newComponent = new parserCommand[component.exec].componentClass;
+                break;
+            case exports.FileComponent.type:
+                newComponent = new exports.FileComponent(component.filename);
+                break;
+        }
+
+        /* istanbul ignore next */
+        if (!newComponent) {
+            return;
+        }
+
+        for (var i in component) {
+            newComponent[i] = component[i];
+        }
+        componentMap[newComponent.id] = newComponent;
+        components.push(newComponent);
+    });
+    newGraph.components = components;
+    newGraph.connections = [];
+    jsonObj.connections.forEach(function connectCreatedComponents(connection) {
+        newGraph.connect(componentMap[connection.startNode], connection.startPort, componentMap[connection.endNode], connection.endPort);
+    });
+    newGraph.firstMainComponent = componentMap[newGraph.firstMainComponent];
+    return newGraph;
+}
+exports.graphFromJsonObject = graphFromJsonObject;
+
+function cloneGraph(graph) {
+    var json = JSON.stringify(graph);
+    return exports.graphFromJson(json);
+}
+exports.cloneGraph = cloneGraph;
 
 parser.generateAST = exports.generateAST;
 parser.parseAST = exports.parseAST;
@@ -4300,9 +4476,8 @@ set parameter (param)
 */
 exports.setParameter = function (param) {
     var paramFn = function (Component, state, substate) {
-        var hasNext, parameter;
-        hasNext = substate.hasNext();
-        parameter = hasNext ? substate.rest() : state.next();
+        var hasNext = substate.hasNext();
+        var parameter = hasNext ? substate.rest() : state.next();
         Component.parameters[param] = parameter;
         return true;
     };
@@ -4313,19 +4488,31 @@ exports.setParameter = function (param) {
 };
 
 
-function select(key, value) {
+function select(key, value, type) {
+    if (typeof type === "undefined") { type = "option"; }
     if (key.name) {
         key = key.name;
     }
     if (value.name) {
         value = value.name;
     }
-    return function (Component) {
-        Component.selectors[key] = {
-            type: "option",
-            name: value
+    if (type == "option") {
+        return function (Component) {
+            Component.selectors[key] = {
+                type: type,
+                name: value
+            };
         };
-    };
+    } else if (type == "numeric parameter") {
+        return function (Component, state, substate) {
+            var parameter = substate.hasNext() ? substate.rest() : state.next();
+            Component.selectors[key] = {
+                type: type,
+                name: value,
+                value: +parameter
+            };
+        };
+    }
 }
 exports.select = select;
 ;
@@ -4364,21 +4551,6 @@ function ignore() {
 }
 exports.ignore = ignore;
 ;
-
-exports.selectParameter = function (key, value) {
-    var paramFn = function (Component, state, substate) {
-        var parameselectParameterter;
-        parameselectParameterter = substate.hasNext() ? substate.rest() : state.next();
-        Component.selectors[key] = {
-            parameterName: value,
-            parameterValue: parameselectParameterter
-        };
-        return true;
-    };
-    paramFn;
-    paramFn.ptype = 'param';
-    return paramFn;
-};
 
 exports.sameAs = function (option) {
     return ['same', option];
@@ -4420,7 +4592,7 @@ function optionParserFromConfig(config) {
         var options = selector.options;
         for (var optionkey in options) {
             var option = options[optionkey];
-            opt = exports.select(selector, option);
+            opt = exports.select(selector, option, option.type);
             if (option.option) {
                 if (option.option[0] === "-") {
                     longOptions[option.option.slice(2)] = opt;

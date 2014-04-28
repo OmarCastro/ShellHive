@@ -302,8 +302,12 @@ export function createComponentDinamicText(text: string){
   
 }
 
+
 export function graphFromJson(json:string){
-  var jsonObj = JSON.parse(json);
+  return graphFromJsonObject(JSON.parse(json));
+}
+
+export function graphFromJsonObject(jsonObj){
   var newGraph = new Graph();
   var componentMap = {}
   for(var i in jsonObj){

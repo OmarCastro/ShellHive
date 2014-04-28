@@ -205,7 +205,9 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
         /* istanbul ignore if */ 
         if(!optionValue) {
           throw [key,".",value,"doesn't exist in ",selectorOptions].join('');          
-        } else /* istanbul ignore else */ if (optionValue[0] !== '-') {
+        } else if(value.type == "numeric parameter"){
+          lFlags.push("-" + optionValue + value.value);
+        } else if (optionValue[0] !== '-') {
           sFlags.push(optionValue);
         } else {
           lFlags.push(optionValue);

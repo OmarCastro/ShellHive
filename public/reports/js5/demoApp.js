@@ -34,13 +34,14 @@ function closestParentWithClass(element, classStr){
   return null;
 }
 SelectionOptions = shellParser.VisualSelectorOptions;
-var app, slice$ = [].slice;
+var app, socket, slice$ = [].slice;
 app = angular.module('demo', ['ui.bootstrap', 'ui.layout']);
+socket = io.connect();
 app.controller('data-flow', [
   '$scope', function($scope){
     var AST, visualData;
     console.log(shellParser);
-    AST = shellParser.generateAST('diff <(grep "nope" file1.txt) <(grep "nope" file3.txt)');
+    AST = shellParser.generateAST(" diff <(zcat rev6/data.txt.gz) <(zcat rev18/data.txt.gz) ");
     visualData = shellParser.parseAST(AST);
     $scope.isImplemented = isImplemented;
     $scope.options = SelectionOptions;
@@ -50,19 +51,62 @@ app.controller('data-flow', [
     $scope.shellText = [];
     $scope.runCommand = function(command){
       console.log($scope.res.visualData);
-      command = shellParser.parseVisualData($scope.res.visualData);
-      $scope.shellText.push({
-        text: command,
-        type: "call"
+      console.log(shellParser.parseVisualData($scope.res.visualData));
+      return socket.emit('runCommand', {
+        visualData: $scope.res.visualData
       });
-      $scope.shellText.push({
-        text: "this is a demo",
-        type: "error"
-      });
-      if ($scope.shellText.length > 50) {
-        return $scope.shellText = slice$.call($scope.shellText, -50);
-      }
     };
+    socket.on('commandCall', function(data){
+      var x;
+      $scope.shellText = $scope.shellText.concat((function(){
+        var i$, ref$, len$, results$ = [];
+        for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+          x = ref$[i$];
+          results$.push({
+            text: x,
+            type: "call"
+          });
+        }
+        return results$;
+      }()));
+      return $scope.$digest();
+    });
+    socket.on('stdout', function(data){
+      var x;
+      $scope.shellText = $scope.shellText.concat((function(){
+        var i$, ref$, len$, results$ = [];
+        for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+          x = ref$[i$];
+          results$.push({
+            text: x,
+            type: "info"
+          });
+        }
+        return results$;
+      }()));
+      if ($scope.shellText.length > 50) {
+        $scope.shellText = slice$.call($scope.shellText, -50);
+      }
+      return $scope.$digest();
+    });
+    socket.on('stderr', function(data){
+      var x;
+      $scope.shellText = $scope.shellText.concat((function(){
+        var i$, ref$, len$, results$ = [];
+        for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+          x = ref$[i$];
+          results$.push({
+            text: x,
+            type: "error"
+          });
+        }
+        return results$;
+      }()));
+      if ($scope.shellText.length > 50) {
+        $scope.shellText = slice$.call($scope.shellText, -50);
+      }
+      return $scope.$digest();
+    });
     return $scope.$on("runCommand", function(event, message){
       console.log('runCommand!');
       return $scope.runCommand();
@@ -726,26 +770,8 @@ app.directive("graphModel", function($document){
           options[data.exec].$changeToValue(data.selectors[name], name, value);
           return sel.open = false;
         };
-        z$.removeComponent = function(id){
-          var x$, res$, i$, ref$, len$, x;
-          console.log("removing component");
-          x$ = scope.visualData;
-          res$ = [];
-          for (i$ = 0, len$ = (ref$ = scope.visualData.components).length; i$ < len$; ++i$) {
-            x = ref$[i$];
-            if (x.id !== id) {
-              res$.push(x);
-            }
-          }
-          x$.components = res$;
-          res$ = [];
-          for (i$ = 0, len$ = (ref$ = scope.visualData.connections).length; i$ < len$; ++i$) {
-            x = ref$[i$];
-            if (x.startNode !== id && x.endNode !== id) {
-              res$.push(x);
-            }
-          }
-          x$.connections = res$;
+        z$.removeComponent = function(component){
+          scope.visualData.removeComponent(component);
         };
         z$.isFreeSpace = function(elem){
           return elem === svgElem || elem === workspace || elem === nodesElem;

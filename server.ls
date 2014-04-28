@@ -37,14 +37,14 @@ io.sockets.on \connection (socket)!->
 
 	socket.on \runCommand (socketData) !->
 		try
-			command = parser.parseVisualData(socketData.visualData)
+			command = parser.parseVisualData(parser.graphFromJsonObject(socketData.visualData))
 			socket.emit("commandCall", command)
 			commandRunner.run(command)
 				..onStdOut = (data) !-> socket.emit("stdout", data.toString('utf8'))
 				..onStdErr = (data) !-> socket.emit("stderr", data.toString('utf8'))
 				..onExit = (code) !-> socket.emit("commExit", code)
 		catch e
-			socket.emit("stderr", "error parsing the graph #e")
+			socket.emit("stderr", "error parsing the graph - #{e.stack}")
 
 
 	/*

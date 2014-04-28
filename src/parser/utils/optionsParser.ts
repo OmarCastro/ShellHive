@@ -61,9 +61,8 @@ export var switchOn = function(...flags:any[]){
   */
 export var setParameter = function(param){
     var paramFn:any = function(Component, state, substate){
-      var hasNext, parameter;
-      hasNext = substate.hasNext();
-      parameter = hasNext
+      var hasNext = substate.hasNext();
+      var parameter = hasNext
         ? substate.rest()
         : state.next();
       Component.parameters[param] = parameter;
@@ -74,21 +73,36 @@ export var setParameter = function(param){
     paramFn.param = param;
     return paramFn
   };
+
+
 /**
   set the selector _key_ with the value _value_
 */
-export function select(key:{name:string}, value:{name:string});
-export function select(key:string, value:string);
-export function select(key:any, value:any){
-    if(key.name){key = key.name}
-    if(value.name){value = value.name}
+export function select(key:{name:string}, value:{name:string}, type?:string);
+export function select(key:string, value:string, type?:string);
+export function select(key:any, value:any, type:string = "option"){
+  if(key.name){key = key.name}
+  if(value.name){value = value.name}
+  if(type == "option"){
     return function(Component){
       Component.selectors[key] = {
-        type:"option",
+        type:type,
         name:value
       }
-    };
-  };
+    }
+  } else if(type == "numeric parameter"){
+    return function(Component, state, substate){
+      var parameter = substate.hasNext()
+        ? substate.rest()
+        : state.next();
+      Component.selectors[key] = {
+        type:type,
+        name:value,
+        value: +parameter
+      }
+    }
+  }
+};
 
 export var selectIfUnselected = function(key, value, ...selections:any[]){
   if(key.name){key = key.name}
@@ -110,25 +124,6 @@ export var selectIfUnselected = function(key, value, ...selections:any[]){
   function to ignore errors when using this option
 */
 export function ignore(){};
-
-
-export var selectParameter = function(key:string, value:string){
-    var paramFn:any = function(Component, state, substate){
-      var parameselectParameterter;
-      parameselectParameterter = substate.hasNext()
-        ? substate.rest()
-        : state.next();
-      Component.selectors[key] = {
-        parameterName: value,
-        parameterValue: parameselectParameterter
-      };
-      return true;
-    };
-    paramFn
-    paramFn.ptype = 'param'
-    return paramFn;
-  };
-
 
 export var sameAs = function(option){ return ['same', option] }
 
@@ -166,7 +161,7 @@ export function optionParserFromConfig(config){
     var options = selector.options;
     for(var optionkey in options){
       var option = options[optionkey];
-      opt = select(selector,option);
+      opt = select(selector,option, option.type);
       if(option.option){
         if(option.option[0] === "-"){
           longOptions[option.option.slice(2)] = opt;

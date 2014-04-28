@@ -2,7 +2,7 @@
     div(ng-if="data.type == 'file'")
         .title(title="{{data.macro.description}}") 
             | FILE
-            a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data.id)")
+            a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data)")
         .ports
             .input
                 span.box(data-port="input")
@@ -21,7 +21,7 @@
     div(ng-if="data.type == 'subgraph'")
         .title(title="{{data.macro.description}}") 
             span(ng-bind="data.macro.name")
-            a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data.id)")
+            a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data)")
 
         .ports
             .input
@@ -46,7 +46,7 @@
     div(ng-if="data.type == 'command'")
         .title 
             span(ng-bind="data.exec")
-            a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data.id)")
+            a.close-button.glyphicon.glyphicon-remove(ng-click="graph.removeComponent(data)")
         .ports
             .input
                 span.box(data-port="input")

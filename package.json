@@ -1,17 +1,22 @@
 {
-  "name": "tese-mieic-omar-castro",
-  "version": "0.0.1",
+  "name": "ShellHive",
+  "version": "0.2.0",
+  "repository" :
+ { 
+   "type" : "git",
+   "url" : "https://github.com/OmarCastro/ShellHive.git"
+ },
   "dependencies": {
     "jade": ">=1.1.4",
     "LiveScript": ">=1.2.0",
     "stylus": ">=0.42.0",
     "nib": "latest",
-    "express": "~3.4.8",
-    "nedb": "~0.10.4"
+    "express": "~3.4.8"
   },
   "scripts": {
     "watch": "gulp",
     "test": "gulp coverage",
+    "server": "lsc server.ls",
     "badge": "coverage-badge `coverage-percentage ./coverage/lcov.info --lcov` badge.png"
   },
   "devDependencies": {
@@ -36,6 +41,7 @@
     "gulp-istanbul": "~0.1.1",
     "coverage-badge": "git://github.com/ashaffer/node-coverage-badge#patch-1",
     "coverage-percentage": "0.0.2",
-    "gulp-jison": "~1.0.0"
+    "gulp-jison": "~1.0.0",
+    "gulp-concat": "~2.2.0"
   }
 }
