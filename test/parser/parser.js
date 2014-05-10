@@ -1,4 +1,4 @@
-var parser = require('../../target/parser/parser.js')
+var parser = require('../../lib/parser/parser.js')
 var should = require("should")
 var Connection        = parser.Connection
 var Macro             = parser.Macro
@@ -47,6 +47,8 @@ describe('parser.js test', function(){
 
     })
   })
+
+  
 
   describe('cloning graph', function(){
     it('should sucessfully clone',function(){

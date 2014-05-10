@@ -1,19 +1,11 @@
 var gulp        = require('gulp'),
     gutil       = require('gulp-util'),
-    source      = require('vinyl-source-stream'),
-    watchify    = require('watchify'),
     tsc         = require('gulp-tsc'),
-    ls          = require('gulp-livescript'),
     newer       = require('gulp-newer'),
-    tinylr      = require('tiny-lr'),
     jison       = require('gulp-jison'),
     istanbul    = require('gulp-istanbul')
     runSequence = require('run-sequence'),
-    concat      = require('gulp-concat'),
-    mocha       = require('gulp-mocha'),
-    livereload  = require('gulp-livereload'), // Livereload plugin needed: https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
-    server      = tinylr();
-
+    mocha       = require('gulp-mocha');
 
 var jisonPath = 'src/parser/ast-builder/ast-builder.jison';
 
@@ -21,18 +13,10 @@ gulp.task('ts', function () {
   return gulp
     .src('src/**/*.ts', {read: false})
     .pipe(newer('target'))
-    .pipe(tsc({target:'ES5', module: 'commonjs', sourcemap: true, outDir: 'target'}))
+    .pipe(tsc({target:'ES5', module: 'commonjs', sourcemap: false, outDir: 'target'}))
     .on('error', gutil.log)
-    .pipe(gulp.dest('target'));
+    .pipe(gulp.dest('lib'));
     //.pipe( livereload( server ));
-});
-
-gulp.task('ls', function() {
-  return gulp.src(['livescript/weeklyReport/init.ls', 'livescript/weeklyReport/demoInit.ls', 'livescript/angularjs/directives/*.ls'])
-    .pipe(ls({bare: true}))
-    .on('error', gutil.log)
-    .pipe(concat('demoApp.js'))
-    .pipe(gulp.dest('public/reports/js5/'));
 });
 
 gulp.task('mocha', function() {
@@ -46,48 +30,46 @@ gulp.task('mocha', function() {
 }); 
 
 gulp.task('coverage', function() {
-  gulp.src([
-    'target/**/commands/*.js',
-    'target/**/utils/*.js',
-    'target/common/*.js',
-    'target/parser/parser.js'])
-    .pipe(istanbul()) // Covering files
-    .on('end', function () {
-      gulp.src(['test/test.js'])
-        .pipe(mocha({reporter: 'spec'}))
-        .on('error', function (error) {
-          var errorText = (error.plugin) ? error : error.stack;
-          gutil.beep();
-          gutil.log(gutil.colors.yellow(errorText));
-        })
-        .pipe(istanbul.writeReports()); // Creating the reports after tests runned
-    });
+
+//	gulp.src([
+//    'lib/**/commands/*.js',
+//    'lib/**/utils/*.js',
+//    'lib/common/*.js',
+//    'lib/parser/parser.js'], { read: false })
+//            .pipe(cover.instrument({
+//                pattern: ['test/test.js'],
+//            }))
+//            .pipe(mocha({reporter: 'spec'}))
+//            .pipe(cover.report({
+//                outFile: 'coverage.html'
+//            }));
+
+
+gulp.src([
+  //'api/**/*.js',
+  'lib/**/commands/*.js',
+  'lib/**/utils/*.js',
+  'lib/common/*.js',
+  'lib/parser/parser.js'])
+  .pipe(istanbul()) // Covering files
+  .on('end', function () {
+    gulp.src(['test/test.js'])
+      .pipe(mocha({reporter: 'spec'}))
+      .on('error', function (error) {
+        var errorText = (error.plugin) ? error : error.stack;
+        gutil.beep();
+        gutil.log(gutil.colors.yellow(errorText));
+      })
+      .pipe(istanbul.writeReports()); // Creating the reports after tests runned
+  });
 });  
 
 gulp.task('jison', function() {
     return gulp.src(jisonPath)
         .pipe(jison({ moduleType: 'commonjs' }))
-        .pipe(gulp.dest('target/parser/ast-builder/'));
+        .pipe(gulp.dest('lib/parser/ast-builder/'));
 });
 
-gulp.task('watchify', function () {
-  var bundler = watchify('./target/parser/shellParser.js');
-  // Optionally, you can apply transforms
-  // and other configuration options on the
-  // bundler just as you would with browserify
-  //bundler.transform('brfs')
-
-  bundler.on('update', rebundle)
-
-  function rebundle () {
-    return bundler.bundle()
-      .pipe(source('parser.js'))
-      .pipe(gulp.dest('./public/js'))
-      .pipe(gulp.dest('./public/reports/js5'))
-  }
-
-  return rebundle()
-});
 
 
 gulp.task('watch', function () {
@@ -97,4 +79,4 @@ gulp.task('watch', function () {
   gulp.watch('test/**/*.js',['coverage']);
 });
 
-gulp.task('default', ['ts','ls','mocha','watch']);//,'watchify']);
+gulp.task('default', ['ts','ls','mocha','watch']);

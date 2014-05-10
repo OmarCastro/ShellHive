@@ -1,4 +1,4 @@
-var parser = require('../../target/parser/parser.js')
+var parser = require('../../lib/parser/parser.js')
 
 describe('AST test', function(){
   describe('basic test', function(){

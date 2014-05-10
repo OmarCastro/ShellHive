@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo Week 5 - Omar Castro</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/styles/importer.css">
+    <link rel="stylesheet" href="/project-assets/ui-layout.css">
+    <link rel="stylesheet" href="/project-assets/style.css">
+    
+  </head>
+  <body ng-app="demo" style="margin:0;height:100%">
+    <div ng-controller="data-flow" style="height:100%" class="TransformResults">
+      <div style="height:100%">
+        <div graph-model="graphData" options="options" class="visual-builder border data-flow"></div>
+      </div>
+    </div>
+  </body>
+    <script src="/bower_components/pointerevents-polyfill/pointerevents.min.js"></script>
+    <script src="/js/sails.io.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script src="/linker/js/dependencies/angular.min.js"></script>
+    <script src="/linker/js/dependencies/ui-bootstrap-tpls.min.js"></script>
+    <script src="/js/ui-layout.min.js"></script>
+  
+  <!-- <script src="/js/parser.js"></script> -->
+  <script src="/js/app.js"></script>
+  <script src="/js/app-graph-component.js"></script>
+  
+  <script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+      <h3>Macro Creation</h3>
+    </div>
+    <div class="modal-body">
+      <form role="form" class="form-horizontal">
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" id="name" ng-model="form.name" placeholder="Name" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="descr" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea id="descr" rows="3" ng-model="form.description" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">Command</label>
+          <div class="col-sm-10">
+            <input type="text" id="command" ng-model="form.command" placeholder="e.g. cat -A hello.txt | grep &quot;world&quot;" class="form-control">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button ng-click="ok()" class="btn btn-primary">Create Macro</button>
+      <button ng-click="cancel()" class="btn btn-warning">Cancel</button>
+    </div>
+  </script>
+  <script type="text/ng-template" id="MacroEditModal.html">
+    <div class="modal-header">
+      <h3>Macro</h3>
+    </div>
+    <div class="modal-body">
+      <form role="form" class="form-horizontal">
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" id="name" ng-model="form.name" placeholder="Name" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="descr" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea id="descr" rows="3" ng-model="form.description" class="form-control"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button ng-click="view()" class="btn btn-primary">View Macro</button>
+      <button ng-click="edit()" class="btn btn-primary">Edit Macro</button>
+      <button ng-click="delete()" class="btn btn-error">Delete Macro</button>
+      <button ng-click="cancel()" class="btn btn-warning">Cancel</button>
+    </div>
+  </script>
+  <script type="text/ng-template" id="sidebarModel.html">
+    <ul class="nav nav-pills nav-stacked">
+      <li class="nav-header">Commands</li>
+      <li ng-repeat="command in implementedCommands"><a data-command="{{command}}" href="#" ng-bind="command"></a></li>
+      <li class="nav-header">Macros</li>
+      <li sidebar-macro-component="name" ng-repeat="(name, val) in $parent.graphModel.macros"></li>
+      <li class="nav-header">Utilities</li>
+      <li><a new-macro ng-click="open()">New Macro</a></li>
+    </ul>
+  </script>
+  <script type="text/ng-template" id="graphTemplate.html"><% include ../ng-templates/graphTemplate.ejs %></script>
+  <script type="text/ng-template" id="typeaheadTemplate.html"><a><span bind-html-unsafe="match.label | typeaheadHighlight:query"></span><span class="badge">14</span></a></script>
+</html>

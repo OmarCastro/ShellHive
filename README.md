@@ -29,13 +29,20 @@ npm test
 After that you can run the server with
 
 ```bash
-npm run server
+npm start
 ```
 
-now you can play by using the link in the browser
+The server is developed using sails.js, if you have it installed you can run it
+with
 
+```bash
+sails lift
+```
+
+Then, the application should be running on 
  ```
-http://localhost:8000/reports/demo1.html
+http://localhost:1337/
 ```
 
-Note: the application is still in alpha version
+Finally, have fun!! :)
+

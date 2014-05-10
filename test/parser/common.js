@@ -1,7 +1,7 @@
 var should = require('should')
 
-var parser  = require('../../target/parser/parser.js')
-var graph   = require('../../target/common/graph.js')
+var parser  = require('../../lib/parser/parser.js')
+var graph   = require('../../lib/common/graph.js')
 var GraphComponent  = graph.GraphComponent
 var FileComponent   = graph.FileComponent
 var Graph           = graph.Graph

@@ -1,0 +1,33 @@
+    <div class="navbar navbar-default navbar-inverse">
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Macro <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a ng-click="newMacroModal()">New Macro</a></li>
+              <li class="divider"></li>
+              <li class="dropdown-header">created Macros</li>
+              <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="macroEditModal(macro)"></a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Add Command <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li ng-repeat="command in implementedCommands"><a ng-click="newCommandAtTopLeft(command)" ng-bind="command"></a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">View<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" ng-click="shell = !shell">Toogle shell</a></li>
+              <li><a href="#" ng-click="viewGraph(rootGraph)">View Root</a></li>
+            </ul>
+          </li>
+          <li><a href="#" ng-click="shell = true; $emit('runCommand', [])">
+            <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
+          </a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" ng-click="showTips = !showTips">Docs</a></li>
+          <li><a href="/user/show/<%= req.session.user.id %>"><%= req.session.user.name %></a></li>
+          <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+        </ul>
+      </div>
+    </div>

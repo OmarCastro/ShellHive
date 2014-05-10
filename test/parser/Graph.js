@@ -1,5 +1,5 @@
-var parser = require('../../target/parser/parser.js')
-var parserinit = require('../../target/parser/commands/_init.js')
+var parser = require('../../lib/parser/parser.js')
+var parserinit = require('../../lib/parser/commands/_init.js')
 var Connection = parser.Connection
 var Component  = parser.Component
 

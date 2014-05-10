@@ -1,0 +1,11 @@
+<form action="/project/create" method="POST" class="form-new-proj well">
+  <h2 class="form-signin-header center">Create Project</h2>
+
+  <div class="form-group">
+      <label for="name">Project Name</label>
+      <input type="text" class="form-control" placeholder="your name" name="name">
+  </div>
+
+  <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create Project">
+  <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+</form>

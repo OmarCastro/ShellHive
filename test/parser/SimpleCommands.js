@@ -1,4 +1,4 @@
-var parser = require('../../target/parser/parser.js')
+var parser = require('../../lib/parser/parser.js')
 var Connection = parser.Connection
 var Component  = parser.Component
 

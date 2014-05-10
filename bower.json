@@ -1,28 +1,8 @@
 {
-  "name": "flownix",
+  "name": "YourAwesomePackageName",
   "version": "0.0.1",
-  "homepage": "https://github.com/OmarCastro/flownix",
-  "authors": [
-    "Omar Castro <omar.castro.360@gmail.com>"
-  ],
-  "description": "visual dataflow programming for unix shell",
-  "keywords": [
-    "visual",
-    "programming"
-  ],
-  "license": "MIT",
-  "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
     "pointerevents-polyfill": "~0.2.0",
-    "angular": "~1.2.14",
-    "bootstrap-stylus": "~3.1.0",
-    "ng-context-menu": "~0.0.8"
+    "angular-ui": "~0.4.0"
   }
 }

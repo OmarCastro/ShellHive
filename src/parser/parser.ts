@@ -16,7 +16,7 @@ export import CommandComponent = GraphModule.CommandComponent
 export import IndexedGraph = GraphModule.IndexedGraph
 
 
-var parserCommand = {
+export var parserCommand = {
   awk: require('./commands/awk'),
   cat: require('./commands/cat'),
   date: require('./commands/date'),
@@ -36,7 +36,7 @@ var parserCommand = {
   tee: require('./commands/tee')
 };
 
-var implementedCommands:any[] = [];
+export var implementedCommands:any[] = [];
 
 export var VisualSelectorOptions = {}
 for (var key in parserCommand) {
@@ -44,7 +44,7 @@ for (var key in parserCommand) {
     VisualSelectorOptions[key] = parserCommand[key].VisualSelectorOptions
 }
 
-function isImplemented(command:string){
+export function isImplemented(command:string){
   return parserCommand[command] != null;
 };
 /**
@@ -271,9 +271,6 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
 
   return commands.join(" | ");
 }
-
-
-
 
 
 
