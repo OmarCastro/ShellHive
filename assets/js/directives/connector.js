@@ -6,7 +6,7 @@ app.directive("connector", function($document){
       
       var dataedge = scope.$parent.edge;
       var elem = element[0];
-      var $graphElement = element.closest('[graph-model]');
+      var $graphElement = scope.graphElement;
       var graphElement = $graphElement[0];
       
       

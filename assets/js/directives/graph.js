@@ -4,7 +4,7 @@ app.directive("graph", function($document){
     scope: true,
     templateUrl: 'graphTemplate.html',
     controller: ['$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
-        var res$, key, ref$, val, x$, $sp, y$, update, mousemove, mouseup, newComponent, newFileComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, hidePopup, hidePopupAndEdge;
+        var res$, key, ref$, val, x$, $sp, update, mousemove, mouseup, newComponent, newFileComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, hidePopup, hidePopupAndEdge;
         
         
         var pointerId = 0;
@@ -34,17 +34,16 @@ app.directive("graph", function($document){
       
         $popup.hide();
 
-    
-        y$ = scope;
-        y$.safedigest = function(){
+        scope.graphElement = element
+        scope.safedigest = function(){
           if (!(scope.$$phase || scope.$root.$$phase)) {
             scope.$digest();
           }
         };
-        y$.toNatNum = function(num){ return num.replace(/[^\d]/, '') };
-        y$.popupText = '';
-        y$.graph = this;
-        y$.$watch("shell", function(){
+        scope.toNatNum = function(num){ return num.replace(/[^\d]/, '') };
+        scope.popupText = '';
+        scope.graph = this;
+        scope.$watch("shell", function(){
           if (!scope.shell) {
             toplayout.style.bottom = "0";
             return splitbar.style.display = "none";
@@ -53,12 +52,12 @@ app.directive("graph", function($document){
             return splitbar.style.display = "";
           }
         });
-        y$.visualData = scope.graphModel;
-        y$.isArray = angular.isArray;
-        y$.isString = angular.isString;
-        y$.isRootView = function(){  return scope.visualData == scope.graphModel };
-        y$.macroViewList = function(){ return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : [] }
-        y$.swapPrevious = function(array, index, id){
+        scope.visualData = scope.graphModel;
+        scope.isArray = angular.isArray;
+        scope.isString = angular.isString;
+        scope.isRootView = function(){  return scope.visualData == scope.graphModel };
+        scope.macroViewList = function(){ return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : [] }
+        scope.swapPrevious = function(array, index, id){
           var ref$, i$, len$, connection, results$ = [];
           if (index === 0) {
             return;
@@ -116,9 +115,8 @@ app.directive("graph", function($document){
           }
           hidePopupAndEdge();
           pointerId = event.pointerId;
-          x$ = $document;
-          x$.bind("pointermove", mousemove);
-          x$.bind("pointerup", mouseup);
+          $document.bind("pointermove", mousemove);
+          $document.bind("pointerup", mouseup);
           startX = event.screenX;
           startY = event.screenY;
           event.preventDefault();

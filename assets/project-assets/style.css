@@ -1,13 +1,13 @@
 @media print{*{-webkit-print-color-adjust:exact}
-}html,body,div[graph-model]{width:100%;height:100%;margin:0;padding:0}
+}html,body,div[graph]{width:100%;height:100%;margin:0;padding:0}
 .popupArea{overflow:auto}
 body,.graph,.nodes{margin:0}
-div[graph-model]{overflow:hidden;}
-div[graph-model] .layout,div[graph-model] .tips{position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px)}
-div[graph-model] svg,div[graph-model] .workspace,div[graph-model] .background,div[graph-model] .workspace > .nodes,div[graph-model] .popupArea{font-size:12px;position:absolute;top:0;left:0;width:100%;height:100%;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-o-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}
-div[graph-model] .workspace,div[graph-model] svg{overflow:hidden}
-div[graph-model] .navbar{position:absolute;top:0;left:0;right:0;height:50px}
-div[graph-model] .user-icon{border:solid 1px #333;margin:5px;padding:2px;font-size:34px}
+div[graph]{overflow:hidden;}
+div[graph] .layout,div[graph] .tips{position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px)}
+div[graph] svg,div[graph] .workspace,div[graph] .background,div[graph] .workspace > .nodes,div[graph] .popupArea{font-size:12px;position:absolute;top:0;left:0;width:100%;height:100%;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-o-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}
+div[graph] .workspace,div[graph] svg{overflow:hidden}
+div[graph] .navbar{position:absolute;top:0;left:0;right:0;height:50px}
+div[graph] .user-icon{border:solid 1px #333;margin:5px;padding:2px;font-size:34px}
 .filename{text-align:center;font-family:Monospace;font-size:1.2em;font-weight:bold}
 .tips{z-index:20;background-color:#eee;color:#000}
 .ui-splitbar{z-index:8}
