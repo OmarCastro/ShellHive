@@ -12,7 +12,7 @@ module.exports = {
     res.view({});
   },
   
-  create: function(req,res){
+  create: function(req,res, next){
     var userID = req.session.user.id;
     Project.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
@@ -26,7 +26,7 @@ module.exports = {
     });
   },
     
-  show:function(req, res){
+  show:function(req, res, next){
     Project.findOne(req.param('id')).populate('members').exec(function (err, project){
       if(err) return next(err);
       if(!project) return next();
@@ -36,7 +36,7 @@ module.exports = {
       });
     });
   },
-  addmember:function(req, res){
+  addmember:function(req, res, next){
     Project.findOne(req.param('id'), function foundProject (err, project){
       if(err) return next(err);
       if(!project) return next();
@@ -52,7 +52,7 @@ module.exports = {
     });
   },
     
-  play:function(req, res){
+  play:function(req, res, next){
     Project.findOne(req.param('id')).populate('members').populate('graphs').exec(function (err, project){
       if(err) return next(err);
       if(!project) return next();
@@ -67,7 +67,7 @@ module.exports = {
       });
   },
 
-  subscribe:function(req, res){
+  subscribe:function(req, res, next){
     var id = req.param('id');
     Project.findOne(id).populate('members').populate('graphs').exec(function (err, project){
       if(err) return next(err);
@@ -84,7 +84,7 @@ module.exports = {
     });
   },
 
-  graphaction: function(req,res){
+  graphaction: function(req,res, next){
     CollaborationService.broadcastMessageInProject(req,res)
   },
 };

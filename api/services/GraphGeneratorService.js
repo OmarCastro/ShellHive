@@ -135,8 +135,8 @@ module.exports = {
 
   removeComponent: function(id, callback){
     async.auto({
-      components: function (cb) {Component.destroy({id:id}).done(cb)},
-      connections: function (cb) {Connection.destroy().where({or:[{startNode:id},{endNode:id}]}).done(cb)}
+      components: function (cb) {Component.destroy({id:id}).exec(cb)},
+      connections: function (cb) {Connection.destroy().where({or:[{startNode:id},{endNode:id}]}).exec(cb)}
     }, callback);
   },
   
@@ -151,14 +151,11 @@ module.exports = {
   },
   
       
-    compileGraph: function(id, cb){
-       Graph.findOne(id).populate('components').populate('connections').exec(function (err, graph){
-        if(err) return next(err);
-        if(!graph) return next();
-        
-        graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
-         
-        cb(parser.parseGraph(parser.graphFromJsonObject(graph)));
-      });
-    }
+  compileGraph: function(id, cb){
+     Graph.findOne(id).populate('components').populate('connections').exec(function (err, graph){
+      if(err) return cb(err, null);
+      graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
+      return cb(null, parser.parseGraph(parser.graphFromJsonObject(graph)));
+    });
+  }
 };

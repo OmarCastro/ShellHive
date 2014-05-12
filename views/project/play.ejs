@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="/project-assets/style.css">
     
   </head>
-  <body ng-app="demo" style="margin:0;height:100%">
+  <body ng-app="app" style="margin:0;height:100%">
     <div ng-controller="data-flow" style="height:100%" class="TransformResults">
       <div style="height:100%">
-        <div graph-model="graphData" options="options" class="visual-builder border data-flow"></div>
+        <div graph options="options" class="visual-builder border data-flow"></div>
       </div>
     </div>
   </body>
@@ -24,7 +24,10 @@
   
   <!-- <script src="/js/parser.js"></script> -->
   <script src="/js/app.js"></script>
-  <script src="/js/app-graph-component.js"></script>
+  <script src="/js/directives/graph"></script>
+  <script src="/js/directives/component"></script>
+  <script src="/js/directives/connector"></script>
+  <script src="/js/directives/port"></script>
   
   <script type="text/ng-template" id="myModalContent.html">
     <div class="modal-header">

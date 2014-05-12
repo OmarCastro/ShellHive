@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-  create: function(req,res){
+  create: function(req,res, next){
     var userID = req.session.user.id;
     Graph.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
@@ -15,7 +15,7 @@ module.exports = {
     });
   },
   
-  subscribe:function(req,res){
+  subscribe:function(req,res, next){
     var id = req.param('id');
     Graph.findOne(id).populate('components').populate('connections').exec(function (err, graph){
       if(err) return next(err);
@@ -24,7 +24,7 @@ module.exports = {
     });
   },
   
-  removeComponent: function(req,res){
+  removeComponent: function(req,res, next){
     GraphGeneratorService.removeComponent(req.body.id, function(err,result){
       if(err) return next(err);
       CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {
@@ -58,8 +58,23 @@ module.exports = {
         })
       })
   },
+
+  compile:function(req,res, next){
+    GraphGeneratorService.compileGraph(req.body.id, function(err, result){
+      if(err) return next(err);
+      res.json({
+        command: result,
+      })
+    })
+  },
+
+  run:function(req,res, next){
+    var command = req.body.command;
+    
+    
+  },
   
-  createfromcommand:function(req,res){
+  createfromcommand:function(req, res, next){
     var userID = req.session.user.id;
     Graph.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);

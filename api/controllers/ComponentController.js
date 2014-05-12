@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-  create: function(req,res){
+  create: function(req, res, next){
     var userID = req.session.user.id;
     Component.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
@@ -18,7 +18,7 @@ module.exports = {
     });
   },
   
-  update: function(req,res){
+  update: function(req, res){
     var socket = req.socket;
     var body = req.body;
     var id = body.id;
