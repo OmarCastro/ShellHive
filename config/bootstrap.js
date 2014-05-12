@@ -92,26 +92,26 @@ module.exports.bootstrap = function (cb) {
       members: [1,2]
     },
     ];
+
     Project.count().exec(function(err, count) {
       if (err) return done(err);
       if (count > 0) return done();
       Project.create(dummyProjects).exec(function(err,res){
-        var saves = []
-        for (var i = dummyProjects.length - 1; i >= 0; i--) {
+        var len = res.length;
+        var current = 0;
+        for (var i = len - 1; i >= 0; i--) {
           for(var j = 0, _ref=dummyProjects[i].members, length=_ref.length;j<length;++j){
             var value = _ref[j];
             res[i].members.add(value)
           }
-          saves.push(res[i].save)
         };
-        res[0].save(done)
-        // TODO: fix for multiple projects
-        //if (saves.length) {
-        //  sails.log(saves);
-        //  async.parallel(saves, done)
-        //} else {
-        //  done(err,res)
-        //}
+        if (len) {
+          res.forEach(function(project){
+            if(++current >= len){ done(err,res) }
+          });
+        } else {
+          done(err,res)
+        }
       });
     });
   }
