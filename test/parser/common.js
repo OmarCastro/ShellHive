@@ -1,4 +1,6 @@
-var should = require('should')
+var chai = require('chai');
+var expect = chai.expect;
+var should = chai.should();
 
 var parser  = require('../../lib/parser/parser.js')
 var graph   = require('../../lib/common/graph.js')

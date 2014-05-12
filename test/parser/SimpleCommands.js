@@ -1,15 +1,21 @@
 var parser = require('../../lib/parser/parser.js')
+var chai = require('chai');
+var expect = chai.expect;
+var should = chai.should();
+
 var Connection = parser.Connection
 var Component  = parser.Component
 
-function isComponent(component){ return component instanceof Component }
 
-function isConnection(connection){ return connection instanceof Connection; }
 
 function shouldBeAGraph(commandResult){
   commandResult.should.be.an.instanceof(parser.Graph)
-  commandResult.components.should.matchEach(isComponent);
-  commandResult.connections.should.matchEach(isConnection);
+  commandResult.components.forEach(function(component){
+    component.should.be.an.instanceof(Component)
+  });  
+  commandResult.connections.forEach(function(component){
+    component.should.be.an.instanceof(Connection)
+  });
   commandResult.toJSON().should.eql({
     components: commandResult.components,
     connections: commandResult.connections

@@ -1,21 +1,26 @@
 var parser = require('../../lib/parser/parser.js')
+
+var chai = require('chai');
+var expect = chai.expect;
+var should = chai.should();
+
 var parserinit = require('../../lib/parser/commands/_init.js')
 var Connection = parser.Connection
 var Component  = parser.Component
 
-function isComponent(component){ return component instanceof Component }
-
-function isConnection(connection){ return connection instanceof Connection; }
-
-function shouldBeAGraph(graph){
-  graph.should.be.an.instanceof(parser.Graph)
-  graph.components.should.matchEach(isComponent);
-  graph.connections.should.matchEach(isConnection);
-  graph.toJSON().should.eql({
-    components: graph.components,
-    connections: graph.connections
+function shouldBeAGraph(commandResult){
+  commandResult.should.be.an.instanceof(parser.Graph)
+  commandResult.components.forEach(function(component){
+    component.should.be.an.instanceof(Component)
+  });  
+  commandResult.connections.forEach(function(component){
+    component.should.be.an.instanceof(Connection)
+  });
+  commandResult.toJSON().should.eql({
+    components: commandResult.components,
+    connections: commandResult.connections
   })
-  return graph;
+  return commandResult
 }
 
 function reparse(command){
@@ -130,7 +135,7 @@ describe('Graph test', function(){
       shouldBeAGraph(graph)
       graph.components.should.have.length(9)
       graph.connections.should.have.length(8)
-      graph.components.should.matchEach(function(component){
+      graph.components.forEach(function(component){
         component.exec.should.equal("cat");
       })
     })

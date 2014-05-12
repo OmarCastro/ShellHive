@@ -1,4 +1,13 @@
-var should = require('should')
+
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+chai.use(require('chai-properties'));
+
+var expect = chai.expect;
+var should = chai.should();
+
 require('./parser/common')
 require('./parser/parser')
 require('./parser/AST')
@@ -75,8 +84,8 @@ describe('Sails Graph compile', function(done) {
   it('should compile a graph in a database', function (done) {
   //Graph.create([{name: "test1", project:1, isRoot:true},{name:"test2", project:1}]).exec(sails.log)
   //GraphGeneratorService.addToGraph(3,"cat json.txt | grep mimi");
-    GraphGeneratorService.compileGraph(1,function(result){
-     result.should.equal("cat  json.txt | grep  mimi"); 
+    GraphGeneratorService.compileGraph(1,function(err, result){
+     expect(result).to.equal("cat  json.txt | grep  mimi"); 
      done();
     });
   });

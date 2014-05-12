@@ -1,4 +1,8 @@
 var parser = require('../../lib/parser/parser.js')
+var chai = require('chai');
+var expect = chai.expect;
+var should = chai.should();
+
 
 describe('AST test', function(){
   describe('basic test', function(){

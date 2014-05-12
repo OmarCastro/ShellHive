@@ -1,5 +1,11 @@
 var parser = require('../../lib/parser/parser.js')
-var should = require("should")
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+var expect = chai.expect;
+var should = chai.should();
+
 var Connection        = parser.Connection
 var Macro             = parser.Macro
 var Component  	      = parser.Component
