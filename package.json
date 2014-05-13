@@ -49,6 +49,7 @@
     "gulp-jison": "~1.0.0",
     "gulp-mocha": "~0.4.1",
     "gulp-newer": "~0.3.0",
+    "gulp-protractor": "0.0.7",
     "gulp-tsc": "~0.7.0",
     "gulp-util": "~2.2.14",
     "karma": "~0.12.16",
@@ -58,6 +59,7 @@
     "karma-mocha": "~0.1.3",
     "karma-ng-scenario": "~0.1.0",
     "mocha": "~1.18.2",
+    "protractor": "^0.22.0",
     "run-sequence": "~0.3.6",
     "supertest": "~0.12.1"
   }

@@ -8,16 +8,9 @@
       <a href="/project/new" class="btn btn-sm btn-primary">New Project</a>
     <% } %>
     <table class="table">
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th></th>
-      <!-- <th></th> -->
-    </tr>
     <% _.each(projects, function(project){ %>
     <tr data-id="<%= user.id %>" data-model="user">
-      <td><%= project.id %></td>
-      <td><%= project.name %></td>
+      <td><b><%= project.name %></b></td>
       <td><a href="/project/show/<%= project.id %>" class="btn btn-sm btn-primary">Info</a></td>
       <% if(session.user && session.user.id == user.id){ %>
       <td><a href="/project/play/<%= project.id %>" class="btn btn-sm btn-primary">Join</a></td>

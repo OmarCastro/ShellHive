@@ -2,22 +2,13 @@
   <h1>
     <%= project.name %>
   <% if(session.authenticated && _.some(members, function(member){return member.id == session.user.id})){ %>
-  <a href="/project/play/<%= session.user.id %>" class="btn btn-default btn-primary">join</a>
+  <a href="/project/play/<%= project.id %>" class="btn btn-default btn-primary">join</a>
   <% } %></h1>
   <hr>
   <h3>members</h3>
     <table class="table">
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
     <% _.each(members, function(user){ %>
     <tr data-id="<%= user.id %>" data-model="user">
-      <td><%= user.id %></td>
       <td><%= user.name %></td>
       <td><%= user.email %></td>
       <td><a href="/user/show/<%= user.id %>" class="btn btn-sm btn-primary">Show</a></td>
