@@ -21,13 +21,13 @@ module.exports.bootstrap = function (cb) {
   function createDummyUserData(done) {
     var dummyUsers = [
     {
-      name: "Administrador el Gran Sheriff",
+      name: "Administrador El Gran Sheriff",
       email:"admin@admin.pt",
       password: "admin123"
     },
     {
         name: "Omar Castro",
-        email:"ei08158@fe.up.pt",
+        email:"user@user.fe.up.pt",
         password: "teste123"  
     }
     ];

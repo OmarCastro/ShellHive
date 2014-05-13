@@ -67,13 +67,13 @@
         <% } else { %>
             <form class="navbar-form navbar-left" action="/user/login" method="POST">
             <div class="form-group">
-              <input type="email" class="form-control" placeholder="email" name="email">
+              <input type="email" class="form-control login-user" placeholder="email" name="email">
             </div>
             <div class="form-group">
-              <input type="password" class="form-control" placeholder="password" name="password">
+              <input  type="password" class="form-control login-password" placeholder="password" name="password">
             </div>
             <input type="hidden" name="_csrf" value="<%= _csrf %>" />
-            <button type="submit" class="btn btn-default">Submit</button>
+            <button type="submit" class="login-submit btn btn-default">Submit</button>
           </form>
           </li>
           <li>
