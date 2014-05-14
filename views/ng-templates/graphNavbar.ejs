@@ -26,8 +26,15 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#" ng-click="showTips = !showTips">Docs</a></li>
-          <li><a href="/user/show/<%= req.session.user.id %>"><%= req.session.user.name %></a></li>
-          <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+          <li>
+          <% if(locals.req && local.req.session.user){ %>
+            <a href="/user/show/<%= req.session.user.id %>"><%= req.session.user.name %></a>
+          <% } else { %>
+            <a href="/"> Anonymous Visitor </a>
+          <% } %>
+        </li>
+           <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+
         </ul>
       </div>
     </div>

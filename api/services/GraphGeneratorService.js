@@ -36,23 +36,35 @@ function metaGraphfromCommand(command){
   }
     
 
-function addToGraph(graphId, command){
+function addToGraph(graphId, command, next){
   var metagraph = metaGraphfromCommand(command);
 
   var metaComponents = metagraph.components.map(function(component){
     return {
       graph: graphId,
-      data: component
+      data: JSON.stringify(component)
     }
   })
     
   Component.create(metaComponents).exec(function(err,created){
     if(err) return next(err);
-     var components = metagraph.components;
+    var components = metagraph.components;
+
+    var createdComponentsOrdered = metagraph.components.map(function(component){
+      var position = component.position
+      for (var i = created.length - 1; i >= 0; i--) {
+         var createdPosition = created[i].data.position
+         if(createdPosition.x == position.x && createdPosition.y == position.y){
+           return created[i];
+         }
+      };
+    });
+
+
      metagraph.connections.forEach(function(connection){
       connection.graph = graphId
-      connection.startNode = created[components.indexOf(connection.startNode)].id
-      connection.endNode = created[components.indexOf(connection.endNode)].id
+      connection.startNode = createdComponentsOrdered[components.indexOf(connection.startNode)].id
+      connection.endNode = createdComponentsOrdered[components.indexOf(connection.endNode)].id
     });
     
     Connection.create(metagraph.connections).exec(function(err,created){

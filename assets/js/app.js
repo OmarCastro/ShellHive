@@ -95,6 +95,8 @@ app.controller('data-flow', ['$scope', function($scope){
   socket.get('/project/subscribe', {id:projId}, function(data){
     $scope.implementedCommands = data.implementedCommands
     $scope.options             = data.SelectionOptions;
+    $scope.page = "graph";
+
     $scope.$digest();
 
 
@@ -102,6 +104,8 @@ app.controller('data-flow', ['$scope', function($scope){
     var graphs = data.graphs
     var len = graphs.length;
     if(len == 0){
+      $scope.page = "newProject";
+      $scope.$digest();      
       // is a new project
     } else {        
       var macros = visualData.macros = [];

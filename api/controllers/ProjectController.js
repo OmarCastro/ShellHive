@@ -69,12 +69,16 @@ module.exports = {
 
   subscribe:function(req, res, next){
     var id = req.param('id');
+
     Project.findOne(id).populate('members').populate('graphs').exec(function (err, project){
       if(err) return next(err);
       if(!project) return next();
       var userId = req.session.user.id
       var members = project.members;
       var isMember = false;
+      if(id == 1){ //special public project
+
+      }
       for(var i = 0, len = members.length; members[i].id != userId && i < len; ++i){}
       if(i < len){
         CollaborationService.joinUserToProject(req,res,project);

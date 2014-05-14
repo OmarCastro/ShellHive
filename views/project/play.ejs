@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= project.name %></title>
+    <title><%= (locals.project) ? project.name : "ShellHive Demo App" %></title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="/styles/importer.css">
     
@@ -19,7 +19,11 @@
     <script src="/linker/js/dependencies/angular.min.js"></script>
     <script src="/linker/js/dependencies/ui-bootstrap-tpls.min.js"></script>
     <script src="/js/ui-layout.min.js"></script>
-    <script src="/js/app.js"></script>
+    <%if (locals.project){ %>
+      <script src="/js/app.js"></script>
+    <% } else { %>
+      <script src="/js/appDemo.js"></script>
+    <% } %>
     <script src="/js/directives/graph.js"></script>
     <script src="/js/directives/component.js"></script>
     <script src="/js/directives/connector.js"></script>

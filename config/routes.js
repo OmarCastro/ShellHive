@@ -30,6 +30,13 @@ module.exports.routes = {
     view: 'static/homepage'
   },
 
+  'get /demo': {
+    view: 'project/play',
+    locals:{
+      layout:false
+    }
+  },
+
 
   // Custom routes here...
 

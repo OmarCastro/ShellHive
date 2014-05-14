@@ -48,3 +48,29 @@
         <div ng-repeat="line in $parent.shellText" ng-class="line.type" ng-bind="line.text"></div>
       </div>
     </div>
+
+
+
+    <div class="new-project" ng-if="page == 'newProject'">
+      <form role="form" class="form-horizontal" ng-submit='findMembers(userToFind)'>
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">Add member</label>
+          <div class="col-sm-10">
+            <input type="text" id="name" ng-model="userToFind" placeholder="email or user name" class="form-control">
+          </div>
+        </div>
+      </form>
+      <div ng-repeat="user in foundUsers">
+        <span class="user-name" ng-bind="user.name"></span>
+        <span class="user-email" ng-bind="user.email"></span>
+        <button class="btn btn-primary" ng-click="selectUser(user)"> Add </button>
+      </div>
+      <form role="form" class="form-horizontal" ng-submit='$emit("startProject",{command: form.command})'>
+        <div class="form-group">
+          <label for="descr" class="col-sm-2 control-label">Set command</label>
+          <div class="col-sm-10">
+            <input id="descr" rows="3" ng-model="form.command" placeholder="eg: cat hello.txt | grep world" class="form-control"></input>
+          </div>
+        </div>
+      </form>
+    </div>

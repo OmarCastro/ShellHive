@@ -62,7 +62,7 @@ app.directive("component", function($document){
         scope.update();
          $('path[connector]').each(function(index){
               var scope = $(this).scope();
-              if(scope.endsPositions[0] == position || scope.endsPositions[1] == position){
+              if(scope.endsPositions && scope.endsPositions[0] == position || scope.endsPositions[1] == position){
                 scope.update();
               }
             })

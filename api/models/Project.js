@@ -23,6 +23,11 @@ module.exports = {
     graphs:{
       collection: 'graph',
       via: 'project'
+    },
+
+    visibility: {
+      type: 'string',
+      defaultsTo: 'private'
     }
   }
 };

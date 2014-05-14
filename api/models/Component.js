@@ -11,7 +11,12 @@ module.exports = {
     graph:{
         model:'graph'
     },
-    data:'json'
+
+    data:{
+    	type:'json',
+    	columnName: 'componentData'
+    }
+
   }
 };
 
