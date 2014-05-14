@@ -1,0 +1,137 @@
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+chai.use(require('chai-properties'));
+
+var expect = chai.expect;
+var should = chai.should();
+var webdriverjs = require('webdriverjs');
+
+
+describe('angularjs homepage', function() {
+  this.timeout(30000);
+  var options = {
+    desiredCapabilities: {
+        browserName: 'firefox'
+    }
+  };
+  var browserA,browserB;
+  
+  function startCheckpoint(numbersOfBrowsers, doneCallback){
+    return {
+      finish: function(){ if(--numbersOfBrowsers <= 0){ doneCallback() } }
+    }
+  }
+    
+  
+  function drag(browser, element, x, y, offsetX, offsetY, times, callback){
+    var val = browser.moveTo(element,x,y).buttonDown(0)
+    var xstep = Math.floor(offsetX/times)
+    var ystep = Math.floor(offsetY/times)
+    
+    for(var i = 0; i < times; i++) {
+        val = val.moveTo(null,xstep,ystep)
+    }
+    val.moveTo(null,offsetX - xstep * times,offsetY - ystep * times).buttonUp(callback)
+  }
+  
+  var dragElBy = function(element,offsetX,offsetY, cb){
+      this.element(element,function(err,result){
+        var times = 5;
+        var val = this.moveTo(result.value.ELEMENT,5,5).buttonDown()
+        var xstep = Math.floor(offsetX/times)
+        var ystep = Math.floor(offsetY/times)
+        for(var i = 0; i < times; i++) {
+          val = val.moveTo(null,xstep,ystep)
+        }
+        val.buttonUp(cb)
+      })
+    }
+  
+  before(function(){  
+    var driver1 = webdriverjs.remote(options);
+    driver1.addCommand("dragBy", dragElBy)
+    browserA = driver1.init();
+    
+    var driver2 = webdriverjs.remote(options);
+    driver2.addCommand("dragBy", dragElBy)
+    browserB = driver2.init(); 
+  })
+
+  
+  
+  it('should login two users and join the same project', function(done) {
+    var checkpoint = startCheckpoint(2,done)
+    
+    browserA
+      .url('http://localhost:1337/')
+      .setValue("input.login-user","admin@admin.pt")
+      .setValue("input.login-password","admin123")
+      .click('button.login-submit')
+      .click('//td[text() = "El miel picante"]/following-sibling::td/a[text() = "Join"]')
+      .waitFor('.file-component.component', function(){checkpoint.finish()})
+      
+
+    browserB
+      .url('http://localhost:1337/')
+      .setValue("input.login-user","user@user.fe.up.pt")
+      .setValue("input.login-password","teste123")
+      .click('button.login-submit')
+      .click('//td[text() = "El miel picante"]/following-sibling::td/a[text() = "Join"]')
+      .waitFor('.file-component.component', function(err){checkpoint.finish(err)})
+  });
+  
+  
+  it('should login two users and join the same project', function(done) {
+    var checkpoint = startCheckpoint(2,done)
+    browserA
+      .dragBy('.file-component',0,50)
+      .pause(1000,function(){
+        browserB
+        .dragBy('.file-component',0,-50)
+        .pause(1000, function(){checkpoint.finish()})
+      
+      })
+      
+      //.element('.file-component',function(err,result) {
+      //  drag(browserA,result.value.ELEMENT,20,20,0,50,15, function(){
+      //    //browserA.wait()
+      //    drag(browserA,result.value.ELEMENT,20,20,0,-50,15, function(){checkpoint.finish()})
+      //  })  
+      //})
+      
+      setTimeout(function(){checkpoint.finish()},1000);
+  });
+  
+   after(function(){
+     browserA.end();
+     browserB.end();
+   })
+  
+  
+  
+  
+/*  browser.getAllWindowHandles().then(function (handles) {
+
+  // handle of first window
+  var originalHandle = handles[0];
+
+  // open new window
+  browser.executeScript('window.open("https://angularjs.org/", "second-window")');
+
+  // switch to new window
+  browser.switchTo().window('second-window');
+
+  // do something within context of new window
+
+  // switch to original window
+  browser.switchTo().window(originalHandle);
+
+  // do something within context of original window
+
+  // closes the current window
+  browser.executeScript('window.close()');
+
+});*/
+});

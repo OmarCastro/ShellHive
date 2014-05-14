@@ -32,7 +32,7 @@ module.exports = {
         return console.log(err);
       // Updated users successfully!
       } else {
-        socket.broadcast.to(project_room(req.body.id)).emit('action',{type:"updateComponent", id:id, data:body});
+        CollaborationService.emitMessageToGraph(socket.graphId,'action',{type:"updateComponent", id:id, data:body});
       }
     });
   }

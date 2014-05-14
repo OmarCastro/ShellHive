@@ -1,5 +1,5 @@
-<div component ng-repeat="data in visualData.components track by data.id" data-node-id="{{data.id}}" ng-style="{transform:transform, WebkitTransform:transform, MsTransform:transform}" class="component">
-  <div ng-if="data.type == 'file'">
+<div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform, WebkitTransform:transform, MsTransform:transform}" class="{{data.type}}-component component">
+  <div ng-switch-when="file">
     <div title="{{data.macro.description}}" class="title">
       FILE
       <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
@@ -23,8 +23,7 @@
   
   
   
-  
-  <div ng-if="data.type == 'subgraph'">
+  <div ng-switch-when="subgraph">
     <div title="{{data.macro.description}}" class="title">
       <span ng-bind="data.macro.name"></span>
       <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
@@ -50,7 +49,7 @@
   
   
   
-  <div ng-if="data.type == 'command'">
+  <div ng-switch-when="command">
     <div class="title"><span ng-bind="data.exec"></span>
       <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
     </div>
