@@ -1,70 +1,6 @@
-/**
-  gets the first supported proprieties in CSS
-  used to resolve prefixes
-
-  @param {Array.<string>} proparray - a list of arrays
-  @return{string} the supported proprierty
-*/
-
-function getCSSSupportedProp(proparray){
-  var root = document.documentElement;
-  for (var i = 0, len = proparray.length; i < len; ++i) {
-    if (proparray[i] in root.style) {
-      return proparray[i];
-    }
-  }
-}
-
-var cssTransform = getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
-
-//var SelectionOptions = shell_Parser.VisualSelectorOptions;
-var app = angular.module('app', ['ui.bootstrap', 'ui.layout']);
-
-var socket = io.socket;
-var pathArray = window.location.pathname.split( '/' );
-var projId = pathArray[pathArray.length - 1];
-window.projId = projId;
-
-socket.on('mess', function(data){ console.log('mess', data) });
-socket.on('message', function(data){ console.log('message', data) });
-
-  socket.on('connect', function socketConnected() {
-
-    console.log("This is from the connect: ", this.socket.sessionid);
-   
-    var _csrf = null;
-    
-    socket.get('/csrfToken', {id:projId}, function(data){
-      _csrf = data._csrf;
-      window._csrf = _csrf
-    });
-    
-    window.printget = function(reqdata){
-      console.log('posting movement', reqdata);
-      io.socket.post('/project/graphaction', {id:projId, message:reqdata,_csrf:_csrf}, function(data){
-        console.log(data);
-      });
-    }
-
-    ///////////////////////////////////////////////////////////
-    // Here's where you'll want to add any custom logic for
-    // when the browser establishes its socket connection to 
-    // the Sails.js server.
-    ///////////////////////////////////////////////////////////
-    console.log(
-        'Socket is now connected and globally accessible as `socket`.\n' + 
-        'e.g. to send a GET request to Sails, try \n' + 
-        '`socket.get("/", function (response) ' +
-        '{ console.log(response); })`'
-    );
-    ///////////////////////////////////////////////////////////
-
-  });
-
-
 var viewGraph;
 
-app.controller('data-flow', ['$scope', function($scope){
+app.controller('shellProject', ['$scope', function($scope){
   var AST, visualData;
   visualData = {};
   $scope.graphData = visualData;
@@ -127,9 +63,12 @@ app.controller('data-flow', ['$scope', function($scope){
   });
   $scope.$on("removeComponent", function(event, id){
     console.log('removeComponent '+id+' !');
-    graphData.components = graphData.components.filter(function(component){component.id == id})
+    var graphData = $scope.graphData
+    graphData.components = graphData.components.filter(function(component){
+      return component.id !== id
+    })
     graphData.connections = graphData.connections.filter(function(connection){
-          return (connection.startNode !== component.id && connection.endNode !== component.id)
+          return (connection.startNode !== id && connection.endNode !== id)
     })
     $scope.$digest();
 

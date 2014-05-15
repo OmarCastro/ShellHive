@@ -36,7 +36,21 @@ module.exports.routes = {
       layout:false
     }
   },
+  
+  'get /directories/project/:id': {
+    controller: 'ProjectController',
+    action:'showDir'
+  },
 
+  'get /files/:id/:path([^?]+?)': {
+    controller: 'ProjectController',
+    action:'viewfile'
+  },
+
+  'get /download/:id/:path([^?]+?)': {
+    controller: 'ProjectController',
+    action:'downloadfile'
+  },
 
   // Custom routes here...
 

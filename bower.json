@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "dependencies": {
     "pointerevents-polyfill": "~0.2.0",
-    "angular-ui": "~0.4.0"
+    "angular-ui": "~0.4.0",
+    "angular-sails": "~1.0.4",
+    "ng-file-upload": "~1.4.0",
+    "ng-file-upload-shim": "~1.4.0"
   }
 }

@@ -8,15 +8,24 @@ A Visual data-flow programming web application to create UNIX Shell workflows
 The purpose of the application is to ease the development of UNIX scripts, its focus is the
 development of scripts for big-data related tasks.
 
+
 # Getting Started
+
 
 To begin, this project depends on Node.js and npm
 
-clone this repository or download the contents, install the dependencies
-of this project by using
+
+## Instalation
+
+
+Clone this repository or download the contents, install the dependencies
+of this project by using `npm install` and `bower install` 
 
 ```bash
+git clone https://github.com/OmarCastro/ShellHive.git
+cd ShellHive
 npm install
+bower install
 
 ```
 
@@ -26,7 +35,9 @@ npm install
 npm test
 ```
 
-After that you can run the server with
+## Execution
+
+To run the server application, use the following command
 
 ```bash
 npm start

@@ -8,6 +8,14 @@ html,body,div[graph]
 .popupArea{overflow:auto}
 body,.graph,.nodes{margin:0}
 
+.layout, .tips, .new-project, .directory{
+  position:absolute;
+  top:50px;
+  bottom:0;
+  left:0;
+  right: 0;
+}
+
 div[graph]{
 
   overflow:hidden;
@@ -15,14 +23,6 @@ div[graph]{
     .new-project{
         background: #A4AACC;
     }
-
-  .layout, .tips, .new-project{
-    position:absolute;
-    top:50px;
-    bottom:0;
-    left:0;
-    right: 0;
-  }
   
   svg, .workspace, .background, .workspace > .nodes, .popupArea{
     font-size:12px;

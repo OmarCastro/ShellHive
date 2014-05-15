@@ -5,6 +5,30 @@
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
 
+var fs = require('fs');
+var walk = function(dir, done) {
+  var results = [];
+  fs.readdir(dir, function(err, list) {
+    if (err) return done(err);
+    var pending = list.length;
+    if (!pending) return done(null, results);
+    list.forEach(function(file) {
+      file = dir + '/' + file;
+      fs.stat(file, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file, function(err, res) {
+            results = results.concat(res);
+            if (!--pending) done(null, results);
+          });
+        } else {
+          results.push(file);
+          if (!--pending) done(null, results);
+        }
+      });
+    });
+  });
+};
+
 
 module.exports = {
   
@@ -59,6 +83,7 @@ module.exports = {
       var members = project.members;
       if(members.indexOf(req.session.user.id)){
         res.view({
+          locals:{project:true},
           project:project,
           members:project.members,
           layout: null
@@ -69,26 +94,82 @@ module.exports = {
 
   subscribe:function(req, res, next){
     var id = req.param('id');
+    if(!req.session.user){
+      res.json({ error: 'not logged id' }, 500);
+    } else {
+      Project.findOne(id).populate('members').populate('graphs').exec(function (err, project){
+        if(err) return next(err);
+        if(!project) return next();
+        var userId = req.session.user.id
+        var members = project.members;
+        var isMember = false;
+        if(id == 1){ //special public project
 
-    Project.findOne(id).populate('members').populate('graphs').exec(function (err, project){
-      if(err) return next(err);
-      if(!project) return next();
-      var userId = req.session.user.id
-      var members = project.members;
-      var isMember = false;
-      if(id == 1){ //special public project
+        }
+        for(var i = 0, len = members.length; members[i].id != userId && i < len; ++i){}
+        if(i < len){
+          CollaborationService.joinUserToProject(req,res,project);
+        } else {
+          res.json({ error: 'User not found' }, 404);
+        }
+      });
+    }
 
-      }
-      for(var i = 0, len = members.length; members[i].id != userId && i < len; ++i){}
-      if(i < len){
-        CollaborationService.joinUserToProject(req,res,project);
+
+  },
+
+  graphaction: function(req, res, next){
+    CollaborationService.broadcastMessageInProject(req,res)
+  },
+
+  showDir: function(req, res, next){
+    var savedDirectory = 'fs/projects/';
+    var directoryToFind = savedDirectory + req.params.id;
+    walk(directoryToFind, function(err, results){
+      var result = results.map(function(result){
+        return {
+          name:result.slice(directoryToFind.length + 1),
+          filename:result.replace(/^.*[\\\/]/, ''),
+        }
+      })
+      res.json(result);
+    })
+  },
+
+  uploadFile: function(req, res, next){
+    var savedDirectory = 'fs/projects/';
+    var directoryToFind = savedDirectory + req.params.id;
+    walk(directoryToFind, function(err, results){
+      res.json(results.map(function(result){return {name:result.slice(directoryToFind.length + 1)}}));
+    })
+  },
+
+  downloadfile:function(req, res, next){
+    var savedDirectory = 'fs/projects/';
+    var directoryToFind = savedDirectory + req.params.id;
+    var path = directoryToFind+'/'+req.params.path
+    fs.exists(path, function(exists) {
+      if (exists) {
+        var filename = path.replace(/^.*[\\\/]/, '')
+        res.download(path,filename);
       } else {
-        res.json({ error: 'User not found' }, 404);
+        res.notFound();
       }
     });
   },
 
-  graphaction: function(req,res, next){
-    CollaborationService.broadcastMessageInProject(req,res)
-  },
+  viewfile:function(req, res, next){
+    var savedDirectory = 'fs/projects/';
+    var directoryToFind = savedDirectory + req.params.id;
+    var path = directoryToFind+'/'+req.params.path
+    fs.exists(path, function(exists) {
+      if (exists) {
+        res.sendfile(path);
+      } else {
+        res.notFound();
+      }
+    });
+  }
+
+
 };

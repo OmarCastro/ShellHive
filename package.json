@@ -28,7 +28,8 @@
     "sails": "~0.10.0-rc5",
     "sails-disk": "~0.10.0",
     "sails-memory": "~0.10.0-rc2",
-    "sails-mysql": "^0.10.0-rc6"
+    "sails-mysql": "^0.10.0-rc6",
+    "shelljs": "^0.3.0"
   },
   "scripts": {
     "start": "node app.js",
