@@ -122,15 +122,7 @@ app.directive("graph", function($document){
           event.preventDefault();
           event.stopPropagation();
         });
-        newComponent = function(content, position){
-          if (in$(content.split(" ")[0], implementedCommands)) {
-            return newCommandComponent(content, position);
-          } else if (content.split(" ")[0].indexOf(".") > -1) {
-            return newFileComponent(content.split(" ")[0], position);
-          } else {
-            return newMacroComponent(content, position);
-          }
-        };
+
         newFileComponent = function(filename, position){
           var visualData, newComponent;
           visualData = scope.visualData;
@@ -257,6 +249,7 @@ app.directive("graph", function($document){
         };
         var popupSubmit = function(content){
           var comp;
+
           scope.$emit('addAndConnectComponent', {
             command: content,
             componentId: popupState.startNode,
@@ -354,7 +347,10 @@ app.directive("graph", function($document){
           });
         };
         scope.newCommandAtTopLeft = function(command){
-          return newCommandComponent(command, mapPointToScene(0, 0));
+          scope.$emit("addComponent",{
+            command:command,
+            position:mapPointToScene(0, 0)
+          })
         };
 
 
@@ -373,7 +369,7 @@ app.directive("graph", function($document){
         this.mapMouseToView = mapMouseToView;
 
         this.isOutputPort = function(port){
-           port === 'output' || port === 'error' || port === 'retcode';
+          return port === 'output' || port === 'error' || port === 'retcode';
         }
 
 

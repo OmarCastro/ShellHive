@@ -79,6 +79,10 @@ var CollaborationService = module.exports = {
   emitMessageToGraph: function(id, type ,content){
     sails.io.sockets.in(graph_room(id)).emit(type,  content);
   },
+
+  emitMessageToProject: function(id, type ,content){
+    sails.io.sockets.in(project_room(id)).emit(type,  content);
+  },
   
 
   broadcastMessageInProject:  function broadcastMessageInProject(req, res){

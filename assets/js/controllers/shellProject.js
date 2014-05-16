@@ -112,13 +112,43 @@ app.controller('shellProject', ['$scope', function($scope){
     },
 
     addComponent: function(data){
-      data.component.data.id = data.component.id
-      visualData.components.push(data.component.data)
+      console.log("addComponent:", data);
+      if(data.component){
+        data.component.data.id = data.component.id
+        visualData.components.push(data.component.data);
+      }
       if(data.connection){
         var connection = data.connection;
-        connection.startComponent = visualData.components.filter(function(component){return component.id == connection.startNode})[0]
-        connection.endComponent = data.component.data
+        visualData.components.forEach(function(component){
+          if(component.id == connection.startNode){
+            connection.startComponent = component
+          } else if(component.id == connection.endNode){
+            connection.endComponent = component
+          }
+        });
         visualData.connections.push(connection)
+      }
+      $scope.$digest();
+    },
+
+    updateComponent: function(data){
+      console.log("updateComponent:", data);
+      var components = visualData.components;
+      for (var i = components.length - 1; i >= 0; i--) {
+        if(components[i].id == data.id){
+          var component = components[i];
+          for(j in data.data){
+            if(j == "position"){
+              var comPosition = component.position
+              var dataPosition = data.data.position
+              comPosition.x = dataPosition.x
+              comPosition.y = dataPosition.y
+            } else {
+              component[j] = data.data[j];
+            }
+          }
+          break;
+        }
       }
       $scope.$digest();
     },
@@ -135,6 +165,19 @@ app.controller('shellProject', ['$scope', function($scope){
     console.log('runCommand!');
     return $scope.runCommand();
   });
+
+  $scope.$on("compileGraph", function(event){
+    console.log('compileGraph!');
+    io.socket.get('/graph/compile/',{_csrf:_csrf}, function(data){
+      console.log(data);
+      $scope.shellText = [{
+        text: data.command,
+        type: "call"
+      }];
+      $scope.$digest();
+    });
+  });
+
   $scope.$on("removeComponent", function(event, message){
     console.log('removeComponent '+message+' !');
     io.socket.post('/graph/removeComponent/', {id:message, _csrf:_csrf}, function(data){
@@ -167,58 +210,85 @@ app.controller('shellProject', ['$scope', function($scope){
     });
   });
 
+  $scope.$on("connectComponent", function(event, message){
+    console.log('connectComponent:' , message);
+    message = {
+      data: message,
+      _csrf: _csrf
+    }
+    io.socket.put('/graph/connect/', message, function(data){
+      console.log(data);
+    });
+  });
 
-
-  //socket.on('commandCall', function(data){
-  //  var x;
-  //  $scope.shellText = $scope.shellText.concat((function(){
-  //    var i$, ref$, len$, results$ = [];
-  //    for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-  //      x = ref$[i$];
-  //      results$.push({
-  //        text: x,
-  //        type: "call"
-  //      });
-  //    }
-  //    return results$;
-  //  }()));
-  //  return $scope.$digest();
-  //});
-  //socket.on('stdout', function(data){
-  //  var x;
-  //  $scope.shellText = $scope.shellText.concat((function(){
-  //    var i$, ref$, len$, results$ = [];
-  //    for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-  //      x = ref$[i$];
-  //      results$.push({
-  //        text: x,
-  //        type: "info"
-  //      });
-  //    }
-  //    return results$;
-  //  }()));
-  //  if ($scope.shellText.length > 50) {
-  //    $scope.shellText = slice$.call($scope.shellText, -50);
-  //  }
-  //  return $scope.$digest();
-  //});
-  //socket.on('stderr', function(data){
-  //  var x;
-  //  $scope.shellText = $scope.shellText.concat((function(){
-  //    var i$, ref$, len$, results$ = [];
-  //    for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-  //      x = ref$[i$];
-  //      results$.push({
-  //        text: x,
-  //        type: "error"
-  //      });
-  //    }
-  //    return results$;
-  //  }()));
-  //  if ($scope.shellText.length > 50) {
-  //    $scope.shellText = slice$.call($scope.shellText, -50);
-  //  }
-  //  return $scope.$digest();
-  //});
+  io.socket.on('commandCall', function(data){
+    var x;
+    $scope.shellText = $scope.shellText.concat((function(){
+      var i$, ref$, len$, results$ = [];
+      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+        x = ref$[i$];
+        results$.push({
+          text: x,
+          type: "call"
+        });
+      }
+      return results$;
+    }()));
+    return $scope.$digest();
+  });
+  io.socket.on('stdout', function(data){
+    var x;
+    $scope.shellText = $scope.shellText.concat((function(){
+      var i$, ref$, len$, results$ = [];
+      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+        x = ref$[i$];
+        results$.push({
+          text: x,
+          type: "info"
+        });
+      }
+      return results$;
+    }()));
+    if ($scope.shellText.length > 50) {
+      $scope.shellText = slice$.call($scope.shellText, -50);
+    }
+    return $scope.$digest();
+  });
+  io.socket.on('stderr', function(data){
+    var x;
+    $scope.shellText = $scope.shellText.concat((function(){
+      var i$, ref$, len$, results$ = [];
+      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+        x = ref$[i$];
+        results$.push({
+          text: x,
+          type: "error"
+        });
+      }
+      return results$;
+    }()));
+    if ($scope.shellText.length > 50) {
+      $scope.shellText = slice$.call($scope.shellText, -50);
+    }
+    return $scope.$digest();
+  });
+  io.socket.on('retcode', function(data){
+    var x;
+    $scope.shellText = $scope.shellText.concat((function(){
+      var i$, ref$, len$, results$ = [];
+      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
+        x = ref$[i$];
+        results$.push({
+          text: "command finished with code "+x,
+          type: "call"
+        });
+      }
+      return results$;
+    }()));
+    if ($scope.shellText.length > 50) {
+      $scope.shellText = slice$.call($scope.shellText, -50);
+    }
+    return $scope.$digest();
+  });
 }]);
 

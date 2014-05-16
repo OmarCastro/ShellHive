@@ -118,7 +118,7 @@ function createComponent(projectId, graphId, command, position, cb){
 
 function createAndConnectComponent(projectId, graphId, command, componentId, startPort, position, cb){
   createComponent(projectId, graphId, command,position, function(err,created){
-    if(err) return next(err);
+    if(err) return cb(err);
     var connectionData = {
       graph     : graphId,
       startNode : componentId,
@@ -143,6 +143,7 @@ module.exports = {
   metaGraphfromCommand:metaGraphfromCommand, 
   parser:parser, 
   addToGraph:addToGraph, 
+  createComponent: createComponent,
   createAndConnectComponent:createAndConnectComponent,
 
   removeComponent: function(id, callback){

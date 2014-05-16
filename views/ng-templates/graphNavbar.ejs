@@ -20,14 +20,15 @@
               <li><a href="#" ng-click="viewGraph(rootGraph)">View Root</a></li>
             </ul>
           </li>
+          <li><a href="#" ng-click="shell = true; $emit('compileGraph')">Compile</a></li>
           <li><a href="#" ng-click="shell = true; $emit('runCommand', [])">
             <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
           </a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="#" ng-click="showTips = !showTips">Docs</a></li>
+          <li><a href="http://omarcastro.github.io/ShellHive/docs/" target="_blank">Docs</a></li>
           <li>
-          <% if(locals.req && local.req.session.user){ %>
+          <% if(req.session.user){ %>
             <a href="/user/show/<%= req.session.user.id %>"><%= req.session.user.name %></a>
           <% } else { %>
             <a href="/"> Anonymous Visitor </a>
@@ -38,3 +39,4 @@
         </ul>
       </div>
     </div>
+

@@ -11,20 +11,26 @@ app.directive("port", function($document){
       var elem = element[0];
       var imstyle = elem.style;
       scope.componentId = datanode.id;
+      scope.component = datanode;
       scope.isOutputNode = graphController.isOutputPort(attr.port)
+      
+
       element.bind("pointerdown", function(ev){
-        var event, x$;
-        console.log(ev);
-        event = ev.originalEvent;
+        var event = ev.originalEvent;
         graphController.startEdge(elem, position, event);
         $document.bind("pointermove", mousemove);
         $document.bind("pointerup", mouseup);
         return false;
       });
-      var ConnectIfOk = function(startNode, startPort, endNode, endPort){
+
+
+
+      var ConnectIfOk = function(startComponent, startPort, endComponent, endPort){
         var visualData, isOk, i$, ref$, len$, x;
-        visualData = graphController.getVisualData();
-        isOk = true;
+        var startNode = startComponent.id;
+        var endNode = endComponent.id;
+        visualData = scope.graphData;
+        var isOk = true;
         for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
           x = ref$[i$];
           if ((x.startNode === endNode && x.endNode === startNode) || (x.startNode === startNode && x.endNode === endNode)) {
@@ -33,13 +39,12 @@ app.directive("port", function($document){
           }
         }
         if (isOk) {
-          visualData.connections.push({
+          scope.$emit('connectComponent',{
             startNode: startNode,
             startPort: startPort,
             endNode: endNode,
             endPort: endPort
           });
-          graphController.updateScope();
         }
       };
       mousemove = function(ev){
@@ -50,6 +55,7 @@ app.directive("port", function($document){
         event = ev.originalEvent;
         pointedElem = document.elementFromPoint(event.clientX, event.clientY);
         $pointedElem = $(pointedElem);
+
         if (graphController.isFreeSpace(pointedElem)) {
           if (graphController.isOutputPort(attr.port)) {
             graphController.showPopup(event, scope.componentId, attr.port, null, 'input');
@@ -63,9 +69,9 @@ app.directive("port", function($document){
             outPortScope = $pointedElem.scope();
             if (scope.isOutputNode !== outPortScope.isOutputNode) {
               if (scope.isOutputNode) {
-                ConnectIfOk(scope.componentId, attr.port, outPortScope.componentId, outAttr);
+                ConnectIfOk(scope.component, attr.port, outPortScope.component, outAttr);
               } else {
-                ConnectIfOk(outPortScope.componentId, outAttr, scope.componentId, attr.port);
+                ConnectIfOk(outPortScope.component, outAttr, scope.component, attr.port);
               }
             }
           }

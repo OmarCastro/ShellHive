@@ -1,0 +1,31 @@
+<div class="popupArea">
+  <div class="popup dropdown open">
+    <ul class="dropdown-menu well">
+      <form ng:submit="graph.popupSubmit(popupText)">
+        <div class="input-group input-group-sm"><span class="input-group-addon glyphicon glyphicon-tasks"></span>
+          <input type="text" ng-model="popupText" class="form-control">
+        </div>
+      </form>
+      <li ng-show="comms.length" class="dropdown-header">
+        <b>command component</b>
+      </li>
+      <li ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" 
+          ng-repeat="foo in comms = (implementedCommands | filter:popupText)">
+        <a ng-click="graph.popupSubmit(foo)">{{foo}}</a>
+      </li>
+      <li ng-show="comms2.length && isRootView()" class="dropdown-header">
+        <b>macro component</b>
+      </li>
+      <li ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" 
+          ng-repeat="foo in comms2 = (macroViewList() | filter:popupText)">
+        <a ng-click="graph.popupSubmit(foo)">{{foo}}</a>
+      </li>
+    </ul>
+  </div>
+  <div ng-if="sel.open" class="selectpopup dropdown open"
+       ng-style="{transform:sel.transform, WebkitTransform:sel.transform, MsTransform:sel.transform}">
+    <ul class="dropdown-menu">
+      <li ng-repeat="c in options[sel.data.exec][sel.name]"><a ng-click="graph.selectSelection(c)"><span ng-bind="c"></span></a></li>
+    </ul>
+  </div>
+</div>
