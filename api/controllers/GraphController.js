@@ -131,7 +131,7 @@ module.exports = {
         console.log('child process exited with code ' + code);
       });
       res.json({
-        command: result,
+        command: command,
       })
     })
   },

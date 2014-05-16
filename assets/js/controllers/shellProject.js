@@ -163,7 +163,14 @@ app.controller('shellProject', ['$scope', function($scope){
 
   $scope.$on("runCommand", function(event, message){
     console.log('runCommand!');
-    return $scope.runCommand();
+    io.socket.get('/graph/runGraph/',{_csrf:_csrf}, function(data){
+      console.log(data);
+      $scope.shellText = [{
+        text: data.command,
+        type: "call"
+      }];
+      $scope.$digest();
+    });
   });
 
   $scope.$on("compileGraph", function(event){
