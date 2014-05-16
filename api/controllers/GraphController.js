@@ -121,10 +121,10 @@ module.exports = {
       CollaborationService.emitMessageToProject(projId,'commandCall',command)
 
       child.stdout.on('data', function (data) {
-        CollaborationService.emitMessageToProject(projId,'stdout',data)
+        CollaborationService.emitMessageToProject(projId,'stdout',data.toString())
       });
       child.stderr.on('data', function (data) {
-        CollaborationService.emitMessageToProject(projId,'stderr',data)
+        CollaborationService.emitMessageToProject(projId,'stderr',data.toString())
       });
       child.on('close', function (code) {
         CollaborationService.emitMessageToProject(projId,'retcode',code)
