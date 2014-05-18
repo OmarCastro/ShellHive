@@ -11,4 +11,3 @@ require('./parser/Graph')
 require('./parser/SimpleCommands')
 
 require('./sails/basic')
-//require('./sails/docker')

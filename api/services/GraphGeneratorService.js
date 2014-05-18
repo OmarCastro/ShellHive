@@ -158,6 +158,13 @@ module.exports = {
     });
   },
   
+  compileProject: function(id, cb){
+    Graph.findOne({project: id, isRoot:true}).populate('components').populate('connections').exec(function (err, graph){
+      /* istanbul ignore if */ if(err) return cb(err, null);
+      graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
+      return cb(null, parser.parseGraph(parser.graphFromJsonObject(graph)));
+    });
+  },
       
   compileGraph: function(id, cb){
      Graph.findOne(id).populate('components').populate('connections').exec(function (err, graph){

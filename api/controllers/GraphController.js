@@ -94,6 +94,16 @@ module.exports = {
     })
   },
 
+
+  compileProject:function(req,res, next){
+    GraphGeneratorService.compileProject(req.socket.projectId, function(err, result){
+      if(err) return next(err);
+      res.json({
+        command: result,
+      })
+    })
+  },
+
   connect: function(req,res, next){
     var connectionData = req.body.data
     connectionData.graph = req.socket.graphId

@@ -156,13 +156,11 @@ describe('command test', function(){
       var graph = shouldBeAGraph(parser.parseCommand(command))
       classname(graph.components[0]).should.equal("GunzipComponent")
       graph.components[0].exec.should.equal("gunzip")
-
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
       graph.components[0].flags.should.have.properties({})
     })
     describe('reparse gunzip', reparse('gunzip'));
-
   })
 
   describe('`zcat` test', function(){

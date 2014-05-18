@@ -64,8 +64,17 @@ describe("Sails test", function(){
        expect(result).to.equal("cat  json.txt | grep  Gloss"); 
        done();
       });
+    });
 
-
+    it('should compile a project and should be the same as the root graph', function (done) {
+      var service = global.GraphGeneratorService
+      global.async.parallel([
+        function(cb){service.compileGraph(1, cb)},
+        function(cb){service.compileProject(1, cb)}
+      ], function(err,results){
+        expect(results[0]).to.equal(results[1])
+        done();
+      })
     });
   });
 
