@@ -46,12 +46,17 @@ gulp.task('coverage', function() {
 
 
 gulp.src([
-  //'api/**/*.js',
+  // api test coverage
+  'api/models/*.js',
+  'api/services/*.js',
+  '!api/services/CollaborationService.js',
+
+  // backend library test coverage
   'lib/**/commands/*.js',
   'lib/**/utils/*.js',
   'lib/common/*.js',
-  'lib/parser/parser.js'])
-  .pipe(istanbul()) // Covering files
+  'lib/parser/parser.js'
+  ]).pipe(istanbul()) // Covering files
   .on('end', function () {
     gulp.src(['test/test.js'])
       .pipe(mocha({reporter: 'spec'}))

@@ -117,14 +117,20 @@ module.exports = {
     GraphGeneratorService.compileGraph(req.socket.graphId, function(err, command){
       if(err) return next(err);
       var projId = req.socket.projectId
-      var child = ExecutionService.executeUnsafe(command, 'fs/projects/'+projId)
+      sails.log("to exectute: ", command)
+      var child = ExecutionService.execute(command, projId)
+
       CollaborationService.emitMessageToProject(projId,'commandCall',command)
 
       child.stdout.on('data', function (data) {
         CollaborationService.emitMessageToProject(projId,'stdout',data.toString())
+        console.log('stdout -- ' + data.toString());
+
       });
       child.stderr.on('data', function (data) {
         CollaborationService.emitMessageToProject(projId,'stderr',data.toString())
+        console.log('stderr -- ' + data.toString());
+
       });
       child.on('close', function (code) {
         CollaborationService.emitMessageToProject(projId,'retcode',code)

@@ -1,8 +1,30 @@
 var spawn = require('child_process').spawn;
+var path = require('path');
 
 function escape(command){
-	command.split("\\").join("\\\\").split('"').join('\\"')
+	return command.split("\\").join("\\\\").split('"').join('\\"')
 }
+
+
+/* istanbul ignore next: function to test with 'sails console' */
+function debugChildProcess(child){
+	child.stdout.on("data", function(data){sails.log.debug(data.toString())})
+	child.stderr.on("data", function(data){sails.log.error(data.toString())})
+	child.on("exit", function(code){sails.log.info("command finished with code ",code)})	
+}
+/* istanbul ignore next: function to test with 'sails console' */
+function sailsExecuteWithDocker (command,projectId){
+	debugChildProcess(ExecutionService.executeWithDocker(command,projectId))
+}
+/* istanbul ignore next: function to test with 'sails console' */
+function sailsExecuteFromShell(command,projectId){
+	debugChildProcess(ExecutionService.executeFromShell(command,projectId))
+}
+/* istanbul ignore next: function to test with 'sails console' */
+function sailsExecute(command,projectId){
+	debugChildProcess(ExecutionService.execute(command,projectId))
+}
+
 
 /**
 * ExecutionService.js
@@ -11,21 +33,50 @@ function escape(command){
 * @docs        :: http://sailsjs.org/#!documentation/services
 */
 module.exports = {
-	execute:function execute (command,cwd) {
-		var exec = "docker";
-		var arguments = ['run','ubuntu','bash','-c'];
-		arguments.push(escape(command));
 
-		return spawn(exec,arguments,{cwd:cwd});
+	execute: function execute (command,projectId){
+		/* istanbul ignore if: stay as that untill I find a CI that supports docker */
+		if (sails.config.shusee.useDocker){
+			return ExecutionService.executeWithDocker(command,projectId)
+		} else {
+			return ExecutionService.executeFromShell(command,projectId);
+		}
 	},
-	/**
-		this function is to be used on development only
-		on production is a good idea to use a container engine
-	*/
-	executeUnsafe:function execute (command,cwd) {
-		var exec = "bash";
-		var arguments = ['-c'];
-		arguments.push(escape(command));
-		return spawn(exec,arguments, {cwd:cwd});
-	}
+
+	executeWithDocker:		
+	/* istanbul ignore next: stay as that untill I find a CI that supports docker */
+	function executeWithDocker (command,projectId) {
+		projectId = projectId + '';
+		var config = sails.config.shusee;
+		var fsPath = config.fsPath;
+
+		var dockerConfig = config.dockerConfig;
+		var exec = dockerConfig.executable;
+		var image = dockerConfig.image;
+		var sh = dockerConfig.sh || config.sh;
+		var dockerPath = dockerConfig.dockerPath;
+		var cwd = path.resolve(fsPath,'projects',projectId)
+
+		var dockerCommand = escape("cd " + dockerPath + ' ; ' + command)
+		
+		var args = ['run','-v',[cwd,dockerPath].join(':'),image,sh,'-c',dockerCommand];
+		sails.log("running command - ",exec, args, 'on project', projectId)
+		return spawn(exec,args);
+	},
+
+	executeFromShell:function executeFromShell (command,projectId) {
+		projectId = projectId + '';
+		var config = sails.config.shusee;
+		var fsPath = config.fsPath;
+		var exec = config.sh;
+		var cwd = path.resolve(fsPath,'projects',projectId)
+
+		var args = ['-c',escape(command)];
+		sails.log("running command - ",exec, args.slice(0,-1).join(" "), '"'+args.slice(-1)+ '" on project', projectId)
+		return spawn(exec,args, {cwd:cwd});
+	},
+
+	sailsExecuteWithDocker:  sailsExecuteWithDocker,
+	sailsExecuteFromShell: sailsExecuteFromShell,
+	sailsExecute:sailsExecute
 }

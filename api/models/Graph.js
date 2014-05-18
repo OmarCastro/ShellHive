@@ -26,6 +26,10 @@ module.exports = {
       via: 'graph'
     }
 
-  }
+  },
+
+  //toGraphMethod: function(){
+  //  console.log("bohemian Raspsody")
+  //}
 };
 

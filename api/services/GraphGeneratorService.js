@@ -36,45 +36,40 @@ function metaGraphfromCommand(command){
   }
     
 
-function addToGraph(graphId, command, next){
+function addToGraph(graphId, command, cb){
+  cb = cb || function(){};
   var metagraph = metaGraphfromCommand(command);
-
-  var metaComponents = metagraph.components.map(function(component){
+  var components = metagraph.components;
+  var componentsToCreate = components.map(function(component){
     return {
       graph: graphId,
       data: JSON.stringify(component)
     }
   })
-    
-  Component.create(metaComponents).exec(function(err,created){
-    if(err) return next(err);
-    var components = metagraph.components;
 
-    var createdComponentsOrdered = metagraph.components.map(function(component){
-      var position = component.position
-      for (var i = created.length - 1; i >= 0; i--) {
-         var createdPosition = created[i].data.position
-         if(createdPosition.x == position.x && createdPosition.y == position.y){
-           return created[i];
-         }
+  async.parallel(
+    componentsToCreate.map(function(component){
+      return function(done){
+        Component.create(component).exec(done);
       };
-    });
-
-
+    }), function(err, createdComponents){
+      /* istanbul ignore if */ if(err || !createdComponents) return cb(err)
      metagraph.connections.forEach(function(connection){
       connection.graph = graphId
-      connection.startNode = createdComponentsOrdered[components.indexOf(connection.startNode)].id
-      connection.endNode = createdComponentsOrdered[components.indexOf(connection.endNode)].id
+      connection.startNode = createdComponents[components.indexOf(connection.startNode)].id
+      connection.endNode = createdComponents[components.indexOf(connection.endNode)].id
     });
-    
-    Connection.create(metagraph.connections).exec(function(err,created){
-      if(err) return next(err);
+
+    Connection.create(metagraph.connections).exec(function(err,createdConnections){
+      /* istanbul ignore if */ if(err || !createdConnections) return cb(err)
+      else return cb(null, {components: createdComponents, connections: createdConnections})
     });
   });
+
 }
 
 
-
+/* istanbul ignore next */
 function createComponent(projectId, graphId, command, position, cb){
   var indexOfSpace = command.indexOf(" ");
   var firstWord = (indexOfSpace > -1 ) ? command.slice(0, command.indexOf(" ")) : command;
@@ -115,7 +110,7 @@ function createComponent(projectId, graphId, command, position, cb){
   Component.create(componentData).exec(cb);   
 }
 
-
+/* istanbul ignore next */
 function createAndConnectComponent(projectId, graphId, command, componentId, startPort, position, cb){
   createComponent(projectId, graphId, command,position, function(err,created){
     if(err) return cb(err);
@@ -146,14 +141,14 @@ module.exports = {
   createComponent: createComponent,
   createAndConnectComponent:createAndConnectComponent,
 
-  removeComponent: function(id, callback){
+  removeComponent: /* istanbul ignore next */ function(id, callback){
     async.auto({
       components: function (cb) {Component.destroy({id:id}).exec(cb)},
       connections: function (cb) {Connection.destroy().where({or:[{startNode:id},{endNode:id}]}).exec(cb)}
     }, callback);
   },
   
-  createGraphfromCommand: function(params, command){ 
+  createGraphfromCommand: /* istanbul ignore next */ function(params, command){ 
   
   Graph.create(params).exec(function(err,created){
     //if(err) return next(err);
@@ -166,7 +161,7 @@ module.exports = {
       
   compileGraph: function(id, cb){
      Graph.findOne(id).populate('components').populate('connections').exec(function (err, graph){
-      if(err) return cb(err, null);
+      /* istanbul ignore if */ if(err) return cb(err, null);
       graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
       return cb(null, parser.parseGraph(parser.graphFromJsonObject(graph)));
     });

@@ -243,59 +243,33 @@ app.controller('shellProject', ['$scope', function($scope){
     }()));
     return $scope.$digest();
   });
+
+
+
   io.socket.on('stdout', function(data){
-    var x;
-    $scope.shellText = $scope.shellText.concat((function(){
-      var i$, ref$, len$, results$ = [];
-      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-        x = ref$[i$];
-        results$.push({
-          text: x,
-          type: "info"
-        });
-      }
-      return results$;
-    }()));
-    if ($scope.shellText.length > 50) {
-      $scope.shellText = slice$.call($scope.shellText, -50);
+    $scope.shellText = $scope.shellText.concat(data.split("\n").map(function(record){
+      return {text: record, type: "info"}
+    }));
+    if ($scope.shellText.length > 100) {
+      $scope.shellText = slice$.call($scope.shellText, -100);
     }
-    return $scope.$digest();
+    $scope.$digest();
   });
   io.socket.on('stderr', function(data){
-    var x;
-    $scope.shellText = $scope.shellText.concat((function(){
-      var i$, ref$, len$, results$ = [];
-      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-        x = ref$[i$];
-        results$.push({
-          text: x,
-          type: "error"
-        });
-      }
-      return results$;
-    }()));
-    if ($scope.shellText.length > 50) {
-      $scope.shellText = slice$.call($scope.shellText, -50);
+    $scope.shellText = $scope.shellText.concat(data.split("\n").map(function(record){
+      return {text: record, type: "error"}
+    }));
+    if ($scope.shellText.length > 100) {
+      $scope.shellText = slice$.call($scope.shellText, -100);
     }
-    return $scope.$digest();
+    $scope.$digest();
   });
   io.socket.on('retcode', function(data){
-    var x;
-    $scope.shellText = $scope.shellText.concat((function(){
-      var i$, ref$, len$, results$ = [];
-      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-        x = ref$[i$];
-        results$.push({
-          text: "command finished with code "+x,
-          type: "call"
-        });
-      }
-      return results$;
-    }()));
-    if ($scope.shellText.length > 50) {
-      $scope.shellText = slice$.call($scope.shellText, -50);
-    }
-    return $scope.$digest();
+    $scope.shellText.push({
+      text: "command finished with code "+x,
+      type: "call"
+    });
+    $scope.$digest();
   });
 }]);
 

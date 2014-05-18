@@ -40,9 +40,11 @@ module.exports = {
     var bcrypt = require('bcrypt');
 
     bcrypt.genSalt(10, function(err, salt) {
+      /* istanbul ignore next */
       if (err) return next(err);
 
       bcrypt.hash(attrs.password, salt, function(err, hash) {
+        /* istanbul ignore next */
         if (err) return next(err);
 
         attrs.password = hash;

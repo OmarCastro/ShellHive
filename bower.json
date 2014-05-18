@@ -7,6 +7,7 @@
     "angular-sails": "~1.0.4",
     "ng-file-upload": "~1.4.0",
     "ng-file-upload-shim": "~1.4.0",
-    "dropzone": "~3.10.0"
+    "dropzone": "~3.10.0",
+    "jquery": "~2.1.1"
   }
 }
