@@ -10,6 +10,9 @@ trap 'kill $(jobs -p)' SIGINT SIGTERM EXIT
 docker -d &
 sleep 1
 
+#test docker
+docker run ubuntu /bin/echo hello world
+
 npm install
 npm test
 npm badge
