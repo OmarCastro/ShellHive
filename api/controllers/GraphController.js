@@ -106,20 +106,25 @@ module.exports = {
 
   connect: function(req,res, next){
     var connectionData = req.body.data
-    connectionData.graph = req.socket.graphId
 
-    Connection.create(connectionData).exec(function(err,created){
-        if(err) return next(err)
+    graphUtils.connect(req.socket.graphId, connectionData, function(){
+      if(err){
+        res.json({
+          alert: true,
+          message:err,
+        });
+      } else {
         CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {
           type:"addComponent",
           connection: created,
         });
-
         res.json({
+          alert: false,
           message: "connection sucessfully added",
           connection: created,
-        })
-    });
+        });
+      }
+    })
   },
 
   runGraph:function(req,res, next){

@@ -80,10 +80,173 @@ describe("Sails test", function(){
 
 
   describe('Sails Command Execution', function(done) {
-    it('should cexecute a project', function (done) {
+    it('should execute a project', function (done) {
       child = global.ExecutionService.execute("ls",1)
       child.stdout.on("data", function(data){
         expect(data.toString()).to.equal("json.txt\n");
+        done();
+      })
+    });
+  });
+
+
+  describe('Sails Graph Component Connection Validation', function(done) {
+    this.timeout(7000);
+    var graph;
+    var id;
+    var inputfile;
+    var cat;
+    var grep;
+
+
+    before(function(done){
+      async.series([
+        function(cb){
+          Component.create({graph: 1, data: {type: "file"} })
+          .exec(function(err, created){
+            if(err || !created) cb(err);
+            id = created.id;
+            cb();
+          })
+        }, function(cb){ 
+          Graph.findOne(1)
+          .populate('components')
+          .populate('connections')
+          .exec(function(err, res){
+            if(err || !res) cb(err);
+            graph = res;
+            res.components.forEach(function(comp){
+              if(comp.data.type == "file" && !inputfile){inputfile = comp.id}
+              else if(comp.data.exec == "cat"){ cat = comp.id }
+              else if(!grep){ grep = comp.id; }
+            })
+            sails.log(inputfile, cat, grep, id)
+            cb();
+          });
+        }], 
+      done);
+    })
+
+    it('should connect successfully', function (done) {
+      var newConn = {
+        startNode: grep,
+        endNode: id,
+        startPort: 'output',
+        endPort: 'input' 
+      }
+
+      global.graphUtils.connect(1, newConn, function(err, res){
+        res.should.have.properties({
+          startNode: grep,
+          endNode: id,
+          startPort: 'output',
+          endPort: 'input' 
+        })
+        Graph.findOne(1) // update the graph
+          .populate('components')
+          .populate('connections')
+          .exec(function(err, res){
+            if(err || !res) cb(err);
+            graph = res;
+            done();
+          });
+      })
+    });
+
+    it('should show "same node" error when validating connection', function (done) {
+      var newConn = {
+        startNode: cat,
+        endNode: cat,
+        startPort: 'output',
+        endPort: 'input' 
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Trying to connect the same node");
+        done();
+      })
+    });
+
+    it('should show "input to input" error when validating connection', function (done) {
+      var newConn = {
+        startNode: cat,
+        endNode: grep,
+        startPort: 'input',
+        endPort: 'input' ,
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Trying to connect an input with another input");
+        done();
+      })
+    });
+
+    it('should show "output to output" error when validating connection', function (done) {
+      var newConn = {
+        startNode: cat,
+        endNode: grep,
+        startPort: 'output',
+        endPort: 'error' ,
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Trying to connect an output with another output");
+        done();
+      })
+    });
+
+    it('should show "writing read file" error when validating connection', function (done) {
+      var newConn = {
+        startNode: grep,
+        endNode: inputfile,
+        startPort: 'output',
+        endPort: 'input' ,
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Trying to write a file used to read");
+        done();
+      })
+    });
+
+    it('should show "reading write file" error when validating connection', function (done) {
+      var newConn = {
+        startNode: id,
+        endNode: cat,
+        startPort: 'output',
+        endPort: 'input' ,
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Trying to read a file used to write");
+        done();
+      })
+    });
+
+    it('should show "connection exists" error when validating connection', function (done) {
+      var newConn = {
+        startNode: grep,
+        endNode: id,
+        startPort: 'output',
+        endPort: 'input' 
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Connection already exists");
+        done();
+      })
+    });
+
+    it('should show "cycle detected" error when validating connection', function (done) {
+      var newConn = {
+        startNode: grep,
+        endNode: cat,
+        startPort: 'output',
+        endPort: 'input' 
+      }
+
+      global.graphUtils.ValidateConnection(graph, newConn, function(err, res){
+        err.should.equal("Connection creates a cycle");
         done();
       })
     });
