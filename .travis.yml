@@ -10,4 +10,5 @@ install:
   - sudo apt-get install -qy slirp lxc lxc-docker
   - git clone git://github.com/jpetazzo/sekexe
 script:
-  - sudo sekexe/run "`pwd`/dockerCItesting.sh"
+  - npm install
+  - sudo sekexe/run "docker -d & sleep 1; docker run ubuntu /bin/echo hello world; npm test && npm badge"
