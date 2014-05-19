@@ -9,4 +9,6 @@ install:
   - sudo chmod +x /usr/sbin/policy-rc.d
   - sudo apt-get install -qy slirp lxc lxc-docker
 script:
-  - docker -d & sleep 1
+  - sudo docker -d & sleep 1
+  - npm install
+  - npm test && npm run badge
