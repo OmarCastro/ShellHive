@@ -10,5 +10,4 @@ install:
   - sudo apt-get install -qy slirp lxc lxc-docker
   - git clone git://github.com/jpetazzo/sekexe
 script:
-  - sudo chmod -x dockerCItesting.sh
-  - sekexe/run "`pwd`/dockerCItesting.sh"
+  - sudo sekexe/run "`pwd`/dockerCItesting.sh"
