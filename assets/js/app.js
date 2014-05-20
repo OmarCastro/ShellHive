@@ -17,7 +17,7 @@ function getCSSSupportedProp(proparray){
 
 var cssTransform = getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
 
-var app = angular.module('app', ['ui.bootstrap', 'ui.layout']);
+var app = angular.module('app', ['ui.bootstrap','ngAnimate', 'ui.layout']);
 
 var socket = io.socket;
 var pathArray = window.location.pathname.split( '/' );

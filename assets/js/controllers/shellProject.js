@@ -1,9 +1,10 @@
 
 var viewGraph;
 
-app.controller('shellProject', ['$scope', function($scope){
+app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
   var AST, visualData;
   visualData = {};
+  $scope.alerts = alerts
   $scope.graphData = visualData;
   $scope.implementedCommands = [];
   $scope.isImplemented = function(data){
@@ -225,6 +226,10 @@ app.controller('shellProject', ['$scope', function($scope){
     }
     io.socket.put('/graph/connect/', message, function(data){
       console.log(data);
+      if(data.alert){
+        alerts.addAlert({type:'danger', msg: data.message});
+        $scope.$digest();
+      }
     });
   });
 

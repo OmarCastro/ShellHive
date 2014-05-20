@@ -107,7 +107,9 @@ module.exports = {
   connect: function(req,res, next){
     var connectionData = req.body.data
 
-    graphUtils.connect(req.socket.graphId, connectionData, function(){
+    console.log(connectionData);
+
+    graphUtils.connect(req.socket.graphId, connectionData, function(err){
       if(err){
         res.json({
           alert: true,

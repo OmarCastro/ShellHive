@@ -5,15 +5,31 @@
 
 html,body,div[graph]
   {width:100%;height:100%;margin:0;padding:0}
-.popupArea{overflow:auto}
+.popupArea{
+    overflow:auto
+}
+
+
 body,.graph,.nodes{margin:0}
 
-.layout, .tips, .new-project, .directory{
+.layout, .tips, .new-project, .directory, .alerts{
   position:absolute;
   top:50px;
   bottom:0;
   left:0;
   right: 0;
+}
+
+.alerts > div{
+    position: absolute;
+    display: inline-block;
+    right: 0;
+    width: 30%;
+    z-index: 20;
+}
+
+.alerts .alert{
+    margin-bottom: 0
 }
 
 div[graph]{
@@ -58,10 +74,8 @@ div[graph]{
     font-size:1.2em;
     font-weight:bold;
 }
-.tips {
+.alert {
     z-index:20;
-    background-color:#eee;
-    color:#000;
 }
 .ui-splitbar {
     z-index:8;
@@ -110,6 +124,7 @@ div[graph]{
 .popup {
     & > .dropdown-menu.well {
         padding:1px;
+        display: block;
     }
     a {
         padding-top:0;
@@ -313,4 +328,38 @@ pre {
     white-space:pre-wrap;
     white-space:-moz-pre-wrap;
     word-wrap:break-word;
+}
+
+
+/*
+  We're using CSS transitions for when
+  the enter and move events are triggered
+  for the element that has the .repeated-item
+  class
+*/
+.alert.ng-enter, .alert.ng-move, .alert.ng-leave{
+  -webkit-transition:0.5s linear all;
+  -moz-transition:0.5s linear all;
+  -o-transition:0.5s linear all;
+  transition:0.5s linear all;
+  opacity:0;
+}
+
+/*
+ The ng-enter-active and ng-move-active
+ are where the transition destination properties
+ are set so that the animation knows what to
+ animate.
+*/
+.alert.ng-enter.ng-enter-active,
+.alert.ng-move.ng-move-active {
+  opacity:1;
+}
+
+.alert.ng-leave{
+   opacity:1;
+}
+
+.alert.ng-leave.ng-leave-active{
+  opacity:0;
 }

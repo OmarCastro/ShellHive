@@ -11,7 +11,6 @@ app.directive("port", function($document){
       var elem = element[0];
       var imstyle = elem.style;
       scope.componentId = datanode.id;
-      scope.component = datanode;
       scope.isOutputNode = graphController.isOutputPort(attr.port)
       
 
@@ -25,27 +24,13 @@ app.directive("port", function($document){
 
 
 
-      var ConnectIfOk = function(startComponent, startPort, endComponent, endPort){
-        var visualData, isOk, i$, ref$, len$, x;
-        var startNode = startComponent.id;
-        var endNode = endComponent.id;
-        visualData = scope.graphData;
-        var isOk = true;
-        for (i$ = 0, len$ = (ref$ = visualData.connections).length; i$ < len$; ++i$) {
-          x = ref$[i$];
-          if ((x.startNode === endNode && x.endNode === startNode) || (x.startNode === startNode && x.endNode === endNode)) {
-            isOk = false;
-            break;
-          }
-        }
-        if (isOk) {
-          scope.$emit('connectComponent',{
-            startNode: startNode,
-            startPort: startPort,
-            endNode: endNode,
-            endPort: endPort
-          });
-        }
+      var ConnectIfOk = function(startNode, startPort, endNode, endPort){
+        scope.$emit('connectComponent',{
+          startNode: startNode,
+          startPort: startPort,
+          endNode: endNode,
+          endPort: endPort
+        });
       };
       mousemove = function(ev){
         graphController.moveEdge(ev.originalEvent);
@@ -69,9 +54,9 @@ app.directive("port", function($document){
             outPortScope = $pointedElem.scope();
             if (scope.isOutputNode !== outPortScope.isOutputNode) {
               if (scope.isOutputNode) {
-                ConnectIfOk(scope.component, attr.port, outPortScope.component, outAttr);
+                ConnectIfOk(scope.componentId, attr.port, outPortScope.componentId, outAttr);
               } else {
-                ConnectIfOk(outPortScope.component, outAttr, scope.component, attr.port);
+                ConnectIfOk(outPortScope.componentId, outAttr, scope.componentId, attr.port);
               }
             }
           }

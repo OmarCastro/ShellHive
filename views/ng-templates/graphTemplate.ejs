@@ -1,3 +1,8 @@
+<div class="alerts">
+  <div>
+  <alert ng-repeat="alert in alerts.alerts" type="danger" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}</alert>
+  </div>
+</div>
 <% include popupArea.ejs %>
 <% include graphNavbar.ejs %>
 <div class="directory directory-manager" ng-controller="directoryCtrl" ng-if="page == 'directory'">

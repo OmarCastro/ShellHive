@@ -35,12 +35,15 @@
     "sails-mysql": "^0.10.0-rc6",
     "shelljs": "^0.3.0",
     "ssh-keygen": "^0.2.1",
-    "tsort": "0.0.1"
+    "tsort": "0.0.1",
+    "coverage-percentage": "0.0.2",
+    "coverage-badge": "0.0.5"
   },
   "scripts": {
     "start": "node app.js",
     "debug": "node debug app.js",
-    "test": "gulp coverage"
+    "test": "gulp coverage",
+    "badge": "coverage-badge `coverage-percentage ./coverage/lcov.info --lcov` badge.png"
   },
   "main": "app.js",
   "repository": {
