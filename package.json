@@ -66,6 +66,6 @@
     "mocha": "~1.18.2",
     "run-sequence": "~0.3.6",
     "supertest": "~0.12.1",
-    "webdriverjs": "^1.6.1",
+    "webdriverjs": "^1.6.1"
   }
 }
