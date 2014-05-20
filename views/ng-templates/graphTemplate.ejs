@@ -3,16 +3,9 @@
   <alert ng-repeat="alert in alerts.alerts" type="danger" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}</alert>
   </div>
 </div>
-<% include popupArea.ejs %>
-<% include graphNavbar.ejs %>
-<div class="directory directory-manager" ng-controller="directoryCtrl" ng-if="page == 'directory'">
-  <div class="panel">
-    <div ng-repeat="record in directoryContent">
-      <div directoryfile draggable="true" ng-bind="record.name"></div>
-    </div>
-  </div>
-</div>
-
+<% include popupArea %>
+<% include graphNavbar %>
+<% include directory %>
 <div ui-layout class="layout">
   <div class="toplayout">
     <div class="background">

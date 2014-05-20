@@ -29,17 +29,4 @@ socket.on('mess', function(data){ console.log('mess', data) });
 socket.on('message', function(data){ console.log('message', data) });
 socket.on('connect', function socketConnected() {
   console.log("This is from the connect: ", this.socket.sessionid);
-  var _csrf = null;
-
-  socket.get('/csrfToken', {id:projId}, function(data){
-    _csrf = data._csrf;
-    window._csrf = _csrf
-  });
-
-  window.printget = function(reqdata){
-    console.log('posting movement', reqdata);
-    io.socket.post('/project/graphaction', {id:projId, message:reqdata,_csrf:_csrf}, function(data){
-      console.log(data);
-    });
-  }
 });

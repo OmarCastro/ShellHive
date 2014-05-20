@@ -1,10 +1,11 @@
 
 var viewGraph;
 
-app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
+app.controller('shellProject', ['$scope','csrf' ,'alerts', function($scope, csrf, alerts){
   var AST, visualData;
   visualData = {};
   $scope.alerts = alerts
+  $scope.filesystem = 0
   $scope.graphData = visualData;
   $scope.implementedCommands = [];
   $scope.isImplemented = function(data){
@@ -164,7 +165,7 @@ app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
 
   $scope.$on("runCommand", function(event, message){
     console.log('runCommand!');
-    io.socket.get('/graph/runGraph/',{_csrf:_csrf}, function(data){
+    io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
       console.log(data);
       $scope.shellText = [{
         text: data.command,
@@ -176,7 +177,7 @@ app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
 
   $scope.$on("compileGraph", function(event){
     console.log('compileGraph!');
-    io.socket.get('/graph/compile/',{_csrf:_csrf}, function(data){
+    io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
       console.log(data);
       $scope.shellText = [{
         text: data.command,
@@ -188,14 +189,14 @@ app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
 
   $scope.$on("removeComponent", function(event, message){
     console.log('removeComponent '+message+' !');
-    io.socket.post('/graph/removeComponent/', {id:message, _csrf:_csrf}, function(data){
+    io.socket.post('/graph/removeComponent/', {id:message, _csrf:csrf.csrf}, function(data){
       console.log(data);
     });
   });
 
   $scope.$on("addAndConnectComponent", function(event, message){
     console.log('addAndConnectComponent ', message,' !');
-    message._csrf = _csrf
+    message._csrf = csrf.csrf
     io.socket.post('/graph/createAndConnectComponent/', message, function(data){
       console.log(data);
     });
@@ -203,7 +204,7 @@ app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
 
     $scope.$on("addComponent", function(event, message){
     console.log('addComponent ', message,' !');
-    message._csrf = _csrf
+    message._csrf = csrf.csrf
     io.socket.post('/graph/createComponent/', message, function(data){
       console.log(data);
     });
@@ -211,7 +212,7 @@ app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
   
   $scope.$on("updateComponent", function(event, message){
     console.log('updateComponent:' , message);
-    message._csrf = _csrf
+    message._csrf = csrf.csrf
     var dataid = message.id;
     io.socket.put('/component/'+dataid, message, function(data){
       console.log(data);
@@ -222,7 +223,7 @@ app.controller('shellProject', ['$scope', 'alerts', function($scope, alerts){
     console.log('connectComponent:' , message);
     message = {
       data: message,
-      _csrf: _csrf
+      _csrf: csrf.csrf
     }
     io.socket.put('/graph/connect/', message, function(data){
       console.log(data);

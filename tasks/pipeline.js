@@ -34,6 +34,15 @@ var jsFilesToInject = [
 	//'linker/js/**/*.js'
 ];
 
+var appJsFilesToInject = [
+	'js/app.js',
+	'js/services/*.js',
+	'js/directives/*.js',
+	'js/controllers/*.js',
+	'!js/controllers/shellProject_demo.js',
+	'!js/controllers/shellProject.js'
+];
+
 
 // Client-side HTML templates are injected using the sources below
 // The ordering of these templates shouldn't matter.
@@ -64,6 +73,11 @@ module.exports.cssFilesToInject = cssFilesToInject.map(function(path) {
 module.exports.jsFilesToInject = jsFilesToInject.map(function(path) {
 	return '.tmp/public/' + path;
 });
+
+module.exports.appJsFilesToInject = appJsFilesToInject.map(function(path) {
+	return (path[0] == "!")? '!.tmp/public/' + path.slice(1) : '.tmp/public/' + path;
+});
+
 module.exports.templateFilesToInject = templateFilesToInject.map(function(path) {
 	return 'assets/' + path;
 });

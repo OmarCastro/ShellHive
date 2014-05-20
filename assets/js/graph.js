@@ -3,8 +3,10 @@ app.directive("graphModel", function($document){
     replace: false,
     scope: true,
     templateUrl: 'graphTemplate.html',
-    controller: ['$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
-        var res$, key, ref$, val, x$, $sp, y$, update, mousemove, mouseup, newComponent, newFileComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, hidePopup, hidePopupAndEdge;
+    controller: ['$scope', '$element', '$modal', '$attrs','creationPopup', function(scope, element, $modal, attr,creationPopup){
+        var res$, key, ref$, val, x$, $sp, scope, update, mousemove, mouseup, newComponent, newFileComponent, newMacroComponent,
+          newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt,
+          simpleEdge, setEdgePath, startEdge, moveEdge, endEdge,  hidePopupAndEdge;
         
         
         var pointerId = 0;
@@ -24,27 +26,21 @@ app.directive("graphModel", function($document){
         var $svgElem = $(svgElem);
         var workspace = elem.querySelector(".workspace");
         var $workspace = $(workspace);
-        var popup = elem.querySelector(".popup");
-        var $popup = $(popup);
-        var popupHeight = $popup.find("form").height();
-        var $popupInput = $popup.find("input");
+       
         var toplayout = elem.querySelector(".toplayout");
         var splitbar = elem.querySelector(".ui-splitbar");
         var graphModel = scope.graphModel = scope.graphData;       
-      
-        $popup.hide();
-
     
-        y$ = scope;
-        y$.safedigest = function(){
+        scope.creationPopup = creationPopup
+        creationPopup.setScope(scope);
+        scope.safedigest = function(){
           if (!(scope.$$phase || scope.$root.$$phase)) {
             scope.$digest();
           }
         };
-        y$.toNatNum = function(num){ return num.replace(/[^\d]/, '') };
-        y$.popupText = '';
-        y$.graph = this;
-        y$.$watch("shell", function(){
+        scope.toNatNum = function(num){ return num.replace(/[^\d]/, '') };
+        scope.graph = this;
+        scope.$watch("shell", function(){
           if (!scope.shell) {
             toplayout.style.bottom = "0";
             return splitbar.style.display = "none";
@@ -53,12 +49,12 @@ app.directive("graphModel", function($document){
             return splitbar.style.display = "";
           }
         });
-        y$.visualData = scope.graphModel;
-        y$.isArray = angular.isArray;
-        y$.isString = angular.isString;
-        y$.isRootView = function(){  return scope.visualData == scope.graphModel };
-        y$.macroViewList = function(){ return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : [] }
-        y$.swapPrevious = function(array, index, id){
+        scope.visualData = scope.graphModel;
+        scope.isArray = angular.isArray;
+        scope.isString = angular.isString;
+        scope.isRootView = function(){  return scope.visualData == scope.graphModel };
+        scope.macroViewList = function(){ return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : [] }
+        scope.swapPrevious = function(array, index, id){
           var ref$, i$, len$, connection, results$ = [];
           if (index === 0) {
             return;
@@ -220,12 +216,7 @@ app.directive("graphModel", function($document){
                 " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY +
                 " H " + endX);
         };
-        popupState = {
-          x: 0,
-          y: 0,
-          startNode: 0,
-          startPort: 0
-        };
+
         startEdge = function(elem, position, ev){
           this.hidePopup();
           edgeIniX = elem.offsetLeft + position.x;
@@ -240,41 +231,11 @@ app.directive("graphModel", function($document){
         endEdge = function(){
           return simpleEdge.setAttribute('d', "M 0 0");
         };
-        showPopup = function(event, startNode, startPort, endNode, endPort){
-          var ref$, x, y, x$;
-          scope.popupText = '';
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
-          importAll$(popupState, {
-            x: x,
-            y: y
-          });
-          popupState.startNode = startNode;
-          popupState.startPort = startPort;
-          popupState.endNode = endNode;
-          popupState.endPort = endPort;
-          popup.style[cssTransform] = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
-          $popup.show();
-          $popupInput.focus();
-          return scope.safedigest();
-        };
-        var popupSubmit = function(content){
-          var comp;
-          scope.$emit('addAndConnectComponent', {
-            command: content,
-            componentId: popupState.startNode,
-            startPort: popupState.startPort,
-            position: {x: popupState.x , y: popupState.y}
-          })
-          hidePopup();
+
+        hidePopupAndEdge = function(){
+          creationPopup.hidePopup();
           endEdge();
-          
         };
-        hidePopup = function(){
-          $popup.hide();
-          scope.sel = { open: false };
-          scope.safedigest();
-        };
-        hidePopupAndEdge = function(){ hidePopup(); endEdge();   };
         scope.newMacroModal = function(){
           var form, modalInstance;
           form = { name: '',  description: '',  command: ''  };
@@ -359,10 +320,13 @@ app.directive("graphModel", function($document){
         scope.newCommandAtTopLeft = function(command){
           return newCommandComponent(command, mapPointToScene(0, 0));
         };
-        this.showPopup = showPopup;
-        this.popupSubmit = popupSubmit;
-        this.hidePopup = hidePopup;
-        this.hidePopupAndEdge = hidePopupAndEdge;
+        
+        this.showPopup = creationPopup.showPopup;
+        this.popupSubmit = creationPopup.popupSubmit;
+        this.hidePopup = creationPopup.hidePopup;
+        this.hidePopupAndEdge = creationPopup.hidePopupAndEdge;
+
+
         this.nodesElement = nodesElem;
         this.newCommandComponent = newCommandComponent;
         this.newMacroComponent = newMacroComponent;

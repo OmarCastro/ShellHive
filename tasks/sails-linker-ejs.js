@@ -13,6 +13,20 @@ module.exports = {
 			}
 		},
 
+		devJsApp: {
+			options: {
+				startTag: '<!--ANGULAR SCRIPTS-->',
+				endTag: '<!--ANGULAR SCRIPTS END-->',
+				fileTmpl: '<script src="%s"></script>',
+				appRoot: '.tmp/public'
+			},
+			files: {
+				'.tmp/public/**/*.html': require('./pipeline').appJsFilesToInject,
+				'views/**/*.html': require('./pipeline').appJsFilesToInject,
+				'views/**/*.ejs': require('./pipeline').appJsFilesToInject
+			}
+		},
+
 		devJsRelative: {
 			options: {
 				startTag: '<!--SCRIPTS-->',
@@ -25,6 +39,21 @@ module.exports = {
 				'.tmp/public/**/*.html': require('./pipeline').jsFilesToInject,
 				'views/**/*.html': require('./pipeline').jsFilesToInject,
 				'views/**/*.ejs': require('./pipeline').jsFilesToInject
+			}
+		},
+
+		devJsAppRelative: {
+			options: {
+				startTag: '<!--ANGULAR SCRIPTS-->',
+				endTag: '<!--ANGULAR SCRIPTS END-->',
+				fileTmpl: '<script src="%s"></script>',
+				appRoot: '.tmp/public',
+				relative: true
+			},
+			files: {
+				'.tmp/public/**/*.html': require('./pipeline').appJsFilesToInject,
+				'views/**/*.html': require('./pipeline').appJsFilesToInject,
+				'views/**/*.ejs': require('./pipeline').appJsFilesToInject
 			}
 		},
 
@@ -42,6 +71,20 @@ module.exports = {
 			}
 		},
 
+		prodJsApp: {
+			options: {
+				startTag: '<!--ANGULAR SCRIPTS-->',
+				endTag: '<!--ANGULAR SCRIPTS END-->',
+				fileTmpl: '<script src="%s"></script>',
+				appRoot: '.tmp/public'
+			},
+			files: {
+				'.tmp/public/**/*.html': ['.tmp/public/min/approduction.js'],
+				'views/**/*.html': ['.tmp/public/min/approduction.js'],
+				'views/**/*.ejs': ['.tmp/public/min/approduction.js']
+			}
+		},
+
 		prodJsRelative: {
 			options: {
 				startTag: '<!--SCRIPTS-->',
@@ -54,6 +97,22 @@ module.exports = {
 				'.tmp/public/**/*.html': ['.tmp/public/min/production.js'],
 				'views/**/*.html': ['.tmp/public/min/production.js'],
 				'views/**/*.ejs': ['.tmp/public/min/production.js']
+			}
+		},
+
+		prodJsAppRelative: {
+			options: {
+				startTag: '<!--ANGULAR SCRIPTS-->',
+				endTag: '<!--ANGULAR SCRIPTS END-->',
+				fileTmpl: '<script src="%s"></script>',
+				appRoot: '.tmp/public',
+				relative: true
+
+			},
+			files: {
+				'.tmp/public/**/*.html': ['.tmp/public/min/approduction.js'],
+				'views/**/*.html': ['.tmp/public/min/approduction.js'],
+				'views/**/*.ejs': ['.tmp/public/min/approduction.js']
 			}
 		},
 

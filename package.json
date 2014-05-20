@@ -8,9 +8,12 @@
   ],
   "dependencies": {
     "bcrypt": "~0.7.7",
+    "coverage-badge": "git://github.com/ashaffer/node-coverage-badge#patch-1",
+    "coverage-percentage": "0.0.2",
     "ejs": "~0.8.4",
     "fs.extra": "^1.2.1",
     "grunt": "0.4.2",
+    "grunt-autoprefixer": "^0.7.3",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "~0.10.1",
     "grunt-contrib-concat": "~0.3.0",
@@ -34,9 +37,7 @@
     "sails-mysql": "^0.10.0-rc6",
     "shelljs": "^0.3.0",
     "ssh-keygen": "^0.2.1",
-    "tsort": "0.0.1",
-    "coverage-percentage": "0.0.2",
-    "coverage-badge": "git://github.com/ashaffer/node-coverage-badge#patch-1"
+    "tsort": "0.0.1"
   },
   "scripts": {
     "start": "node app.js",
