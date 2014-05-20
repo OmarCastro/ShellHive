@@ -21,10 +21,10 @@
         </ul>
       </li>
       <li ng-class="filesystem ? 'active' : ''">
-        <a href="#" ng-click="filesystem = !filesystem">FileSystem</a>
+        <a ng-click="filesystem = !filesystem">FileSystem</a>
       </li>
-      <li><a href="#" ng-click="shell = true; $emit('compileGraph')">Compile</a></li>
-      <li><a href="#" ng-click="shell = true; $emit('runCommand', [])">
+      <li><a ng-click="shell = true; $emit('compileGraph')">Compile</a></li>
+      <li><a ng-click="shell = true; $emit('runCommand', [])">
         <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
       </a></li>
     </ul>

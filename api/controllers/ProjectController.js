@@ -136,12 +136,17 @@ module.exports = {
     })
   },
 
-  uploadFile: function(req, res, next){
-    var savedDirectory = 'fs/projects/';
-    var directoryToFind = savedDirectory + req.params.id;
-    walk(directoryToFind, function(err, results){
-      res.json(results.map(function(result){return {name:result.slice(directoryToFind.length + 1)}}));
-    })
+  uploadfile: function(req, res){
+    var directoryToSave = './fs/projects/' + req.params.id+ "/";
+
+    req.file('file').upload({dirname: directoryToSave}, function onUploadComplete (err, uploadedFiles) {
+      if (err) return res.serverError(err);
+
+      return res.json({
+        message: uploadedFiles.length + ' file(s) uploaded successfully!',
+        files: uploadedFiles
+      });
+    });
   },
 
   downloadfile:function(req, res, next){

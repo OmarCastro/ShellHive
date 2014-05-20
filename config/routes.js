@@ -52,6 +52,11 @@ module.exports.routes = {
     action:'downloadfile'
   },
 
+  'post /upload/:id': {
+    controller: 'ProjectController',
+    action:'uploadfile'
+  },
+
   // Custom routes here...
 
   '/reports': {
