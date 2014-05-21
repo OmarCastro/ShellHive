@@ -1,6 +1,13 @@
 <div class="alerts">
   <div>
-  <alert ng-repeat="alert in alerts.alerts" type="danger" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}</alert>
+  <alert ng-repeat="alert in alerts.alerts" type="{{alert.type}}" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}
+
+    <div class="progress progress-striped active" ng-if="alert.progress">
+      <div class="progress-bar"  role="progressbar" aria-valuenow="{{alert.progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{alert.progress}}%">
+        <span>{{alert.progress}}%</span>
+      </div>
+    </div>
+  </alert>
   </div>
 </div>
 <% include popupArea %>

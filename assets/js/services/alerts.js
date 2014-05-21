@@ -4,12 +4,23 @@ app.service('alerts',function($timeout){
   this.alerts = alerts;
 
   this.addAlert = function(msg) {
+    msg.type = "danger"
     alerts.push(msg);
+    _this.removeAfter(msg, 5000)
+  };
+
+  this.addNotification = function(msg) {
+    msg.type = "info"
+    alerts.push(msg);
+    return msg
+  };
+
+  this.removeAfter = function(msg, time) {
     $timeout(function(){
       var indx = alerts.indexOf(msg)
       if(indx < 0) return;
       _this.closeAlert(indx)
-    },5000)
+    },time)
   };
 
   this.closeAlert = function(index) {
