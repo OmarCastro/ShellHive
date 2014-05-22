@@ -6,7 +6,8 @@
  */
 
 var fs = require('fs');
-var walk = function(dir, done) {
+/* istanbul ignore next */
+function walk(dir, done) {
   var results = [];
   fs.readdir(dir, function(err, list) {
     if (err) return done(err);
@@ -37,7 +38,7 @@ module.exports = {
   },
   
   create: function(req,res, next){
-    var userID = req.session.user.id;
+    var userID = req.user.id;
     Project.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
       if(!created) return next();
@@ -52,14 +53,16 @@ module.exports = {
     
   show:function(req, res, next){
     Project.findOne(req.param('id')).populate('members').exec(function (err, project){
-      if(err) return next(err);
-      if(!project) return next();
+      if(err || !project) return next(err);
       res.view({
         project:project,
         members:project.members
       });
     });
   },
+
+
+
   addmember:function(req, res, next){
     Project.findOne(req.param('id'), function foundProject (err, project){
       if(err) return next(err);
@@ -77,43 +80,50 @@ module.exports = {
   },
     
   play:function(req, res, next){
-    Project.findOne(req.param('id')).populate('members').populate('graphs').exec(function (err, project){
-      if(err) return next(err);
-      if(!project) return next();
-      var members = project.members;
-      if(members.indexOf(req.session.user.id)){
+    Project.findOne(req.param('id')).populate('members').exec(function (err, project){
+      if(err || !project) return next(err);
+      if(project.visibility == "global"){
         res.view({
           locals:{project:true},
           project:project,
           members:project.members,
           layout: null
         });
-      } else res.redirect("/project/show/"+project.id); 
+      } else if(req.user) {
+        var members = project.members;
+        console.log()
+        if(members.indexOf(req.user.id)){
+          res.view({
+            locals : {project:true},
+            project: project,
+            members: project.members,
+            layout: null
+          });
+        } else res.redirect("/project/show/"+project.id); 
+      } else {
+        res.redirect("/project/show/"+project.id); 
+      }
       });
   },
 
   subscribe:function(req, res, next){
     var id = req.param('id');
-    if(!req.session.user){
-      res.json({ error: 'not logged id' }, 500);
-    } else {
-      Project.findOne(id).populate('members').populate('graphs').exec(function (err, project){
-        if(err) return next(err);
-        if(!project) return next();
-        var userId = req.session.user.id
-        var members = project.members;
-        var isMember = false;
-        if(id == 1){ //special public project
-
-        }
-        for(var i = 0, len = members.length; members[i].id != userId && i < len; ++i){}
-        if(i < len){
+    
+    Project.findOne(id).populate('members').populate('graphs').exec(function (err, project){
+      if(err || !project) return next(err);
+      if(project.visibility == "global"){
+        CollaborationService.joinUserToProject(req,res,project);
+      } else if(!req.user){
+        res.json({ error: 'not logged id' }, 500);
+      } else {
+        var userId = req.user.id
+        if(_.some(project.members, function(member){return member.id == userId})){
           CollaborationService.joinUserToProject(req,res,project);
         } else {
           res.json({ error: 'User not found' }, 404);
         }
-      });
-    }
+      }
+    });
 
 
   },

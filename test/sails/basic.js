@@ -13,6 +13,9 @@ var request = require('supertest');
  */
  
 var app;
+var server;
+var _csrf;
+
 describe("Sails test", function(){ 
   before(function(done) {
     
@@ -41,20 +44,111 @@ describe("Sails test", function(){
       //  grunt: false
       //}
 
-    }, function(err, sails) {
+    }, function(error, sails) {
       app = sails;
-      done(err, sails);
+      server = request.agent(Sails.hooks.http.app);
+      server
+        .get('/csrfToken')
+        .expect(200)
+        .end(function(err, res){
+          _csrf = res.body._csrf;
+          if (err) return done(err);
+          done(error, sails);
+        });
     });
+
+
     
   });
    
    
   describe('Routes', function(done) {
     it('GET / should return 200', function (done) {
-      request(Sails.hooks.http.app).get('/').expect(200, done);
+      server.get('/').expect(200, done);
     });
-      it('GET /user/1 should return 200', function (done) {
-      request(Sails.hooks.http.app).get('/user/1').expect(200, done);
+    it('GET /user/1 should return 200', function (done) {
+      server.get('/user/1').expect(200, done);
+    });
+    it('GET /project/play/1 should return 200', function (done) {
+      server.get('/project/play/1').expect(200, done);
+    });
+
+    it('GET /project/play/2 should return 302', function (done) {
+      server.get('/project/play/2').expect(302, done);
+    });
+
+    it('GET /user/new should return 200', function (done) {
+      server.get('/user/new').expect(200, done);
+    });
+
+    it('GET /project/new should return 200', function (done) {
+      server.get('/project/new').expect(200, done);
+    });
+
+     it('Login fails - wrong username', function (done) {
+      server
+        .post('/auth/login')
+        .send({username:"admin@n.pt", password:"admin123", _csrf:_csrf})
+        .type('form')
+        .expect(302)
+        .expect('Location', '/')
+        .end(done);
+    });
+
+    it('Login fails  - wrong password', function (done) {
+      server
+        .post('/auth/login')
+        .send({username:"admin@admin.pt", password:"admin13", _csrf:_csrf})
+        .type('form')
+        .expect(302)
+        .expect('Location', '/')
+        .end(done);
+    });
+
+    it('Login alright', function (done) {
+      server
+        .post('/auth/login')
+        .send({username:"admin@admin.pt", password:"admin123", _csrf:_csrf})
+        .type('form')
+        .expect(302)
+        .expect('Location', '/user/show/1')
+        .end(done);
+    });
+
+   it('GET /user/show/1 should return 200', function (done) {
+      server.get('/user/show/1').expect(200, done);
+    });
+
+    it('GET /project/play/2 should return 200', function (done) {
+      server.get('/project/play/2').expect(200, done);
+    });
+
+    it('GET /directories/project/2 should return 200', function (done) {
+      server.get('/directories/project/2').expect(200, done);
+    });
+
+    it('GET /project/show/2 should return 200', function (done) {
+      server.get('/project/show/2').expect(200, done);
+    });
+
+    it('GET /project/show/404 should return 404', function (done) {
+      server.get('/project/show/404').expect(404, done);
+    });
+
+    it('GET /project/play/404 should return 404', function (done) {
+      server.get('/project/play/404').expect(404, done);
+    });
+
+
+    it('GET /user/show/500 should return 404', function (done) {
+      server.get('/user/show/500').expect(404, done);
+    });
+
+    it('Logout alright', function (done) {
+      server
+        .get('/logout')
+        .expect(302)
+        .end(done);
     });
   });
 

@@ -27,7 +27,8 @@ module.exports = {
 
     visibility: {
       type: 'string',
-      defaultsTo: 'private'
+      defaultsTo: 'private',
+      in:['private','public','global']
     }
   }
 };

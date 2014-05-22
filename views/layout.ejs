@@ -57,9 +57,9 @@
         <li>
         <% if ( session.user ) { %>
           <li><a href="/user/show/<%= session.user.id %>"><%= session.user.name %></a></li>
-          <li><a href="/user/logout">Logout</a></li>
+          <li><a href="/logout">Logout</a></li>
         <% } else { %>
-            <form class="navbar-form navbar-left" action="/user/login" method="POST">
+            <form class="navbar-form navbar-left" action="/auth/login" method="POST">
             <div class="form-group">
               <input type="email" class="form-control login-user" placeholder="email" name="username">
             </div>

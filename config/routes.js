@@ -30,6 +30,9 @@ module.exports.routes = {
     view: 'static/homepage'
   },
 
+  '/login': 'AuthController.login',
+  '/logout': 'AuthController.logout',
+
   'get /demo': {
     view: 'project/play',
     locals:{

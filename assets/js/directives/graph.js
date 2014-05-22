@@ -3,8 +3,9 @@ app.directive("graph", function($document){
     replace: false,
     scope: true,
     templateUrl: 'graphTemplate.html',
-    controller: ['$scope', '$element', '$modal', '$attrs', function(scope, element, $modal, attr){
-        var res$, key, ref$, val, x$, $sp, update, mousemove, mouseup, newComponent, newFileComponent, newMacroComponent, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, hidePopup, hidePopupAndEdge;
+    controller: ['$scope', '$element', '$attrs', function(scope, element, attr){
+        var key, val, x$, $sp, update, mousemove, mouseup,
+        newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, hidePopup, hidePopupAndEdge;
         
         
         var pointerId = 0;
@@ -62,9 +63,11 @@ app.directive("graph", function($document){
           if (index === 0) {
             return;
           }
+
+
           ref$ = [array[index - 1], array[index]],  array[index] = ref$[0], array[index - 1] = ref$[1];
-          for (i$ = 0, len$ = (ref$ = scope.visualData.connections).length; i$ < len$; ++i$) {
-            connection = ref$[i$];
+          for(var i = 0, _ref=scope.visualData.connections, length=_ref.length;i<length;++i){
+            var connection = _ref[i];
             if (connection.endNode === id) {
               if (connection.endPort === "file" + index) {
                 results$.push(connection.endPort = "file" + (index - 1));
@@ -123,33 +126,6 @@ app.directive("graph", function($document){
           event.stopPropagation();
         });
 
-        newFileComponent = function(filename, position){
-          var visualData, newComponent;
-          visualData = scope.visualData;
-          
-          newComponent = {
-            type: 'file',
-            id: visualData.counter++,
-            filename: filename,
-            position: {}
-          };
-          visualData.components.push(newComponent);
-          importAll$(newComponent.position, position);
-          return newComponent;
-        };
-        newMacroComponent = function(name, position){
-          var visualData, newComponent;
-          visualData = scope.visualData;
-          newComponent = {
-            type: 'subgraph',
-            macro: graphModel.macros[name],
-            id: visualData.counter++,
-            position: {}
-          };
-          visualData.components.push(newComponent);
-          importAll$(newComponent.position, position);
-          return newComponent;
-        };
         newCommandComponent = function(command, position){
           scope.$emit('addComponent', {})
         };
@@ -266,87 +242,8 @@ app.directive("graph", function($document){
           scope.safedigest();
         };
         hidePopupAndEdge = function(){ hidePopup(); endEdge();   };
-        scope.newMacroModal = function(){
-          var form, modalInstance;
-          form = { name: '',  description: '',  command: ''  };
-          modalInstance = $modal.open({
-            templateUrl: 'myModalContent.html',
-            controller: function($scope, $modalInstance){
-              $scope.form = form;
-              $scope.cancel = function(){
-                return $modalInstance.dismiss('cancel');
-              };
-              $scope.ok = function(){
-                $modalInstance.close(form);
-              };
-            }
-          });
-          return modalInstance.result.then(function(selectedItem){
-            scope.graph.newMacro(form.name, form.description, form.command);
-            return form.name = form.description = '';
-          });
-        };
-        scope.macroEditModal = function(macroName){
-          var macro, form, modalInstance;
-          macro = graphModel.macros[macroName];
-          form = {
-            name: macro.name,
-            description: macro.description
-          };
-          modalInstance = $modal.open({
-            templateUrl: 'MacroEditModal.html',
-            controller: function($scope, $modalInstance){
-              $scope.form = form;
-              $scope.cancel = function(){
-                return $modalInstance.dismiss('cancel');
-              };
-              $scope.edit = function(){
-                $modalInstance.close({
-                  result: "edit"
-                });
-              };
-              $scope['delete'] = function(){
-                $modalInstance.close({
-                  result: "delete"
-                });
-              };
-              $scope.view = function(){
-                $modalInstance.close({
-                  result: "view"
-                });
-              };
-            }
-          });
-          return modalInstance.result.then(function(selectedItem){
-            var x$, res$, key;
-            switch (selectedItem.result) {
-            case "edit":
-              graphModel.macros[form.name] = macro;
-              delete graphModel.macros[macroName];
-              macro.name = form.name;
-              macro.description = form.description;
-              res$ = [];
-              for (key in graphModel.macros) {
-                res$.push(key);
-              }
-              graphModel.macroList = res$;
-              scope.$digest();
-              break;
-            case "view":
-              scope.graph.setGraphView(graphModel.macros[macroName]);
-              break;
-            case "delete":
-              delete graphModel.macros[macroName];
-              res$ = [];
-              for (key in graphModel.macros) {
-                res$.push(key);
-              }
-              graphModel.macroList = res$;
-            }
-            return form.name = form.description = '';
-          });
-        };
-        scope.newCommandAtTopLeft = function(command){
+
+        scope.newCommandAtTopLeft = function(command,event){
           scope.$emit("addComponent",{
             command:command,
             position:mapPointToScene(0, 0)
@@ -360,7 +257,6 @@ app.directive("graph", function($document){
         this.hidePopupAndEdge = hidePopupAndEdge;
         this.nodesElement = nodesElem;
         this.newCommandComponent = newCommandComponent;
-        this.newMacroComponent = newMacroComponent;
         this.startEdge = startEdge;
         this.moveEdge = moveEdge;
         this.endEdge = endEdge;
@@ -414,21 +310,12 @@ app.directive("graph", function($document){
         this.getVisualData = function(){
           return scope.visualData;
         };
-        this.setGraphView = function(view){
+        this.setGraphView = function(viewId){
           hidePopupAndEdge();
-          viewGraph(view.id);
+          viewGraph(viewId);
         };
         this.revertToRoot = function(){
           scope.visualData = graphModel;
-        };
-        this.newMacro = function(name, descr, command){
-          var res$, key;
-          //graphModel.macros[name] = shellParser.createMacro(name, descr, command);
-          //res$ = [];
-          //for (key in graphModel.macros) {
-          //  res$.push(key);
-          //}
-          //graphModel.macroList = res$;
         };
         this.translateNode = function(id, position, x, y){
           var i$, ref$, len$, el;
@@ -451,6 +338,8 @@ function importAll$(obj, src){
   for (var key in src) obj[key] = src[key];
   return obj;
 }
+
+
 app.directive("elscope", function($document){
   return {
     link: function(scope, element){

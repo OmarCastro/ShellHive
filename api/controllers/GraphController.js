@@ -7,7 +7,7 @@
 
 module.exports = {
   create: function(req,res, next){
-    var userID = req.session.user.id;
+    var userID = req.user.id;
     Graph.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
       if(!created) return next();
@@ -109,7 +109,7 @@ module.exports = {
 
     console.log(connectionData);
 
-    graphUtils.connect(req.socket.graphId, connectionData, function(err){
+    graphUtils.connect(req.socket.graphId, connectionData, function(err, created){
       if(err){
         res.json({
           alert: true,
@@ -160,7 +160,7 @@ module.exports = {
   },
   
   createfromcommand:function(req, res, next){
-    var userID = req.session.user.id;
+    var userID = req.user.id;
     Graph.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
       if(!created) return next();

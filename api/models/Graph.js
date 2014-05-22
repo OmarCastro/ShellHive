@@ -8,12 +8,21 @@
 module.exports = {
 
   attributes: {
-    isRoot: 'boolean',
-    name:'string',
-    description:'string',
+
+    data:{
+      type:'json',
+      columnName: 'graphData'
+    },
+
+    type:{
+      type:'string',
+      'in':['root', 'macro', 'commandGraph'],
+      required: true
+    },
+
     
     project:{
-        model:'project'
+      model:'project'
     },
     
     components:{
@@ -25,7 +34,6 @@ module.exports = {
       collection: 'connection',
       via: 'graph'
     }
-
   },
 
   //toGraphMethod: function(){

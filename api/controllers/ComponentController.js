@@ -7,7 +7,6 @@
 
 module.exports = {
   create: function(req, res, next){
-    var userID = req.session.user.id;
     Component.create(req.params.all()).exec(function(err,created){
       if(err) return next(err);
       if(!created) return next();

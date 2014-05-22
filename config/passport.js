@@ -3,11 +3,11 @@ var passport    = require('passport'),
   bcrypt = require('bcrypt');
 
 passport.serializeUser(function(user, done) {
-  done(null, user[0].id);
+  done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  User.findById(id, function (err, user) {
+  User.findOneById(id, function (err, user) {
     done(err, user);
   });
 });
@@ -28,7 +28,6 @@ passport.use(new LocalStrategy(
 module.exports = {
  express: {
     customMiddleware: function(app){
-      console.log('express midleware for passport');
       app.use(passport.initialize());
       app.use(passport.session());
     }

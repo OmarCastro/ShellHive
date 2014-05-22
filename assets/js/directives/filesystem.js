@@ -3,6 +3,11 @@ app.directive("filesystem", ['csrf','alerts','$rootScope',function(csrf, alerts,
     scope: true,
     link: function(scope, element, attr){
       scope.directoryContent = []
+      scope.selectedFile = null
+      scope.selectFile = function(file){
+        console.log(file);
+        scope.selectedFile = (scope.selectedFile == file) ? null : file;
+      }
       //scope.sails = sails
 
       function updateFileSystem(){

@@ -23,10 +23,14 @@ var CollaborationService = module.exports = {
     var socket = req.socket;
     var io = sails.io;
     var data = {}
-
-    socket.userId = req.session.user.id;
+    if(req.user){
+      socket.userId = req.user.id;
+      socket.name = data.name = req.user.name;
+    } else {
+      socket.userId = -1;
+      socket.name = "Anonymous"      
+    }
     socket.projectId = project.id;
-    socket.name = data.name = req.session.user.name;
     socket.color = data.color = colors[Math.floor(Math.random() * colors.length)];
 
     io.sockets.in(projectRoom).emit('mess',  {type: "new user", data: data});

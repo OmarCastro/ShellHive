@@ -29,35 +29,22 @@ gulp.task('mocha', function() {
     });
 }); 
 
-gulp.task('coverage', function() {
 
-//	gulp.src([
-//    'lib/**/commands/*.js',
-//    'lib/**/utils/*.js',
-//    'lib/common/*.js',
-//    'lib/parser/parser.js'], { read: false })
-//            .pipe(cover.instrument({
-//                pattern: ['test/test.js'],
-//            }))
-//            .pipe(mocha({reporter: 'spec'}))
-//            .pipe(cover.report({
-//                outFile: 'coverage.html'
-//            }));
 
+
+gulp.task('coverage', function(cb) {
 
 gulp.src([
-  // api test coverage
-  'api/models/*.js',
-  'api/services/*.js',
+  'api/**/*.js',
+  '!api/responses/*.js',
+  '!api/controllers/DemoControllers.js',
   '!api/services/CollaborationService.js',
-
-  // backend library test coverage
   'lib/**/commands/*.js',
   'lib/**/utils/*.js',
   'lib/common/*.js',
   'lib/parser/parser.js'
   ]).pipe(istanbul()) // Covering files
-  .on('end', function () {
+  .on('finish', function () {
     gulp.src(['test/test.js'])
       .pipe(mocha({reporter: 'spec'}))
       .on('error', function (error) {
@@ -65,7 +52,8 @@ gulp.src([
         gutil.beep();
         gutil.log(gutil.colors.yellow(errorText));
       })
-      .pipe(istanbul.writeReports()); // Creating the reports after tests runned
+      .pipe(istanbul.writeReports()) // Creating the reports after tests runned
+      .on('end', cb);
   });
 });  
 

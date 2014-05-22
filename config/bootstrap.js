@@ -28,19 +28,26 @@ module.exports.bootstrap = function (cb) {
       password: "admin123"
     },
     {
-        name: "Omar Castro",
-        email:"user@user.fe.up.pt",
-        password: "teste123"  
+      name: "Omar Castro",
+      email:"user@user.fe.up.pt",
+      password: "teste123"  
     }
     ];
     User.count().exec(function(err, count) {
       if (err || count > 0) return done(err);
-      User.create(dummyUsers).exec(done);
+      async.series(dummyUsers.map(function(user){
+        return function(cb){User.create(user).exec(cb)}
+      }), done);
     });
   }
 
   function createDummyProjects(done) {
-    var dummyProjects = [{
+    var dummyProjects = [
+    {
+      name:"public",
+      visibility: "global"
+    },
+    {
       name:"project miel picante",
       members: [1,2]
     }];
@@ -62,17 +69,24 @@ module.exports.bootstrap = function (cb) {
   function createDummyGraphs(done) {
     var dummyGraphs = [
       {
-        name: null,
         project:1,
-        isRoot:true
+        type:"root"
       },
       {
-        name:"macroTest",
-        project:1
+        project:2,
+        type:"root"
+      },
+      {
+        data:{
+          name:"macroTest",
+          description:"a test macro"
+        },
+        type: "macro",
+        project:2
       }
     ];
 
-    var dummyCommands = ["cat json.txt | grep Gloss", "ls | grep c"];
+    var dummyCommands = ["cat json.txt | grep Gloss", "ls | grep c", "cat mini.txt"];
 
     Graph.count().exec(function(err, count) {
       if (err || count > 0) return done(err);

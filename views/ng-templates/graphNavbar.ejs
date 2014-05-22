@@ -1,25 +1,38 @@
 <div class="navbar navbar-fixed-top navbar-default navbar-inverse">
   <div class="collapse navbar-collapse">
     <ul class="nav navbar-nav">
-      <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Macro <b class="caret"></b></a>
+      <li class="dropdown" ng-controller="macroCtrl">
+      <a href="#" data-toggle="dropdown" class="dropdown-toggle" is-open="status.macroDropdown">
+      Macro <b class="caret"></b></a>
         <ul class="dropdown-menu">
           <li><a ng-click="newMacroModal()">New Macro</a></li>
           <li class="divider"></li>
           <li class="dropdown-header">created Macros</li>
-          <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="macroEditModal(macro)"></a></li>
+          <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="; status.macroDropdown = false; macroEditModal(macro)"></a></li>
         </ul>
       </li>
-      <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Add Command <b class="caret"></b></a>
+      <li class="dropdown" is-open="status.isopen">
+      <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+        Add Command 
+        <b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li ng-repeat="command in implementedCommands"><a ng-click="newCommandAtTopLeft(command)" ng-bind="command"></a></li>
+          <li ng-repeat="command in implementedCommands">
+          <a ng-click="newCommandAtTopLeft(command); status.isopen=false;" ng-bind="command"></a>
+          </li>
         </ul>
       </li>
-      <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">View<b class="caret"></b></a>
+
+
+
+      <li class="dropdown" is-open="status.isopen2">
+        <a href="#" data-toggle="dropdown" class="dropdown-toggle">View<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a href="#" ng-click="shell = !shell">Toogle shell</a></li>
-          <li><a href="#" ng-click="viewGraph(rootGraph)">View Root</a></li>
+          <li><a ng-click="filesystem = false; shell = !shell; status.isopen2=false">Toogle shell</a></li>
+          <li><a ng-click="filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root</a></li>
         </ul>
       </li>
+
+
       <li ng-class="filesystem ? 'active' : ''">
         <a ng-click="filesystem = !filesystem">FileSystem</a>
       </li>
@@ -30,14 +43,22 @@
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><a href="http://omarcastro.github.io/ShellHive/docs/" target="_blank">Docs</a></li>
-      <li>
+      
       <% if(req.session.user){ %>
-        <a href="/user/show/<%= req.session.user.id %>"><%= req.session.user.name %></a>
+        <li>
+          <a href="/user/show/<%= req.session.user.id %>">
+            <%= req.session.user.name %>
+          </a>
+        </li>
+        <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+        <li><a href="/logout">Logout</a></li>
+
       <% } else { %>
-        <a href="/"> Anonymous Visitor </a>
+        <li><a href="/"> Anonymous Visitor </a></li>
+        <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+
       <% } %>
-    </li>
-       <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+    
 
     </ul>
   </div>

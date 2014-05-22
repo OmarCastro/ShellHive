@@ -9,6 +9,8 @@ app.directive("directoryfile", ['$document', function($document){
       var origin = window.location.origin;
       var path = [origin, 'files', projId, scope.record.name].join('/')
       var downloadurl = [contentType,filename,path].join(':');
+      scope.record.downloadurl = ['/download', projId, scope.record.name].join('/')
+
 
       //element.attr("href", path)
       element.attr("data-downloadurl", downloadurl)

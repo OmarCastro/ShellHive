@@ -36,36 +36,16 @@ function metaGraphfromCommand(command){
   }
     
 
-function addToGraph(graphId, command, cb){
-  cb = cb || function(){};
-  var metagraph = metaGraphfromCommand(command);
-  var components = metagraph.components;
-  var componentsToCreate = components.map(function(component){
-    return {
-      graph: graphId,
-      data: JSON.stringify(component)
-    }
-  })
 
-  async.parallel(
-    componentsToCreate.map(function(component){
-      return function(done){
-        Component.create(component).exec(done);
-      };
-    }), function(err, createdComponents){
-      /* istanbul ignore if */ if(err || !createdComponents) return cb(err)
-     metagraph.connections.forEach(function(connection){
-      connection.graph = graphId
-      connection.startNode = createdComponents[components.indexOf(connection.startNode)].id
-      connection.endNode = createdComponents[components.indexOf(connection.endNode)].id
-    });
-
-    Connection.create(metagraph.connections).exec(function(err,createdConnections){
-      /* istanbul ignore if */ if(err || !createdConnections) return cb(err)
-      else return cb(null, {components: createdComponents, connections: createdConnections})
-    });
-  });
-
+/* istanbul ignore next */
+function addInputAndOutputs(graph, newComponent){
+  //async.parallel(
+  //  componentsToCreate.map(function(component){
+  //    return function(done){
+  //      Component.create(component).exec(done);
+  //    };
+  //  });
+  //Component.create(component).exec(done);
 }
 
 
@@ -137,7 +117,36 @@ module.exports = {
   
   metaGraphfromCommand:metaGraphfromCommand, 
   parser:parser, 
-  addToGraph:addToGraph, 
+  addToGraph: function addToGraph(graphId, command, cb){
+  cb = cb || function(){};
+  var metagraph = GraphGeneratorService.metaGraphfromCommand(command);
+  var components = metagraph.components;
+  var componentsToCreate = components.map(function(component){
+    return {
+      graph: graphId,
+      data: JSON.stringify(component)
+    }
+  })
+
+  async.parallel(
+    componentsToCreate.map(function(component){
+      return function(done){
+        Component.create(component).exec(done);
+      };
+    }), function(err, createdComponents){
+      /* istanbul ignore if */ if(err || !createdComponents) return cb(err)
+     metagraph.connections.forEach(function(connection){
+      connection.graph = graphId
+      connection.startNode = createdComponents[components.indexOf(connection.startNode)].id
+      connection.endNode = createdComponents[components.indexOf(connection.endNode)].id
+    });
+
+    Connection.create(metagraph.connections).exec(function(err,createdConnections){
+      /* istanbul ignore if */ if(err || !createdConnections) return cb(err)
+      else return cb(null, {components: createdComponents, connections: createdConnections})
+    });
+  });
+}, 
   createComponent: createComponent,
   createAndConnectComponent:createAndConnectComponent,
 
@@ -159,7 +168,7 @@ module.exports = {
   },
   
   compileProject: function(id, cb){
-    Graph.findOne({project: id, isRoot:true}).populate('components').populate('connections').exec(function (err, graph){
+    Graph.findOne({project: id, type:"root"}).populate('components').populate('connections').exec(function (err, graph){
       /* istanbul ignore if */ if(err) return cb(err, null);
       graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
       return cb(null, parser.parseGraph(parser.graphFromJsonObject(graph)));

@@ -1,6 +1,36 @@
 <div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform, WebkitTransform:transform, MsTransform:transform}" class="{{data.type}}-component component">
+  
+  <div ng-switch-when="input">
+    <div class="title"> INPUTS </div>
+    <div class="ports">
+      <div class="input">
+        <span ng-repeat="port in data.ports">
+          <span data-port="input" class="box"></span>
+          <input type="text" ng-model="data.ports[$index]">
+          <br>
+        </span>
+        <button ng-click="data.ports.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <div ng-switch-when="output">
+    <div class="title"> OUTPUTS </div>
+    <div class="ports">
+      <div class="input">
+        <span ng-repeat="port in data.ports">
+          <span data-port="input" class="box"></span>
+          <input type="text" ng-model="data.ports[$index]">
+          <br>
+        </span>
+        <button ng-click="data.ports.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+      </div>
+    </div>
+  </div>
+
+
   <div ng-switch-when="file">
-    <div title="{{data.macro.description}}" class="title">
+    <div title="{{data.filename}}" class="title">
       FILE
       <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
     </div>
@@ -18,11 +48,13 @@
       </div>
     </div>
     <br><br><br>
-    <input class="filename" type="text" ng-model="data.filename">
+    <input parameter-field class="filename" type="text" ng-model="data.filename">
   </div>
   
   
   
+  
+
   <div ng-switch-when="macro">
     <div title="{{data.macro.description}}" class="title">
       <span ng-bind="data.macro.name"></span>
@@ -42,7 +74,7 @@
         <span data-port="retcode" class="box"></span></div>
     </div><br><br><br>
     <div>{{data.macro.description}}</div>
-    <button ng-click="graph.setGraphView(data.macro)">view macro</button>
+    <div class="btn btn-sm btn-primary" ng-click="graph.setGraphView(data.graph)">view macro</div>
   </div>
   
   
@@ -61,7 +93,8 @@
     
     
     <div ng-if="data.files !== undefined">files :<br ng-if="data.files.length > 0">
-      <div ng-repeat="file in data.files track by $index"><span data-port="file{{$index}}" class="box"></span>
+      <div ng-repeat="file in data.files track by $index">
+        <span data-port="file{{$index}}" class="box"></span>
         <input type="text" ng-model="data.files[$index]" ng-if="isString(data.files[$index])">
         <span ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])"></span>
         <button ng-click="data.files.splice($index,1)" class="btn btn-xs btn-default">
@@ -73,14 +106,14 @@
       <button ng-click="data.files.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button><br>
     </div>
     <div ng-if="data.exec == 'awk'">script:<br>
-      <textarea type="text" ng-model="data.script"></textarea>
+      <textarea parameter-field type="text" ng-model="data.script"></textarea>
     </div>
     
     
     <div ng-if="data.parameters">
       <div ng-repeat="(name, option) in data.parameters track by name">
         <div class="input-group input-group-sm"><span ng-bind="name" class="input-group-addon"></span>
-          <input type="text" ng-model="data.parameters[name]" class="form-control">
+          <input parameter-field type="text" ng-model="data.parameters[name]" class="form-control">
         </div>
       </div>
     </div>
@@ -89,7 +122,7 @@
     <div ng-if="data.exec == 'grep'">
       <div>
         <label>pattern:
-          <input type="text" ng-model="data.pattern">
+          <input parameter-field type="text" ng-model="data.pattern">
         </label><br>
       </div>
     </div>

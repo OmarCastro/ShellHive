@@ -36,7 +36,6 @@ var jsFilesToInject = [
 
 var appJsFilesToInject = [
 	'js/app.js',
-	'bower_components/dropzone/downloads/dropzone.min.js',
 	'js/services/*.js',
 	'js/directives/*.js',
 	'js/controllers/*.js',

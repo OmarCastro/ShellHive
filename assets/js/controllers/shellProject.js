@@ -51,12 +51,13 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts', function($scope, csrf
       var macroList = visualData.macroList = [];
       for(var i = 0; i < len; ++i){
         var graph = graphs[i];
-        if(graph.isRoot){
+        if(graph.type == 'root'){
           $scope.rootGraph = graphs[i]
           viewGraph(graphs[i].id)
         } else {
-          macros[graph.name] = graphs[i]
-          macroList.push(graph.name)
+          graphs[i].data.id = graphs[i].id;
+          macros[graph.data.name] = graphs[i].data
+          macroList.push(graph.data.name)
         }
       }
     }
