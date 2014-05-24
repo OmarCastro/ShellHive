@@ -186,12 +186,7 @@ describe("Sails test", function(){
 
   describe('Sails Graph Component Connection Validation', function(done) {
     this.timeout(7000);
-    var graph;
-    var id;
-    var inputfile;
-    var cat;
-    var grep;
-
+    var graph, id, inputfile, cat, grep
 
     before(function(done){
       async.series([

@@ -8,7 +8,6 @@
   ],
   "dependencies": {
     "bcrypt": "~0.7.7",
-    "coverage-badge": "git://github.com/ashaffer/node-coverage-badge#patch-1",
     "coverage-percentage": "0.0.2",
     "ejs": "~0.8.4",
     "fs.extra": "^1.2.1",
@@ -43,7 +42,7 @@
     "start": "node app.js",
     "debug": "node debug app.js",
     "test": "gulp coverage",
-    "badge": "coverage-badge `coverage-percentage ./coverage/lcov.info --lcov` badge.png"
+    "badge": "node coverage-badge.js `coverage-percentage ./coverage/lcov.info --lcov` flat > badge.svg"
   },
   "main": "app.js",
   "repository": {
