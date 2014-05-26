@@ -5,14 +5,17 @@
 
 A Visual data-flow programming web application to create UNIX Shell workflows
 
+
+
 The purpose of the application is to ease the development of UNIX scripts, its focus is the
 development of scripts for big-data related tasks.
 
 
-# Getting Started
+# Requirements
+
+This application is developed using nodeJS, and it highly integrates with Docker a container engine
 
 
-To begin, this project depends on Node.js and npm
 
 
 ## Instalation

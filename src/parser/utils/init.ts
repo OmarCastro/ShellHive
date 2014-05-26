@@ -240,16 +240,23 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
 
   return function(component, visualData, componentIndex:IndexedGraph, mapOfParsedComponents){
     var exec:any[] = [component.exec];
-    mapOfParsedComponents[component.id] = true;
     var flags = parseFlagsAndSelectors(component, options);
     var parameters:any = [];
     var Componentparameters = component.parameters;
+    var result:any;
+
+    mapOfParsedComponents[component.id] = true;
+
 
     for (var key in Componentparameters) {
       var value = Componentparameters[key];
-      if (value) {
-        var result = "-" + parameterOptions[key] + value;
-        if (value.indexOf(" ") >= 0){ result = '"'+ result +'"' }
+      var option = parameterOptions[key];
+      if (option && value) {
+        result = "-" + parameterOptions[key] + value;
+        if (/[\ #]/.test(result)){ result = '"'+ result +'"' }
+        parameters.push(result)
+      } else if(value){
+        result = (/[\ #]/.test(value)) ? '"'+value+'"' : value
         parameters.push(result)
       }
     }
@@ -258,8 +265,7 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
         if (file instanceof Array) {
           var subCommand = parser.parseVisualDatafromComponent(componentIndex.components[file[1]], visualData, componentIndex, mapOfParsedComponents);
           return "<(" + subCommand + ")"
-        } else if (file.indexOf(" ") >= 0) { return '"' + file + '"'; }
-        else return file;
+        } else return (/[\ #]/.test(file)) ?  '"' + file + '"' : file;
 
       });
 
@@ -269,10 +275,14 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
     if (beforeJoin) {
       return beforeJoin(component, exec, flags, files, parameters);
     } else {
-      return exec.concat(flags, parameters, files).join(' ');
+      if(flags){exec = exec.concat(flags)}
+      if(parameters){exec = exec.concat(parameters)}
+      if(files){exec = exec.concat(files)}
+      return exec.join(' ');
     }
   };
 };
+
 
 
 export var select = optionsParser.select;

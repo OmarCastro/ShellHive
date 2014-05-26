@@ -32,22 +32,30 @@
   <div ng-switch-when="file">
     <div title="{{data.filename}}" class="title">
       FILE
-      <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
+      <span class="button-group">
+        <a ng-click="togglecollapse()" 
+           class="glyphicon" 
+           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
+        </a> 
+        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
     </div>
     <div class="ports">
       <div class="input">
-        <span data-port="input" class="box"></span>
-        <span class="text">&nbsp;overwrite&nbsp;&nbsp;</span>
-        <br>
-        <span data-port="append" class="box"></span>
-        <span class="text">&nbsp;append&nbsp;&nbsp;</span>
+        <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
+          <span class="box"></span>
+          <span class="text" ng-bind="port.text"></span>
+        </div>
       </div>
       <div style="text-align: right" class="output">
-        <span class="text">&nbsp;&nbsp;content&nbsp;</span>
-        <span data-port="output" class="box"></span>
+
+        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
+          <span class="text" ng-bind="port.text"></span>
+          <span class="box"></span>
+       </div>
+
       </div>
+      <div style="clear: both;"></div>
     </div>
-    <br><br><br>
     <input parameter-field class="filename" type="text" ng-model="data.filename">
   </div>
   
@@ -58,21 +66,30 @@
   <div ng-switch-when="macro">
     <div title="{{data.macro.description}}" class="title">
       <span ng-bind="data.macro.name"></span>
-      <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
+           <span class="button-group">
+        <a ng-click="togglecollapse()" 
+           class="glyphicon" 
+           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
+        </a> 
+        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
     </div>
     <div class="ports">
       <div class="input">
-        <span data-port="input" class="box"></span>
-        <span class="text">&nbsp;stdin&nbsp;&nbsp;</span>
+        <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
+          <span class="box"></span>
+          <span class="text" ng-bind="port.text"></span>
+        </div>
       </div>
       <div style="text-align: right" class="output">
-        <span class="text">&nbsp;&nbsp;stdout&nbsp;</span>
-        <span data-port="output" class="box"></span><br>
-        <span class="text">&nbsp;&nbsp;stderr&nbsp;</span>
-        <span data-port="error" class="box"></span><br>
-        <span class="text">&nbsp;&nbsp;return&nbsp;</span>
-        <span data-port="retcode" class="box"></span></div>
-    </div><br><br><br>
+
+        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
+          <span class="text" ng-bind="port.text"></span>
+          <span class="box"></span>
+       </div>
+
+      </div>
+      <div style="clear: both;"></div>
+    </div>
     <div>{{data.macro.description}}</div>
     <div class="btn btn-sm btn-primary" ng-click="graph.setGraphView(data.graph)">view macro</div>
   </div>
@@ -82,28 +99,54 @@
   
   
   <div ng-switch-when="command">
-    <div class="title"><span ng-bind="data.exec"></span>
-      <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
+    <div class="title">
+      <span ng-bind="data.exec"></span>
+      <span class="button-group">
+        <a ng-click="togglecollapse()" 
+           class="glyphicon" 
+           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
+        </a> 
+        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
+      </span> 
     </div>
     <div class="ports">
-      <div class="input"><span data-port="input" class="box"></span><span class="text">&nbsp;stdin&nbsp;&nbsp;</span></div>
-      <div style="text-align: right" class="output"><span class="text">&nbsp;&nbsp;stdout&nbsp;</span><span data-port="output" class="box"></span><br><span class="text">&nbsp;&nbsp;stderr&nbsp;</span><span data-port="error" class="box"></span><br><span class="text">&nbsp;&nbsp;return&nbsp;</span><span data-port="retcode" class="box"></span></div>
-    </div><br><br><br>
+      <div class="input">
+        <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
+          <span class="box"></span>
+          <span class="text" ng-bind="port.text"></span>
+        </div>
+      </div>
+      <div style="text-align: right" class="output">
+
+        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
+          <span class="text" ng-bind="port.text"></span>
+          <span class="box"></span>
+       </div>
+
+      </div>
+      <div style="clear: both;"></div>
+    </div>
     
     
     
-    <div ng-if="data.files !== undefined">files :<br ng-if="data.files.length > 0">
+    <div ng-if="data.files !== undefined && (!collapsed || data.files.length)">files :<br ng-if="data.files.length > 0">
       <div ng-repeat="file in data.files track by $index">
-        <span data-port="file{{$index}}" class="box"></span>
+        <span data-port="file{{$index}}">
+          <span class="box"></span>
+        </span>
         <input type="text" ng-model="data.files[$index]" ng-if="isString(data.files[$index])">
         <span ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])"></span>
-        <button ng-click="data.files.splice($index,1)" class="btn btn-xs btn-default">
+        <button  ng-if="!collapsed" ng-click="data.files.splice($index,1)" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-remove"></span>
         </button>
-        <button ng-click="swapPrevious(data.files,$index,data.id)" ng-if="$index" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-chevron-up"></span></button>
-        <button ng-click="swapPrevious(data.files,$index + 1,data.id)" ng-if="$index != data.files.length -1 " class="btn btn-xs btn-default"><span class="glyphicon glyphicon-chevron-down">      </span></button><br>
+        <button  ng-click="swapPrevious(data.files,$index,data.id)" ng-if="$index && !collapsed" class="btn btn-xs btn-default">
+          <span class="glyphicon glyphicon-chevron-up"></span>
+        </button>
+        <button ng-click="swapPrevious(data.files,$index + 1,data.id)" ng-if="$index != data.files.length -1 && !collapsed" class="btn btn-xs btn-default">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+        </button><br>
       </div>
-      <button ng-click="data.files.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button><br>
+      <button ng-if="!collapsed" ng-click="data.files.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button><br>
     </div>
     <div ng-if="data.exec == 'awk'">script:<br>
       <textarea parameter-field type="text" ng-model="data.script"></textarea>
@@ -134,7 +177,7 @@
                  ng-if="data.selectors[name].type == 'numeric parameter'" min="0" required class="form-control">
           <div class="input-group-btn">
             <button elscope type="button" ng-click="graph.setSelection({data:data, name:name},scopedElement)" class="btn btn-default">
-              <span ng-bind="data.selectors[name].name"></span>&nbsp;<span class="caret"></span>
+              <span ng-bind="data.selectors[name].name"></span><span class="caret"></span>
             </button>
           </div>
           <input type="text" ng-model="data.selectors[name].value" name="field" 
@@ -143,8 +186,8 @@
       </form>
     </div>
     <div>
-      <span ng-repeat="(name, val) in data.flags track by name" ng-click="data.flags[name] = !val;$emit('updateComponent',data)">
-        <label ng-class="(val)?'glyphicon-check':'glyphicon-unchecked'" class="glyphicon">&nbsp;</label>
+      <span ng-repeat="(name, val) in data.flags track by name" ng-click="data.flags[name] = !val;$emit('updateComponent',data)" ng-if="!collapsed || data.flags[name]">
+        <label ng-class="(val)?'glyphicon-check':'glyphicon-unchecked'" class="glyphicon"></label>
         <label ng-bind="name"></label>
         <br>
       </span>

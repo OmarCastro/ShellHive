@@ -72,7 +72,7 @@ describe('parser.js test', function(){
       graph.components.push(newfile);
       graph.connect(graph.components[0],'error',newfile,'input');
       var resultCode = parser.parseGraph(graph);
-      //resultCode.should.equal('(grep  "hello world" cenas.txt; (echo $? > exit.txt)) | grep  mimi')
+      //resultCode.should.equal('(grep "hello world" cenas.txt; (echo $? > exit.txt)) | grep mimi')
     })
 
     it('should generate code to save return to command',function(){
@@ -87,7 +87,7 @@ describe('parser.js test', function(){
       graph.connect(graph.components[0],'error',graph2.components[0],'input');
       console.error(parser.parseGraph(graph)); 
 
-      //parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+      //parser.parseGraph(graph).should.equal('(grep "hello world" cenas.txt; (echo $? | grep 0 > file.txt) &> /dev/null) | grep mimi'); 
 
     })
 
@@ -109,7 +109,7 @@ describe('parser.js test', function(){
       graph.connect(graph.components[0],'error',newfile,'input');
       console.error(parser.parseGraph(graph)); 
 
-      //parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+      //parser.parseGraph(graph).should.equal('(grep "hello world" cenas.txt; (echo $? | grep 0 > file.txt) &> /dev/null) | grep mimi'); 
 
     })
   })
@@ -122,7 +122,7 @@ describe('parser.js test', function(){
       graph.components.push(newfile);
       graph.connect(graph.components[0],'retcode',newfile,'input');
       var resultCode = parser.parseGraph(graph);
-      resultCode.should.equal('(grep  "hello world" cenas.txt; (echo $? > exit.txt)) | grep  mimi')
+      resultCode.should.equal('(grep "hello world" cenas.txt; (echo $? > exit.txt)) | grep mimi')
     })
 
     it('should generate code to save return to command',function(){
@@ -135,7 +135,7 @@ describe('parser.js test', function(){
         component.id = graph.counter++;
       })
       graph.connect(graph.components[0],'retcode',graph2.components[0],'input');
-      parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+      parser.parseGraph(graph).should.equal('(grep "hello world" cenas.txt; (echo $? | grep 0 > file.txt) &> /dev/null) | grep mimi'); 
 
     })
 
@@ -157,7 +157,7 @@ describe('parser.js test', function(){
       graph.connect(graph.components[0],'retcode',newfile,'input');
       console.error(parser.parseGraph(graph)); 
 
-      //parser.parseGraph(graph).should.equal('(grep  "hello world" cenas.txt; (echo $? | grep  0 > file.txt) &> /dev/null) | grep  mimi'); 
+      //parser.parseGraph(graph).should.equal('(grep "hello world" cenas.txt; (echo $? | grep 0 > file.txt) &> /dev/null) | grep mimi'); 
 
     })
 
@@ -180,7 +180,7 @@ describe('parser.js test', function(){
       var macro = parser.createMacro("mimi","mimimi","grep 'hello world' cenas.txt | grep mimi");
       macro.components.should.have.length(3);
       var macroComp = new MacroComponent(macro);
-      parser.parseComponent(macroComp).should.equal('grep  "hello world" cenas.txt | grep  mimi');
+      parser.parseComponent(macroComp).should.equal('grep "hello world" cenas.txt | grep mimi');
     })
 
     it('should create a macro based on another macro',function(){
@@ -188,7 +188,7 @@ describe('parser.js test', function(){
       var otherMacro = parser.createMacro("mimi","mimimi",null, macro);
       macro.components.should.have.length(3);
       var macroComp = new MacroComponent(otherMacro);
-      parser.parseComponent(macroComp).should.equal('grep  "hello world" cenas.txt | grep  mimi');
+      parser.parseComponent(macroComp).should.equal('grep "hello world" cenas.txt | grep mimi');
     })
 
   })

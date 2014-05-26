@@ -16,10 +16,17 @@ import GraphModule = require("../../common/graph");
 var config = {
   parameters:{
     separator:{
-      name:'field separator',
-      option: 'F',
+      name:'path',
+      option: null,
       type: "string",
-      description:"filter entries by anything other than the content",
+      description:"path of file to find",
+      defaultValue: ""
+    },
+    maxLevelDepht:{
+      name:'max level depht',
+      option: "-maxdepth",
+      type: "numeric",
+      description:"path of file to find",
       defaultValue: ""
     }
   }
@@ -62,7 +69,7 @@ export var parseComponent = common.commonParseComponent(awkData.flagOptions, awk
   (component,exec,flags,files,parameters) => {
     var script = component.script.replace('"','\\"');
     if(script){
-      script = (/[\n\ #]/.test(script)) ? '"'+script+'"' : script;
+      script = (/[\n\ ]/.test(script)) ? '"'+script+'"' : script;
     }    
     return exec.concat(parameters,script).join(' ');
   })

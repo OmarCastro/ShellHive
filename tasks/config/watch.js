@@ -21,13 +21,21 @@ module.exports = function(grunt) {
 			files: ['api/**/*']
 		},
 		assets: {
-
+            options: {
+              livereload: true 
+            },
 			// Assets to watch:
 			files: ['assets/**/*', 'tasks/pipeline.js'],
 
 			// When assets are changed:
 			tasks: ['syncAssets' , 'linkAssets']
-		}
+		},
+      views:{
+        options:{
+          livereload: true
+        },
+        files:['views/**/*']
+      }
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-watch');

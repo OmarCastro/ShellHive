@@ -57,7 +57,7 @@ module.exports = {
 		var dockerPath = dockerConfig.dockerPath;
 		var cwd = path.resolve(fsPath,'projects',projectId)
 
-		var dockerCommand = escape("cd " + dockerPath + ' ; ' + command)
+		var dockerCommand = "cd " + dockerPath + ' ; ' + command
 		
 		var args = ['run','-v',[cwd,dockerPath].join(':'),image,sh,'-c',dockerCommand];
 		sails.log("running command - ",exec, args, 'on project', projectId)

@@ -212,9 +212,8 @@ DESCRIPTION
 
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
-import common = require("./_init");
+import common = require("../utils/init");
 import GraphModule = require("../../common/graph");
-
 
 
 var selectors = {

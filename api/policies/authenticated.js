@@ -12,21 +12,19 @@ module.exports = function(req, res, next) {
   // User is allowed, proceed to the next policy, 
   // or if this is the last policy, the controller
 
-
-  //if (req.isAuthenticated()){
-  //  return next();
-  //}else{
-  //  return res.send(403, { message: 'Not Authorized' });
-  //}
-
-  if (req.isAuthenticated()) {
-    res.locals.user = _.clone(req.user)
-  } else {
-    res.locals.user = {}
-  }
-  
-  return next();
-
+  // Initialize Passport
+  passport.initialize()(req, res, function () {
+    // Use the built-in sessions
+    passport.session()(req, res, function () {
+      // Make the user available throughout the frontend
+      if (req.user) {
+        res.locals.user = _.clone(req.user)
+      } else {
+        res.locals.user = {}
+      }
+      next();
+    });
+  });
     // User is not allowed
   // (default res.forbidden() behavior can be overridden in `config/403.js`)
   //return res.forbidden('You are not permitted to perform this action.');

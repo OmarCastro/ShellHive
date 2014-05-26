@@ -4,7 +4,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var should = chai.should();
 
-var parserinit = require('../../lib/parser/commands/_init.js')
+var parserinit = require('../../lib/parser/utils/init.js')
 var Connection = parser.Connection
 var Component  = parser.Component
 

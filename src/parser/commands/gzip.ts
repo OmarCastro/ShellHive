@@ -14,9 +14,9 @@
 */
 
 import $ = require("../utils/optionsParser");
-import GraphModule = require("../../common/graph");
 import parserModule = require("../utils/parserData");
-import common = require("./_init");
+import common = require("../utils/init");
+import GraphModule = require("../../common/graph");
 
 
 var selectors = {

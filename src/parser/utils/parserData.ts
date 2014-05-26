@@ -89,18 +89,6 @@ export class ParserData{
 
 
     visualSelectorOptions.$selector = selectors
-    /* istanbul ignore next */
-    visualSelectorOptions.$changeToValue = function (currSelector, key ,value) {
-      var toChange = selectors[key][value];
-      currSelector.name = toChange.name
-      currSelector.type = toChange.type
-      if(currSelector.value && toChange.type === "option"){
-        delete currSelector.value
-      }
-      else if(!currSelector.value && toChange.type !== "option" && toChange.defaultValue){
-        currSelector.value = toChange.defaultValue
-      }
-    }
     return this;
   }  
 

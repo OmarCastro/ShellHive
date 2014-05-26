@@ -11,11 +11,65 @@ app.directive("component", function($document){
       startY = 0;
       title = datanode.title;
       position = datanode.position;
-      
+      scope.collapsed = false;
+      scope.togglecollapse = function(){
+        scope.collapsed = !scope.collapsed;
+        updatePorts();
+        requestAnimationFrame(function(){
+           $('path[connector]').each(function(index){
+              var scope = $(this).scope();
+              if(scope.endsPositions && scope.endsPositions[0] == position || scope.endsPositions[1] == position){
+                scope.reset();
+              }
+            })
+         });
+      };
       scope.update = function(){
         scope.transform = "translate(" + position.x + "px, " + position.y + "px)"; 
       }
-      
+
+
+
+      function existConnectionToPort(port){
+        return !scope.graphData.connections.every(function(connection){
+          return (connection.startNode != datanode.id || connection.startPort != port.name) 
+          && (connection.endNode != datanode.id || connection.endPort != port.name) 
+        })
+      }
+    scope.updatePorts = updatePorts;
+     function updatePorts (){
+                  console.log("updatePorts")
+
+        scope.inputPorts = [];
+        scope.outputPorts = [];
+          switch(datanode.type){
+            case 'file':
+              scope.inputPorts = [{name: "input", text:"overwrite"},{name: "append", text:"append"}]
+              scope.outputPorts = [{name: "output", text:"content"}]
+              break;
+            case 'command':
+            case 'macro':
+              scope.inputPorts = [{name: "input", text:"stdin"}]
+              scope.outputPorts = [{name: "output", text:"stdout"}
+                            ,{name: "error", text:"stderr"}
+                            ,{name: "retcode", text:"return"}]
+              break;
+            default:
+              scope.inputPorts = [];
+              scope.outputPorts = [];
+          }
+        if(scope.collapsed){
+          console.log("collapsed")
+          scope.inputPorts = scope.inputPorts.filter(existConnectionToPort)
+          scope.outputPorts = scope.outputPorts.filter(existConnectionToPort)
+        }
+      }
+
+
+
+
+      updatePorts();
+
       scope.update();
       elem = element[0];
       imstyle = elem.style;

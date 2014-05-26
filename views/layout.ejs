@@ -55,10 +55,10 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-        <% if ( session.user ) { %>
-          <li><a href="/user/show/<%= session.user.id %>"><%= session.user.name %></a></li>
+        <% if ( req.isAuthenticated() ) { %>
+          <li><a href="/user/show/<%= req.user.id %>"><%= req.user.name %></a></li>
           <li><a href="/logout">Logout</a></li>
-        <% } else { %>
+       <% } else { %>
             <form class="navbar-form navbar-left" action="/auth/login" method="POST">
             <div class="form-group">
               <input type="email" class="form-control login-user" placeholder="email" name="username">

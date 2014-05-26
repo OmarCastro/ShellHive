@@ -86,7 +86,7 @@ module.exports.bootstrap = function (cb) {
       }
     ];
 
-    var dummyCommands = ["cat json.txt | grep Gloss", "ls | grep c", "cat mini.txt"];
+    var dummyCommands = ["cat json.txt | grep Gloss", "curl http://get.docker.io/ubuntu/ | grep \"#\"", "cat mini.txt"];
 
     Graph.count().exec(function(err, count) {
       if (err || count > 0) return done(err);

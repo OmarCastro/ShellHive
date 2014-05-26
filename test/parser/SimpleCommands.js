@@ -332,6 +332,25 @@ describe('command test', function(){
     })
   })
 
+
+    describe('`curl` test', function(){
+    it('should create a component with class CurlComponent', function(){
+      var command = "curl https://gnomo.fe.up.pt";
+      var graph = shouldBeAGraph(parser.parseCommand(command))
+
+      classname(graph.components[0]).should.equal("CurlComponent")
+      graph.components[0].exec.should.equal("curl")
+
+      graph.components.should.have.length(1)
+      graph.connections.should.be.empty
+      graph.components[0].parameters.should.have.properties({
+        url: "https://gnomo.fe.up.pt"
+      })
+      parser.parseGraph(graph).should.equal(command);
+    })
+  })
+
+
   describe('`date` test', function(){
     it('should create a component with class DateComponent', function(){
       var command = "date";

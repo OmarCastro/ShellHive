@@ -250,6 +250,40 @@ app.directive("graph", function($document){
           })
         };
 
+        scope.collapseAll = function(){
+          $('[component]').each(function(index){
+            var scope = $(this).scope();
+            scope.collapsed = true
+            scope.updatePorts();
+            requestAnimationFrame(scope.resetConnections)
+          })
+        }
+
+
+
+        scope.uncollapseAll = function(){
+          $('[component]').each(function(index){
+            var scope = $(this).scope();
+            scope.collapsed = false
+            scope.updatePorts();
+            requestAnimationFrame(scope.resetConnections)
+          })
+        }
+
+        scope.toggleShell = function(){
+          scope.shell = !scope.shell
+          if(scope.shell)
+          scope.$emit('compileGraph')
+        }
+        Mousetrap.bind("ctrl+shift+up", function(){scope.$apply(scope.collapseAll)});
+        Mousetrap.bind("alt+a", function(){scope.$apply(scope.collapseAll)});
+        Mousetrap.bind("alt+s", function(){scope.$apply(scope.toggleShell)});
+        Mousetrap.bind("ctrl+shift+down", function(){scope.$apply(scope.uncollapseAll)});
+
+
+        scope.resetConnections = function(){
+          $('path[connector]').each(function(index){ $(this).scope().reset() });
+        }
 
         this.showPopup = showPopup;
         this.popupSubmit = popupSubmit;

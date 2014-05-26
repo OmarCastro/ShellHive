@@ -161,3 +161,69 @@
  -q                 If used as the first parameter disables .curlrc
 
 */
+
+
+/*
+-f arqprog              --file=arqprog
+-F fs                   --field-separator=fs
+-v var=val              --assign=var=val
+*/
+
+
+
+import $ = require("../utils/optionsParser");
+import parserModule = require("../utils/parserData");
+import common = require("../utils/init");
+import GraphModule = require("../../common/graph");
+
+
+var config = {
+  parameters:{
+    separator:{
+      name:'url',
+      option: null,
+      type: "string",
+      description:"URL of the application",
+      defaultValue: ""
+    }
+  },
+  flags: {
+    silent: {
+      name: "silent",
+      option: 's',
+      longOption: 'silent',
+      description: "don't show progress information",
+      active: false
+    },
+  }
+}
+
+var cUrlData = new parserModule.ParserData(config);
+
+
+var optionsParser = {}
+
+$.generate(optionsParser)
+
+
+export class CurlComponent extends GraphModule.CommandComponent {
+  public exec:string = "curl"
+  public files: any[] = []
+}
+
+
+function defaultComponentData(){
+  var component = new CurlComponent();
+  component.parameters = cUrlData.componentParameters  
+  component.flags = cUrlData.componentFlags
+  return component;
+};
+
+export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
+    string: (component:CurlComponent, str) => {component.parameters.url = str }
+    })
+
+export var parseComponent = common.commonParseComponent(cUrlData.flagOptions, cUrlData.selectorOptions,cUrlData.parameterOptions)
+
+export var VisualSelectorOptions = cUrlData.visualSelectorOptions;
+export var componentClass = CurlComponent

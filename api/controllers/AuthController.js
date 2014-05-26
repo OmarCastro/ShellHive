@@ -12,6 +12,7 @@ module.exports = {
       req.login(user, function(err){
         /* istanbul ignore next : should not happen anyway */
         if (err) res.redirect('/');
+        req.session.user = user;
         res.redirect("/user/show/"+user.id);
       });
     })(req, res);
@@ -19,6 +20,7 @@ module.exports = {
 
   logout: function(req, res){
      req.logout();
+     req.session.user = null;
      res.redirect("/");
   },
 };

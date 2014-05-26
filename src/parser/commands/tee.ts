@@ -1,4 +1,5 @@
-import $ = require("./_init");
+
+import $ = require("../utils/init");
 import GraphModule = require("../../common/graph")
 import Graph = GraphModule.Graph;
 import Boundary = GraphModule.Boundary;

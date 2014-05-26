@@ -21,6 +21,7 @@ export var parserCommand = {
   cat: require('./commands/cat'),
   date: require('./commands/date'),
   ls: require('./commands/ls'),
+  curl: require('./commands/curl'),
   grep: require('./commands/grep'),
   bunzip2: require('./commands/bunzip2'),
   diff: require('./commands/diff'),
@@ -210,6 +211,10 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
     }
     return result;
   }
+
+
+
+
 
   var nextcommands:any[] = parselist(outputs);
   var nextErrcommands:any[] = parselist(stdErrors);

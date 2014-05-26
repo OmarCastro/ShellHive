@@ -155,7 +155,7 @@ describe("Sails test", function(){
   describe('Sails Graph compile', function(done) {
     it('should compile a graph in a database', function (done) {
       global.GraphGeneratorService.compileGraph(1,function(err, result){
-       expect(result).to.equal("cat  json.txt | grep  Gloss"); 
+       expect(result).to.equal("cat json.txt | grep Gloss"); 
        done();
       });
     });

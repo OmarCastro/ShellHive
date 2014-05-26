@@ -11,6 +11,7 @@
     "jquery": "~2.1.1",
     "angular-animate": "~1.2.16",
     "angular": "~1.2.16",
-    "angular-bootstrap": "~0.11.0"
+    "angular-bootstrap": "~0.11.0",
+    "mousetrap": "~1.4.6"
   }
 }

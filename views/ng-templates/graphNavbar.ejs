@@ -29,6 +29,8 @@
         <ul class="dropdown-menu">
           <li><a ng-click="filesystem = false; shell = !shell; status.isopen2=false">Toogle shell</a></li>
           <li><a ng-click="filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root</a></li>
+          <li><a ng-click="filesystem = false; collapseAll(); status.isopen2=false">Collapse all components</a></li>
+          <li><a ng-click="filesystem = false; uncollapseAll(); status.isopen2=false;">Uncollapse all components</a></li>
         </ul>
       </li>
 

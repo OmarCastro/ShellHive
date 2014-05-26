@@ -113,7 +113,7 @@ module.exports = {
       if(err || !project) return next(err);
       if(project.visibility == "global"){
         CollaborationService.joinUserToProject(req,res,project);
-      } else if(!req.user){
+      } else if(!req.session.user){
         res.json({ error: 'not logged id' }, 500);
       } else {
         var userId = req.user.id
@@ -133,7 +133,8 @@ module.exports = {
   },
 
   showDir: function(req, res, next){
-    var savedDirectory = 'fs/projects/';
+    var fsPath = sails.config.shusee.fsPath
+    var savedDirectory = fsPath+'/projects/';
     var directoryToFind = savedDirectory + req.params.id;
     walk(directoryToFind, function(err, results){
       var result = results.map(function(result){
@@ -147,7 +148,8 @@ module.exports = {
   },
 
   uploadfile: function(req, res){
-    var directoryToSave = './fs/projects/' + req.params.id+ "/";
+    var fsPath = sails.config.shusee.fsPath
+    var directoryToSave = fsPath+'/projects/' + req.params.id+ "/";
 
     req.file('file').upload({dirname: directoryToSave}, function onUploadComplete (err, uploadedFiles) {
       if (err) return res.serverError(err);
@@ -160,7 +162,8 @@ module.exports = {
   },
 
   downloadfile:function(req, res, next){
-    var savedDirectory = 'fs/projects/';
+    var fsPath = sails.config.shusee.fsPath
+    var savedDirectory = fsPath + '/projects/';
     var directoryToFind = savedDirectory + req.params.id;
     var path = directoryToFind+'/'+req.params.path
     fs.exists(path, function(exists) {
@@ -174,7 +177,8 @@ module.exports = {
   },
 
   viewfile:function(req, res, next){
-    var savedDirectory = 'fs/projects/';
+    var fsPath = sails.config.shusee.fsPath
+    var savedDirectory = fsPath+'/projects/';
     var directoryToFind = savedDirectory + req.params.id;
     var path = directoryToFind+'/'+req.params.path
     fs.exists(path, function(exists) {

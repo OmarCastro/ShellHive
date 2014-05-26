@@ -20,9 +20,9 @@ grep:
 */
 
 import $ = require("../utils/optionsParser");
-import GraphModule = require("../../common/graph");
 import parserModule = require("../utils/parserData");
-import common = require("./_init");
+import common = require("../utils/init");
+import GraphModule = require("../../common/graph");
 
 var selectors = {
   patternType:{
@@ -166,13 +166,14 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
 
 export var parseComponent = common.commonParseComponent(grepCommandData.flagOptions,grepCommandData.selectorOptions, null, (component,exec:any[],flags,files:any[]) =>{
   var pattern = component.pattern || ""
-  pattern = (pattern.indexOf(" ") >= 0) ? '"'+pattern+'"' : pattern
+  pattern = (/[\ #]/.test(pattern)) ? '"'+pattern+'"' : pattern
   //console.error(pattern + " - " + files.length );
   //console.error(!!pattern + " - " + !!files.length );
-  if(pattern && files.length){return exec.concat(flags,pattern,files).join(' ')}
-  else if(pattern){return exec.concat(flags,pattern,files).join(' ')}
-  else if(files.length){return exec.concat(flags,'""',files).join(' ')}
-  else return exec.concat(flags).join(' ')
+  if(flags){exec = exec.concat(flags)}
+  if(pattern && files.length){return exec.concat(pattern,files).join(' ')}
+  else if(pattern){return exec.concat(pattern,files).join(' ')}
+  else if(files.length){return exec.concat('""',files).join(' ')}
+  else return exec.join(' ')
 })
 
 export var VisualSelectorOptions = grepCommandData.visualSelectorOptions;

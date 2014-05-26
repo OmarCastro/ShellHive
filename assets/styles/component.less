@@ -1,8 +1,7 @@
 .component,.inline-component {
     font-size:1em;
     position:absolute;
-    min-width:80px;
-    min-height:80px;
+    min-width:70px;
     background-color:#fff;
     border-radius:.3em;
     border:.2em solid #aaa;
@@ -26,15 +25,24 @@
         width:initial;
     }
     .title {
+        -webkit-user-select: none; /* Chrome/Safari */        
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+ */
+        
+        /* Rules below not implemented in browsers yet */
+        -o-user-select: none;
+        user-select: none;
         text-align:center;
         background-color:#ddd;
         height:1.5em;
         border-top-left-radius:.1em;
         border-top-right-radius:.1em;
-        .close-button {
+        .button-group {
             float:right;
             font-size:1.1em;
-            text-decoration:none;
+            a {
+                text-decoration:none;
+            }
         }
     }
     .input{

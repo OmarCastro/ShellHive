@@ -41,9 +41,9 @@ app.directive("connector", function($document){
       
       scope.reset = function(){
         var Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']");
-        var StartPort = Startnode.querySelector(".box[data-port='" + dataedge.startPort + "']");
+        var StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box");
         var Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']");
-        var EndPort = Endnode.querySelector(".box[data-port='" + dataedge.endPort + "']");
+        var EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box");
         StartPortOffset = {
           top: StartPort.offsetTop + StartPort.offsetHeight * 0.75,
           left: StartPort.offsetLeft
