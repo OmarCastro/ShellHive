@@ -199,7 +199,7 @@
     <h1>Code coverage report for <span class="entity">api/controllers/ProjectController.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">40.95% <small>(43 / 105)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">40.37% <small>(44 / 109)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
         Branches: <span class="metric">43.1% <small>(25 / 58)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
@@ -208,7 +208,7 @@
         Functions: <span class="metric">43.33% <small>(13 / 30)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">42.05% <small>(37 / 88)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">41.3% <small>(38 / 92)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric">6 statements, 1 function, 6 branches</span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -406,7 +406,11 @@
 188
 189
 190
-191</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+191
+192
+193
+194
+195</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -546,6 +550,7 @@
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -556,23 +561,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -582,6 +572,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -711,7 +719,7 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >      if(err || !project) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
 <span class="cstat-no" title="statement not covered" >      if(project.visibility == "global"){</span>
 <span class="cstat-no" title="statement not covered" >        CollaborationService.joinUserToProject(req,res,project);</span>
-      } else <span class="cstat-no" title="statement not covered" >if(!req.user){</span>
+      } else <span class="cstat-no" title="statement not covered" >if(!req.session.user){</span>
 <span class="cstat-no" title="statement not covered" >        res.json({ error: 'not logged id' }, 500);</span>
       } else {
 <span class="cstat-no" title="statement not covered" >        var userId = req.user.id</span>
@@ -731,7 +739,8 @@ module.exports = {
   },
 &nbsp;
   showDir: function(req, res, next){
-    var savedDirectory = 'fs/projects/';
+    var fsPath = sails.config.shusee.fsPath
+    var savedDirectory = fsPath+'/projects/';
     var directoryToFind = savedDirectory + req.params.id;
     walk(directoryToFind, function(err, results){
       var result = results.map(function(result){
@@ -745,7 +754,8 @@ module.exports = {
   },
 &nbsp;
   uploadfile: <span class="fstat-no" title="function not covered" >function(req, res){</span>
-<span class="cstat-no" title="statement not covered" >    var directoryToSave = './fs/projects/' + req.params.id+ "/";</span>
+<span class="cstat-no" title="statement not covered" >    var fsPath = sails.config.shusee.fsPath</span>
+<span class="cstat-no" title="statement not covered" >    var directoryToSave = fsPath+'/projects/' + req.params.id+ "/";</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    req.file('file').upload({dirname: directoryToSave}, <span class="fstat-no" title="function not covered" >function onUploadComplete (err, uploadedFiles) {</span></span>
 <span class="cstat-no" title="statement not covered" >      if (err) <span class="cstat-no" title="statement not covered" >return res.serverError(err);</span></span>
@@ -758,7 +768,8 @@ module.exports = {
   },
 &nbsp;
   downloadfile:<span class="fstat-no" title="function not covered" >function(req, res, next){</span>
-<span class="cstat-no" title="statement not covered" >    var savedDirectory = 'fs/projects/';</span>
+<span class="cstat-no" title="statement not covered" >    var fsPath = sails.config.shusee.fsPath</span>
+<span class="cstat-no" title="statement not covered" >    var savedDirectory = fsPath + '/projects/';</span>
 <span class="cstat-no" title="statement not covered" >    var directoryToFind = savedDirectory + req.params.id;</span>
 <span class="cstat-no" title="statement not covered" >    var path = directoryToFind+'/'+req.params.path</span>
 <span class="cstat-no" title="statement not covered" >    fs.exists(path, <span class="fstat-no" title="function not covered" >function(exists) {</span></span>
@@ -772,7 +783,8 @@ module.exports = {
   },
 &nbsp;
   viewfile:<span class="fstat-no" title="function not covered" >function(req, res, next){</span>
-<span class="cstat-no" title="statement not covered" >    var savedDirectory = 'fs/projects/';</span>
+<span class="cstat-no" title="statement not covered" >    var fsPath = sails.config.shusee.fsPath</span>
+<span class="cstat-no" title="statement not covered" >    var savedDirectory = fsPath+'/projects/';</span>
 <span class="cstat-no" title="statement not covered" >    var directoryToFind = savedDirectory + req.params.id;</span>
 <span class="cstat-no" title="statement not covered" >    var path = directoryToFind+'/'+req.params.path</span>
 <span class="cstat-no" title="statement not covered" >    fs.exists(path, <span class="fstat-no" title="function not covered" >function(exists) {</span></span>
@@ -791,7 +803,7 @@ module.exports = {
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat May 24 2014 01:23:55 GMT+0000 (UTC)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 26 2014 15:45:11 GMT+0000 (UTC)</div>
 </div>
 
 <script src="../../prettify.js"></script>
