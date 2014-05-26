@@ -1,6 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/omarcastro/shellhive.png?label=ready&title=Ready)](https://waffle.io/omarcastro/shellhive)
 [![Build Status](https://drone.io/github.com/OmarCastro/ShellHive/status.png)](https://drone.io/github.com/OmarCastro/ShellHive/latest)
-[![Coverage Status](http://omarcastro.github.io/ShellHive/coverage/badge.png)](http://omarcastro.github.io/ShellHive/coverage/lcov-report/index.html)
+[![Coverage Status](http://omarcastro.github.io/ShellHive/coverage/badge.svg)](http://omarcastro.github.io/ShellHive/coverage/lcov-report/index.html)
 # ShellHive
 
 A Visual data-flow programming web application to create UNIX Shell workflows
