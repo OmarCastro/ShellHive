@@ -12,7 +12,7 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-passport.use(new LocalStrategy(
+passport.use(new LocalStrategy({usernameField: "email"},
   function(username, password, done) {
     User.findOneByEmail(username).exec(function(err, user) {
       if (err) { return done(err); }

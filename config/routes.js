@@ -32,6 +32,7 @@ module.exports.routes = {
 
   '/login': 'AuthController.login',
   '/logout': 'AuthController.logout',
+  'post /signup': 'User.signup',
 
   'get /demo': {
     view: 'project/play',

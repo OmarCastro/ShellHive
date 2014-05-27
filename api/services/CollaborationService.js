@@ -47,9 +47,7 @@ var CollaborationService = module.exports = {
       SelectionOptions: parser.VisualSelectorOptions,
       graphs: project.graphs
     }
-    
-    sails.log(response)
-    
+        
     res.json(response); 
   },
   

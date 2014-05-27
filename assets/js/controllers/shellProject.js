@@ -1,7 +1,7 @@
 
 var viewGraph;
 
-app.controller('shellProject', ['$scope','csrf' ,'alerts', function($scope, csrf, alerts){
+app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($scope, csrf, alerts, modal){
   var AST, visualData;
   visualData = {};
   $scope.alerts = alerts
@@ -43,7 +43,28 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts', function($scope, csrf
     var graphs = data.graphs
     var len = graphs.length;
     if(len == 0){
-      $scope.page = "newProject";
+        var form = {command: "cat hello.txt"}
+        var modalInstance = modal.open({
+          templateUrl: 'projectCreationModal.html',
+          controller: function($scope, $modalInstance){
+            $scope.form = form;
+            $scope.ok = function(){
+              $modalInstance.close(form);
+            };
+          }
+        });
+        return modalInstance.result.then(function(selectedItem){
+          console.log(selectedItem);
+          io.socket.post('/graph/createfromcommand/', {project:projId, type:'root',
+            command:form.command, _csrf:csrf.csrf}, function(res){
+              console.log(res);
+              if(res.graph){
+                var graph = res.graph;
+                $scope.rootGraph = graph;
+                viewGraph(graph.id)
+              }
+            });
+        });
       $scope.$digest();      
       // is a new project
     } else {        

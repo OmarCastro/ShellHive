@@ -9,7 +9,10 @@ module.exports = {
   schema:true,
 
   attributes: {
-    name: 'string',
+    name: {
+      type: 'string',
+      required: true
+    },
     password: {
       type: 'string',
       required: true,
@@ -33,6 +36,21 @@ module.exports = {
       delete obj.admin;
       delete obj._csrf;
       return obj;
+    }
+  },
+
+  validation_messages: {
+    name: {
+        required: 'you have to specify a name'
+    },
+    email: {
+      email: 'invalid email, bro',
+      unique: 'email alreay exists, don\'t try to use the same email to signup again',
+      required: 'you have to specify a email'
+    },
+    password:{
+      required: "you forgot the password",
+      minLength: "password too short! 6 charater at minimum"
     }
   },
 

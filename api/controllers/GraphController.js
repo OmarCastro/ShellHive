@@ -160,11 +160,16 @@ module.exports = {
   },
   
   createfromcommand:function(req, res, next){
-    var userID = req.user.id;
+    sails.log("creating graph", req.param("command"))
     Graph.create(req.params.all()).exec(function(err,created){
-      if(err) return next(err);
-      if(!created) return next();
-      sails.log('Created project with name '+created.name);
+      if(err || !created) return next(err);
+      GraphGeneratorService.addToGraph(created.id, req.param("command"), function(err, result){
+        if(err){return next(err)};
+        res.json({
+          message:"graph sucessfully created",
+          graph: created
+        });
+      });
     });
   },
   

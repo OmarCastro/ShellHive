@@ -117,6 +117,8 @@ module.exports = {
   
   metaGraphfromCommand:metaGraphfromCommand, 
   parser:parser, 
+
+  
   addToGraph: function addToGraph(graphId, command, cb){
   cb = cb || function(){};
   var metagraph = GraphGeneratorService.metaGraphfromCommand(command);

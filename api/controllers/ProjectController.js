@@ -91,7 +91,6 @@ module.exports = {
         });
       } else if(req.user) {
         var members = project.members;
-        console.log()
         if(members.indexOf(req.user.id)){
           res.view({
             locals : {project:true},

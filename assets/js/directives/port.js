@@ -24,6 +24,11 @@ app.directive("port", function($document){
 
 
 
+element.hover(
+       function(){ $(this).addClass('hover') },
+       function(){ $(this).removeClass('hover') }
+)
+
       var ConnectIfOk = function(startNode, startPort, endNode, endPort){
         scope.$emit('connectComponent',{
           startNode: startNode,
@@ -34,6 +39,7 @@ app.directive("port", function($document){
       };
       mousemove = function(ev){
         graphController.moveEdge(ev.originalEvent);
+        return true;
       };
       mouseup = function(ev){
         var event, pointedElem, $pointedElem, ref$, outAttr, outPortScope, x$;
@@ -49,7 +55,8 @@ app.directive("port", function($document){
           }
         } else {
           graphController.endEdge();
-          outAttr = $pointedElem.attr("data-port");
+
+          outAttr = $pointedElem.attr("data-port") || $pointedElem.parent().attr("data-port");
           if (outAttr) {
             outPortScope = $pointedElem.scope();
             if (scope.isOutputNode !== outPortScope.isOutputNode) {

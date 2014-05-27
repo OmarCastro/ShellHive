@@ -46,8 +46,7 @@
           <span class="text" ng-bind="port.text"></span>
         </div>
       </div>
-      <div style="text-align: right" class="output">
-
+      <div class="output">
         <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
           <span class="text" ng-bind="port.text"></span>
           <span class="box"></span>
@@ -80,7 +79,7 @@
           <span class="text" ng-bind="port.text"></span>
         </div>
       </div>
-      <div style="text-align: right" class="output">
+      <div class="output">
 
         <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
           <span class="text" ng-bind="port.text"></span>
@@ -111,18 +110,18 @@
     </div>
     <div class="ports">
       <div class="input">
-        <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
+        <span data-port="{{port.name}}" ng-repeat="port in inputPorts">        
           <span class="box"></span>
           <span class="text" ng-bind="port.text"></span>
-        </div>
+        </span>
       </div>
-      <div style="text-align: right" class="output">
-
+      <div class="output">
+      <div>
         <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
           <span class="text" ng-bind="port.text"></span>
           <span class="box"></span>
        </div>
-
+     </div>
       </div>
       <div style="clear: both;"></div>
     </div>

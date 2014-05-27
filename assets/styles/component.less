@@ -45,11 +45,23 @@
             }
         }
     }
-    .input{
+    .input, .output{
         float:left;
+        width: 50%;
+        [data-port]{
+            &:hover, &:active, &.hover{
+                background-color: #eee;
+                .box{
+                    background-color:#00f;
+                }
+            }
+        }
     }
     .output{
-        float:right;
+        text-align: right;
+        > div {
+            float: right;
+        }
     }
     .box {
         display:inline-block;
@@ -58,9 +70,6 @@
         width:1em;
         background-color:#aaa;
         border-radius:.1em;
-        &:hover{
-            background-color:#00f;
-        }
     }
     label {
         font-weight:normal;

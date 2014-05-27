@@ -1,9 +1,3 @@
-var chai = require('chai');
-var chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-chai.use(require('chai-properties'));
-
 var expect = chai.expect;
 var should = chai.should();
 var webdriverjs = require('webdriverjs');
@@ -24,7 +18,6 @@ describe('angularjs homepage', function() {
     }
   }
     
-  
   function drag(browser, element, x, y, offsetX, offsetY, times, callback){
     var val = browser.moveTo(element,x,y).buttonDown(0)
     var xstep = Math.floor(offsetX/times)
@@ -49,15 +42,59 @@ describe('angularjs homepage', function() {
       })
     }
   
-  before(function(){  
+  before(function(done){  
+    var checkpoint = startCheckpoint(2,done)
+
+
     var driver1 = webdriverjs.remote(options);
     driver1.addCommand("dragBy", dragElBy)
-    browserA = driver1.init();
+    browserA = driver1
+      .init()
+      .url('http://localhost:1337/')
+      .windowHandleMaximize(function(){checkpoint.finish()});
     
     var driver2 = webdriverjs.remote(options);
     driver2.addCommand("dragBy", dragElBy)
-    browserB = driver2.init(); 
+    browserB = driver2
+      .init()
+      .url('http://localhost:1337/')
+      .windowHandleMaximize(function(){checkpoint.finish()});
+
+
   })
+
+  it('should register and fail', function(done) {
+    var checkpoint = startCheckpoint(1,done)
+    
+    browserA
+      .setValue("input.signup-name", "Mieister Hendrich")
+      .setValue("input.signup-email", "invalidEmail")
+      .setValue("input.signup-password", "nininini")
+      .setValue("input.signup-confirmation", "nininini")
+      .click('input.signup-submit')
+      .getText('.alert li', function(err,text){
+        text.should.equal("invalid email, bro")
+      })
+      .setValue("input.signup-name", "Mieister Hendrich")
+      .setValue("input.signup-email", "mieister@hendrich.com")
+      .setValue("input.signup-password", "nininini")
+      .setValue("input.signup-confirmation", "nininini")
+      .click('input.signup-submit')
+      .url(function(err, url){
+        expect(url.value).to.contain("/user/show/");
+      })
+      .click('.logout-button',function(){checkpoint.finish()});
+      
+
+    //browserB
+    //  .url('http://localhost:1337/')
+    //  .setValue("input.login-user","user@user.fe.up.pt")
+    //  .setValue("input.login-password","teste123")
+    //  .click('button.login-submit')
+    //  .click('//td[text() = "project miel picante"]/following-sibling::td/a[text() = "Join"]')
+    //  .waitFor('.file-component.component', function(err){checkpoint.finish(err)})
+
+  });
 
   
   
@@ -65,20 +102,18 @@ describe('angularjs homepage', function() {
     var checkpoint = startCheckpoint(2,done)
     
     browserA
-      .url('http://localhost:1337/')
       .setValue("input.login-user","admin@admin.pt")
       .setValue("input.login-password","admin123")
       .click('button.login-submit')
-      .click('//td[text() = "El miel picante"]/following-sibling::td/a[text() = "Join"]')
+      .click('//td[text() = "project miel picante"]/following-sibling::td/a[text() = "Join"]')
       .waitFor('.file-component.component', function(){checkpoint.finish()})
       
 
     browserB
-      .url('http://localhost:1337/')
       .setValue("input.login-user","user@user.fe.up.pt")
       .setValue("input.login-password","teste123")
       .click('button.login-submit')
-      .click('//td[text() = "El miel picante"]/following-sibling::td/a[text() = "Join"]')
+      .click('//td[text() = "project miel picante"]/following-sibling::td/a[text() = "Join"]')
       .waitFor('.file-component.component', function(err){checkpoint.finish(err)})
   });
   
@@ -86,10 +121,10 @@ describe('angularjs homepage', function() {
   it('should login two users and join the same project', function(done) {
     var checkpoint = startCheckpoint(2,done)
     browserA
-      .dragBy('.file-component',0,50)
+      .dragBy('.command-component',0,50)
       .pause(1000,function(){
         browserB
-        .dragBy('.file-component',0,-50)
+        .dragBy('.command-component',0,-50)
         .pause(1000, function(){checkpoint.finish()})
       
       })

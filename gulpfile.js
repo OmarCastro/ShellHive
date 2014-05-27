@@ -37,8 +37,7 @@ gulp.task('coverage', function(cb) {
 gulp.src([
   'api/**/*.js',
   '!api/responses/*.js',
-  '!api/controllers/DemoControllers.js',
-  '!api/services/CollaborationService.js',
+  '!api/controllers/DemoController.js',
   'lib/**/commands/*.js',
   'lib/**/utils/*.js',
   'lib/common/*.js',

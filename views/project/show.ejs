@@ -1,7 +1,7 @@
 <div class="container">
   <h1>
     <%= project.name %>
-  <% if(session.authenticated && _.some(members, function(member){return member.id == session.user.id})){ %>
+  <% if(req.isAuthenticated() && _.some(members, function(member){return member.id == req.user.id})){ %>
   <a href="/project/play/<%= project.id %>" class="btn btn-default btn-primary">join</a>
   <% } %></h1>
   <hr>

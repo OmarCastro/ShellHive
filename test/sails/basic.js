@@ -88,7 +88,7 @@ describe("Sails test", function(){
      it('Login fails - wrong username', function (done) {
       server
         .post('/auth/login')
-        .send({username:"admin@n.pt", password:"admin123", _csrf:_csrf})
+        .send({email:"admin@n.pt", password:"admin123", _csrf:_csrf})
         .type('form')
         .expect(302)
         .expect('Location', '/')
@@ -98,7 +98,7 @@ describe("Sails test", function(){
     it('Login fails  - wrong password', function (done) {
       server
         .post('/auth/login')
-        .send({username:"admin@admin.pt", password:"admin13", _csrf:_csrf})
+        .send({email:"admin@admin.pt", password:"admin13", _csrf:_csrf})
         .type('form')
         .expect(302)
         .expect('Location', '/')
@@ -108,7 +108,7 @@ describe("Sails test", function(){
     it('Login alright', function (done) {
       server
         .post('/auth/login')
-        .send({username:"admin@admin.pt", password:"admin123", _csrf:_csrf})
+        .send({email:"admin@admin.pt", password:"admin123", _csrf:_csrf})
         .type('form')
         .expect(302)
         .expect('Location', '/user/show/1')
@@ -150,6 +150,30 @@ describe("Sails test", function(){
         .expect(302)
         .end(done);
     });
+
+    it('signup alright', function (done) {
+      server
+        .post('/signup')
+        .send({
+          name:"Omar Grande Xerife",
+          email:"teste@admin.pt", 
+          password:"teste123",
+          confirmation:"teste123",
+          _csrf:_csrf
+        })
+        .type('form')
+        .expect(302)
+        .expect('Location', '/user/show/3')
+        .end(done);
+    });
+
+    it('Logout alright', function (done) {
+      server
+        .get('/logout')
+        .expect(302)
+        .end(done);
+    });
+
   });
 
   describe('Sails Graph compile', function(done) {
@@ -353,6 +377,8 @@ describe("Sails test", function(){
   //    })
   //  });
   //});
+
+  require("../e2e/test")
 
 
   /**
