@@ -83,7 +83,6 @@ module.exports = {
       /* istanbul ignore next */ if(err || !result) return cb(err);
       graphUtils.ValidateConnection(result, newConnection, function(err, res){
         /* istanbul ignore next */  if(err || !res) return cb(err);
-        global.sails.log("creating connection..." , newConnection);
         newConnection.graph = graph;
         Connection.create(newConnection).exec(cb);
       })

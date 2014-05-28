@@ -47,12 +47,6 @@ module.exports = {
       body.componentId, body.startPort, body.position,
       function(err, result){
         if(err) return next(err)
-        sails.log("sending:", {
-          type:"addComponent",
-          component: result.component,
-          connection: result.connection
-        });
-
         CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {
           type:"addComponent",
           component: result.component,
@@ -106,9 +100,6 @@ module.exports = {
 
   connect: function(req,res, next){
     var connectionData = req.body.data
-
-    console.log(connectionData);
-
     graphUtils.connect(req.socket.graphId, connectionData, function(err, created){
       if(err){
         res.json({
@@ -141,17 +132,17 @@ module.exports = {
 
       child.stdout.on('data', function (data) {
         CollaborationService.emitMessageToProject(projId,'stdout',data.toString())
-        console.log('stdout -- ' + data.toString());
+        //console.log('stdout -- ' + data.toString());
 
       });
       child.stderr.on('data', function (data) {
         CollaborationService.emitMessageToProject(projId,'stderr',data.toString())
-        console.log('stderr -- ' + data.toString());
+        //console.log('stderr -- ' + data.toString());
 
       });
       child.on('close', function (code) {
         CollaborationService.emitMessageToProject(projId,'retcode',code)
-        console.log('child process exited with code ' + code);
+        //console.log('child process exited with code ' + code);
       });
       res.json({
         command: command,

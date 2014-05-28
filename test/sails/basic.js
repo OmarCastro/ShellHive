@@ -28,7 +28,7 @@ describe("Sails test", function(){
     Sails.lift({
 
       log: {
-        level: 'info'
+        level: 'warn'
       },
 
       models:{

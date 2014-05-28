@@ -3,7 +3,7 @@ var should = chai.should();
 var webdriverjs = require('webdriverjs');
 
 
-describe('angularjs homepage', function() {
+describe('E2E selenium tests', function() {
   this.timeout(30000);
   var options = {
     desiredCapabilities: {
@@ -106,7 +106,7 @@ describe('angularjs homepage', function() {
       .setValue("input.login-password","admin123")
       .click('button.login-submit')
       .click('//td[text() = "project miel picante"]/following-sibling::td/a[text() = "Join"]')
-      .waitFor('.file-component.component', function(){checkpoint.finish()})
+      .waitFor('.command-component.component', function(){checkpoint.finish()})
       
 
     browserB
@@ -114,11 +114,11 @@ describe('angularjs homepage', function() {
       .setValue("input.login-password","teste123")
       .click('button.login-submit')
       .click('//td[text() = "project miel picante"]/following-sibling::td/a[text() = "Join"]')
-      .waitFor('.file-component.component', function(err){checkpoint.finish(err)})
+      .waitFor('.command-component.component', function(err){checkpoint.finish(err)})
   });
   
   
-  it('should login two users and join the same project', function(done) {
+  it('should collaboarively moce a component', function(done) {
     var checkpoint = startCheckpoint(2,done)
     browserA
       .dragBy('.command-component',0,50)
