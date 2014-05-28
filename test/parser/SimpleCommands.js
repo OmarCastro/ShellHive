@@ -111,6 +111,7 @@ describe('command test', function(){
     })
 
     describe('reparse grep without arguments', reparse('grep'));
+    describe('reparse grep with flags', reparse('grep -F'));
     describe('reparse grep, only pattern', reparse('grep mimi'));
     describe('reparse grep, only pattern ( with spaces )', reparse('grep "mi mi"'));
     describe('reparse grep, only files',function(){
