@@ -38,7 +38,7 @@ if (require.main === module) {
     console.log("Usage: node color.js coverage");
   } else{
     args[0] = Math.floor(Number(args[0]));
-  	var url = "http://img.shields.io/badge/coverage-"+args[0]+"-"+getColor(args[0])+".svg"
+  	var url = "http://img.shields.io/badge/coverage-"+args[0]+"%-"+getColor(args[0])+".svg"
   	if(args[1]){
   		url += "?style="+args[1]
   	}
