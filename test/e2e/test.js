@@ -121,13 +121,13 @@ describe('E2E selenium tests', function() {
   it('should collaboratively move a component', function(done) {
     var checkpoint = startCheckpoint(2,done)
     browserA
-      .pause(4000)
-      .waitFor('.command-component')
-      .dragBy('.command-component',0,50)
+      .pause(2000)
+      .waitFor('.component')
+      .dragBy('.component',0,50)
       .pause(1000,function(){
         browserB
-        .waitFor('.command-component')
-        .dragBy('.command-component',0,-50)
+        .waitFor('.component')
+        .dragBy('.component',0,-50)
         .pause(1000, function(){checkpoint.finish()})
       
       })
