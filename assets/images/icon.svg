@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="373.29126"
+   height="427.6835"
+   id="svg2">
+  <defs
+     id="defs4" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-142.08812,-45.262606)"
+     id="layer1">
+    <path
+       d="m 322.85715,481.80695 -198.70499,-114.72238 -10e-6,-229.44476 198.70499,-114.722391 198.705,114.722381 0,229.44476 z"
+       transform="matrix(0.88472073,0,0,0.88472073,43.09535,35.834297)"
+       id="path2987"
+       style="fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:#d6d6d6;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    <text
+       x="317.36008"
+       y="773.45917"
+       transform="matrix(1.2178669,-0.71646197,-0.08409665,0.87058119,0,0)"
+       id="text3757-2"
+       xml:space="preserve"
+       style="font-size:59.05563354px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#d4d4d4;fill-opacity:1;stroke:none;font-family:Monospace;-inkscape-font-specification:Monospace Bold"><tspan
+         x="317.36008"
+         y="773.45917"
+         id="tspan3759-9">hive</tspan></text>
+    <text
+       x="164.08803"
+       y="326.82022"
+       transform="matrix(0.98645742,-0.57849294,0,1.0137285,0,0)"
+       id="text3800"
+       xml:space="preserve"
+       style="font-size:67.40220642px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#d4d4d4;fill-opacity:1;stroke:none;font-family:Monospace;-inkscape-font-specification:Monospace Bold"><tspan
+         x="164.08803"
+         y="326.82022"
+         id="tspan3802">Shell</tspan></text>
+  </g>
+</svg>

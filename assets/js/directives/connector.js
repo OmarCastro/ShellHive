@@ -18,14 +18,25 @@ app.directive("connector", function($document){
       
        function update(){
          console.log('updating edge')
-          setEdgePath(startPosition.x + StartPortOffset.left, 
+          setEdgePath(startPosition.x + StartPortOffset.right - 2, 
                       startPosition.y + StartPortOffset.top,
-                      endPosition.x + EndPortOffset.left,
+                      endPosition.x + EndPortOffset.left + 2,
                       endPosition.y + EndPortOffset.top);
       };
       
+      var elementClass = "from-"+startComponent.type;
+      elem.classList.add(elementClass);
+      elem.classList.add(elementClass+"-"+dataedge.startPort);
       
-      
+      element.bind("pointerdown", function(){
+        scope.$apply(function(){
+          var connections = scope.graphData.connections
+          var index = connections.indexOf(dataedge);
+          if (index > -1) {
+              connections.splice(index, 1);
+          }
+        })
+      });
 
       var setEdgePath = function(iniX, iniY, endX, endY){
         var xpoint;
@@ -46,7 +57,8 @@ app.directive("connector", function($document){
         var EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box");
         StartPortOffset = {
           top: StartPort.offsetTop + StartPort.offsetHeight * 0.75,
-          left: StartPort.offsetLeft
+          left: StartPort.offsetLeft,
+          right: StartPort.offsetLeft + StartPort.offsetWidth
         };
         EndPortOffset = {
           top: EndPort.offsetTop + EndPort.offsetHeight * 0.75,

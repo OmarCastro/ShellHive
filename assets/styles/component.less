@@ -1,10 +1,10 @@
 .component,.inline-component {
-    font-size:1em;
+    font-size:12px;
     position:absolute;
     min-width:70px;
     background-color:#fff;
-    border-radius:.3em;
-    border:.2em solid #aaa;
+    border-radius:4px;
+    border:2px solid #aaa;
     z-index:auto;
     .input-group-addon, .input-group-btn &> .btn, .form-control{
         height:24px;
@@ -35,6 +35,8 @@
         text-align:center;
         background-color:#ddd;
         height:1.5em;
+        font-family: monospace;
+        font-weight: bolder;
         border-top-left-radius:.1em;
         border-top-right-radius:.1em;
         .button-group {
@@ -47,6 +49,7 @@
     }
     .input, .output{
         float:left;
+        white-space: nowrap;
         width: 50%;
         [data-port]{
             &:hover, &:active, &.hover{
@@ -58,7 +61,9 @@
         }
     }
     .output{
+        float:right;
         text-align: right;
+        padding-left: 10px;
         > div {
             float: right;
         }
@@ -79,3 +84,44 @@
         width:7em;
     }
 }
+
+
+.file-component{
+    border-color:#99f;
+    [data-port="output"] > .box{
+        background-color:#77a;
+    }
+}
+
+.command-component {
+    border-color:#7a7;
+
+    [data-port="output"] > .box{
+        background-color:#595;
+    }
+    
+    [data-port="error"] > .box{
+        background-color:#944;
+    }
+    
+    [data-port="retcode"] > .box{
+        background-color:#777;
+    }
+}
+
+.macro-component{ 
+    border-color:#B8703D;
+
+    .output .box{
+        background-color:#B8703D
+    }
+}
+
+.output .box{
+    margin-right: -2px;
+}
+
+.input .box{
+    margin-left: -2px;
+}
+

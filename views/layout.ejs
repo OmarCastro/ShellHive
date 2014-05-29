@@ -32,8 +32,11 @@
     <link rel="stylesheet" href="/styles/importer.css">
     <!--STYLES END-->
   </head>
-
-  <body ng-app="start"  class="body" data-spy="scroll" data-target="#sidebar">
+  <%if(typeof homeBg != "undefined"){%> 
+    <body ng-app="start" class="body homepage">
+  <% } else { %>
+    <body ng-app="start" class="body">
+  <% } %>
 
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container-fluid">

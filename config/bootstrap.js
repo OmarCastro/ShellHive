@@ -93,10 +93,16 @@ module.exports.bootstrap = function (cb) {
       Graph.create(dummyGraphs).exec(function(err, res){
         if (err) return done(err);
         if (!res) return done();
-        for (var i = Math.min(res.length, dummyCommands.length)  - 1; i >= 0; i--) {
-          GraphGeneratorService.addToGraph(res[i].id,dummyCommands[i]);
-        };
-        done(err, res);
+        var toMap = (res.length < dummyCommands.length)?res:dummyCommands
+        var series = toMap.map(function(__, i){
+          return function(cb){
+            GraphGeneratorService.addToGraph(res[i].id,dummyCommands[i],cb);
+          }
+        });
+        //series.push(function(cb){
+        //  GraphGeneratorService.createAndConnectComponent(2,2,"macroTest",5, "output", null,cb);
+        //})
+        async.series(series,done);
       });
     });
   }

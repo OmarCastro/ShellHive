@@ -73,11 +73,11 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       for(var i = 0; i < len; ++i){
         var graph = graphs[i];
         if(graph.type == 'root'){
-          $scope.rootGraph = graphs[i]
-          viewGraph(graphs[i].id)
+          $scope.rootGraph = graph
+          viewGraph(graph.id)
         } else {
-          graphs[i].data.id = graphs[i].id;
-          macros[graph.data.name] = graphs[i].data
+          graph.data.id = graph.id;
+          macros[graph.data.name] = graph.data
           macroList.push(graph.data.name)
         }
       }

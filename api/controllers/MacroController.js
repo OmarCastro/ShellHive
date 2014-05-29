@@ -6,15 +6,18 @@
  */
 
 module.exports = {
-  newMacro:function(req,res,next){
-    var userID = req.user.id;
+  create:function(req,res,next){
     var data = req.body.data;
     var command = req.body.command;
     Graph.create(data).exec(function(err,created){
       if(err || !created) return next(err);
       if(command){
         GraphGeneratorService.addToGraph(created.id, command, function(){
-          //res: "macro created"
+          res.json({
+            message:"macro created",
+            name:created.data.name,
+            macro: created.id
+          })
         })
       }
       sails.log('Created macro with name '+created.name);

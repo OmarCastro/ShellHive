@@ -27,9 +27,11 @@ module.exports.routes = {
   // 
   // (Alternatively, remove this and add an `index.html` file in your `assets` directory)
   '/': {
-    view: 'static/homepage'
+    view: 'static/homepage',
+    locals:{
+      homeBg:true
+    }
   },
-
   '/login': 'AuthController.login',
   '/logout': 'AuthController.logout',
   'post /signup': 'User.signup',

@@ -1,4 +1,4 @@
-app.controller('macroCtrl', ['$scope','$modal', function(scope, modal){
+app.controller('macroCtrl', ['$scope','$modal','csrf', function(scope, modal, csrf){
 
 
   scope.newMacroModal = function(){
@@ -68,6 +68,28 @@ app.controller('macroCtrl', ['$scope','$modal', function(scope, modal){
 
   scope.newMacro = function(name, descr, command){
     var res$, key;
+    var data = {
+      name: name,
+      description: descr
+    }
+    var message = {
+      data:{
+        project: projId,
+        data: data,
+        type:'macro'
+      },
+      command: command,
+      _csrf: csrf.csrf
+    }
+
+    io.socket.post('/macro/create/', message, function(data){
+      console.log(data);
+      if(data.macro){
+        scope.graph.setGraphView(data.macro);
+        scope.graphData.macros[data.name] = data;
+        scope.graphData.macroList.push(data.name)
+      }
+    });
     //graphModel.macros[name] = shellParser.createMacro(name, descr, command);
     //res$ = [];
     //for (key in graphModel.macros) {

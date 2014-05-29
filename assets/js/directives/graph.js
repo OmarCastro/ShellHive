@@ -4,8 +4,9 @@ app.directive("graph", function($document){
     scope: true,
     templateUrl: 'graphTemplate.html',
     controller: ['$scope', '$element', '$attrs', function(scope, element, attr){
-        var key, val, x$, $sp, update, mousemove, mouseup,
-        newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, MouseWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge, endEdge, showPopup, hidePopup, hidePopupAndEdge;
+        var key, val, x$, $sp, update, mousemove, mouseup, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, 
+        useWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge,
+        endEdge, showPopup, hidePopup, hidePopupAndEdge;
         
         
         var pointerId = 0;
@@ -99,12 +100,11 @@ app.directive("graph", function($document){
           $document.unbind("pointerup", mouseup);
         };
         $workspace.bind("pointerdown", function(ev){
-          var event, targetTag, x$;
           if (ev.which === 3) {
             return false;
           }
-          event = ev.originalEvent;
-          targetTag = event.target.tagName;
+          var event = ev.originalEvent;
+          var targetTag = event.target.tagName;
           if (pointerId || 
             (  targetTag === 'SPAN' 
             || targetTag === 'LI'
@@ -117,6 +117,18 @@ app.directive("graph", function($document){
             return;
           }
           hidePopupAndEdge();
+          var mx = event.clientX
+          var my = event.clientY
+          $workspace.hide()
+          var elonpointer = document.elementFromPoint(mx, my)
+          $workspace.show()
+          console.log("tagname", elonpointer.tagName);
+          if(elonpointer.tagName == "path"){
+            event.preventDefault();
+            event.stopPropagation();
+            return $(elonpointer).trigger(ev)
+          }
+
           pointerId = event.pointerId;
           $document.bind("pointermove", mousemove);
           $document.bind("pointerup", mouseup);

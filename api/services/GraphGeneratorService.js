@@ -54,26 +54,25 @@ function createComponent(projectId, graphId, command, position, cb){
   var indexOfSpace = command.indexOf(" ");
   var firstWord = (indexOfSpace > -1 ) ? command.slice(0, command.indexOf(" ")) : command;
   var componentData;
-  sails.log('command ', command, "1st word:", firstWord);
+  //sails.log('command ', command, "1st word:", firstWord);
   if(firstWord.indexOf('.') >= 0){
     componentData = {
         graph: graphId,
         data: { type:"file", filename: firstWord }
       };
     
-  } if(parser.isImplemented(firstWord)){
+  } else if(parser.isImplemented(firstWord)){
       var metagraph = metaGraphfromCommand(command);  
       componentData = {
         graph: graphId,
         data: metagraph.components[0]
       };
-
   } else {
     Graph.find({project:projectId}).exec(function(err, res){
       res
-        .filter(function(graph){return !graph.isRoot})
+        .filter(function(graph){return graph.type !== 'root'})
         .every(function(graph){
-          if(graph.name === command){
+          if(graph.data.name === command){
             componentData = {
               graph: graphId,
               data: { type:"macro", graph: graph.id }
@@ -101,7 +100,7 @@ function createAndConnectComponent(projectId, graphId, command, componentId, sta
       endNode   : created.id,
       endPort   : 'input'
     }
-    sails.log('connectionData:', connectionData)
+    //sails.log('connectionData:', connectionData)
     Connection.create(connectionData).exec(function(err,createdConn){
       cb(err, {component: created, connection:createdConn})
     });
@@ -170,18 +169,26 @@ module.exports = {
   },
   
   compileProject: function(id, cb){
-    Graph.findOne({project: id, type:"root"}).populate('components').populate('connections').exec(function (err, graph){
+    Graph.find({project: id}).populate('components').populate('connections').exec(function (err, graphs){
       /* istanbul ignore if */ if(err) return cb(err, null);
-      graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
-      return cb(null, parser.parseGraph(parser.graphFromJsonObject(graph)));
+
+      graphs.forEach(function(graph){
+        graph.components = graph.components.map(function(comp){
+          var data = comp.data;
+          if(data.type == "macro"){
+            data.macro = _.find(graphs, function(graph){return graph.id == data.graph});
+          }
+          data.id = comp.id; return data
+        });
+      });
+      var rootGraph = _.find(graphs, function(graph){return graph.type == "root"});
+      return cb(null, parser.parseGraph(parser.graphFromJsonObject(rootGraph)));
     });
   },
       
   compileGraph: function(id, cb){
-     Graph.findOne(id).populate('components').populate('connections').exec(function (err, graph){
-      /* istanbul ignore if */ if(err) return cb(err, null);
-      graph.components = graph.components.map(function(comp){comp.data.id = comp.id; return comp.data});      
-      return cb(null, parser.parseGraph(parser.graphFromJsonObject(graph)));
+     Graph.findOne(id).exec(function (err, graph){
+      module.exports.compileProject(graph.project,cb)
     });
   }
 };

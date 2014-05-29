@@ -122,7 +122,7 @@ export function parseCommand(command){
 
 export function parseVisualData(VisualData:Graph){
   var indexedComponentList, initialComponent;
-  if (VisualData.components.length < 1) {
+  if (VisualData.components.filter(function(component){return component.type == CommandComponent.type}).length < 1) {
     return '';
   }
   indexedComponentList = new IndexedGraph(VisualData);
@@ -130,7 +130,7 @@ export function parseVisualData(VisualData:Graph){
   if (!(initialComponent instanceof CommandComponent)) {
     var ref = VisualData.components
     for(var i = 0, len = ref.length; i < len; ++i){
-      if(ref[i] instanceof CommandComponent){
+      if(ref[i].type == CommandComponent.type){
         initialComponent = ref[i];
         break;
       }
@@ -145,7 +145,7 @@ export function parseComponent(component, visualData:Graph, componentIndex, mapO
   case CommandComponent.type:
     return parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
   case MacroComponent.type:
-    return parseVisualData(component.macro);
+    return parseGraph(component.macro);
   }
 }
 
@@ -325,6 +325,11 @@ export function graphFromJsonObject(jsonObj){
       case FileComponent.type:
         newComponent = new FileComponent(component.filename)
         break;
+      case MacroComponent.type:
+        var subgraph:any = graphFromJsonObject(component.macro)
+        console.log(subgraph.components);
+        console.log(subgraph.connections);
+        newComponent = new MacroComponent(subgraph);
     }
     /* istanbul ignore next */
     if(!newComponent){ return; }

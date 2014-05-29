@@ -3,7 +3,7 @@
   *{-webkit-print-color-adjust:exact}
 }
 
-html,body{
+body[ng-app="app"]{
     overflow:hidden;
 
 }
@@ -145,6 +145,7 @@ div[sidebar] {
     transition:all 0.3s linear;
     background-color:#ddd;
 }
+
 path {
     fill:none;
     stroke:#aaa;
@@ -154,10 +155,46 @@ path.sel {
     stroke:#00f;
     stroke-width:5;
 }
+
+path.from-file-output{
+    stroke:#77a;
+}
+
+path.from-command-output{
+    stroke:#595;
+}
+
+path.from-command-error{
+    stroke:#a77;
+}
+
+path.from-macro{
+    stroke:#A89238;
+}
+
 path.back {
     stroke-width:5;
     stroke:#777;
 }
+
+path.back.from-file-output{
+    stroke:#33f;
+}
+
+path.back.from-command-output{
+    stroke:#383;
+}
+
+path.back.from-command-error{
+    stroke:#944;
+}
+
+path.back.from-macro{
+    stroke:#B8703D;
+}
+
+
+
 .input-group-addon {
     color:#000;
 }
