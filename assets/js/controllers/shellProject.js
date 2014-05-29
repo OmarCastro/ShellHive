@@ -177,6 +177,12 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       $scope.$digest();
     },
 
+    removePipe: function(data){
+      var connections = data.pipes.map(function(connection){return connection.id})
+      visualData.connections = visualData.connections.filter(function(connection){return connections.indexOf(connection.id) < 0})   
+      $scope.$digest();
+    }
+
   }
 
 
@@ -255,6 +261,27 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       }
     });
   });
+
+
+  $scope.$on("removePipe", function(event, message){
+    console.log('removePipe:' , message);
+    message = {
+      data: message,
+      _csrf: csrf.csrf
+    }
+    io.socket.put('/graph/removePipe/', message, function(data){
+      console.log(data);
+      if(data.alert){
+        alerts.addAlert({type:'danger', msg: data.message});
+        $scope.$digest();
+      }
+    });
+  });
+
+
+
+
+
 
   io.socket.on('commandCall', function(data){
     var x;

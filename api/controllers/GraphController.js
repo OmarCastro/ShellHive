@@ -79,6 +79,21 @@ module.exports = {
       })
   },
 
+  removePipe: function(req,res, next){
+    var body = req.body;
+    Connection.destroy(body.data.id).exec(function(err, deleted){
+      if(err) return next(err);
+      CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {
+        type:"removePipe",
+        pipes: deleted,
+      });
+      res.json({
+          message: "pipe sucessfully removed",
+          pipes: deleted
+        })
+    });
+  },
+
   compile:function(req,res, next){
     GraphGeneratorService.compileGraph(req.socket.graphId, function(err, result){
       if(err) return next(err);

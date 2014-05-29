@@ -1,4 +1,5 @@
 app.directive("connector", function($document){
+  "use strict"
   return {
     scope: true,
     link: function(scope, element, attr){
@@ -28,14 +29,23 @@ app.directive("connector", function($document){
       elem.classList.add(elementClass);
       elem.classList.add(elementClass+"-"+dataedge.startPort);
       
-      element.bind("pointerdown", function(){
+      element.bind("pointerdown", function(event){
+        var orig = event.originalEvent;
         scope.$apply(function(){
-          var connections = scope.graphData.connections
-          var index = connections.indexOf(dataedge);
-          if (index > -1) {
-              connections.splice(index, 1);
+          var data = {
+            x: orig.clientX,
+            y: orig.clientY,
+            transform: "translate("+orig.clientX+"px,"+orig.clientY+"px)",
+            index: scope.$index,
+            id: dataedge.id
           }
-        })
+          if(scope.edgePopups.length){
+            scope.edgePopups[0] = data;
+          } else {
+            scope.edgePopups.push(data);
+          }
+
+        });
       });
 
       var setEdgePath = function(iniX, iniY, endX, endY){

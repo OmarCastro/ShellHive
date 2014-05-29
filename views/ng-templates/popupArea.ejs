@@ -22,10 +22,24 @@
       </li>
     </ul>
   </div>
+
+
   <div ng-if="sel.open" class="selectpopup dropdown open"
        ng-style="{transform:sel.transform, WebkitTransform:sel.transform, MsTransform:sel.transform}">
     <ul class="dropdown-menu">
       <li ng-repeat="c in options[sel.data.exec][sel.name]"><a ng-click="graph.selectSelection(c)"><span ng-bind="c"></span></a></li>
     </ul>
   </div>
+
+
+  <div class="edgepopup" ng-repeat="c in edgePopups track by c.index" ng-style="{transform:c.transform, WebkitTransform:c.transform, MsTransform:c.transform}">
+    <div class="content well well-sm" ng-class="(c.y < 120)?'bottom':'top'">  
+    <div>Remove the connection?</div>
+    <button class="btn btn-sm btn-success" ng-click="$emit('removePipe',{id: c.id});
+    edgePopups.splice($index,1)">Remove</button>
+    <button class="btn btn-sm btn-primary" ng-click="edgePopups.splice($index,1)">No</button>
+    </div>
+
+  </div>
+
 </div>

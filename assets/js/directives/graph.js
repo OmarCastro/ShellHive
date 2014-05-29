@@ -36,6 +36,8 @@ app.directive("graph", function($document){
       
         $popup.hide();
 
+        scope.edgePopups = [];
+
         scope.graphElement = element
         scope.safedigest = function(){
           if (!(scope.$$phase || scope.$root.$$phase)) {
@@ -250,6 +252,7 @@ app.directive("graph", function($document){
         };
         hidePopup = function(){
           $popup.hide();
+          scope.edgePopups.length = 0;
           scope.sel = { open: false };
           scope.safedigest();
         };
