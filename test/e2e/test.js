@@ -4,7 +4,7 @@ var webdriverjs = require('webdriverjs');
 
 
 describe('E2E selenium tests', function() {
-  this.timeout(30000);
+  this.timeout(90000);
   var options = {
     desiredCapabilities: {
         browserName: 'firefox'

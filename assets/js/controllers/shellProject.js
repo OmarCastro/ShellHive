@@ -8,6 +8,10 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   $scope.filesystem = 0
   $scope.graphData = visualData;
   $scope.implementedCommands = [];
+  $scope.chatMessages = [];
+  $scope.clients = [];
+  $scope.chat = {open: true};
+
   $scope.isImplemented = function(data){
     return this.implementedCommands.indexOf(data.exec) >= 0;
   };
@@ -34,7 +38,11 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   socket.get('/project/subscribe', {id:projId}, function(data){
     $scope.implementedCommands = data.implementedCommands
     $scope.options             = data.SelectionOptions;
+    $scope.clients             = data.clients;
     $scope.page = "graph";
+    $scope.chatterId = io.socket.socket.sessionid;
+
+    console.log("socket.id =" ,io.socket.socket.sessionid);
 
     $scope.$digest();
 
@@ -68,7 +76,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       $scope.$digest();      
       // is a new project
     } else {        
-      var macros = visualData.macros = [];
+      var macros = visualData.macros = {};
       var macroList = visualData.macroList = [];
       for(var i = 0; i < len; ++i){
         var graph = graphs[i];
@@ -85,13 +93,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   });
 
   $scope.shellText = [];
-  $scope.runCommand = function(command){
-    //console.log($scope.res.visualData);
-    //console.log(shell_Parser.parseVisualData($scope.res.visualData));
-    //return socket.emit('runCommand', {
-    //  visualData: $scope.res.visualData
-    //});
-  };
+
 
   var onComponentbyID_do = function(id, callback){
     var components = visualData.components;
@@ -191,6 +193,21 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     actionReceiveCallbacks[data.type](data)
   });
 
+  io.socket.on('new user', function(data){
+    $scope.clients.push(data)
+    $scope.$digest();
+  });
+
+  io.socket.on('user leave', function(id){
+    $scope.clients = $scope.clients.filter(function(client){return client.id != id});
+    $scope.$digest();
+  });
+
+  io.socket.on('chat', function(data){
+    $scope.chatMessages.push(data)
+    $scope.$digest();
+  });
+
   $scope.$on("runCommand", function(event, message){
     console.log('runCommand!');
     io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
@@ -203,15 +220,22 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     });
   });
 
-  $scope.$on("compileGraph", function(event){
-    console.log('compileGraph!');
-    io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
+  $scope.$on("runCommand", function(event, message){
+    console.log('runCommand!');
+    io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
       console.log(data);
       $scope.shellText = [{
         text: data.command,
         type: "call"
       }];
       $scope.$digest();
+    });
+  });
+
+ $scope.$on("chat", function(event, message){
+    console.log('chat '+message+' !');
+    io.socket.post('/project/chat/', {data:message, _csrf:csrf.csrf}, function(data){
+      console.log(data);
     });
   });
 

@@ -1,6 +1,15 @@
 @media print
 {
   *{-webkit-print-color-adjust:exact}
+  .layout, .tips, .new-project, .directory, .alerts{
+      top:0
+    }
+}
+
+.shortcuts{
+    font-size: 0.8em;
+    float: right;
+    margin-top: 0.2em;
 }
 
 body[ng-app="app"]{
@@ -87,7 +96,6 @@ div[graph]{
     width:100%;
     height:100%;
 }
-
 
 
 .shell {
@@ -203,7 +211,7 @@ path.back.from-file-output{
 }
 
 path.back.from-command-output{
-    stroke:#383;
+    stroke:#080;
 }
 
 path.back.from-command-error{

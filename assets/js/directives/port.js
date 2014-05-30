@@ -16,7 +16,7 @@ app.directive("port", function($document){
 
       element.bind("pointerdown", function(ev){
         var event = ev.originalEvent;
-        graphController.startEdge(elem, position, event);
+        graphController.startEdge(elem, datanode.type, attr.port, position, event);
         $document.bind("pointermove", mousemove);
         $document.bind("pointerup", mouseup);
         return false;
@@ -24,10 +24,10 @@ app.directive("port", function($document){
 
 
 
-element.hover(
-       function(){ $(this).addClass('hover') },
-       function(){ $(this).removeClass('hover') }
-)
+      element.hover(
+        function(){ $(this).addClass('hover') },
+        function(){ $(this).removeClass('hover') }
+      )
 
       var ConnectIfOk = function(startNode, startPort, endNode, endPort){
         scope.$emit('connectComponent',{

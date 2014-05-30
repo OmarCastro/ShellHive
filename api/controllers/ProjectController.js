@@ -62,6 +62,11 @@ module.exports = {
   },
 
 
+  chat:function(req, res){
+    CollaborationService.chat(req,res);
+  },
+
+
 
   addmember:function(req, res, next){
     Project.findOne(req.param('id'), function foundProject (err, project){

@@ -1,5 +1,35 @@
 <div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform, WebkitTransform:transform, MsTransform:transform}" class="{{data.type}}-component component">
-  
+
+    <div title="{{title.desc}}" class="title">
+      <span class="title-name" ng-bind="title.name"></span>
+      <span class="button-group">
+        <a ng-click="togglecollapse()" 
+           class="glyphicon" 
+           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
+        </a> 
+        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
+    </div>
+    <div class="ports">
+      <div class="input">
+        <div>
+          <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
+            <span class="box"></span>
+            <span class="text" ng-bind="port.text"></span>
+          </div>
+        </div>
+      </div>
+      <div class="output">
+        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
+          <span class="text" ng-bind="port.text"></span>
+          <span class="box"></span>
+       </div>
+
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+
+
+
   <div ng-switch-when="input">
     <div class="title"> INPUTS </div>
     <div class="ports">
@@ -30,103 +60,16 @@
 
 
   <div ng-switch-when="file">
-    <div title="{{data.filename}}" class="title">
-      FILE
-      <span class="button-group">
-        <a ng-click="togglecollapse()" 
-           class="glyphicon" 
-           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
-        </a> 
-        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
-    </div>
-    <div class="ports">
-      <div class="input">
-        <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
-          <span class="box"></span>
-          <span class="text" ng-bind="port.text"></span>
-        </div>
-      </div>
-      <div class="output">
-        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
-          <span class="text" ng-bind="port.text"></span>
-          <span class="box"></span>
-       </div>
-
-      </div>
-      <div style="clear: both;"></div>
-    </div>
     <input parameter-field class="filename" type="text" ng-model="data.filename">
   </div>
   
-  
-  
-  
-
   <div ng-switch-when="macro">
-    <div title="{{data.macro.description}}" class="title">
-      <span ng-bind="data.macro.name"></span>
-           <span class="button-group">
-        <a ng-click="togglecollapse()" 
-           class="glyphicon" 
-           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
-        </a> 
-        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
+    <div class="btn btn-sm btn-primary" ng-click="graph.setGraphView(data.graph)">
+      view macro
     </div>
-    <div class="ports">
-      <div class="input">
-        <div data-port="{{port.name}}" ng-repeat="port in inputPorts">        
-          <span class="box"></span>
-          <span class="text" ng-bind="port.text"></span>
-        </div>
-      </div>
-      <div class="output">
-
-        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
-          <span class="text" ng-bind="port.text"></span>
-          <span class="box"></span>
-       </div>
-
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="btn btn-sm btn-primary" ng-click="graph.setGraphView(data.graph)">view macro</div>
   </div>
   
-  
-  
-  
-  
-  <div ng-switch-when="command">
-    <div class="title">
-      <span ng-bind="data.exec"></span>
-      <span class="button-group">
-        <a ng-click="togglecollapse()" 
-           class="glyphicon" 
-           ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
-        </a> 
-        <a ng-click="$emit('removeComponent', data.id)" class="close-button glyphicon glyphicon-remove"></a>
-      </span> 
-    </div>
-    <div class="ports">
-      <div class="input">
-        <span data-port="{{port.name}}" ng-repeat="port in inputPorts">        
-          <span class="box"></span>
-          <span class="text" ng-bind="port.text"></span>
-        </span>
-      </div>
-      <div class="output">
-      <div>
-        <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
-          <span class="text" ng-bind="port.text"></span>
-          <span class="box"></span>
-       </div>
-     </div>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    
-    
-    
+  <div ng-switch-when="command">    
     <div ng-if="data.files !== undefined && (!collapsed || data.files.length)">files :<br ng-if="data.files.length > 0">
       <div ng-repeat="file in data.files track by $index">
         <span data-port="file{{$index}}">

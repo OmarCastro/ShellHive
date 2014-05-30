@@ -24,7 +24,7 @@ module.exports.sockets = {
 
   // This custom onDisconnect function will be run each time a socket disconnects
   onDisconnect: function(session, socket) {
-
+    CollaborationService.userleave(socket);
     // By default: do nothing.
   },
 

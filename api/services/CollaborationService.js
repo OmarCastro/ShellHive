@@ -14,6 +14,14 @@ var CollaborationService = module.exports = {
   graph_room: graph_room,
   parser: parser,
 
+  userleave: function(socket){
+    if(socket.projectId){
+      var projectRoom = project_room(socket.projectId);
+      sails.io.sockets.in(projectRoom).emit('user leave', socket.id);
+      socket.leave(projectRoom);
+    }
+  },
+
   joinUserToProject: function joinUserToProject(req, res, project){
     
     var id = project.id;
@@ -26,23 +34,33 @@ var CollaborationService = module.exports = {
     if(req.user){
       socket.userId = req.user.id;
       socket.name = data.name = req.user.name;
+      data.visitor = false
     } else {
       socket.userId = -1;
-      socket.name = "Anonymous"      
+      socket.name = "Anonymous" 
+      data.visitor = true;     
     }
     socket.projectId = project.id;
     socket.color = data.color = colors[Math.floor(Math.random() * colors.length)];
+    data.id = socket.id;
 
-    io.sockets.in(projectRoom).emit('mess',  {type: "new user", data: data});
-    var existingClients = io.sockets.clients(projectRoom);
-    var clientsData = existingClients.map(function(client){ return {name: client.name, color: client.color}});
+    io.sockets.in(projectRoom).emit('new user', data);
     socket.join(projectRoom)
+    var existingClients = io.sockets.clients(projectRoom);
+    var clientsData = existingClients.map(function(client){
+      return {
+        name: client.name, 
+        color: client.color,
+        id: client.id
+      }
+    });
     sails.log('socket '+socket.id+' joined project room ' + id)
     //Project.subscribe( req.socket, project); //at the time of development it wasnt working well
     var response = {
       success: true,
       message: "you have been subscribed",
       clients: clientsData,
+      you: data,
       implementedCommands: parser.implementedCommands,
       SelectionOptions: parser.VisualSelectorOptions,
       graphs: project.graphs
@@ -51,7 +69,7 @@ var CollaborationService = module.exports = {
     res.json(response); 
   },
   
-  joinUserToGraph: function joinUserToProject(req, res, graph){
+  joinUserToGraph: function(req, res, graph){
     
     if(req.socket && req.socket.projectId == graph.project){
       var id = graph.id;
@@ -66,7 +84,7 @@ var CollaborationService = module.exports = {
       socket.graphId = id;
 
 
-      io.sockets.in(graphRoom).emit('mess',  {type: "new user in graph", data: data});
+      //io.sockets.in(graphRoom).emit('mess',  {type: "new user in graph", data: data});
       socket.join(graphRoom)
       sails.log('socket '+socket.id+' joined grapj room ' + id)
       res.json({
@@ -85,9 +103,20 @@ var CollaborationService = module.exports = {
   emitMessageToProject: function(id, type ,content){
     sails.io.sockets.in(project_room(id)).emit(type,  content);
   },
-  
 
-  broadcastMessageInProject:  function broadcastMessageInProject(req, res){
+  chat: function(req,res){
+    var socket = req.socket;
+    var data = req.body.data;
+    data.sender = socket.name;
+    data.color = socket.color;
+    sails.log("chat to project "+socket.projectId + " -- " + JSON.stringify(data));
+    sails.io.sockets.in(project_room(socket.projectId)).emit('chat',data);
+    res.json("message sent");
+  },
+
+
+  
+  broadcastMessageInProject: function(req, res){
     // Get the value of a parameter
     var param = req.body;
     //Project.message(req.body.id, {type: "action", action: req.body.message});

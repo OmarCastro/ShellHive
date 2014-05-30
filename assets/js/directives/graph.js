@@ -5,7 +5,7 @@ app.directive("graph", function($document){
     templateUrl: 'graphTemplate.html',
     controller: ['$scope', '$element', '$attrs', function(scope, element, attr){
         var key, val, x$, $sp, update, mousemove, mouseup, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, 
-        useWheelHandler, mousewheelevt, simpleEdge, setEdgePath, popupState, startEdge, moveEdge,
+        useWheelHandler, mousewheelevt, setEdgePath, popupState, startEdge, moveEdge,
         endEdge, showPopup, hidePopup, hidePopupAndEdge;
         
         
@@ -190,7 +190,8 @@ app.directive("graph", function($document){
         };
         mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
         elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
-        simpleEdge = element.find('.emptyEdge')[0];
+        var simpleEdge = element.find('.emptyEdge')[0];
+
         setEdgePath = function(iniX, iniY, endX, endY){
           var xpoint;
           xpoint = (endX - iniX) / 4;
@@ -206,8 +207,10 @@ app.directive("graph", function($document){
           startNode: 0,
           startPort: 0
         };
-        startEdge = function(elem, position, ev){
+        startEdge = function(elem, type, port , position, ev){
           this.hidePopup();
+          elem = elem.querySelector(".box") || elem;
+          simpleEdge.setAttribute("class", "emptyEdge from-"+type+"-"+port+" from-"+type)
           edgeIniX = elem.offsetLeft + position.x;
           edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
           return setEdgePath(edgeIniX, edgeIniY, edgeIniX, edgeIniY);
@@ -252,6 +255,7 @@ app.directive("graph", function($document){
         };
         hidePopup = function(){
           $popup.hide();
+          document.activeElement.blur();
           scope.edgePopups.length = 0;
           scope.sel = { open: false };
           scope.safedigest();
@@ -290,11 +294,6 @@ app.directive("graph", function($document){
           if(scope.shell)
           scope.$emit('compileGraph')
         }
-        Mousetrap.bind("ctrl+shift+up", function(){scope.$apply(scope.collapseAll)});
-        Mousetrap.bind("alt+a", function(){scope.$apply(scope.collapseAll)});
-        Mousetrap.bind("alt+s", function(){scope.$apply(scope.toggleShell)});
-        Mousetrap.bind("ctrl+shift+down", function(){scope.$apply(scope.uncollapseAll)});
-
 
         scope.resetConnections = function(){
           $('path[connector]').each(function(index){ $(this).scope().reset() });

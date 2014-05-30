@@ -5,7 +5,7 @@
       <a href="#" data-toggle="dropdown" class="dropdown-toggle" is-open="status.macroDropdown">
       Macro <b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a ng-click="newMacroModal()">New Macro</a></li>
+          <li><a mousetrap="Shift+M" ng-click="newMacroModal()">New Macro</a></li>
           <li class="divider"></li>
           <li class="dropdown-header">created Macros</li>
           <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="; status.macroDropdown = false; macroEditModal(macro)"></a></li>
@@ -27,24 +27,29 @@
       <li class="dropdown" is-open="status.isopen2">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">View<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a ng-click="filesystem = false; shell = !shell; status.isopen2=false">Toogle shell</a></li>
-          <li><a ng-click="filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root</a></li>
-          <li><a ng-click="filesystem = false; collapseAll(); status.isopen2=false">Collapse all components</a></li>
-          <li><a ng-click="filesystem = false; uncollapseAll(); status.isopen2=false;">Uncollapse all components</a></li>
+          <li><a mousetrap="Shift+S" ng-click="$parent.filesystem = false; $parent.shell = !shell; shell && $emit('compileGraph'); status.isopen2=false">Toogle Terminal View</a></li>
+          <li><a mousetrap="Shift+R" ng-click="$parent.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
+          <li><a mousetrap="Shift+F" ng-click="$parent.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
+        </ul>
+      </li>
+
+      <li class="dropdown" is-open="status.isopen3">
+        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Action<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a mousetrap="Ctrl+Shift+up" ng-click="$parent.filesystem = false; collapseAll(); status.isopen2=false">Collapse all components</a></li>
+          <li><a mousetrap="Ctrl+Shift+down" ng-click="$parent.filesystem = false; uncollapseAll(); status.isopen2=false;">Uncollapse all components</a></li>
         </ul>
       </li>
 
 
-      <li ng-class="filesystem ? 'active' : ''">
-        <a ng-click="filesystem = !filesystem">FileSystem</a>
-      </li>
-      <li><a ng-click="shell = true; $emit('compileGraph')">Compile</a></li>
       <li><a ng-click="shell = true; $emit('runCommand', [])">
         <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
       </a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><a href="http://omarcastro.github.io/ShellHive/docs/" target="_blank">Docs</a></li>
+      <li><a ng-click="chat.open = true">Chat <span class="badge" ng-if="clients.length > 1" ng-bind="clients.length - 1"></span></a></li>
+
       
       <% if(req.session.user){ %>
         <li>

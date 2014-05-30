@@ -36,6 +36,34 @@ app.directive("component", function($document){
           && (connection.endNode != datanode.id || connection.endPort != port.name) 
         })
       }
+
+    switch(datanode.type){
+    case 'file':
+      scope.title = {
+        name: "file"
+      }
+      break;
+    case 'command':
+      scope.title = {
+        name: datanode.exec
+      }
+      break;
+    case 'macro':
+      var macros = scope.graphData.macros;
+      scope.graphData.macroList.every(function(macroName){
+        var macro = macros[macroName];
+        if(macro.id == datanode.graph){
+          scope.title = {
+            name: macro.name,
+            description: macro.description
+          }
+          return false;
+        }
+        return true;
+      })
+      break;
+    }
+
     scope.updatePorts = updatePorts;
      function updatePorts (){
                   console.log("updatePorts")

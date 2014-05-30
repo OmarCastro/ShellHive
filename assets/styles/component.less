@@ -1,7 +1,6 @@
 .component,.inline-component {
     font-size:12px;
     position:absolute;
-    min-width:70px;
     background-color:#fff;
     border-radius:4px;
     border:2px solid #aaa;
@@ -34,13 +33,20 @@
         user-select: none;
         text-align:center;
         background-color:#ddd;
+        position: relative;
         height:1.5em;
         font-family: monospace;
         font-weight: bolder;
         border-top-left-radius:.1em;
         border-top-right-radius:.1em;
+        & > .title-name{
+            padding-left: 4em;
+            padding-right: 4em;
+        }
         .button-group {
-            float:right;
+            position: absolute;
+            right: 0;
+            top: 0;
             font-size:1.1em;
             a {
                 text-decoration:none;
@@ -48,24 +54,28 @@
         }
     }
     .input, .output{
-        float:left;
         white-space: nowrap;
-        width: 50%;
         [data-port]{
             &:hover, &:active, &.hover{
-                background-color: #eee;
-                .box{
-                    background-color:#00f;
-                }
+                background-color: #ddd;
             }
         }
     }
+
+    .input{
+        float:left;
+        > div {
+            float: left;
+        }
+    }
+
     .output{
         float:right;
         text-align: right;
         padding-left: 10px;
         > div {
-            float: right;
+            display: block;
+            width: auto;
         }
     }
     .box {
@@ -91,6 +101,9 @@
     [data-port="output"] > .box{
         background-color:#77a;
     }
+    .title{
+        background-color:#ddf;
+    }
 }
 
 .command-component {
@@ -107,6 +120,9 @@
     [data-port="retcode"] > .box{
         background-color:#777;
     }
+    .title{
+        background-color:#dde3dd;
+    }
 }
 
 .macro-component{ 
@@ -114,6 +130,9 @@
 
     .output .box{
         background-color:#B8703D
+    }
+    .title{
+        background-color:#e0ddcd;
     }
 }
 
