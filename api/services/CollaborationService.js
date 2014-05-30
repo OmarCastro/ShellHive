@@ -33,16 +33,24 @@ var CollaborationService = module.exports = {
     }
   },
 
-  joinUserToProject: function joinUserToProject(req, res, project){
+  setSocketName: function(socket, name){
+    if(socket.projectId){
+      var data = socket.collabData;
+      data.name = name;
+      var projectRoom = project_room(socket.projectId);
+      sails.io.sockets.in(projectRoom).emit('update user', data);
+    }
+  },
+
+  joinUserToProject: function(req, res, project){
     
     var id = project.id;
     var projectRoom = project_room(id);
     
     var colors = ['#AE331F', '#D68434', '#116A9F', '#360B95', '#1c8826'];
     var socket = req.socket;
-    socket.collabData = {}
     var io = sails.io;
-    var data = socket.collabData
+    var data = socket.collabData = {}
     if(req.user){
       socket.userId = req.user.id;
       data.name = req.user.name;
@@ -68,7 +76,7 @@ var CollaborationService = module.exports = {
       success: true,
       message: "you have been subscribed",
       clients: clientsData,
-      you: data,
+      visitor: data.visitor,
       implementedCommands: parser.implementedCommands,
       SelectionOptions: parser.VisualSelectorOptions,
       graphs: project.graphs

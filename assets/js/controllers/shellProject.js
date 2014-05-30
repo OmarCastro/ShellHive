@@ -48,28 +48,34 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     $scope.$digest();
 
 
+
     if(data.visitor){
-      var form = { name: 'Anonymous'};
-      var modalInstance = modal.open({
-        templateUrl: 'myModalContent.html',
-        controller: function($scope, $modalInstance){
-          $scope.form = form;
-          $scope.ok = function(){
-            $modalInstance.close(form);
-          };
-        }
-      });
-      return modalInstance.result.then(function(selectedItem){
-        scope.newMacro(form.name, form.description, form.command);
-        return form.name = form.description = '';
-      });
+      var visitorName = sessionStorage.visitorName
+      if(visitorName){
+        io.socket.post('/project/setmyname', {name:visitorName, _csrf:csrf.csrf});
+      } else {
+        var form = { name: ''};
+        var modalInstance = modal.open({
+          templateUrl: 'UserNameModal.html',
+          controller: function($scope, $modalInstance){
+            $scope.form = form;
+            $scope.ok = function(){
+              $modalInstance.close(form);
+            };
+          }
+        });
+        return modalInstance.result.then(function(selectedItem){
+          io.socket.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});
+          sessionStorage.visitorName = form.name;
+        });
+      }
     }
 
     console.log(data);
     var graphs = data.graphs
     var len = graphs.length;
     if(len == 0){
-        var form = {command: "cat hello.txt"}
+        var form = {command: ""}
         var modalInstance = modal.open({
           templateUrl: 'projectCreationModal.html',
           controller: function($scope, $modalInstance){
@@ -220,6 +226,17 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     $scope.clients = $scope.clients.filter(function(client){return client.id != id});
     $scope.$digest();
   });
+
+  io.socket.on('update user', function(data){
+    for(var i = 0, _ref=$scope.clients, length=_ref.length;i<length;++i){
+      var client = _ref[i];
+      if(client.id == data.id){
+        _ref[i] = data;
+      }
+    }
+    $scope.$digest();
+  });
+
 
   io.socket.on('chat', function(data){
     $scope.chatMessages.push(data)

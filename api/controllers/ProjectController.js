@@ -36,6 +36,11 @@ module.exports = {
   new:function(req, res){
     res.view({});
   },
+
+  setmyname:function(req, res){
+    CollaborationService.setSocketName(req.socket,req.body.name);
+    res.json("done");
+  },
   
   create: function(req,res, next){
     var userID = req.user.id;
