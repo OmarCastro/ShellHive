@@ -38,7 +38,7 @@ module.exports = {
   },
 
   setmyname:function(req, res){
-    CollaborationService.setSocketName(req.socket,req.body.name);
+    CollaborationService.setSocketName(req.socket,req.body);
     res.json("done");
   },
   

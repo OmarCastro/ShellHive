@@ -51,8 +51,10 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
 
     if(data.visitor){
       var visitorName = sessionStorage.visitorName
-      if(visitorName){
-        io.socket.post('/project/setmyname', {name:visitorName, _csrf:csrf.csrf});
+      var visitorColor = sessionStorage.visitorColor
+      if(visitorName && visitorColor){
+        io.socket.post('/project/setmyname', {
+          name:visitorName, color: visitorColor, _csrf:csrf.csrf});
       } else {
         var form = { name: ''};
         var modalInstance = modal.open({
@@ -67,6 +69,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
         return modalInstance.result.then(function(selectedItem){
           io.socket.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});
           sessionStorage.visitorName = form.name;
+          sessionStorage.visitorColor = data.you.color;
         });
       }
     }
