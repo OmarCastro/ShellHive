@@ -66,7 +66,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
             };
           }
         });
-        return modalInstance.result.then(function(selectedItem){
+        modalInstance.result.then(function(selectedItem){
           io.socket.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});
           sessionStorage.visitorName = form.name;
           sessionStorage.visitorColor = data.you.color;
