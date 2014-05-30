@@ -30,3 +30,9 @@ socket.on('message', function(data){ console.log('message', data) });
 socket.on('connect', function socketConnected() {
   console.log("This is from the connect: ", this.socket.sessionid);
 });
+
+Mousetrap.bind("shift+p", function(){
+  document.body.classList.add("sr-shoot")
+  window.print();
+  document.body.classList.remove("sr-shoot")
+})

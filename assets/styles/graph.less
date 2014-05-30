@@ -1,9 +1,33 @@
 @media print
 {
-  *{-webkit-print-color-adjust:exact}
-  .layout, .tips, .new-project, .directory, .alerts{
-      top:0
+  @page { size:12in 9in; margin: 0cm }
+
+  *{-webkit-print-color-adjust:exact; print-color-adjust: exact;}
+  body.sr-shoot{
+    .navbar-fixed-top{
+      position: absolute;
+      top: 0;
+      left:0;
+      right: 0;
+      display: block;
+
+      a[href]:after {
+        content: "";
+      }
     }
+
+    .shell > div{
+        font-size: 2em
+    }
+
+
+  }
+  body:not(.sr-shoot){
+    .layout, .tips, .new-project, .directory, .alerts{
+      top:0 !important;
+    }
+  }
+  
 }
 
 .shortcuts{
@@ -74,7 +98,11 @@ div[graph]{
   }
   
   .user-icon{
-    border:solid 1px #333;margin:5px;padding:2px;font-size:34px
+    border:solid 1px #999;
+    margin:5px;
+    padding: 8px;
+    font-size: 28px;
+    color:#eee;
   }
 }
 

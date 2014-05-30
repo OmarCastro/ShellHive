@@ -22,6 +22,17 @@ var CollaborationService = module.exports = {
     }
   },
 
+  updateMacroList: function(socket){
+    if(socket.projectId){
+      Graph.find({project: socket.projectId, type:'macro'}).exec(function(err, graphs){
+        if(!err){
+          var projectRoom = project_room(socket.projectId);
+          sails.io.sockets.in(projectRoom).emit('updateMacroList', graphs);
+        }
+      });
+    }
+  },
+
   joinUserToProject: function joinUserToProject(req, res, project){
     
     var id = project.id;
@@ -29,30 +40,27 @@ var CollaborationService = module.exports = {
     
     var colors = ['#AE331F', '#D68434', '#116A9F', '#360B95', '#1c8826'];
     var socket = req.socket;
+    socket.collabData = {}
     var io = sails.io;
-    var data = {}
+    var data = socket.collabData
     if(req.user){
       socket.userId = req.user.id;
-      socket.name = data.name = req.user.name;
+      data.name = req.user.name;
       data.visitor = false
     } else {
       socket.userId = -1;
-      socket.name = "Anonymous" 
+      data.name = "Anonymous" 
       data.visitor = true;     
     }
-    socket.projectId = project.id;
-    socket.color = data.color = colors[Math.floor(Math.random() * colors.length)];
     data.id = socket.id;
+    data.color = colors[Math.floor(Math.random() * colors.length)];
+    socket.projectId = project.id;
 
     io.sockets.in(projectRoom).emit('new user', data);
     socket.join(projectRoom)
     var existingClients = io.sockets.clients(projectRoom);
     var clientsData = existingClients.map(function(client){
-      return {
-        name: client.name, 
-        color: client.color,
-        id: client.id
-      }
+      return client.collabData;
     });
     sails.log('socket '+socket.id+' joined project room ' + id)
     //Project.subscribe( req.socket, project); //at the time of development it wasnt working well
@@ -107,8 +115,8 @@ var CollaborationService = module.exports = {
   chat: function(req,res){
     var socket = req.socket;
     var data = req.body.data;
-    data.sender = socket.name;
-    data.color = socket.color;
+    data.sender = socket.collabData.name;
+    data.color = socket.collabData.color;
     sails.log("chat to project "+socket.projectId + " -- " + JSON.stringify(data));
     sails.io.sockets.in(project_room(socket.projectId)).emit('chat',data);
     res.json("message sent");

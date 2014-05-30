@@ -1,4 +1,15 @@
-<div class="navbar navbar-fixed-top navbar-default navbar-inverse">
+<div class="navbar navbar-fixed-top navbar-default navbar-inverse" role="navigation">
+<div class="container-fluid">
+
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
   <div class="collapse navbar-collapse">
     <ul class="nav navbar-nav">
       <li class="dropdown" ng-controller="macroCtrl">
@@ -27,7 +38,7 @@
       <li class="dropdown" is-open="status.isopen2">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">View<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a mousetrap="Shift+S" ng-click="$parent.filesystem = false; $parent.shell = !shell; shell && $emit('compileGraph'); status.isopen2=false">Toogle Terminal View</a></li>
+          <li><a mousetrap="Shift+S" ng-click="$parent.filesystem = false; $parent.shell = !shell; $parent.shell && $emit('compileGraph'); status.isopen2=false">Toogle Terminal View</a></li>
           <li><a mousetrap="Shift+R" ng-click="$parent.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
           <li><a mousetrap="Shift+F" ng-click="$parent.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
         </ul>
@@ -48,7 +59,12 @@
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><a href="http://omarcastro.github.io/ShellHive/docs/" target="_blank">Docs</a></li>
-      <li><a ng-click="chat.open = true">Chat <span class="badge" ng-if="clients.length > 1" ng-bind="clients.length - 1"></span></a></li>
+      <li>
+        <a ng-click="chat.open = !chat.open">
+          <span class="glyphicon glyphicon-user"></span> 
+          <span class="badge" ng-if="clients.length > 1" ng-bind="clients.length - 1"></span>
+        </a>
+      </li>
 
       
       <% if(req.session.user){ %>
@@ -61,7 +77,7 @@
         <li><a href="/logout">Logout</a></li>
 
       <% } else { %>
-        <li><a href="/"> Anonymous Visitor </a></li>
+        <li><a> Anonymous Visitor </a></li>
         <li><a class="glyphicon glyphicon-user user-icon"></a></li>
 
       <% } %>
@@ -69,4 +85,5 @@
 
     </ul>
   </div>
+</div>
 </div>

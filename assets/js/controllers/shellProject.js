@@ -10,7 +10,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   $scope.implementedCommands = [];
   $scope.chatMessages = [];
   $scope.clients = [];
-  $scope.chat = {open: true};
+  $scope.chat = {open: false};
 
   $scope.isImplemented = function(data){
     return this.implementedCommands.indexOf(data.exec) >= 0;
@@ -41,11 +41,29 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     $scope.clients             = data.clients;
     $scope.page = "graph";
     $scope.chatterId = io.socket.socket.sessionid;
+    $scope.chat = {open: $scope.clients.length > 1};
 
     console.log("socket.id =" ,io.socket.socket.sessionid);
 
     $scope.$digest();
 
+
+    if(data.visitor){
+      var form = { name: 'Anonymous'};
+      var modalInstance = modal.open({
+        templateUrl: 'myModalContent.html',
+        controller: function($scope, $modalInstance){
+          $scope.form = form;
+          $scope.ok = function(){
+            $modalInstance.close(form);
+          };
+        }
+      });
+      return modalInstance.result.then(function(selectedItem){
+        scope.newMacro(form.name, form.description, form.command);
+        return form.name = form.description = '';
+      });
+    }
 
     console.log(data);
     var graphs = data.graphs
@@ -208,6 +226,19 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     $scope.$digest();
   });
 
+  io.socket.on('updateMacroList', function(graphs){
+    var len = graphs.length;
+    var macros = visualData.macros = {};
+    var macroList = visualData.macroList = [];
+    for(var i = 0; i < len; ++i){
+      var graph = graphs[i];
+      graph.data.id = graph.id;
+      macros[graph.data.name] = graph.data
+      macroList.push(graph.data.name)
+    }
+    $scope.$digest();
+  });
+
   $scope.$on("runCommand", function(event, message){
     console.log('runCommand!');
     io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
@@ -220,9 +251,11 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     });
   });
 
-  $scope.$on("runCommand", function(event, message){
-    console.log('runCommand!');
-    io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
+
+
+  $scope.$on("compileGraph", function(event, message){
+    console.log('compileGraph!');
+    io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
       console.log(data);
       $scope.shellText = [{
         text: data.command,
