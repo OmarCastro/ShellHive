@@ -31,7 +31,7 @@
     </div>
   </div>
   <div ng-show="shell" touch-action="all" class="shell">
-    <div ng-repeat="line in $parent.shellText" ng-class="line.type" ng-bind="line.text"></div>
+    <pre ng-repeat="line in $parent.shellText" ng-class="line.type" ng-bind="line.text"></pre>
   </div>
 </div>
 

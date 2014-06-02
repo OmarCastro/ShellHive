@@ -59,7 +59,7 @@ module.exports = {
 
 		var dockerCommand = "cd " + dockerPath + ' ; ' + command
 		
-		var args = ['run','-v',[cwd,dockerPath].join(':'),image,sh,'-c',dockerCommand];
+		var args = ['run','-v',[cwd,dockerPath].join(':'),"-e","SHELL=/bin/"+sh,image,sh,'-c',dockerCommand];
 		sails.log("running command - ",exec, args, 'on project', projectId)
 		return spawn(exec,args);
 	},

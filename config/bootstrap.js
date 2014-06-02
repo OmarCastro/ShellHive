@@ -99,9 +99,9 @@ module.exports.bootstrap = function (cb) {
             GraphGeneratorService.addToGraph(res[i].id,dummyCommands[i],cb);
           }
         });
-        //series.push(function(cb){
-        //  GraphGeneratorService.createAndConnectComponent(2,2,"macroTest",5, "output", null,cb);
-        //})
+        series.push(function(cb){
+          GraphGeneratorService.createAndConnectComponent(2,2,"macroTest",5, "output", null,cb);
+        })
         async.series(series,done);
       });
     });

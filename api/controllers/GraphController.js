@@ -178,5 +178,9 @@ module.exports = {
       });
     });
   },
+
+  action: function(req, res, next){
+    CollaborationService.broadcastMessageInGraph(req,res)
+  },
   
 };

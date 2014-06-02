@@ -221,7 +221,7 @@ describe('command test', function(){
     describe('reparse bunzip2', reparse('bunzip2'));
   })
 
-  describe('`compress` test', function(){
+  /*describe('`compress` test', function(){
     it('should create a component with class CompressComponent', function(){
       var command = "compress";
       var graph = shouldBeAGraph(parser.parseCommand(command))
@@ -233,7 +233,7 @@ describe('command test', function(){
       graph.components[0].flags.should.have.properties({})
     })
     describe('reparse compress', reparse('compress'));
-  })
+  })*/
 
     describe('`diff` test', function(){
     it('should create a component with class DiffComponent', function(){

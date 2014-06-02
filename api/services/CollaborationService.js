@@ -145,5 +145,18 @@ var CollaborationService = module.exports = {
     socket.broadcast.to(project_room(req.body.id)).emit('action',req.body.message);
     // Send a JSON response
     res.json("action sent");
+  },
+
+  broadcastMessageInGraph: function(req, res){
+    // Get the value of a parameter
+    var param = req.body;
+    //Project.message(req.body.id, {type: "action", action: req.body.message});
+    var socket = req.socket;
+    var io = sails.io;
+    sails.log('broadcasting message -- '+req.body.message.type);
+
+    socket.broadcast.to(graph_room(req.socket.graphId)).emit('action',req.body.message);
+    // Send a JSON response
+    res.json("action sent");
   }
 };

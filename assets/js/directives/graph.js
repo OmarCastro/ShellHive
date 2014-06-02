@@ -224,13 +224,9 @@ app.directive("graph", function($document){
           return simpleEdge.setAttribute('d', "M 0 0");
         };
         showPopup = function(event, startNode, startPort, endNode, endPort){
-          var ref$, x, y, x$;
           scope.popupText = '';
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
-          importAll$(popupState, {
-            x: x,
-            y: y
-          });
+          var ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          importAll$(popupState, mapMouseToScene(event));
           popupState.startNode = startNode;
           popupState.startPort = startPort;
           popupState.endNode = endNode;

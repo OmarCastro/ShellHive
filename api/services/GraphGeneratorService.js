@@ -4,7 +4,6 @@
 * @description :: Service that takes care of managing a graph.
 * @docs        :: http://sailsjs.org/#!documentation/services
 */
-
 var parser = require('../../lib/parser/parser.js');
 
 function metaGraphfromCommand(command){
@@ -182,7 +181,7 @@ module.exports = {
         });
       });
       var rootGraph = _.find(graphs, function(graph){return graph.type == "root"});
-      return cb(null, parser.parseGraph(parser.graphFromJsonObject(rootGraph)));
+      return cb(null, parser.parseVisualDataExperimental(parser.graphFromJsonObject(rootGraph)));
     });
   },
       

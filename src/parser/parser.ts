@@ -27,7 +27,7 @@ export var parserCommand = {
   diff: require('./commands/diff'),
   bzcat: require('./commands/bzcat'),
   bzip2: require('./commands/bzip2'),
-  compress: require('./commands/compress'),
+  //compress: require('./commands/compress'),
   gzip: require('./commands/gzip'),
   gunzip: require('./commands/gunzip'),
   zcat: require('./commands/zcat'),
@@ -117,16 +117,230 @@ export function parseCommand(command){
   return parseAST(generateAST(command));
 }
 
+  interface mod
+  {
+    [s:string]:{
+      list:Connection[];
+      byPortList:{[s:string]:Connection[]}
+    }
+  }
+
+export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string){
+
+
+  fifoPrepend = fifoPrepend || "/tmp/fifo-"
+
+  var escapeSingleQuote = (commandString:string) => commandString.split("'").join("'\"'\"'")
+
+  var fifos =  [];
+  var commands = []
+  var IndexedGraph = {
+    inConnectedComponent: <mod>{},
+    outConnectedComponent:<mod>{}
+  };
+  VisualData.components.forEach(component => {
+    IndexedGraph.inConnectedComponent[component.id] = {
+      list:[],
+      byPortList:{}
+    }
+    IndexedGraph.outConnectedComponent[component.id] = {
+      list:[],
+      byPortList:{}
+    }
+  });  
+
+  VisualData.connections.forEach(connection => {
+      var sNode = IndexedGraph.outConnectedComponent[connection.startNode];
+      sNode.list.push(connection)
+      var sPortList = sNode.byPortList[connection.startPort];
+      if(sPortList instanceof Array){sPortList.push(connection)}
+      else{sNode.byPortList[connection.startPort] = [connection]}
+
+
+      var eNode = IndexedGraph.inConnectedComponent[connection.endNode];
+      eNode.list.push(connection)
+      var ePortList = eNode.byPortList[connection.endPort];
+      if(ePortList instanceof Array){ePortList.push(connection)}
+      else{eNode.byPortList[connection.endPort] = [connection]}
+  });
+
+  VisualData.components.forEach(component => {
+    var portList = IndexedGraph.inConnectedComponent[component.id]
+    var byPortList = portList.byPortList
+    var keys = Object.keys(byPortList);
+    keys.forEach(port => {
+      var connections = byPortList[port]
+      
+      if(connections.length > 1){
+        for (var i = connections.length - 1; i >= 0; i--) {
+          var fifo = port+"-"+i
+          connections[i].endPort = fifo;
+          fifos.push(fifoPrepend+component.id+"-"+fifo);
+        }
+
+      } else fifos.push(fifoPrepend+component.id+"-"+port)
+    });
+  });
+
+
+  VisualData.components.forEach(function(component){
+  var afterCommand = "";
+  var outConnection = IndexedGraph.outConnectedComponent[component.id];
+  var outConnections = outConnection.list;
+  var inConnection = IndexedGraph.inConnectedComponent[component.id];
+  var inByPort = inConnection.byPortList;
+  var len = outConnections.length;
+
+
+
+  switch (component.type) {
+
+  case CommandComponent.type:
+    var outputs = outConnection.byPortList["output"]
+    var errors = outConnection.byPortList["error"]
+    var retcodes = outConnection.byPortList["retcode"]
+
+
+    if(component["files"]){
+      var files = <any[]> component["files"]
+      component["files"] = files.map((file, idx) => {
+        var connections = inByPort["file"+idx]
+        if(!connections) return "-";
+        else if(connections.length > 1){
+          var fifo = fifoPrepend+component.id+"-file"+idx;
+          commands.push("find "+fifo+"-* | xargs grep -h --line-buffered ^ > "+fifo);
+          return fifo;
+        } else return fifoPrepend+component.id+"-file"+idx
+      });
+    }
+    var parsedExec = parserCommand[component["exec"]].parseComponent(component, {}, {}, {});
+    
+
+    if(errors && errors.length){
+      if(errors.length > 1){
+        var newfifo =fifoPrepend+component.id+"-stderr"
+        fifos.push(newfifo);
+
+        var len = errors.length - 1
+
+        var newcommand = "tee < " + newfifo
+        for(var i = 0;i<len;++i){
+          var value = errors[i];
+          newcommand += " "+fifoPrepend+value.endNode+"-"+value.endPort
+        }
+        newcommand += " > "+fifoPrepend+errors[len].endNode+"-"+errors[len].endPort
+        parsedExec += " 2> " +newfifo
+        commands.push(newcommand);
+        } else {
+          parsedExec += " 2> " 
+                      + fifoPrepend + errors[0].endNode 
+                      + "-" + errors[0].endPort;
+        }
+    }
+
+    if(outputs && outputs.length){
+      if(outputs.length > 1){
+        var len = outputs.length - 1
+        parsedExec += " | tee" 
+        for(var i = 0;i<len;++i){
+          var value = outputs[i];
+          parsedExec += " "+fifoPrepend+value.endNode+"-"+value.endPort
+        }
+        parsedExec += " > "+fifoPrepend+outputs[len].endNode+"-"+outputs[len].endPort
+        } else {
+          parsedExec += " > " 
+                      + fifoPrepend + outputs[0].endNode 
+                      + "-" + outputs[0].endPort;
+        }
+    }
+
+    if(retcodes && retcodes.length){
+      var newcommand = "; echo $?"
+      var len = retcodes.length - 1
+
+      if(len > 0){
+        newcommand += " | tee" 
+        for(var i = 0;i<len;++i){
+          var value = retcodes[i];
+          newcommand += " "+fifoPrepend+value.endNode+"-"+value.endPort
+        }
+      }
+      newcommand += " > "+fifoPrepend+retcodes[len].endNode+"-"+retcodes[len].endPort
+      parsedExec = "("+parsedExec+newcommand+")";
+        
+    }
+
+
+    if(inByPort["input"]){
+      var fifo = fifoPrepend+component.id+"-input";
+      var len = inByPort["input"].length
+      if(len > 1){
+        parsedExec = "find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ | " + parsedExec
+      } else if(parsedExec.indexOf(" ") < 0){
+          parsedExec += " < "+fifo;          
+      }else{
+        parsedExec = parsedExec.replace(" ", " < "+fifo+" ");          
+      }
+    }
+
+    return commands.push(parsedExec);
+  
+
+  case MacroComponent.type:
+    return commands.push("(" 
+      + parseVisualDataExperimental(component["macro"], fifoPrepend+component.id+"-")
+      +")"
+    );
+
+  case FileComponent.type:
+    if(inByPort["input"]){
+        var fifo = fifoPrepend+component.id+"-input";
+        var len = inByPort["input"].length
+        if(len > 1){
+          commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >  "+ component["filename"]);
+        } else commands.push("cat "+fifo+" > " + component["filename"] );
+    } else if(inByPort["append"]){
+      var fifo = fifoPrepend+component.id+"-append";
+      var len = inByPort["append"].length
+      if(len > 1){
+        commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >>  "+ component["filename"]);
+      } else commands.push("cat "+fifo+" >> " + component["filename"] );
+    } else if(outConnections && outConnections.length > 0){
+      parsedExec = "pv " + component["filename"];
+      var len = outConnections.length - 1
+      if(len > 0){
+        parsedExec += " | tee" 
+        for(var i = 0;i<len;++i){
+          var value = outConnections[i];
+          parsedExec += " "+fifoPrepend+value.endNode+"-"+value.endPort
+        }
+      }
+      parsedExec += " > "+fifoPrepend+outConnections[len].endNode+"-"+outConnections[len].endPort
+      commands.push(parsedExec);
+    }
+    return;
+
+  }
+  });
+
+  var mkfifos = ["mkfifo"].concat(fifos).join(" ")
+  var result_commands = commands.map(command => "echo '"+escapeSingleQuote(command)+"' >> /tmp/sHiveExec.sh")
+
+
+  return [mkfifos].concat(result_commands,["timeout 10 parallel < /tmp/sHiveExec.sh -uj "+commands.length]).join("\n");
+}
+
+
+
 
 
 
 export function parseVisualData(VisualData:Graph){
-  var indexedComponentList, initialComponent;
   if (VisualData.components.filter(function(component){return component.type == CommandComponent.type}).length < 1) {
     return '';
   }
-  indexedComponentList = new IndexedGraph(VisualData);
-  initialComponent = VisualData.firstMainComponent
+  var indexedComponentList = new IndexedGraph(VisualData);
+  var initialComponent = VisualData.firstMainComponent
   if (!(initialComponent instanceof CommandComponent)) {
     var ref = VisualData.components
     for(var i = 0, len = ref.length; i < len; ++i){

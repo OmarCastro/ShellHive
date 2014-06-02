@@ -4,7 +4,7 @@ app.service('csrf',function(){
     _this.csrf = data._csrf;
   });
   window.printget = function(reqdata){
-    io.socket.post('/project/graphaction', {id:projId, message:reqdata,_csrf:_this.csrf}, function(data){
+    io.socket.post('/graph/action', {message:reqdata,_csrf:_this.csrf}, function(data){
       console.log(data);
     });
   }

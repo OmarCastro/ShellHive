@@ -20,7 +20,11 @@ app.directive("directoryfile", ['$document', function($document){
         dt.setData("text/uri-list", path);
         dt.setData("text/plain", filename);
         dt.setData("DownloadURL",downloadurl);
-      },false);  
+      },false);
+
+      element.dblclick( function(event){
+        window.open(path,'_blank');
+      });  
     }
   };
 }]);
