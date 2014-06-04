@@ -6,6 +6,8 @@
  */
 
 var fs = require('fs');
+var fsExtra = require('fs.extra');
+
 /* istanbul ignore next */
 function walk(dir, done) {
   var results = [];
@@ -49,10 +51,34 @@ module.exports = {
       if(!created) return next();
       created.members.add(userID);
       created.save(function foundUser (err, user){
-          if(err) res.json(err);
-          else res.redirect("/project/show/"+created.id); 
+         var fsPath = sails.config.shusee.fsPath
+          var directoryToCreate = fsPath+'/projects/' + created.id;
+          if(err) return res.json(err);
+          fs.mkdirSync(directoryToCreate);
+          res.redirect("/project/show/"+created.id); 
         });
       sails.log('Created project with name '+created.name);
+    });
+  },
+
+  createdemo: function(req,res, next){
+    Project.create({
+      name:"public",
+      visibility: "global"
+    }).exec(function(err,created){
+        if(err) return next(err);
+        var fsPath = sails.config.shusee.fsPath
+        var directoryToCreate = fsPath+'/projects/' + created.id;
+        fs.mkdirSync(directoryToCreate);
+
+      Graph.create({project:created.id, type:"root"}).exec(function(err, res2){
+        if(err) return next(err);
+        GraphGeneratorService.addToGraph(res2.id,"curl -s http://get.docker.io/ubuntu/ | grep \"#\"",function(err,__){
+          if(err) return next(err);
+          res.redirect("/project/play/"+created.id); 
+        });
+      });
+      sails.log('Created public project');
     });
   },
     

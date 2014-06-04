@@ -131,7 +131,7 @@ var config:parserModule.Config = {
 
 
 
-var bzipData = new parserModule.ParserData(config);
+var sortData = new parserModule.ParserData(config);
 
 var optionsParser = {
   shortOptions: {
@@ -172,17 +172,21 @@ var optionsParser = {
 };
 $.generate(optionsParser);
 
+
+
+export class SortComponent extends GraphModule.CommandComponent {
+  public exec:string = "sort"
+  public files: any[] = []
+}
+
 function defaultComponentData(){
-  return {
-    type: 'command',
-    exec: "sort",
-    flags: bzipData.componentFlags,
-    selectors: bzipData.componentSelectors,
-    files: []
-  };
+  var component = new SortComponent();
+  component.selectors = sortData.componentSelectors
+  component.flags = sortData.componentFlags
+  return component;
 };
 
-
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions,bzipData.parameterOptions);
-export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var parseComponent = common.commonParseComponent(sortData.flagOptions, sortData.selectorOptions,sortData.parameterOptions);
+export var VisualSelectorOptions = sortData.visualSelectorOptions;
+export var componentClass = SortComponent

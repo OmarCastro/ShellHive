@@ -214,6 +214,17 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
 
   }
 
+  function debugData(data){
+    console.log(data);
+    if(data.alert){
+      alerts.addAlert({type:'danger', msg: data.message});
+      $scope.$digest();
+    } else if(data.status == 500 && data.errors){
+      data.errors.forEach(function(message){
+        alerts.addAlert({type:'danger', msg: message})
+      })
+    }
+  }
 
   io.socket.on('action', function(data){
     console.log('action',data);
@@ -262,7 +273,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   $scope.$on("runCommand", function(event, message){
     console.log('runCommand!');
     io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
-      console.log(data);
+      debugData(data);
       $scope.shellText = [{
         text: data.command.commands,
         type: "call"
@@ -276,7 +287,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   $scope.$on("compileGraph", function(event, message){
     console.log('compileGraph!');
     io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
-      console.log(data);
+      debugData(data);
       $scope.shellText = [{
         text: data.command,
         type: "call"
@@ -287,42 +298,45 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
 
  $scope.$on("chat", function(event, message){
     console.log('chat '+message+' !');
-    io.socket.post('/project/chat/', {data:message, _csrf:csrf.csrf}, function(data){
-      console.log(data);
-    });
+    io.socket.post('/project/chat/', {data:message, _csrf:csrf.csrf}, debugData);
   });
 
   $scope.$on("removeComponent", function(event, message){
     console.log('removeComponent '+message+' !');
-    io.socket.post('/graph/removeComponent/', {id:message, _csrf:csrf.csrf}, function(data){
-      console.log(data);
-    });
+    io.socket.post('/graph/removeComponent/', {id:message, _csrf:csrf.csrf}, debugData);
   });
 
   $scope.$on("addAndConnectComponent", function(event, message){
     console.log('addAndConnectComponent ', message,' !');
     message._csrf = csrf.csrf
-    io.socket.post('/graph/createAndConnectComponent/', message, function(data){
-      console.log(data);
-    });
+    io.socket.post('/graph/createAndConnectComponent/', message, debugData);
   });
 
     $scope.$on("addComponent", function(event, message){
     console.log('addComponent ', message,' !');
     message._csrf = csrf.csrf
-    io.socket.post('/graph/createComponent/', message, function(data){
-      console.log(data);
-    });
+    io.socket.post('/graph/createComponent/', message, debugData);
   });
   
   $scope.$on("updateComponent", function(event, message){
     console.log('updateComponent:' , message);
     message._csrf = csrf.csrf
     var dataid = message.id;
-    io.socket.put('/component/'+dataid, message, function(data){
-      console.log(data);
-    });
+    io.socket.put('/component/'+dataid, message, debugData);
   });
+
+  $scope.$on("updateMacro", function(event, message){
+    console.log('updateMacro:' , message);
+    message._csrf = csrf.csrf
+    io.socket.put('/macro/setData', message, debugData);
+  });
+
+  $scope.$on("deleteMacro", function(event, message){
+    console.log('deleteMacro:' , message);
+    message._csrf = csrf.csrf
+    io.socket.put('/macro/remove', message, debugData);
+  });
+
 
   $scope.$on("connectComponent", function(event, message){
     console.log('connectComponent:' , message);
@@ -330,13 +344,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       data: message,
       _csrf: csrf.csrf
     }
-    io.socket.put('/graph/connect/', message, function(data){
-      console.log(data);
-      if(data.alert){
-        alerts.addAlert({type:'danger', msg: data.message});
-        $scope.$digest();
-      }
-    });
+    io.socket.put('/graph/connect/', message, debugData);
   });
 
 
@@ -346,13 +354,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       data: message,
       _csrf: csrf.csrf
     }
-    io.socket.put('/graph/removePipe/', message, function(data){
-      console.log(data);
-      if(data.alert){
-        alerts.addAlert({type:'danger', msg: data.message});
-        $scope.$digest();
-      }
-    });
+    io.socket.put('/graph/removePipe/', message, debugData);
   });
 
 

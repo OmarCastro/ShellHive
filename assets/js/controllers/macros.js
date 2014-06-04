@@ -1,4 +1,4 @@
-app.controller('macroCtrl', ['$scope','$modal','csrf', function(scope, modal, csrf){
+app.controller('macroCtrl', ['$scope','$modal','alerts','csrf', function(scope, modal, alerts, csrf){
 
 
   scope.newMacroModal = function(){
@@ -51,13 +51,14 @@ app.controller('macroCtrl', ['$scope','$modal','csrf', function(scope, modal, cs
     return modalInstance.result.then(function(selectedItem){
       switch (selectedItem.result) {
       case "edit":
-        graphModel.macros[form.name] = macro;
-        macro.name = form.name;
-        macro.description = form.description;
+        scope.$emit("updateMacro", {macroId: macro.id, data:{
+          name: form.name,
+          description: form.description,
+          inputs: macro.inputs,
+          outputs: macro.outputs
+        }})
       case "delete":
-        delete graphModel.macros[macroName];
-        graphModel.macroList = Object.keys(graphModel.macros)
-        scope.$apply();
+          scope.$emit("deleteMacro", {id: macro.id});
         break;
       case "view":
         scope.graph.setGraphView(graphModel.macros[macroName].id);
@@ -80,10 +81,19 @@ app.controller('macroCtrl', ['$scope','$modal','csrf', function(scope, modal, cs
       },
       command: command,
       _csrf: csrf.csrf
+
     }
 
     io.socket.post('/macro/create/', message, function(data){
-      console.log(data);
+       console.log(data);
+      if(data.alert){
+        alerts.addAlert({type:'danger', msg: data.message});
+      } else if(data.status == 500 && data.errors){
+        data.errors.forEach(function(message){
+          alerts.addAlert({type:'danger', msg: message})
+        })
+      }
+      scope.$digest();
       if(data.macro){
         scope.graph.setGraphView(data.macro);
       }

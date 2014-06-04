@@ -201,7 +201,8 @@ var config = {
 var cUrlData = new parserModule.ParserData(config);
 
 
-var optionsParser = {}
+var optionsParser = $.optionParserFromConfig(config);
+
 
 $.generate(optionsParser)
 

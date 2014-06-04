@@ -73,6 +73,10 @@ function createComponent(projectId, graphId, command, position, cb){
         })
     })
   }
+
+  if(!componentData){
+    return cb("unable to create component \""+firstWord+"\"");
+  }
   
   if(position){
     componentData.data.position = position;

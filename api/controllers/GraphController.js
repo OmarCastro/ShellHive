@@ -46,7 +46,12 @@ module.exports = {
       req.socket.projectId, req.socket.graphId, body.command,
       body.componentId, body.startPort, body.position,
       function(err, result){
-        if(err) return next(err)
+        if(err) {
+          res.json({
+            alert:true,
+            message: err,
+          })
+        }
         CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {
           type:"addComponent",
           component: result.component,
