@@ -86,8 +86,6 @@ app.controller('macroCtrl', ['$scope','$modal','csrf', function(scope, modal, cs
       console.log(data);
       if(data.macro){
         scope.graph.setGraphView(data.macro);
-        scope.graphData.macros[data.name] = data;
-        scope.graphData.macroList.push(data.name)
       }
     });
     //graphModel.macros[name] = shellParser.createMacro(name, descr, command);

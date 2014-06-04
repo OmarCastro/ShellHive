@@ -24,11 +24,13 @@ module.exports = {
   },
 
   ValidateConnection: function(graph, newConnection, callback){
-    function portType(p){
-      return (p == "output" || p == "error" || p == "retcode")
+    function portType(c,p){
+      if(c.data.type == "input") return true;
+      else if(c.data.type == "output") return false;
+      else return (p == "output" || p == "error" || p == "retcode");
     }
 
-    function portTypeName(p){return portType(p) ? "output" : "input"}
+    function portTypeName(c,p){return portType(c,p) ? "output" : "input"}
 
     async.series([
       function(cb){
@@ -36,18 +38,19 @@ module.exports = {
         var sPort = newConnection.startPort 
         var eNode = newConnection.endNode 
         var ePort = newConnection.endPort
+        var sComponent = _.find(graph.components, function(comp){return comp.id == sNode})
+        var eComponent = _.find(graph.components, function(comp){return comp.id == eNode})
+
         if(sNode == eNode){return cb({message:"Trying to connect the same node"})}
-        else if(portType(sPort) == portType(ePort)){
-          var portName = portTypeName(sPort)
+        else if(portType(sComponent,sPort) == portType(eComponent,ePort)){
+          var portName = portTypeName(sComponent,sPort)
           return cb({message:"Trying to connect an "+ portName +" with another " + portName})
         }
-        var sComponent = _.find(graph.components, function(comp){return comp.id == sNode})
         if(sComponent.data.type == "file" &&
            _.some(graph.connections, function(conn){return conn.endNode == sComponent.id})){
          return cb({message: "Trying to read a file used to write"})
         }
 
-        var eComponent = _.find(graph.components, function(comp){return comp.id == eNode})
         if(eComponent.data.type == "file" &&
            _.some(graph.connections, function(conn){return conn.startNode == eComponent.id})){
          return cb({message: "Trying to write a file used to read"})

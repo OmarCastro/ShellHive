@@ -79,7 +79,7 @@ var CollaborationService = module.exports = {
       clients: clientsData,
       visitor: data.visitor,
       you: data,
-      implementedCommands: parser.implementedCommands,
+      implementedCommands: parser.implementedCommands.filter(function(f){return f!="tee"}),
       SelectionOptions: parser.VisualSelectorOptions,
       graphs: project.graphs
     }

@@ -78,6 +78,8 @@ module.exports.bootstrap = function (cb) {
       },
       {
         data:{
+          inputs:["input"],
+          outputs:["output", "error"],
           name:"macroTest",
           description:"a test macro"
         },
@@ -96,7 +98,8 @@ module.exports.bootstrap = function (cb) {
         var toMap = (res.length < dummyCommands.length)?res:dummyCommands
         var series = toMap.map(function(__, i){
           return function(cb){
-            GraphGeneratorService.addToGraph(res[i].id,dummyCommands[i],cb);
+
+            GraphGeneratorService.addToGraph(res[i].id,dummyCommands[i],cb,res[i].type == "macro");
           }
         });
         series.push(function(cb){

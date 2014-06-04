@@ -35,28 +35,17 @@ function metaGraphfromCommand(command){
   }
     
 
-
-/* istanbul ignore next */
-function addInputAndOutputs(graph, newComponent){
-  //async.parallel(
-  //  componentsToCreate.map(function(component){
-  //    return function(done){
-  //      Component.create(component).exec(done);
-  //    };
-  //  });
-  //Component.create(component).exec(done);
-}
-
-
 /* istanbul ignore next */
 function createComponent(projectId, graphId, command, position, cb){
   var indexOfSpace = command.indexOf(" ");
   var firstWord = (indexOfSpace > -1 ) ? command.slice(0, command.indexOf(" ")) : command;
   var componentData;
+  var input = "input"
   //sails.log('command ', command, "1st word:", firstWord);
   if(firstWord.indexOf('.') >= 0){
     componentData = {
         graph: graphId,
+        type:"file",
         data: { type:"file", filename: firstWord }
       };
     
@@ -64,6 +53,7 @@ function createComponent(projectId, graphId, command, position, cb){
       var metagraph = metaGraphfromCommand(command);  
       componentData = {
         graph: graphId,
+        type:"command",
         data: metagraph.components[0]
       };
   } else {
@@ -74,8 +64,10 @@ function createComponent(projectId, graphId, command, position, cb){
           if(graph.data.name === command){
             componentData = {
               graph: graphId,
+              type:"macro",
               data: { type:"macro", graph: graph.id }
             };
+            input = "macroIn0";
             return true
           } else return false
         })
@@ -85,19 +77,21 @@ function createComponent(projectId, graphId, command, position, cb){
   if(position){
     componentData.data.position = position;
   }
-  Component.create(componentData).exec(cb);   
+  Component.create(componentData).exec(function(err,res){
+    cb(err,res,input);
+  });   
 }
 
 /* istanbul ignore next */
 function createAndConnectComponent(projectId, graphId, command, componentId, startPort, position, cb){
-  createComponent(projectId, graphId, command,position, function(err,created){
+  createComponent(projectId, graphId, command,position, function(err,created, endPort){
     if(err) return cb(err);
     var connectionData = {
       graph     : graphId,
       startNode : componentId,
       startPort : startPort,
       endNode   : created.id,
-      endPort   : 'input'
+      endPort   : endPort
     }
     //sails.log('connectionData:', connectionData)
     Connection.create(connectionData).exec(function(err,createdConn){
@@ -117,16 +111,40 @@ module.exports = {
   parser:parser, 
 
   
-  addToGraph: function addToGraph(graphId, command, cb){
+  addToGraph: function addToGraph(graphId, command, cb, addInOut){
   cb = cb || function(){};
   var metagraph = GraphGeneratorService.metaGraphfromCommand(command);
   var components = metagraph.components;
+  var maxPos = 0
   var componentsToCreate = components.map(function(component){
+    if(addInOut){
+      component.position.x += 400;
+      maxPos = Math.max(maxPos, component.position.x);
+    }
     return {
       graph: graphId,
       data: JSON.stringify(component)
     }
   })
+
+  if(addInOut){
+    componentsToCreate = componentsToCreate.concat({
+      graph: graphId,
+      data: JSON.stringify({
+        type:"input",
+        position: {x:0, y:0},
+        ports:["input"]
+      })
+
+    },{
+      graph: graphId,
+      data: JSON.stringify({
+        type:"output",
+        position: {x:maxPos + 400, y:0},
+        ports:["output","error"]
+      })
+    })
+  }
 
   async.parallel(
     componentsToCreate.map(function(component){
@@ -175,7 +193,16 @@ module.exports = {
         graph.components = graph.components.map(function(comp){
           var data = comp.data;
           if(data.type == "macro"){
-            data.macro = _.find(graphs, function(graph){return graph.id == data.graph});
+            var macro = _.find(graphs, function(graph){return graph.id == data.graph});
+            data.macro = macro
+            data.inputs = macro.data.inputs
+            data.outputs = macro.data.outputs
+          }
+          if(data.type == "input"){
+            data.ports = graph.data.inputs
+          }
+          if(data.type == "output"){
+            data.ports = graph.data.outputs
           }
           data.id = comp.id; return data
         });

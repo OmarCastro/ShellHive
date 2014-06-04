@@ -98,7 +98,7 @@ module.exports = {
     GraphGeneratorService.compileGraph(req.socket.graphId, function(err, result){
       if(err) return next(err);
       res.json({
-        command: result,
+        command: result.pretty,
       })
     })
   },
@@ -108,7 +108,7 @@ module.exports = {
     GraphGeneratorService.compileProject(req.socket.projectId, function(err, result){
       if(err) return next(err);
       res.json({
-        command: result,
+        command: result.pretty,
       })
     })
   },
@@ -137,8 +137,9 @@ module.exports = {
 
   runGraph:function(req,res, next){
 
-    GraphGeneratorService.compileGraph(req.socket.graphId, function(err, command){
+    GraphGeneratorService.compileGraph(req.socket.graphId, function(err, result){
       if(err) return next(err);
+      var command = result.commands;
       var projId = req.socket.projectId
       sails.log("to exectute: ", command)
       var child = ExecutionService.execute(command, projId)
@@ -160,7 +161,7 @@ module.exports = {
         //console.log('child process exited with code ' + code);
       });
       res.json({
-        command: command,
+        command: result,
       })
     })
   },

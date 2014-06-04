@@ -22,6 +22,7 @@ var cssFilesToInject = [
 // Client-side javascript files to inject in order
 // (uses Grunt-style wildcard/glob/splat expressions)
 var jsFilesToInject = [
+	'bower_components/lazy.js/lazy.js',
 	'bower_components/angular/angular.min.js',
 	'bower_components/angular-animate/angular-animate.min.js',
 	'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'

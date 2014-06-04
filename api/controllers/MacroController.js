@@ -8,6 +8,8 @@
 module.exports = {
   create:function(req,res,next){
     var data = req.body.data;
+    data.data.inputs = ["input"]
+    data.data.outputs = ["output", "error"]
     data.project = req.socket.projectId
     var command = req.body.command;
     Graph.find({project: data.project, type:'macro'}).exec(function(err,graphs){
@@ -29,8 +31,9 @@ module.exports = {
                 name:created.data.name,
                 macro: created.id
               })
-            })
+            }, true)
           }
+
           sails.log('Created macro with name '+created.name);
         });        
       }
@@ -39,6 +42,22 @@ module.exports = {
   },
 
   setData: function(req,res,next){
+    var userID = req.user.id;
+    var id = req.body.macroId;
+    var data = req.body.data;
+    Graph.findOne(id).exec(function(err,created){
+      if(err || !created) return next(err);
+      created.data = data;
+      created.save(function(){
+        CollaborationService.updateMacroList(req.socket);
+        res.json({
+          message: "macro updated"
+        })
+      })
+    });
+  },
+
+  removeInput: function(req,res,next){
     var userID = req.user.id;
     var id = req.body.macroId;
     var data = req.body.data;

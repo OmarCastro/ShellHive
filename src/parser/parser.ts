@@ -19,15 +19,16 @@ export import IndexedGraph = GraphModule.IndexedGraph
 export var parserCommand = {
   awk: require('./commands/awk'),
   cat: require('./commands/cat'),
-  date: require('./commands/date'),
-  ls: require('./commands/ls'),
   curl: require('./commands/curl'),
-  grep: require('./commands/grep'),
-  bunzip2: require('./commands/bunzip2'),
+  date: require('./commands/date'),
   diff: require('./commands/diff'),
+  bunzip2: require('./commands/bunzip2'),
   bzcat: require('./commands/bzcat'),
   bzip2: require('./commands/bzip2'),
+  grep: require('./commands/grep'),
+  ls: require('./commands/ls'),
   //compress: require('./commands/compress'),
+  sort: require('./commands/sort'),
   gzip: require('./commands/gzip'),
   gunzip: require('./commands/gunzip'),
   zcat: require('./commands/zcat'),
@@ -125,15 +126,15 @@ export function parseCommand(command){
     }
   }
 
-export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string){
+export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string){
 
 
   fifoPrepend = fifoPrepend || "/tmp/fifo-"
 
-  var escapeSingleQuote = (commandString:string) => commandString.split("'").join("'\"'\"'")
 
   var fifos =  [];
   var commands = []
+  var retOutputs = []
   var IndexedGraph = {
     inConnectedComponent: <mod>{},
     outConnectedComponent:<mod>{}
@@ -287,10 +288,28 @@ export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string
   
 
   case MacroComponent.type:
-    return commands.push("(" 
-      + parseVisualDataExperimental(component["macro"], fifoPrepend+component.id+"-")
-      +")"
-    );
+    var result = aux_parseVisualDataExperimental(component["macro"], fifoPrepend+component.id+"-")
+    fifos = fifos.concat(result.fifos);
+    commands = commands.concat(result.commands);
+    if(result.outputs){
+      result.outputs.forEach(output => {
+        var command = "tee < "+output.fifo;
+        var connections = outConnection.byPortList[output.port];
+        if(connections && connections.length){
+          var len = connections.length - 1
+          for(var i = 0;i<len;++i){
+            var value = connections[i];
+            command += " "+fifoPrepend+value.endNode+"-"+value.endPort
+          }
+          command += " > "+fifoPrepend+connections[len].endNode+"-"+connections[len].endPort
+        }
+        commands.push(command);
+      });
+    }
+
+
+
+    return 
 
   case FileComponent.type:
     if(inByPort["input"]){
@@ -306,7 +325,7 @@ export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string
         commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >>  "+ component["filename"]);
       } else commands.push("cat "+fifo+" >> " + component["filename"] );
     } else if(outConnections && outConnections.length > 0){
-      parsedExec = "pv " + component["filename"];
+      parsedExec = "pv -f " + component["filename"];
       var len = outConnections.length - 1
       if(len > 0){
         parsedExec += " | tee" 
@@ -319,15 +338,69 @@ export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string
       commands.push(parsedExec);
     }
     return;
-
+  case "input":
+    component["ports"].forEach((port,index)=>{
+      var portName = "macroIn"+index
+      var connections = outConnection.byPortList[portName];
+      var command = "tee < "+fifoPrepend+portName
+      if(connections && connections.length){
+        var len = connections.length - 1
+        if(len > 0){
+          for(var i = 0;i<len;++i){
+            var value = connections[i];
+            command += " "+fifoPrepend+value.endNode+"-"+value.endPort
+          }
+        } else {
+          command += " > "+fifoPrepend+connections[len].endNode+"-"+connections[len].endPort
+        }
+      } else {
+        command += " > /dev/null"
+      }
+      commands.push(command);
+    })
+    return;
+  case "output":
+    component["ports"].forEach((port,index)=>{
+      var portName = "macroOut"+index
+      var newFifo = fifoPrepend+portName
+      var fifo = fifoPrepend+component.id+"-"+portName;
+      fifos.push(newFifo);
+      retOutputs.push({fifo:newFifo,port:portName});
+      var connections = inConnection.byPortList[portName];
+      if(connections && connections.length){
+        var len = connections.length
+        if(len > 1){
+          commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ > "+newFifo);
+        } else {
+          commands.push("cat "+fifo+" > "+newFifo);
+        }
+      } else {
+        commands.push("echo '' > "+newFifo)
+      }
+    })
+    return;
+    console.log("..component...",JSON.stringify(component))
   }
   });
 
-  var mkfifos = ["mkfifo"].concat(fifos).join(" ")
-  var result_commands = commands.map(command => "echo '"+escapeSingleQuote(command)+"' >> /tmp/sHiveExec.sh")
+  return {
+    fifos: fifos,
+    commands: commands,
+    outputs:retOutputs
+  }
+}
 
-
-  return [mkfifos].concat(result_commands,["timeout 10 parallel < /tmp/sHiveExec.sh -uj "+commands.length]).join("\n");
+export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string){
+  var escapeSingleQuote = (commandString:string) => commandString.split("'").join("'\"'\"'")
+  var result = aux_parseVisualDataExperimental(VisualData,fifoPrepend)
+  var mkfifos = ["mkfifo"].concat(result.fifos).join(" ")
+  var result_commands = result.commands.map(command => "echo '"+escapeSingleQuote(command)+"' >> /tmp/sHiveExec.sh")
+  var real_commands = [mkfifos].concat(result_commands,["timeout 10 parallel < /tmp/sHiveExec.sh -uj "+result_commands.length + " --halt 2"]).join("\n");
+  var pretty_printed_commands = [mkfifos].concat(result.commands.map(c=>c+" &")).join("\n");
+  return {
+    commands: real_commands,
+    pretty: pretty_printed_commands
+  }
 }
 
 
@@ -544,6 +617,9 @@ export function graphFromJsonObject(jsonObj){
         console.log(subgraph.components);
         console.log(subgraph.connections);
         newComponent = new MacroComponent(subgraph);
+      case "input":
+      case "output":
+        newComponent = component;
     }
     /* istanbul ignore next */
     if(!newComponent){ return; }

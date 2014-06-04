@@ -11,8 +11,17 @@ app.directive("port", function($document){
       var elem = element[0];
       var imstyle = elem.style;
       scope.componentId = datanode.id;
-      scope.isOutputNode = graphController.isOutputPort(attr.port)
-      
+
+      var mIn= "macroIn"
+      var mOut= "macroOut"
+
+      if(datanode.type == "input" || (attr.port.slice(0,mOut.length) == mOut && datanode.type != "output")){
+        scope.isOutputNode = true
+      } else if(datanode.type == "output" || (attr.port.slice(0,mIn.length) == mIn && datanode.type == "input")){
+        scope.isOutputNode = false
+      } else {
+        scope.isOutputNode = graphController.isOutputPort(attr.port)
+      }
 
       element.bind("pointerdown", function(ev){
         var event = ev.originalEvent;
@@ -48,7 +57,7 @@ app.directive("port", function($document){
         $pointedElem = $(pointedElem);
 
         if (graphController.isFreeSpace(pointedElem)) {
-          if (graphController.isOutputPort(attr.port)) {
+          if (scope.isOutputNode) {
             graphController.showPopup(event, scope.componentId, attr.port, null, 'input');
           } else {
             graphController.showPopup(event, null, 'output', scope.componentId, attr.port);

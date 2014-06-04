@@ -5,8 +5,58 @@ app.directive("component", function($document){
     require: '^graph',
     scope: true,
     link: function(scope, element, attr, graphModelController){
-      var datanode, startX, startY, title, position, elem, imstyle, mousemove, moveBy, mouseup;
-      datanode = scope.data;
+
+      var datanode = scope.data;
+      function findMacro(){
+        var macros = scope.graphData.macros;
+        var ref = scope.graphData.macroList
+        for (var i = ref.length - 1; i >= 0; i--) {
+          var macro = macros[ ref[i] ];
+          if(macro.id == datanode.graph){
+            return macro
+          }
+        };
+      };
+      function updatePorts (){
+        scope.inputPorts = [];
+        scope.outputPorts = [];
+          switch(datanode.type){
+            case 'file':
+              scope.inputPorts = [{name: "input", text:"overwrite"}
+                                 ,{name: "append", text:"append"}]
+              scope.outputPorts = [{name: "output", text:"content"}]
+              break;
+            case 'command':
+              scope.inputPorts =  [{name: "input",  text:"stdin"}]
+              scope.outputPorts = [{name: "output", text:"stdout"}
+                                  ,{name: "error",  text:"stderr"}
+                                  ,{name: "retcode",text:"return"}]
+              break;
+            case 'macro':
+              var macro = findMacro();
+              scope.inputPorts = macro.inputs.map(function(text,index){
+                return {name: "macroIn"+index,text:text}
+              })
+              scope.outputPorts = macro.outputs.map(function(text,index){
+                return {name: "macroOut"+index,text:text}
+              })
+              break;
+            default:
+              scope.inputPorts = [];
+              scope.outputPorts = [];
+          }
+        if(scope.collapsed){
+          console.log("collapsed")
+          scope.inputPorts = scope.inputPorts.filter(existConnectionToPort)
+          scope.outputPorts = scope.outputPorts.filter(existConnectionToPort)
+        }
+      }
+
+      updatePorts();
+
+
+
+      var startX, startY, title, position, elem, imstyle, mousemove, moveBy, mouseup;
       startX = 0;
       startY = 0;
       title = datanode.title;
@@ -37,6 +87,8 @@ app.directive("component", function($document){
         })
       }
 
+
+
     switch(datanode.type){
     case 'file':
       scope.title = {
@@ -49,54 +101,16 @@ app.directive("component", function($document){
       }
       break;
     case 'macro':
-      var macros = scope.graphData.macros;
-      scope.graphData.macroList.every(function(macroName){
-        var macro = macros[macroName];
-        if(macro.id == datanode.graph){
-          scope.title = {
-            name: macro.name,
-            description: macro.description
-          }
-          return false;
-        }
-        return true;
-      })
+      var macro = findMacro();
+      scope.title = {
+        name: macro.name,
+        description: macro.description
+      }
       break;
     }
 
+
     scope.updatePorts = updatePorts;
-     function updatePorts (){
-                  console.log("updatePorts")
-
-        scope.inputPorts = [];
-        scope.outputPorts = [];
-          switch(datanode.type){
-            case 'file':
-              scope.inputPorts = [{name: "input", text:"overwrite"},{name: "append", text:"append"}]
-              scope.outputPorts = [{name: "output", text:"content"}]
-              break;
-            case 'command':
-            case 'macro':
-              scope.inputPorts = [{name: "input", text:"stdin"}]
-              scope.outputPorts = [{name: "output", text:"stdout"}
-                            ,{name: "error", text:"stderr"}
-                            ,{name: "retcode", text:"return"}]
-              break;
-            default:
-              scope.inputPorts = [];
-              scope.outputPorts = [];
-          }
-        if(scope.collapsed){
-          console.log("collapsed")
-          scope.inputPorts = scope.inputPorts.filter(existConnectionToPort)
-          scope.outputPorts = scope.outputPorts.filter(existConnectionToPort)
-        }
-      }
-
-
-
-
-      updatePorts();
 
       scope.update();
       elem = element[0];

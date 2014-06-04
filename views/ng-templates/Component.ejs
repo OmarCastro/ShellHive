@@ -22,8 +22,7 @@
         <div data-port="{{port.name}}" ng-repeat="port in outputPorts">        
           <span class="text" ng-bind="port.text"></span>
           <span class="box"></span>
-       </div>
-
+        </div>
       </div>
       <div style="clear: both;"></div>
     </div>
@@ -33,12 +32,16 @@
   <div ng-switch-when="input">
     <div class="title"> INPUTS </div>
     <div class="ports">
-      <div class="input">
-        <span ng-repeat="port in data.ports">
-          <span data-port="input" class="box"></span>
+      <div class="output">
+        <div>
+          <div ng-repeat="port in data.ports track by $index">
+          <button  ng-if="!collapsed" ng-click="data.ports.splice($index,1)" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span>
+        </button>        
           <input type="text" ng-model="data.ports[$index]">
-          <br>
-        </span>
+          <span data-port="{{'macroIn'+$index}}"><span class="box"></span></span>
+        </div>
+                </div>
+
         <button ng-click="data.ports.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
     </div>
@@ -48,11 +51,15 @@
     <div class="title"> OUTPUTS </div>
     <div class="ports">
       <div class="input">
-        <span ng-repeat="port in data.ports">
-          <span data-port="input" class="box"></span>
+        <div>
+        <div ng-repeat="port in data.ports track by $index">        
+          <span data-port="{{'macroOut'+$index}}"><span class="box"></span></span>
           <input type="text" ng-model="data.ports[$index]">
-          <br>
-        </span>
+          <button  ng-if="!collapsed" ng-click="data.ports.splice($index,1)" class="btn btn-xs btn-default">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>        </div>
+        </div>
+
         <button ng-click="data.ports.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
     </div>
@@ -77,17 +84,17 @@
         </span>
         <input type="text" ng-model="data.files[$index]" ng-if="isString(data.files[$index])">
         <span ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])"></span>
-        <button  ng-if="!collapsed" ng-click="data.files.splice($index,1)" class="btn btn-xs btn-default">
+        <button  ng-if="!collapsed" ng-click="data.files.splice($index,1);$emit('updateComponent',data)" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-remove"></span>
         </button>
-        <button  ng-click="swapPrevious(data.files,$index,data.id)" ng-if="$index && !collapsed" class="btn btn-xs btn-default">
+        <button  ng-click="swapPrevious(data.files,$index,data.id);$emit('updateComponent',data)" ng-if="$index && !collapsed" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-chevron-up"></span>
         </button>
-        <button ng-click="swapPrevious(data.files,$index + 1,data.id)" ng-if="$index != data.files.length -1 && !collapsed" class="btn btn-xs btn-default">
+        <button ng-click="swapPrevious(data.files,$index + 1,data.id);$emit('updateComponent',data)" ng-if="$index != data.files.length -1 && !collapsed" class="btn btn-xs btn-default">
         <span class="glyphicon glyphicon-chevron-down"></span>
         </button><br>
       </div>
-      <button ng-if="!collapsed" ng-click="data.files.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button><br>
+      <button ng-if="!collapsed" ng-click="data.files.push('');$emit('updateComponent',data)" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button><br>
     </div>
     <div ng-if="data.exec == 'awk'">script:<br>
       <textarea parameter-field type="text" ng-model="data.script"></textarea>

@@ -179,11 +179,11 @@ describe("Sails test", function(){
   describe('Sails Graph compile', function(done) {
     it('should compile a graph in a database', function (done) {
       global.GraphGeneratorService.compileGraph(1,function(err, result){
-       expect(result).to.equal(
+       expect(result.pretty).to.equal(
         ["mkfifo /tmp/fifo-1-file0 /tmp/fifo-3-input"
-        ,"echo 'cat /tmp/fifo-1-file0 > /tmp/fifo-3-input' >> /tmp/sHiveExec.sh"
-        ,"echo 'pv json.txt > /tmp/fifo-1-file0' >> /tmp/sHiveExec.sh"
-        ,"echo 'grep < /tmp/fifo-3-input Gloss' >> /tmp/sHiveExec.sh"
+        ,"cat /tmp/fifo-1-file0 > /tmp/fifo-3-input &"
+        ,"pv json.txt > /tmp/fifo-1-file0 &"
+        ,"grep < /tmp/fifo-3-input Gloss &"
         ,"timeout 10 parallel < /tmp/sHiveExec.sh -uj 3"].join("\n")); 
        done();
       });
@@ -195,7 +195,7 @@ describe("Sails test", function(){
         function(cb){service.compileGraph(1, cb)},
         function(cb){service.compileProject(1, cb)}
       ], function(err,results){
-        expect(results[0]).to.equal(results[1])
+        expect(results[0]).to.eql(results[1])
         done();
       })
     });
