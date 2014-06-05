@@ -199,16 +199,16 @@
     <h1>Code coverage report for <span class="entity">api/controllers/GraphController.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">1.47% <small>(1 / 68)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">1.32% <small>(1 / 76)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">0% <small>(0 / 28)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">0% <small>(0 / 30)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Functions: <span class="metric">0% <small>(0 / 24)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">0% <small>(0 / 27)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">1.79% <small>(1 / 56)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">1.56% <small>(1 / 64)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -383,7 +383,32 @@
 165
 166
 167
-168</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -437,6 +462,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -468,6 +498,21 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -512,13 +557,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -529,6 +570,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -547,6 +593,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -598,7 +648,12 @@ module.exports = {
       req.socket.projectId, req.socket.graphId, body.command,
       body.componentId, body.startPort, body.position,
 <span class="fstat-no" title="function not covered" >      function(err, result){</span>
-<span class="cstat-no" title="statement not covered" >        if(err) <span class="cstat-no" title="statement not covered" >return next(err)</span></span>
+<span class="cstat-no" title="statement not covered" >        if(err) {</span>
+<span class="cstat-no" title="statement not covered" >          res.json({</span>
+            alert:true,
+            message: err,
+          })
+        }
 <span class="cstat-no" title="statement not covered" >        CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {</span>
           type:"addComponent",
           component: result.component,
@@ -631,11 +686,26 @@ module.exports = {
       })
   },
 &nbsp;
+  removePipe: <span class="fstat-no" title="function not covered" >function(req,res, next){</span>
+<span class="cstat-no" title="statement not covered" >    var body = req.body;</span>
+<span class="cstat-no" title="statement not covered" >    Connection.destroy(body.data.id).exec(<span class="fstat-no" title="function not covered" >function(err, deleted){</span></span>
+<span class="cstat-no" title="statement not covered" >      if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
+<span class="cstat-no" title="statement not covered" >      CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {</span>
+        type:"removePipe",
+        pipes: deleted,
+      });
+<span class="cstat-no" title="statement not covered" >      res.json({</span>
+          message: "pipe sucessfully removed",
+          pipes: deleted
+        })
+    });
+  },
+&nbsp;
   compile:<span class="fstat-no" title="function not covered" >function(req,res, next){</span>
 <span class="cstat-no" title="statement not covered" >    GraphGeneratorService.compileGraph(req.socket.graphId, <span class="fstat-no" title="function not covered" >function(err, result){</span></span>
 <span class="cstat-no" title="statement not covered" >      if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
 <span class="cstat-no" title="statement not covered" >      res.json({</span>
-        command: result,
+        command: result.pretty,
       })
     })
   },
@@ -645,7 +715,7 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >    GraphGeneratorService.compileProject(req.socket.projectId, <span class="fstat-no" title="function not covered" >function(err, result){</span></span>
 <span class="cstat-no" title="statement not covered" >      if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
 <span class="cstat-no" title="statement not covered" >      res.json({</span>
-        command: result,
+        command: result.pretty,
       })
     })
   },
@@ -674,8 +744,9 @@ module.exports = {
 &nbsp;
   runGraph:<span class="fstat-no" title="function not covered" >function(req,res, next){</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    GraphGeneratorService.compileGraph(req.socket.graphId, <span class="fstat-no" title="function not covered" >function(err, command){</span></span>
+<span class="cstat-no" title="statement not covered" >    GraphGeneratorService.compileGraph(req.socket.graphId, <span class="fstat-no" title="function not covered" >function(err, result){</span></span>
 <span class="cstat-no" title="statement not covered" >      if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
+<span class="cstat-no" title="statement not covered" >      var command = result.commands;</span>
 <span class="cstat-no" title="statement not covered" >      var projId = req.socket.projectId</span>
 <span class="cstat-no" title="statement not covered" >      sails.log("to exectute: ", command)</span>
 <span class="cstat-no" title="statement not covered" >      var child = ExecutionService.execute(command, projId)</span>
@@ -697,7 +768,7 @@ module.exports = {
         //console.log('child process exited with code ' + code);
       });
 <span class="cstat-no" title="statement not covered" >      res.json({</span>
-        command: command,
+        command: result,
       })
     })
   },
@@ -715,6 +786,10 @@ module.exports = {
       });
     });
   },
+&nbsp;
+  action: <span class="fstat-no" title="function not covered" >function(req, res, next){</span>
+<span class="cstat-no" title="statement not covered" >    CollaborationService.broadcastMessageInGraph(req,res)</span>
+  },
   
 };
 &nbsp;</pre></td></tr>
@@ -722,7 +797,7 @@ module.exports = {
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed May 28 2014 01:01:16 GMT+0000 (UTC)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 05 2014 15:40:24 GMT+0000 (UTC)</div>
 </div>
 
 <script src="../../prettify.js"></script>

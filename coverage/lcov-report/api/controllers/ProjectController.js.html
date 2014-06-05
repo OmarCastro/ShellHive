@@ -199,16 +199,16 @@
     <h1>Code coverage report for <span class="entity">api/controllers/ProjectController.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">39.81% <small>(43 / 108)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">34.11% <small>(44 / 129)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">43.1% <small>(25 / 58)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">39.06% <small>(25 / 64)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Functions: <span class="metric">43.33% <small>(13 / 30)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">36.11% <small>(13 / 36)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">40.66% <small>(37 / 91)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">34.86% <small>(38 / 109)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric">6 statements, 1 function, 6 branches</span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -409,7 +409,43 @@
 191
 192
 193
-194</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -417,6 +453,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
@@ -451,12 +489,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -470,6 +537,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -610,6 +682,8 @@
  */
 &nbsp;
 var fs = require('fs');
+var fsExtra = require('fs.extra');
+&nbsp;
 /* istanbul ignore next */
 function walk(dir, done) {
   var results = [];
@@ -640,6 +714,11 @@ module.exports = {
   new:function(req, res){
     res.view({});
   },
+&nbsp;
+  setmyname:<span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    CollaborationService.setSocketName(req.socket,req.body);</span>
+<span class="cstat-no" title="statement not covered" >    res.json("done");</span>
+  },
   
   create: <span class="fstat-no" title="function not covered" >function(req,res, next){</span>
 <span class="cstat-no" title="statement not covered" >    var userID = req.user.id;</span>
@@ -648,10 +727,34 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >      if(!created) <span class="cstat-no" title="statement not covered" >return next();</span></span>
 <span class="cstat-no" title="statement not covered" >      created.members.add(userID);</span>
 <span class="cstat-no" title="statement not covered" >      created.save(<span class="fstat-no" title="function not covered" >function foundUser (err, user){</span></span>
-<span class="cstat-no" title="statement not covered" >          if(err) <span class="cstat-no" title="statement not covered" >res.json(err);</span></span>
-          else <span class="cstat-no" title="statement not covered" >res.redirect("/project/show/"+created.id); </span>
+<span class="cstat-no" title="statement not covered" >         var fsPath = sails.config.shusee.fsPath</span>
+<span class="cstat-no" title="statement not covered" >          var directoryToCreate = fsPath+'/projects/' + created.id;</span>
+<span class="cstat-no" title="statement not covered" >          if(err) <span class="cstat-no" title="statement not covered" >return res.json(err);</span></span>
+<span class="cstat-no" title="statement not covered" >          fs.mkdirSync(directoryToCreate);</span>
+<span class="cstat-no" title="statement not covered" >          res.redirect("/project/show/"+created.id); </span>
         });
 <span class="cstat-no" title="statement not covered" >      sails.log('Created project with name '+created.name);</span>
+    });
+  },
+&nbsp;
+  createdemo: <span class="fstat-no" title="function not covered" >function(req,res, next){</span>
+<span class="cstat-no" title="statement not covered" >    Project.create({</span>
+      name:"public",
+      visibility: "global"
+    }).exec(<span class="fstat-no" title="function not covered" >function(err,created){</span>
+<span class="cstat-no" title="statement not covered" >        if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
+<span class="cstat-no" title="statement not covered" >        var fsPath = sails.config.shusee.fsPath</span>
+<span class="cstat-no" title="statement not covered" >        var directoryToCreate = fsPath+'/projects/' + created.id;</span>
+<span class="cstat-no" title="statement not covered" >        fs.mkdirSync(directoryToCreate);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      Graph.create({project:created.id, type:"root"}).exec(<span class="fstat-no" title="function not covered" >function(err, res2){</span></span>
+<span class="cstat-no" title="statement not covered" >        if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
+<span class="cstat-no" title="statement not covered" >        GraphGeneratorService.addToGraph(res2.id,"curl -s http://get.docker.io/ubuntu/ | grep \"#\"",<span class="fstat-no" title="function not covered" >function(err,__){</span></span>
+<span class="cstat-no" title="statement not covered" >          if(err) <span class="cstat-no" title="statement not covered" >return next(err);</span></span>
+<span class="cstat-no" title="statement not covered" >          res.redirect("/project/play/"+created.id); </span>
+        });
+      });
+<span class="cstat-no" title="statement not covered" >      sails.log('Created public project');</span>
     });
   },
     
@@ -663,6 +766,11 @@ module.exports = {
         members:project.members
       });
     });
+  },
+&nbsp;
+&nbsp;
+  chat:<span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    CollaborationService.chat(req,res);</span>
   },
 &nbsp;
 &nbsp;
@@ -800,7 +908,7 @@ module.exports = {
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed May 28 2014 01:01:16 GMT+0000 (UTC)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 05 2014 15:40:24 GMT+0000 (UTC)</div>
 </div>
 
 <script src="../../prettify.js"></script>

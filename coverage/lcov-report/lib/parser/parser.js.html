@@ -195,20 +195,20 @@
     </style>
 </head>
 <body>
-<div class="header high">
+<div class="header medium">
     <h1>Code coverage report for <span class="entity">lib/parser/parser.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">100% <small>(223 / 223)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">74.94% <small>(305 / 407)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">92.96% <small>(66 / 71)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">63.76% <small>(95 / 149)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Functions: <span class="metric">100% <small>(22 / 22)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">91.89% <small>(34 / 37)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">100% <small>(222 / 222)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">74.88% <small>(304 / 406)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric">1 statement, 1 branch</span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -588,7 +588,293 @@
 370
 371
 372
-373</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -613,6 +899,7 @@
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -642,7 +929,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">4</span>
+<span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -654,7 +941,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">125</span>
+<span class="cline-any cline-yes">122</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -668,82 +955,359 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">156</span>
-<span class="cline-any cline-yes">197</span>
-<span class="cline-any cline-yes">197</span>
-<span class="cline-any cline-yes">197</span>
-<span class="cline-any cline-yes">197</span>
-<span class="cline-any cline-yes">197</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-yes">194</span>
+<span class="cline-any cline-yes">194</span>
+<span class="cline-any cline-yes">194</span>
+<span class="cline-any cline-yes">194</span>
+<span class="cline-any cline-yes">194</span>
 <span class="cline-any cline-yes">6</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">191</span>
+<span class="cline-any cline-yes">188</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">191</span>
+<span class="cline-any cline-yes">188</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">191</span>
-<span class="cline-any cline-yes">191</span>
-<span class="cline-any cline-yes">191</span>
-<span class="cline-any cline-yes">191</span>
+<span class="cline-any cline-yes">188</span>
+<span class="cline-any cline-yes">188</span>
+<span class="cline-any cline-yes">188</span>
+<span class="cline-any cline-yes">188</span>
 <span class="cline-any cline-yes">35</span>
 <span class="cline-any cline-yes">35</span>
 <span class="cline-any cline-yes">35</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">191</span>
-<span class="cline-any cline-yes">191</span>
-<span class="cline-any cline-yes">156</span>
+<span class="cline-any cline-yes">188</span>
+<span class="cline-any cline-yes">188</span>
+<span class="cline-any cline-yes">153</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">150</span>
-<span class="cline-any cline-yes">150</span>
-<span class="cline-any cline-yes">150</span>
-<span class="cline-any cline-yes">150</span>
-<span class="cline-any cline-yes">150</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">118</span>
+<span class="cline-any cline-yes">147</span>
+<span class="cline-any cline-yes">147</span>
+<span class="cline-any cline-yes">147</span>
+<span class="cline-any cline-yes">147</span>
+<span class="cline-any cline-yes">147</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">48</span>
-<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-yes">115</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">47</span>
-<span class="cline-any cline-yes">47</span>
-<span class="cline-any cline-yes">47</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">6</span>
 <span class="cline-any cline-yes">6</span>
 <span class="cline-any cline-yes">6</span>
 <span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">47</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">9</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">44</span>
+<span class="cline-any cline-yes">121</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43</span>
+<span class="cline-any cline-yes">43</span>
+<span class="cline-any cline-yes">43</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">83</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -754,42 +1318,42 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">89</span>
-<span class="cline-any cline-yes">90</span>
-<span class="cline-any cline-yes">351</span>
+<span class="cline-any cline-yes">82</span>
+<span class="cline-any cline-yes">83</span>
+<span class="cline-any cline-yes">339</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">350</span>
+<span class="cline-any cline-yes">338</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">89</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">82</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">345</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42</span>
-<span class="cline-any cline-yes">42</span>
-<span class="cline-any cline-yes">42</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">33</span>
-<span class="cline-any cline-yes">33</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">333</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">39</span>
+<span class="cline-any cline-yes">39</span>
+<span class="cline-any cline-yes">39</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">30</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">5</span>
@@ -799,24 +1363,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">261</span>
-<span class="cline-any cline-yes">261</span>
-<span class="cline-any cline-yes">42</span>
-<span class="cline-any cline-yes">42</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">240</span>
+<span class="cline-any cline-yes">240</span>
+<span class="cline-any cline-yes">39</span>
+<span class="cline-any cline-yes">39</span>
 <span class="cline-any cline-yes">10</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">32</span>
+<span class="cline-any cline-yes">29</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">261</span>
+<span class="cline-any cline-yes">240</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">12</span>
@@ -832,23 +1396,23 @@
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">3</span>
-<span class="cline-any cline-yes">84</span>
-<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">77</span>
+<span class="cline-any cline-yes">22</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20</span>
+<span class="cline-any cline-yes">17</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">86</span>
+<span class="cline-any cline-yes">79</span>
 <span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -856,10 +1420,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">86</span>
+<span class="cline-any cline-yes">79</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -867,7 +1431,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">87</span>
+<span class="cline-any cline-yes">80</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -923,6 +1487,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">5</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -987,15 +1559,16 @@ exports.IndexedGraph = IndexedGraph;
 exports.parserCommand = {
     awk: require('./commands/awk'),
     cat: require('./commands/cat'),
-    date: require('./commands/date'),
-    ls: require('./commands/ls'),
     curl: require('./commands/curl'),
-    grep: require('./commands/grep'),
-    bunzip2: require('./commands/bunzip2'),
+    date: require('./commands/date'),
     diff: require('./commands/diff'),
+    bunzip2: require('./commands/bunzip2'),
     bzcat: require('./commands/bzcat'),
     bzip2: require('./commands/bzip2'),
-    compress: require('./commands/compress'),
+    grep: require('./commands/grep'),
+    ls: require('./commands/ls'),
+    //compress: require('./commands/compress'),
+    sort: require('./commands/sort'),
     gzip: require('./commands/gzip'),
     gunzip: require('./commands/gunzip'),
     zcat: require('./commands/zcat'),
@@ -1092,17 +1665,294 @@ function parseCommand(command) {
 }
 exports.parseCommand = parseCommand;
 &nbsp;
+function aux_parseVisualDataExperimental(VisualData, fifoPrepend) {
+    fifoPrepend = fifoPrepend || "/tmp/fifo-";
+&nbsp;
+    var fifos = [];
+    var commands = [];
+    var retOutputs = [];
+    var IndexedGraph = {
+        inConnectedComponent: {},
+        outConnectedComponent: {}
+    };
+    VisualData.components.forEach(function (component) {
+        IndexedGraph.inConnectedComponent[component.id] = {
+            list: [],
+            byPortList: {}
+        };
+        IndexedGraph.outConnectedComponent[component.id] = {
+            list: [],
+            byPortList: {}
+        };
+    });
+&nbsp;
+    VisualData.connections.forEach(function (connection) {
+        var sNode = IndexedGraph.outConnectedComponent[connection.startNode];
+        sNode.list.push(connection);
+        var sPortList = sNode.byPortList[connection.startPort];
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (sPortList instanceof Array) {
+<span class="cstat-no" title="statement not covered" >            sPortList.push(connection);</span>
+        } else {
+            sNode.byPortList[connection.startPort] = [connection];
+        }
+&nbsp;
+        var eNode = IndexedGraph.inConnectedComponent[connection.endNode];
+        eNode.list.push(connection);
+        var ePortList = eNode.byPortList[connection.endPort];
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (ePortList instanceof Array) {
+<span class="cstat-no" title="statement not covered" >            ePortList.push(connection);</span>
+        } else {
+            eNode.byPortList[connection.endPort] = [connection];
+        }
+    });
+&nbsp;
+    VisualData.components.forEach(function (component) {
+        var portList = IndexedGraph.inConnectedComponent[component.id];
+        var byPortList = portList.byPortList;
+        var keys = Object.keys(byPortList);
+        keys.forEach(function (port) {
+            var connections = byPortList[port];
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (connections.length &gt; 1) {
+<span class="cstat-no" title="statement not covered" >                for (var i = connections.length - 1; i &gt;= 0; i--) {</span>
+<span class="cstat-no" title="statement not covered" >                    var fifo = port + "-" + i;</span>
+<span class="cstat-no" title="statement not covered" >                    connections[i].endPort = fifo;</span>
+<span class="cstat-no" title="statement not covered" >                    fifos.push(fifoPrepend + component.id + "-" + fifo);</span>
+                }
+            } else
+                fifos.push(fifoPrepend + component.id + "-" + port);
+        });
+    });
+&nbsp;
+    VisualData.components.forEach(function (component) {
+        var afterCommand = "";
+        var outConnection = IndexedGraph.outConnectedComponent[component.id];
+        var outConnections = outConnection.list;
+        var inConnection = IndexedGraph.inConnectedComponent[component.id];
+        var inByPort = inConnection.byPortList;
+        var len = outConnections.length;
+&nbsp;
+        switch (component.type) {
+            case exports.CommandComponent.type:
+                var outputs = outConnection.byPortList["output"];
+                var errors = outConnection.byPortList["error"];
+                var retcodes = outConnection.byPortList["retcode"];
+&nbsp;
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (component["files"]) {
+                    var files = component["files"];
+                    component["files"] = files.map(function (file, idx) {
+                        var connections = inByPort["file" + idx];
+                        <span class="missing-if-branch" title="if path not taken" >I</span>if (!connections)
+<span class="cstat-no" title="statement not covered" >                            return "-";</span>
+                        else <span class="missing-if-branch" title="if path not taken" >I</span>if (connections.length &gt; 1) {
+<span class="cstat-no" title="statement not covered" >                            var fifo = fifoPrepend + component.id + "-file" + idx;</span>
+<span class="cstat-no" title="statement not covered" >                            commands.push("find " + fifo + "-* | xargs grep -h --line-buffered ^ &gt; " + fifo);</span>
+<span class="cstat-no" title="statement not covered" >                            return fifo;</span>
+                        } else
+                            return fifoPrepend + component.id + "-file" + idx;
+                    });
+                }
+                var parsedExec = exports.parserCommand[component["exec"]].parseComponent(component, {}, {}, {});
+&nbsp;
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (errors &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >errors.length)</span> {
+<span class="cstat-no" title="statement not covered" >                    if (errors.length &gt; 1) {</span>
+<span class="cstat-no" title="statement not covered" >                        var newfifo = fifoPrepend + component.id + "-stderr";</span>
+<span class="cstat-no" title="statement not covered" >                        fifos.push(newfifo);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                        var len = errors.length - 1;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                        var newcommand = "tee &lt; " + newfifo;</span>
+<span class="cstat-no" title="statement not covered" >                        for (var i = 0; i &lt; len; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >                            var value = errors[i];</span>
+<span class="cstat-no" title="statement not covered" >                            newcommand += " " + fifoPrepend + value.endNode + "-" + value.endPort;</span>
+                        }
+<span class="cstat-no" title="statement not covered" >                        newcommand += " &gt; " + fifoPrepend + errors[len].endNode + "-" + errors[len].endPort;</span>
+<span class="cstat-no" title="statement not covered" >                        parsedExec += " 2&gt; " + newfifo;</span>
+<span class="cstat-no" title="statement not covered" >                        commands.push(newcommand);</span>
+                    } else {
+<span class="cstat-no" title="statement not covered" >                        parsedExec += " 2&gt; " + fifoPrepend + errors[0].endNode + "-" + errors[0].endPort;</span>
+                    }
+                }
+&nbsp;
+                if (outputs &amp;&amp; outputs.length) {
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (outputs.length &gt; 1) {
+<span class="cstat-no" title="statement not covered" >                        var len = outputs.length - 1;</span>
+<span class="cstat-no" title="statement not covered" >                        parsedExec += " | tee";</span>
+<span class="cstat-no" title="statement not covered" >                        for (var i = 0; i &lt; len; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >                            var value = outputs[i];</span>
+<span class="cstat-no" title="statement not covered" >                            parsedExec += " " + fifoPrepend + value.endNode + "-" + value.endPort;</span>
+                        }
+<span class="cstat-no" title="statement not covered" >                        parsedExec += " &gt; " + fifoPrepend + outputs[len].endNode + "-" + outputs[len].endPort;</span>
+                    } else {
+                        parsedExec += " &gt; " + fifoPrepend + outputs[0].endNode + "-" + outputs[0].endPort;
+                    }
+                }
+&nbsp;
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (retcodes &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >retcodes.length)</span> {
+<span class="cstat-no" title="statement not covered" >                    var newcommand = "; echo $?";</span>
+<span class="cstat-no" title="statement not covered" >                    var len = retcodes.length - 1;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    if (len &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >                        newcommand += " | tee";</span>
+<span class="cstat-no" title="statement not covered" >                        for (var i = 0; i &lt; len; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >                            var value = retcodes[i];</span>
+<span class="cstat-no" title="statement not covered" >                            newcommand += " " + fifoPrepend + value.endNode + "-" + value.endPort;</span>
+                        }
+                    }
+<span class="cstat-no" title="statement not covered" >                    newcommand += " &gt; " + fifoPrepend + retcodes[len].endNode + "-" + retcodes[len].endPort;</span>
+<span class="cstat-no" title="statement not covered" >                    parsedExec = "(" + parsedExec + newcommand + ")";</span>
+                }
+&nbsp;
+                if (inByPort["input"]) {
+                    var fifo = fifoPrepend + component.id + "-input";
+                    var len = inByPort["input"].length;
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (len &gt; 1) {
+<span class="cstat-no" title="statement not covered" >                        parsedExec = "find " + fifo + "-* | xargs -P" + len + " grep -h --line-buffered ^ | " + parsedExec;</span>
+                    } else <span class="missing-if-branch" title="if path not taken" >I</span>if (parsedExec.indexOf(" ") &lt; 0) {
+<span class="cstat-no" title="statement not covered" >                        parsedExec += " &lt; " + fifo;</span>
+                    } else {
+                        parsedExec = parsedExec.replace(" ", " &lt; " + fifo + " ");
+                    }
+                }
+&nbsp;
+                return commands.push(parsedExec);
+&nbsp;
+<span class="branch-1 cbranch-no" title="branch not covered" >            case exports.MacroComponent.type:</span>
+<span class="cstat-no" title="statement not covered" >                var result = exports.aux_parseVisualDataExperimental(component["macro"], fifoPrepend + component.id + "-");</span>
+<span class="cstat-no" title="statement not covered" >                fifos = fifos.concat(result.fifos);</span>
+<span class="cstat-no" title="statement not covered" >                commands = commands.concat(result.commands);</span>
+<span class="cstat-no" title="statement not covered" >                if (result.outputs) {</span>
+<span class="cstat-no" title="statement not covered" >                    result.outputs.forEach(<span class="fstat-no" title="function not covered" >function (output) {</span></span>
+<span class="cstat-no" title="statement not covered" >                        var command = "tee &lt; " + output.fifo;</span>
+<span class="cstat-no" title="statement not covered" >                        var connections = outConnection.byPortList[output.port];</span>
+<span class="cstat-no" title="statement not covered" >                        if (connections &amp;&amp; connections.length) {</span>
+<span class="cstat-no" title="statement not covered" >                            var len = connections.length - 1;</span>
+<span class="cstat-no" title="statement not covered" >                            for (var i = 0; i &lt; len; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >                                var value = connections[i];</span>
+<span class="cstat-no" title="statement not covered" >                                command += " " + fifoPrepend + value.endNode + "-" + value.endPort;</span>
+                            }
+<span class="cstat-no" title="statement not covered" >                            command += " &gt; " + fifoPrepend + connections[len].endNode + "-" + connections[len].endPort;</span>
+                        }
+<span class="cstat-no" title="statement not covered" >                        commands.push(command);</span>
+                    });
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                return;</span>
+&nbsp;
+            case exports.FileComponent.type:
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (inByPort["input"]) {
+<span class="cstat-no" title="statement not covered" >                    var fifo = fifoPrepend + component.id + "-input";</span>
+<span class="cstat-no" title="statement not covered" >                    var len = inByPort["input"].length;</span>
+<span class="cstat-no" title="statement not covered" >                    if (len &gt; 1) {</span>
+<span class="cstat-no" title="statement not covered" >                        commands.push("find " + fifo + "-* | xargs -P" + len + " grep -h --line-buffered ^ &gt;  " + component["filename"]);</span>
+                    } else
+<span class="cstat-no" title="statement not covered" >                        commands.push("cat " + fifo + " &gt; " + component["filename"]);</span>
+                } else <span class="missing-if-branch" title="if path not taken" >I</span>if (inByPort["append"]) {
+<span class="cstat-no" title="statement not covered" >                    var fifo = fifoPrepend + component.id + "-append";</span>
+<span class="cstat-no" title="statement not covered" >                    var len = inByPort["append"].length;</span>
+<span class="cstat-no" title="statement not covered" >                    if (len &gt; 1) {</span>
+<span class="cstat-no" title="statement not covered" >                        commands.push("find " + fifo + "-* | xargs -P" + len + " grep -h --line-buffered ^ &gt;&gt;  " + component["filename"]);</span>
+                    } else
+<span class="cstat-no" title="statement not covered" >                        commands.push("cat " + fifo + " &gt;&gt; " + component["filename"]);</span>
+                } else <span class="missing-if-branch" title="else path not taken" >E</span>if (outConnections &amp;&amp; outConnections.length &gt; 0) {
+                    parsedExec = "pv -f " + component["filename"];
+                    var len = outConnections.length - 1;
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (len &gt; 0) {
+<span class="cstat-no" title="statement not covered" >                        parsedExec += " | tee";</span>
+<span class="cstat-no" title="statement not covered" >                        for (var i = 0; i &lt; len; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >                            var value = outConnections[i];</span>
+<span class="cstat-no" title="statement not covered" >                            parsedExec += " " + fifoPrepend + value.endNode + "-" + value.endPort;</span>
+                        }
+                    }
+                    parsedExec += " &gt; " + fifoPrepend + outConnections[len].endNode + "-" + outConnections[len].endPort;
+                    commands.push(parsedExec);
+                }
+                return;
+<span class="branch-3 cbranch-no" title="branch not covered" >            case "input":</span>
+<span class="cstat-no" title="statement not covered" >                component["ports"].forEach(<span class="fstat-no" title="function not covered" >function (port, index) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    var portName = "macroIn" + index;</span>
+<span class="cstat-no" title="statement not covered" >                    var connections = outConnection.byPortList[portName];</span>
+<span class="cstat-no" title="statement not covered" >                    var command = "tee &lt; " + fifoPrepend + portName;</span>
+<span class="cstat-no" title="statement not covered" >                    if (connections &amp;&amp; connections.length) {</span>
+<span class="cstat-no" title="statement not covered" >                        var len = connections.length - 1;</span>
+<span class="cstat-no" title="statement not covered" >                        if (len &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >                            for (var i = 0; i &lt; len; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >                                var value = connections[i];</span>
+<span class="cstat-no" title="statement not covered" >                                command += " " + fifoPrepend + value.endNode + "-" + value.endPort;</span>
+                            }
+                        } else {
+<span class="cstat-no" title="statement not covered" >                            command += " &gt; " + fifoPrepend + connections[len].endNode + "-" + connections[len].endPort;</span>
+                        }
+                    } else {
+<span class="cstat-no" title="statement not covered" >                        command += " &gt; /dev/null";</span>
+                    }
+<span class="cstat-no" title="statement not covered" >                    commands.push(command);</span>
+                });
+<span class="cstat-no" title="statement not covered" >                return;</span>
+<span class="branch-4 cbranch-no" title="branch not covered" >            case "output":</span>
+<span class="cstat-no" title="statement not covered" >                component["ports"].forEach(<span class="fstat-no" title="function not covered" >function (port, index) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    var portName = "macroOut" + index;</span>
+<span class="cstat-no" title="statement not covered" >                    var newFifo = fifoPrepend + portName;</span>
+<span class="cstat-no" title="statement not covered" >                    var fifo = fifoPrepend + component.id + "-" + portName;</span>
+<span class="cstat-no" title="statement not covered" >                    fifos.push(newFifo);</span>
+<span class="cstat-no" title="statement not covered" >                    retOutputs.push({ fifo: newFifo, port: portName });</span>
+<span class="cstat-no" title="statement not covered" >                    var connections = inConnection.byPortList[portName];</span>
+<span class="cstat-no" title="statement not covered" >                    if (connections &amp;&amp; connections.length) {</span>
+<span class="cstat-no" title="statement not covered" >                        var len = connections.length;</span>
+<span class="cstat-no" title="statement not covered" >                        if (len &gt; 1) {</span>
+<span class="cstat-no" title="statement not covered" >                            commands.push("find " + fifo + "-* | xargs -P" + len + " grep -h --line-buffered ^ &gt; " + newFifo);</span>
+                        } else {
+<span class="cstat-no" title="statement not covered" >                            commands.push("cat " + fifo + " &gt; " + newFifo);</span>
+                        }
+                    } else {
+<span class="cstat-no" title="statement not covered" >                        commands.push("echo '' &gt; " + newFifo);</span>
+                    }
+                });
+<span class="cstat-no" title="statement not covered" >                return;</span>
+<span class="cstat-no" title="statement not covered" >                console.log("..component...", JSON.stringify(component));</span>
+        }
+    });
+&nbsp;
+    return {
+        fifos: fifos,
+        commands: commands,
+        outputs: retOutputs
+    };
+}
+exports.aux_parseVisualDataExperimental = aux_parseVisualDataExperimental;
+&nbsp;
+function parseVisualDataExperimental(VisualData, fifoPrepend) {
+    var escapeSingleQuote = function (commandString) {
+        return commandString.split("'").join("'\"'\"'");
+    };
+    var result = exports.aux_parseVisualDataExperimental(VisualData, fifoPrepend);
+    var mkfifos = ["mkfifo"].concat(result.fifos).join(" ");
+    var result_commands = result.commands.map(function (command) {
+        return "echo '" + escapeSingleQuote(command) + "' &gt;&gt; /tmp/sHiveExec.sh";
+    });
+    var real_commands = [mkfifos].concat(result_commands, ["timeout 10 parallel &lt; /tmp/sHiveExec.sh -uj " + result_commands.length + " --halt 2"]).join("\n");
+    var pretty_printed_commands = [mkfifos].concat(result.commands.map(function (c) {
+        return c + " &amp;";
+    })).join("\n");
+    return {
+        commands: real_commands,
+        pretty: pretty_printed_commands
+    };
+}
+exports.parseVisualDataExperimental = parseVisualDataExperimental;
+&nbsp;
 function parseVisualData(VisualData) {
-    var indexedComponentList, initialComponent;
-    if (VisualData.components.length &lt; 1) {
+    if (VisualData.components.filter(function (component) {
+        return component.type == exports.CommandComponent.type;
+    }).length &lt; 1) {
         return '';
     }
-    indexedComponentList = new exports.IndexedGraph(VisualData);
-    initialComponent = VisualData.firstMainComponent;
+    var indexedComponentList = new exports.IndexedGraph(VisualData);
+    var initialComponent = VisualData.firstMainComponent;
     if (!(initialComponent instanceof exports.CommandComponent)) {
         var ref = VisualData.components;
         for (var i = 0, len = ref.length; i &lt; len; ++i) {
-            <span class="missing-if-branch" title="else path not taken" >E</span>if (ref[i] instanceof exports.CommandComponent) {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (ref[i].type == exports.CommandComponent.type) {
                 initialComponent = ref[i];
                 break;
             }
@@ -1117,7 +1967,7 @@ function parseComponent(component, visualData, componentIndex, mapOfParsedCompon
         case exports.CommandComponent.type:
             return exports.parserCommand[component.exec].parseComponent(component, visualData, componentIndex, mapOfParsedComponents);
         case exports.MacroComponent.type:
-            return exports.parseVisualData(component.macro);
+            return exports.parseGraph(component.macro);
     }
 }
 exports.parseComponent = parseComponent;
@@ -1295,6 +2145,14 @@ function graphFromJsonObject(jsonObj) {
             case exports.FileComponent.type:
                 newComponent = new exports.FileComponent(component.filename);
                 break;
+<span class="branch-2 cbranch-no" title="branch not covered" >            case exports.MacroComponent.type:</span>
+<span class="cstat-no" title="statement not covered" >                var subgraph = exports.graphFromJsonObject(component.macro);</span>
+<span class="cstat-no" title="statement not covered" >                console.log(subgraph.components);</span>
+<span class="cstat-no" title="statement not covered" >                console.log(subgraph.connections);</span>
+<span class="cstat-no" title="statement not covered" >                newComponent = new exports.MacroComponent(subgraph);</span>
+<span class="branch-3 cbranch-no" title="branch not covered" >            case "input":</span>
+<span class="branch-4 cbranch-no" title="branch not covered" >            case "output":</span>
+<span class="cstat-no" title="statement not covered" >                newComponent = component;</span>
         }
 &nbsp;
         /* istanbul ignore next */
@@ -1337,7 +2195,7 @@ exports.parseGraph = exports.parseVisualData;
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed May 28 2014 01:01:16 GMT+0000 (UTC)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 05 2014 15:40:24 GMT+0000 (UTC)</div>
 </div>
 
 <script src="../../prettify.js"></script>

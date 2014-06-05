@@ -199,16 +199,16 @@
     <h1>Code coverage report for <span class="entity">api/services/graphUtils.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">100% <small>(57 / 57)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">96.72% <small>(59 / 61)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">97.44% <small>(38 / 39)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">93.02% <small>(40 / 43)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
         Functions: <span class="metric">100% <small>(16 / 16)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">100% <small>(51 / 51)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">100% <small>(53 / 53)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric">4 statements, 3 branches</span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -306,7 +306,10 @@
 88
 89
 90
-91</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
+91
+92
+93
+94</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
@@ -334,6 +337,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">16</span>
+<span class="cline-any cline-yes">16</span>
+<span class="cline-any cline-yes">16</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2</span>
@@ -344,18 +349,19 @@
 <span class="cline-any cline-yes">8</span>
 <span class="cline-any cline-yes">8</span>
 <span class="cline-any cline-yes">8</span>
+<span class="cline-any cline-yes">19</span>
+<span class="cline-any cline-yes">19</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8</span>
 <span class="cline-any cline-yes">7</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16</span>
 <span class="cline-any cline-yes">5</span>
 <span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11</span>
 <span class="cline-any cline-yes">4</span>
 <span class="cline-any cline-yes">6</span>
 <span class="cline-any cline-yes">1</span>
@@ -422,11 +428,13 @@ module.exports = {
   },
 &nbsp;
   ValidateConnection: function(graph, newConnection, callback){
-    function portType(p){
-      return (p == "output" || p == "error" || p == "retcode")
+    function portType(c,p){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(c.data.type == "input") <span class="cstat-no" title="statement not covered" >return true;</span>
+      else <span class="missing-if-branch" title="if path not taken" >I</span>if(c.data.type == "output") <span class="cstat-no" title="statement not covered" >return false;</span>
+      else return (p == "output" || p == "error" || p == "retcode");
     }
 &nbsp;
-    function portTypeName(p){return portType(p) ? "output" : "input"}
+    function portTypeName(c,p){return portType(c,p) ? "output" : "input"}
 &nbsp;
     async.series([
       function(cb){
@@ -434,18 +442,19 @@ module.exports = {
         var sPort = newConnection.startPort 
         var eNode = newConnection.endNode 
         var ePort = newConnection.endPort
+        var sComponent = _.find(graph.components, function(comp){return comp.id == sNode})
+        var eComponent = _.find(graph.components, function(comp){return comp.id == eNode})
+&nbsp;
         if(sNode == eNode){return cb({message:"Trying to connect the same node"})}
-        else if(portType(sPort) == portType(ePort)){
-          var portName = portTypeName(sPort)
+        else if(portType(sComponent,sPort) == portType(eComponent,ePort)){
+          var portName = portTypeName(sComponent,sPort)
           return cb({message:"Trying to connect an "+ portName +" with another " + portName})
         }
-        var sComponent = _.find(graph.components, function(comp){return comp.id == sNode})
         if(sComponent.data.type == "file" &amp;&amp;
            _.some(graph.connections, function(conn){return conn.endNode == sComponent.id})){
          return cb({message: "Trying to read a file used to write"})
         }
 &nbsp;
-        var eComponent = _.find(graph.components, function(comp){return comp.id == eNode})
         if(eComponent.data.type == "file" &amp;&amp;
            _.some(graph.connections, function(conn){return conn.startNode == eComponent.id})){
          return cb({message: "Trying to write a file used to read"})
@@ -491,7 +500,7 @@ module.exports = {
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed May 28 2014 01:01:16 GMT+0000 (UTC)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 05 2014 15:40:24 GMT+0000 (UTC)</div>
 </div>
 
 <script src="../../prettify.js"></script>
