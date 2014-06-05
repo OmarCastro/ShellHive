@@ -143,10 +143,9 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
         position.y = data.movepos.y;
 
         var compScope = $('.component[data-node-id="'+ data.componentId +'"]').scope();
-        if(compScope.data == component){
-          compScope.update(); 
-          compScope.$digest();
-        }
+        compScope.update(); 
+        compScope.$digest();
+        
 
         $('path[connector]').each(function(index){
           var scope = $(this).scope();

@@ -158,8 +158,12 @@ app.directive("component", function($document){
         scope.update();
          $('path[connector]').each(function(index){
               var scope = $(this).scope();
-              if(scope.endsPositions && scope.endsPositions[0] == position || scope.endsPositions[1] == position){
-                scope.update();
+              if(scope.edge){
+                if(scope.edge.startNode == datanode.id){
+                  scope.update(position);
+                } else if(scope.edge.endNode == datanode.id){
+                  scope.update(null, position);
+                }
               }
             })
         
