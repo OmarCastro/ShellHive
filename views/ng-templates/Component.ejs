@@ -82,7 +82,7 @@
         <span data-port="file{{$index}}">
           <span class="box"></span>
         </span>
-        <input type="text" ng-model="data.files[$index]" ng-if="isString(data.files[$index])">
+        <span ng-bind="'entry' + $index" ng-if="isString(data.files[$index])"></span>
         <span ng-bind-template="{{' '+data.files[$index][0]+' '}}" ng-if="isArray(data.files[$index])"></span>
         <button  ng-if="!collapsed" ng-click="data.files.splice($index,1);$emit('updateComponent',data)" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-remove"></span>

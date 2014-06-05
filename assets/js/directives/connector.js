@@ -18,7 +18,7 @@ app.directive("connector", function($document){
       scope.endsPositions = [startPosition,endPosition]
       
        function update(){
-         console.log('updating edge')
+         //console.log('updating edge')
           setEdgePath(startPosition.x + StartPortOffset.right - 2, 
                       startPosition.y + StartPortOffset.top,
                       endPosition.x + EndPortOffset.left + 2,

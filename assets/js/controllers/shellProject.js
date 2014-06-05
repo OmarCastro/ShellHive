@@ -275,7 +275,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
     io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
       debugData(data);
       $scope.shellText = [{
-        text: data.command.commands,
+        text: data.command.pretty,
         type: "call"
       }];
       $scope.$digest();
