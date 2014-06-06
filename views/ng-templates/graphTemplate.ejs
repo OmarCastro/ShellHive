@@ -37,13 +37,17 @@
 
 <div class="chat" ng-if="chat.open">
   <button type="button" class="close" ng-click="chat.open = false" aria-hidden="true">&times;</button>
+  <div style="overflow:auto; height:30%">
   <div ng-repeat="c in clients track by c.id">
     <b ng-style="{color:c.color}" ng-bind="c.name"></b>
   </div>
-  <hr>
+  </div>
+  <hr style="margin:0">
+  <div style="overflow:auto;height:calc(70% - 34px)">
   <div ng-repeat="c in chatMessages">
     <b ng-style="{color:c.color}" ng-bind="c.sender"></b>
     <span ng-bind="c.text"></span>
+  </div>
   </div>
   <form role="form" class="form" ng-init="chatMsg = ''" ng-submit='$emit("chat",{text: chatMsg}); chatMsg = ""'>
     <input type="text" id="name" ng-model="chatMsg" placeholder="send message" class="form-control">
