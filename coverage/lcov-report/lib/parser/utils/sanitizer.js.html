@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for api/services/graphUtils.js</title>
+    <title>Code coverage report for lib/parser/utils/sanitizer.js</title>
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="../../prettify.css">
+    <link rel="stylesheet" href="../../../prettify.css">
 
     <style>
         body, html {
@@ -196,23 +196,23 @@
 </head>
 <body>
 <div class="header high">
-    <h1>Code coverage report for <span class="entity">api/services/graphUtils.js</span></h1>
+    <h1>Code coverage report for <span class="entity">lib/parser/utils/sanitizer.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">96.72% <small>(59 / 61)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">100% <small>(11 / 11)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">93.02% <small>(40 / 43)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">100% <small>(4 / 4)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Functions: <span class="metric">100% <small>(16 / 16)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">100% <small>(3 / 3)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">100% <small>(53 / 53)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">100% <small>(11 / 11)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
-        Ignored: <span class="metric">4 statements, 3 branches</span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
-    <div class="path"><a href="../../index.html">All files</a> &#187; <a href="index.html">api/services/</a> &#187; graphUtils.js</div>
+    <div class="path"><a href="../../../index.html">All files</a> &#187; <a href="index.html">lib/parser/utils/</a> &#187; sanitizer.js</div>
 </div>
 <div class="body">
 <pre><table class="coverage">
@@ -233,269 +233,41 @@
 15
 16
 17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2</span>
-<span class="cline-any cline-yes">2</span>
-<span class="cline-any cline-yes">5</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2</span>
+18</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2</span>
-<span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">16</span>
-<span class="cline-any cline-yes">16</span>
-<span class="cline-any cline-yes">16</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8</span>
+<span class="cline-any cline-yes">35</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-yes">19</span>
-<span class="cline-any cline-yes">19</span>
+<span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-yes">7</span>
-<span class="cline-any cline-yes">2</span>
+<span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5</span>
-<span class="cline-any cline-yes">3</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4</span>
-<span class="cline-any cline-yes">6</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2</span>
-<span class="cline-any cline-yes">2</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8</span>
-<span class="cline-any cline-yes">7</span>
-<span class="cline-any cline-yes">7</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var tsort = require('tsort');
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">function sanitizeCommand(commandString) {
+    return commandString.split("'").join("'\"'\"'");
+}
+exports.sanitizeCommand = sanitizeCommand;
 &nbsp;
+function sanitizeArgument(commandArg) {
+    if (/[\ #\$\`\'\"\\]/.test(commandArg)) {
+        return "'" + exports.sanitizeCommand(commandArg) + "'";
+    } else
+        return commandArg;
+}
+exports.sanitizeArgument = sanitizeArgument;
 &nbsp;
-module.exports = {
-  tsortGraph: function tsortGraph(graph, newConnection, cb){
-    /* istanbul ignore next: just a function check */
-    <span class="skip-if-branch" title="if path not taken" >I</span>if(typeof newConnection == "function"){
-<span class="cstat-skip" title="statement not covered" >      cb = newConnection</span>
-<span class="cstat-skip" title="statement not covered" >      newConnection = null;</span>
-    }
-    var tgraph = tsort();
-    graph.connections.forEach(function(c){
-      tgraph.add(c.startNode, c.endNode)
-    });
-    <span class="missing-if-branch" title="else path not taken" >E</span>if(newConnection){
-      tgraph.add(newConnection.startNode, newConnection.endNode)
-    }
-    try{
-      var result = tgraph.sort()
-      return cb(null, result)
-    } catch(err){
-      return cb(err)
-    }
-  },
-&nbsp;
-  ValidateConnection: function(graph, newConnection, callback){
-    function portType(c,p){
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(c.data.type == "input") <span class="cstat-no" title="statement not covered" >return true;</span>
-      else <span class="missing-if-branch" title="if path not taken" >I</span>if(c.data.type == "output") <span class="cstat-no" title="statement not covered" >return false;</span>
-      else return (p == "output" || p == "error" || p == "retcode");
-    }
-&nbsp;
-    function portTypeName(c,p){return portType(c,p) ? "output" : "input"}
-&nbsp;
-    async.series([
-      function(cb){
-        var sNode = newConnection.startNode 
-        var sPort = newConnection.startPort 
-        var eNode = newConnection.endNode 
-        var ePort = newConnection.endPort
-        var sComponent = _.find(graph.components, function(comp){return comp.id == sNode})
-        var eComponent = _.find(graph.components, function(comp){return comp.id == eNode})
-&nbsp;
-        if(sNode == eNode){return cb({message:"Trying to connect the same node"})}
-        else if(portType(sComponent,sPort) == portType(eComponent,ePort)){
-          var portName = portTypeName(sComponent,sPort)
-          return cb({message:"Trying to connect an "+ portName +" with another " + portName})
-        }
-        if(sComponent.data.type == "file" &amp;&amp;
-           _.some(graph.connections, function(conn){return conn.endNode == sComponent.id})){
-         return cb({message: "Trying to read a file used to write"})
-        }
-&nbsp;
-        if(eComponent.data.type == "file" &amp;&amp;
-           _.some(graph.connections, function(conn){return conn.startNode == eComponent.id})){
-         return cb({message: "Trying to write a file used to read"})
-        }
-&nbsp;
-        if(_.some(graph.connections, function(conn){
-          return conn.startNode == sNode &amp;&amp; conn.endNode == eNode
-              &amp;&amp; conn.startPort == sPort &amp;&amp; conn.endPort == ePort
-        })){
-         return cb({message: "Connection already exists"});
-        }
-&nbsp;
-&nbsp;
-        return cb(null, true);
-      }, function(cb){graphUtils.tsortGraph(graph, newConnection,cb)}
-    ], function(err, res){
-      if(err){
-        var msg = err.message;
-        if(_.contains(msg, 'There is a cycle in the graph')){
-          msg = "Connection creates a cycle"
-        }
-        return callback(msg);
-      }
-      return callback(err, res);
-    })
-  },
-&nbsp;
-  connect: function(graph, newConnection, cb){
-    Graph.findOne(graph)
-    .populate('components')
-    .populate('connections')
-    .exec(function(err,result){
-      /* istanbul ignore next */ <span class="skip-if-branch" title="if path not taken" >I</span>if(err || !result) <span class="cstat-skip" title="statement not covered" >return cb(err);</span>
-      graphUtils.ValidateConnection(result, newConnection, function(err, res){
-        /* istanbul ignore next */  <span class="skip-if-branch" title="if path not taken" >I</span>if(err || !res) <span class="cstat-skip" title="statement not covered" >return cb(err);</span>
-        newConnection.graph = graph;
-        Connection.create(newConnection).exec(cb);
-      })
-    });
-  }
-}</pre></td></tr>
+function sanitizedWithSingleQuotes(commandArg) {
+    return commandArg[0] == commandArg[commandArg.length - 1] &amp;&amp; commandArg[0] == "'";
+}
+exports.sanitizedWithSingleQuotes = sanitizedWithSingleQuotes;
+&nbsp;</pre></td></tr>
 </table></pre>
 
 </div>
@@ -503,7 +275,7 @@ module.exports = {
     <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 06 2014 23:27:03 GMT+0000 (UTC)</div>
 </div>
 
-<script src="../../prettify.js"></script>
+<script src="../../../prettify.js"></script>
 
 <script src="http://yui.yahooapis.com/3.6.0/build/yui/yui-min.js"></script>
 <script>
