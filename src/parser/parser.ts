@@ -5,6 +5,8 @@ var parser:any = {};
 var astBuilder:{parse:(string)=>any} = require('./ast-builder/ast-builder');
 
 import GraphModule = require("../common/graph");
+import sanitizer = require("./utils/sanitizer");
+
 export import Graph = GraphModule.Graph
 export import Macro = GraphModule.Macro
 export import GraphComponent = GraphModule.GraphComponent
@@ -126,6 +128,14 @@ export function parseCommand(command){
       byPortList:{[s:string]:Connection[]}
     }
   }
+
+
+////////// NEW COMMAND GENERATOR ////////////////
+//
+// The old command generator used to create commans without creating fifos
+// since it became difficult to generate code to join inputs and to
+// allow macros to have multiple ports, the old code has been discontinued
+//
 
 export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string){
 
@@ -477,10 +487,17 @@ export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string
   }
 }
 
+////////// END NEW COMMAND GENERATOR ////////////////
 
 
 
-
+////////// OLD COMMAND GENERATOR ////////////////
+//
+// This generator used to create commans without creating fifos
+// since it became difficult to generate code to join inputs and to
+// allow macros to have multiple ports, this code has been discontinued
+//
+// TODO: remove old generator code after removing related tests;
 
 export function parseVisualData(VisualData:Graph){
   if (VisualData.components.filter(function(component){return component.type == CommandComponent.type}).length < 1) {
@@ -637,6 +654,13 @@ export function parseVisualDatafromComponent(currentComponent, visualData:Graph,
 
   return commands.join(" | ");
 }
+
+
+////////// END OLD COMMAND GENERATOR ////////////////
+
+
+
+
 
 
 

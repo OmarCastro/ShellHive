@@ -3,6 +3,7 @@ import optionsParser = require("../utils/optionsParser");
 import Iterator = optionsParser.Iterator;
 
 import parser = require("../parser");
+import sanitizer = require("./sanitizer");
 
 import GraphModule = require("../../common/graph");
 import Boundary = GraphModule.Boundary;
@@ -252,20 +253,24 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
       var value = Componentparameters[key];
       var option = parameterOptions[key];
       if (option && value) {
-        result = "-" + parameterOptions[key] + value;
-        if (/[\ #]/.test(result)){ result = '"'+ result +'"' }
-        parameters.push(result)
+        result = "-" + parameterOptions[key];
+
+        var sanitizedVal = sanitizer.sanitizeArgument(value)
+        if(sanitizer.sanitizedWithSingleQuotes(sanitizedVal)){
+           result += " ";
+        }
+        result += sanitizedVal;
+        parameters.push(result);
       } else if(value){
-        result = (/[\ #]/.test(value)) ? '"'+value+'"' : value
-        parameters.push(result)
+        parameters.push(sanitizer.sanitizeArgument(value));
       }
     }
 
     var files = !component.files ? [] : component.files.map(file => {
-        if (file instanceof Array) {
+        if (file instanceof Array) { //TODO: remove this "if" when removing old command generator
           var subCommand = parser.parseVisualDatafromComponent(componentIndex.components[file[1]], visualData, componentIndex, mapOfParsedComponents);
           return "<(" + subCommand + ")"
-        } else return (/[\ #]/.test(file)) ?  '"' + file + '"' : file;
+        } else return sanitizer.sanitizeArgument(file)
 
       });
 
