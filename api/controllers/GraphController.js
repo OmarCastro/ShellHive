@@ -79,7 +79,7 @@ module.exports = {
         
         res.json({
           message: "component sucessfully added",
-          component: result.component,
+          component: created,
         })
       })
   },
