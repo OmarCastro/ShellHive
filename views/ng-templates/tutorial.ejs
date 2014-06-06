@@ -1,0 +1,35 @@
+<div class="tutorial-panel" ng-if="!status.tutorial">
+  <tabset>
+    <tab heading="Intoduction">
+
+    <h2>Hello Visitor!</h2>
+    <p>
+    Before playing the demo there is some instructions on how to use the application.
+</p><p>
+    This page was created due to the feedback received, so it is still "work in progress"
+</p><p>
+    The next tab shows how to create and connect a command at the same time
+</p><p>
+    To play the demo, click on "<i class="glyphicon glyphicon-play"></i> Play demo" tab
+</p>
+    </pre>
+    </tab>
+
+    <tab heading="Create & connect component">
+    <!--object data="/images/tut-ccc.svg" type="image/svg+xml"></object-->
+      <!--img src="/images/tut-ccc-hover.svg" style="top: 30vw; left: 2% ; width: 30%"-->
+      <!--img src="/images/tut-ccc-drag.svg" style="top: 30vw; left: 44%; width: 30%"-->
+      <!--img src="/images/tut-ccc-hover.svg" style="top: 30vw; left: 86%; width: 30%"-->
+      <!--img src="/images/tut-ccc-mouse-select.svg" style="top: 5vw; left: 128%; width: 30%"-->
+      <img src="/images/tut-ccc.resized.jpeg">
+      <!--img src="/images/tut-ccc-mouse-select.svg" style="top: 30vw; left: 128%; width: 30%"-->
+      <!--img src="/images/tut-ccc-mouse-select.svg" style="top: 55vw; left: 128%; width: 30%"-->
+
+    </tab>
+    <tab select="status.tutorial = true">
+      <tab-heading>
+        <i class="glyphicon glyphicon-play"></i> Play demo
+      </tab-heading>
+    </tab>
+  </tabset>
+</div>

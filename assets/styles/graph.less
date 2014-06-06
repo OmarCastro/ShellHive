@@ -54,7 +54,7 @@ html,body,div[graph]{
 
 body,.graph,.nodes{margin:0}
 
-.layout, .tips, .new-project, .directory, .alerts{
+.layout, .tips, .new-project, .directory, .alerts, .tutorial-panel{
   position:absolute;
   top:50px;
   bottom:0;
@@ -167,6 +167,30 @@ div[graph]{
     & > .dropdown-menu {
         padding:1px;
         display: block;
+    }
+}
+
+
+.tutorial-panel{
+    background-color: #eee;
+  z-index:2040;
+    p{
+        padding-left: 2em;
+        font-weight: bold;
+        font-size: 1.5em;
+    }
+    .tab-pane{
+        overflow: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 42px;
+        bottom: 0;
+
+    }
+    img{
+        border: 2px solid #7a7;
+        border-radius: 2px;
     }
 }
 
