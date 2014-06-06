@@ -38,24 +38,24 @@
       <li class="dropdown" is-open="status.isopen2">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">View<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a mousetrap="Shift+S" ng-click="$parent.filesystem = false; $parent.shell = !shell; $parent.shell && $emit('compileGraph'); status.isopen2=false">Toogle Terminal View</a></li>
-          <li><a mousetrap="Shift+R" ng-click="$parent.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
-          <li><a mousetrap="Shift+F" ng-click="$parent.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
+          <li><a mousetrap="Shift+S" ng-click="status.filesystem = false; $parent.shell = !shell; $parent.shell && $emit('compileGraph'); status.isopen2=false">Toogle Terminal View</a></li>
+          <li><a mousetrap="Shift+R" ng-click="status.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
+          <li><a mousetrap="Shift+F" ng-click="status.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
           <li class="divider"></li>
           <li class="dropdown-header">Macros</li>
-          <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="$parent.filesystem = false; viewGraph(graphModel.macros[macro]); status.isopen2=false"></a></li>
+          <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="status.filesystem = false; viewGraph(graphModel.macros[macro]); status.isopen2=false"></a></li>
         </ul>
       </li>
 
       <li class="dropdown" is-open="status.isopen3">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">Action<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a mousetrap="Ctrl+Shift+up" ng-click="$parent.filesystem = false; collapseAll(); status.isopen3=false">Collapse all components</a></li>
-          <li><a mousetrap="Ctrl+Shift+down" ng-click="$parent.filesystem = false; uncollapseAll(); status.isopen3=false;">Uncollapse all components</a></li>
+          <li><a mousetrap="Ctrl+Shift+up" ng-click="status.filesystem = false; collapseAll(); status.isopen3=false">Collapse all components</a></li>
+          <li><a mousetrap="Ctrl+Shift+down" ng-click="status.filesystem = false; uncollapseAll(); status.isopen3=false;">Uncollapse all components</a></li>
         </ul>
       </li>
 
-      <li><a ng-click="$parent.filesystem = !$parent.filesystem">Filesystem</a></li>
+      <li><a ng-click="status.filesystem = !status.filesystem">Filesystem</a></li>
       <li><a ng-click="shell = true; $emit('runCommand', [])">
         <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
       </a></li>

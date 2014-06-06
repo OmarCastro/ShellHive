@@ -1,4 +1,4 @@
-<div class="directory directory-manager" filesystem ng-if="filesystem">
+<div class="directory directory-manager" filesystem ng-if="status.filesystem">
   <div class="container-fluid">
     <div class="row-fluid">
       <div ng-repeat="record in directoryContent" class="col-xs-4 col-sm-3 col-md-2" directoryfile ng-class="(selectedFile == record) ? 'selected':''"
