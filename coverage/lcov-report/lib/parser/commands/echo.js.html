@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for api/services/</title>
+    <title>Code coverage report for lib/parser/commands/echo.js</title>
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="../../prettify.css">
+    <link rel="stylesheet" href="../../../prettify.css">
 
     <style>
         body, html {
@@ -196,167 +196,308 @@
 </head>
 <body>
 <div class="header medium">
-    <h1>Code coverage report for <span class="entity">api/services/</span></h1>
+    <h1>Code coverage report for <span class="entity">lib/parser/commands/echo.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">73.44% <small>(235 / 320)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">79.41% <small>(27 / 34)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">76.52% <small>(88 / 115)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">75% <small>(3 / 4)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Functions: <span class="metric">80.72% <small>(67 / 83)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">50% <small>(3 / 6)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">73.31% <small>(217 / 296)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">77.42% <small>(24 / 31)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
-        Ignored: <span class="metric">43 statements, 13 functions, 16 branches</span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
-    <div class="path"><a href="../../index.html">All files</a> &#187; api/services/</div>
+    <div class="path"><a href="../../../index.html">All files</a> &#187; <a href="index.html">lib/parser/commands/</a> &#187; echo.js</div>
 </div>
 <div class="body">
-<div class="coverage-summary">
-<table>
-<thead>
-<tr>
-   <th data-col="file" data-fmt="html" data-html="true" class="file">File</th>
-   <th data-col="pic" data-type="number" data-fmt="html" data-html="true" class="pic"></th>
-   <th data-col="statements" data-type="number" data-fmt="pct" class="pct">Statements</th>
-   <th data-col="statements_raw" data-type="number" data-fmt="html" class="abs"></th>
-   <th data-col="branches" data-type="number" data-fmt="pct" class="pct">Branches</th>
-   <th data-col="branches_raw" data-type="number" data-fmt="html" class="abs"></th>
-   <th data-col="functions" data-type="number" data-fmt="pct" class="pct">Functions</th>
-   <th data-col="functions_raw" data-type="number" data-fmt="html" class="abs"></th>
-   <th data-col="lines" data-type="number" data-fmt="pct" class="pct">Lines</th>
-   <th data-col="lines_raw" data-type="number" data-fmt="html" class="abs"></th>
-</tr>
-</thead>
-<tbody><tr>
-	<td class="file low" data-value="CollaborationService.js"><a href="CollaborationService.js.html">CollaborationService.js</a></td>
-	<td data-value="6.25" class="pic low"><span class="cover-fill" style="width: 6px;"></span><span class="cover-empty" style="width:94px;"></span></td>
-	<td data-value="6.25" class="pct low">6.25%</td>
-	<td data-value="80" class="abs low">(5&nbsp;/&nbsp;80)</td>
-	<td data-value="5.56" class="pct low">5.56%</td>
-	<td data-value="18" class="abs low">(1&nbsp;/&nbsp;18)</td>
-	<td data-value="6.67" class="pct low">6.67%</td>
-	<td data-value="15" class="abs low">(1&nbsp;/&nbsp;15)</td>
-	<td data-value="6.41" class="pct low">6.41%</td>
-	<td data-value="78" class="abs low">(5&nbsp;/&nbsp;78)</td>
-	</tr>
+<pre><table class="coverage">
+<tr><td class="line-count">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/*
+grep:
+Matcher Selection:
+arguments:
+- ["E","--extended-regexp","Interpret PATTERN as an extended regular expression"]
+- ["F","--fixed-strings","Interpret PATTERN as a list of fixed strings, separated by newlines, any of which is to be matched."]
+- ["G","--basic-regexp","Interpret PATTERN as a basic regular expression (BRE, see below).  This is the default."]
+- ["P","--perl-regexp","display $ at end of each line"]
+Matching Control:
+arguments:
+- ["e PATTERN","--regexp=PATTERN","Use PATTERN as the pattern.  This can be used to specify multiple search patterns, or to protect a pattern beginning with a hyphen (-)."]
+- ["f FILE","--file=FILE","Obtain patterns from FILE, one per line.  The empty file contains zero patterns, and therefore matches nothing."]
+- ["i","--ignore-case","Ignore case distinctions in both the PATTERN and the input files."]
+- ["v","--invert-match","Invert the sense of matching, to select non-matching lines."]
+- ["w","--word-regexp"," Select only those lines containing matches that form whole words.  The test is that the matching substring must either be at the beginning of the line, or preceded by a non-
+word constituent character.  Similarly, it must be either at the end of the line or followed by a non-word constituent character.  Word-constituent characters  are  letters,
+digits, and the underscore."]
+- ["x","--line-regexp","Select only those matches that exactly match the whole line."]
+*/
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) <span class="missing-if-branch" title="else path not taken" >E</span>if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var $ = require("../utils/optionsParser");
+var parserModule = require("../utils/parserData");
+var common = require("../utils/init");
+var GraphModule = require("../../common/graph");
+&nbsp;
+var parameters = {
+    separator: {
+        name: 'text',
+        option: null,
+        type: "string",
+        description: "filter entries by anything other than the content",
+        defaultValue: ""
+    }
+};
+&nbsp;
+var flags = {
+    interpretEscape: {
+        name: "Interpret escape characters",
+        option: 'e',
+        description: "Interpret escape characters",
+        active: false
+    },
+    newline: {
+        name: "no trailing newline",
+        option: 'n',
+        description: "no not output trailing newline",
+        active: false
+    }
+};
+&nbsp;
+var config = {
+    parameters: parameters,
+    flags: flags
+};
+&nbsp;
+var echoData = new parserModule.ParserData(config);
+&nbsp;
+var optionsParser = $.optionParserFromConfig(config);
+&nbsp;
+var EchoComponent = (function (_super) {
+    __extends(EchoComponent, _super);
+<span class="fstat-no" title="function not covered" >    function EchoComponent() {</span>
+<span class="cstat-no" title="statement not covered" >        _super.apply(this, arguments);</span>
+<span class="cstat-no" title="statement not covered" >        this.exec = "echo";</span>
+    }
+    return EchoComponent;
+})(GraphModule.CommandComponent);
+exports.EchoComponent = EchoComponent;
+&nbsp;
+<span class="fstat-no" title="function not covered" >function defaultComponentData() {</span>
+<span class="cstat-no" title="statement not covered" >    var component = new EchoComponent();</span>
+<span class="cstat-no" title="statement not covered" >    component.parameters = echoData.componentParameters;</span>
+<span class="cstat-no" title="statement not covered" >    component.flags = echoData.componentFlags;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return component;</span>
+}
+;
+&nbsp;
+exports.parseCommand = common.commonParseCommand(optionsParser, defaultComponentData, {
+    string: <span class="fstat-no" title="function not covered" >function (component, str) {</span>
+<span class="cstat-no" title="statement not covered" >        component.parameters["text"] = str;</span>
+    }
+});
+exports.parseComponent = common.commonParseComponent(echoData.flagOptions, echoData.selectorOptions, echoData.parameterOptions);
+exports.VisualSelectorOptions = echoData.visualSelectorOptions;
+exports.componentClass = EchoComponent;
+&nbsp;</pre></td></tr>
+</table></pre>
 
-<tr>
-	<td class="file high" data-value="ExecutionService.js"><a href="ExecutionService.js.html">ExecutionService.js</a></td>
-	<td data-value="100" class="pic high"><span class="cover-fill cover-full" style="width: 100px;"></span><span class="cover-empty" style="width:0px;"></span></td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="42" class="abs high">(42&nbsp;/&nbsp;42)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="4" class="abs high">(4&nbsp;/&nbsp;4)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="11" class="abs high">(11&nbsp;/&nbsp;11)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="39" class="abs high">(39&nbsp;/&nbsp;39)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="GraphGeneratorService.js"><a href="GraphGeneratorService.js.html">GraphGeneratorService.js</a></td>
-	<td data-value="93" class="pic high"><span class="cover-fill" style="width: 93px;"></span><span class="cover-empty" style="width:7px;"></span></td>
-	<td data-value="93" class="pct high">93%</td>
-	<td data-value="100" class="abs high">(93&nbsp;/&nbsp;100)</td>
-	<td data-value="89.47" class="pct high">89.47%</td>
-	<td data-value="38" class="abs high">(34&nbsp;/&nbsp;38)</td>
-	<td data-value="93.75" class="pct high">93.75%</td>
-	<td data-value="32" class="abs high">(30&nbsp;/&nbsp;32)</td>
-	<td data-value="93.48" class="pct high">93.48%</td>
-	<td data-value="92" class="abs high">(86&nbsp;/&nbsp;92)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="graphUtils.js"><a href="graphUtils.js.html">graphUtils.js</a></td>
-	<td data-value="96.72" class="pic high"><span class="cover-fill" style="width: 96px;"></span><span class="cover-empty" style="width:4px;"></span></td>
-	<td data-value="96.72" class="pct high">96.72%</td>
-	<td data-value="61" class="abs high">(59&nbsp;/&nbsp;61)</td>
-	<td data-value="93.02" class="pct high">93.02%</td>
-	<td data-value="43" class="abs high">(40&nbsp;/&nbsp;43)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="16" class="abs high">(16&nbsp;/&nbsp;16)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="53" class="abs high">(53&nbsp;/&nbsp;53)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="parser.js"><a href="parser.js.html">parser.js</a></td>
-	<td data-value="100" class="pic high"><span class="cover-fill cover-full" style="width: 100px;"></span><span class="cover-empty" style="width:0px;"></span></td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="1" class="abs high">(1&nbsp;/&nbsp;1)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="0" class="abs high">(0&nbsp;/&nbsp;0)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="0" class="abs high">(0&nbsp;/&nbsp;0)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="1" class="abs high">(1&nbsp;/&nbsp;1)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="passport.js"><a href="passport.js.html">passport.js</a></td>
-	<td data-value="94.12" class="pic high"><span class="cover-fill" style="width: 94px;"></span><span class="cover-empty" style="width:6px;"></span></td>
-	<td data-value="94.12" class="pct high">94.12%</td>
-	<td data-value="17" class="abs high">(16&nbsp;/&nbsp;17)</td>
-	<td data-value="83.33" class="pct high">83.33%</td>
-	<td data-value="6" class="abs high">(5&nbsp;/&nbsp;6)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="6" class="abs high">(6&nbsp;/&nbsp;6)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="14" class="abs high">(14&nbsp;/&nbsp;14)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="shelljs.js"><a href="shelljs.js.html">shelljs.js</a></td>
-	<td data-value="100" class="pic high"><span class="cover-fill cover-full" style="width: 100px;"></span><span class="cover-empty" style="width:0px;"></span></td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="1" class="abs high">(1&nbsp;/&nbsp;1)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="0" class="abs high">(0&nbsp;/&nbsp;0)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="0" class="abs high">(0&nbsp;/&nbsp;0)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="1" class="abs high">(1&nbsp;/&nbsp;1)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="showValidationError.js"><a href="showValidationError.js.html">showValidationError.js</a></td>
-	<td data-value="100" class="pic high"><span class="cover-fill cover-full" style="width: 100px;"></span><span class="cover-empty" style="width:0px;"></span></td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="17" class="abs high">(17&nbsp;/&nbsp;17)</td>
-	<td data-value="66.67" class="pct medium">66.67%</td>
-	<td data-value="6" class="abs medium">(4&nbsp;/&nbsp;6)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="3" class="abs high">(3&nbsp;/&nbsp;3)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="17" class="abs high">(17&nbsp;/&nbsp;17)</td>
-	</tr>
-
-<tr>
-	<td class="file high" data-value="sshKeygen.js"><a href="sshKeygen.js.html">sshKeygen.js</a></td>
-	<td data-value="100" class="pic high"><span class="cover-fill cover-full" style="width: 100px;"></span><span class="cover-empty" style="width:0px;"></span></td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="1" class="abs high">(1&nbsp;/&nbsp;1)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="0" class="abs high">(0&nbsp;/&nbsp;0)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="0" class="abs high">(0&nbsp;/&nbsp;0)</td>
-	<td data-value="100" class="pct high">100%</td>
-	<td data-value="1" class="abs high">(1&nbsp;/&nbsp;1)</td>
-	</tr>
-
-</tbody>
-</table>
-</div>
 </div>
 <div class="footer">
     <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 06 2014 11:34:49 GMT+0000 (UTC)</div>
 </div>
 
-<script src="../../prettify.js"></script>
+<script src="../../../prettify.js"></script>
 
 <script src="http://yui.yahooapis.com/3.6.0/build/yui/yui-min.js"></script>
 <script>
