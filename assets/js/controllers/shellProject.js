@@ -58,6 +58,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
       } else {
         var form = { name: ''};
         var modalInstance = modal.open({
+          backdrop: 'static',
           templateUrl: 'UserNameModal.html',
           controller: function($scope, $modalInstance){
             $scope.form = form;
@@ -65,6 +66,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
               $modalInstance.close(form);
             };
           }
+
         });
         modalInstance.result.then(function(selectedItem){
           io.socket.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});

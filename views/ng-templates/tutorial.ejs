@@ -1,71 +1,177 @@
 <div class="tutorial-panel" ng-class="{top: !status.tutop}" ng-if="!status.tutorial">
-  <tabset>
+  <tabset class="tabs-left" vertical="true" type="tabs">
     <tab heading="Intoduction">
+      <div class="bigger-text">
 
-    <h2>Hello Visitor!</h2>
-    <p>
-    Before playing the demo there is some instructions on how to use the application.
-</p><p>
-    This page was created due to the feedback received, so it is still "work in progress"
-</p><p>
-    The next tab shows how to create and connect a command at the same time
-</p>
-<p>
-  The next tab shows a short list of shotcuts that helps how to 
-  use the application
-</p>
-<p>
-    To play the demo, click on "<i class="glyphicon glyphicon-play"></i> Play demo" tab
-</p>
-    </pre>
+        <h2>Hello Visitor!</h2>
+        <p>
+          Before playing the demo there is some instructions on how to use the application.
+        </p>
+        <p>
+          This page was created due to the feedback received, so it is still "work in progress"
+        </p>
+        <p>
+          The next tab shows how to create and connect a command at the same time
+        </p>
+        <p>
+          The next tab shows a short list of shotcuts that helps how to 
+          use the application
+        </p>
+        <p>
+          To play the demo, click on "<i class="glyphicon glyphicon-play"></i> Play demo" tab
+        </p>
+      </div>
+
     </tab>
 
     <tab heading="Create & connect component">
-    <!--object data="/images/tut-ccc.svg" type="image/svg+xml"></object-->
-      <!--img src="/images/tut-ccc-hover.svg" style="top: 30vw; left: 2% ; width: 30%"-->
-      <!--img src="/images/tut-ccc-drag.svg" style="top: 30vw; left: 44%; width: 30%"-->
-      <!--img src="/images/tut-ccc-hover.svg" style="top: 30vw; left: 86%; width: 30%"-->
-      <!--img src="/images/tut-ccc-mouse-select.svg" style="top: 5vw; left: 128%; width: 30%"-->
-      <img src="/images/tut-ccc.resized.jpeg">
-      <!--img src="/images/tut-ccc-mouse-select.svg" style="top: 30vw; left: 128%; width: 30%"-->
-      <!--img src="/images/tut-ccc-mouse-select.svg" style="top: 55vw; left: 128%; width: 30%"-->
+
+      <h2> Creating and connecting components </h2>
+
+      <p>
+        This page contains information on how to create and connect an component
+        it will begin with an intial step to create a popup to create any kind of component
+        and connect it automatically
+      </p>
+
+      <h3> Initial steps </h3>
+
+      <p>
+        To add and connect a component
+        at the same time you start by
+        moving your mouse to a "port".
+        A port is where the input and 
+        output of a component is, and
+        it allows to connect a
+        component to another one.
+      </p>
+      <div class="align-center">
+        <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/hover.svg">
+      </div>
+      <p>
+        When you click and hold
+        the mouse button, and
+        drag the port to any place,
+        a connection line is created,
+        lets call it a "pipe"
+      </p>
+      <div class="align-center">
+        <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/drag.svg">
+      </div>
+      <p>
+        When you release the mouse
+        button in an empty space, a
+        context menu appears with 
+        options to create a command
+      </p>
+      <div class="align-center">
+        <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/popup.svg">
+      </div>
+
+      <h3> Next step </h3>
+
+      <p> In this section contains a tabset which shows different ways to create
+        different kind of commands;
+      </p>
+
+
+      <tabset>
+        <tab heading="Using mouse">
+          <p>Chose one of the commands in the list</p>
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/mouse-select.svg">
+          </div>
+
+          <p>
+            And the component is created
+          </p>
+
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/simple-grep-complete.svg">
+          </div>    
+        </tab>
+        <tab heading="Using key (simple command)">
+          <p>just write the name of the command you want to create</p>
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/simple-grep.svg">
+          </div> 
+          <p>
+            And the component is created
+          </p>
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/simple-grep-complete.svg">
+          </div>     
+
+        </tab>
+
+        <tab heading="Using key (adanced command)">
+          <p>Write the name of the command along with its argumets</p>
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/advanced-grep.svg">
+          </div>
+          <p>
+            And the command is created with the information
+            automatcally updated based on the arguments
+          </p> 
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/advanced-grep-complete.svg">
+          </div>       
+        </tab>
+
+        <tab heading="Using key (file component)">
+          <p>
+            Write in the box the name of the file with the file extension, just having a dot in
+            the text will tell that the component to be created is a file
+          </p>
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/file.svg">
+          </div> 
+
+          <p>
+            And the file component is created with the choosen name
+          </p>
+          <div class="align-center">
+            <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/file-complete.svg">
+          </div>       
+        </tab>
+      </tabset>
 
     </tab>
     <tab heading="shortcuts">
-    <h3> Shortcut </h3>
-    This panel shows a list of keyboard shortcuts and simple instructions
-    that helps how to use the application <br><br>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3"><kbd>Alt</kbd> + mouse wheel:</div>
-        <div class="col-md-9"><b> Zoom in and out </b></div>
-      </div><br>
-      <div class="row">
-        <div class="col-md-3">Drag Mouse on empty space</div>
-        <div class="col-md-9"><b> drag the viewport </b></div>
-      </div><br>
-      <div class="row">
-        <div class="col-md-3"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd></div>
-        <div class="col-md-9"><b> Collapse all Components </b></div>
-      </div><br>
-      <div class="row">
-        <div class="col-md-3"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd></div>
-        <div class="col-md-9"><b> Uncollapse all Components </b></div>
-      </div><br>
-      <div class="row">
-        <div class="col-md-3"><kbd>Shift</kbd>+<kbd>S</kbd></div>
-        <div class="col-md-9"><b> Toggle Shell View </b></div>
-      </div><br>
-      <div class="row">
-        <div class="col-md-3"><kbd>Shift</kbd>+<kbd>F</kbd></div>
-        <div class="col-md-9"><b> View FileSystem </b></div>
-      </div>
+      <h3> Shortcut </h3>
+      This panel shows a list of keyboard shortcuts and simple instructions
+      that helps how to use the application <br><br>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3"><kbd>Alt</kbd> + mouse wheel:</div>
+          <div class="col-md-9"><b> Zoom in and out </b></div>
+        </div><br>
+        <div class="row">
+          <div class="col-md-3">Drag Mouse on empty space</div>
+          <div class="col-md-9"><b> drag the viewport </b></div>
+        </div><br>
+        <div class="row">
+          <div class="col-md-3"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd></div>
+          <div class="col-md-9"><b> Collapse all Components </b></div>
+        </div><br>
+        <div class="row">
+          <div class="col-md-3"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd></div>
+          <div class="col-md-9"><b> Uncollapse all Components </b></div>
+        </div><br>
+        <div class="row">
+          <div class="col-md-3"><kbd>Shift</kbd>+<kbd>S</kbd></div>
+          <div class="col-md-9"><b> Toggle Shell View </b></div>
+        </div><br>
+        <div class="row">
+          <div class="col-md-3"><kbd>Shift</kbd>+<kbd>F</kbd></div>
+          <div class="col-md-9"><b> View FileSystem </b></div>
+        </div>
       </div>
     </tab>
     <tab select="status.tutop = true; status.tutorial = true">
-      <tab-heading class="btn btn-xs btn-primary">
-        <i class="glyphicon glyphicon-play"></i> Play demo
-      </tab-heading>
-    </tab>
-  </tabset>
+      <tab-heading class="btn btn-primary">
+      <i class="glyphicon glyphicon-play"></i> Play demo
+    </tab-heading>
+  </tab>
+</tabset>
 </div>

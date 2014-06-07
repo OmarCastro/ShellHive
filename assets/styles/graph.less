@@ -175,18 +175,26 @@ div[graph]{
     background-color: #eee;
     z-index:2040;
     &.top{top: 0;}
+    > div, .tab-content{
+        width: 100%;
+        height: 100%;
+    }
+    
     p{
+        margin: 1em;
+    }
+    .bigger-text p{
         padding-left: 2em;
         font-weight: bold;
         font-size: 1.5em;
     }
     .tab-pane{
         overflow: auto;
-        position: absolute;
-        left: 0;
+        position: relative;
+        height: 100%;
         right: 0;
-        top: 44px;
-        bottom: 0;
+    //    top: 44px;
+    //    bottom: 0;
 
     }
     img{
