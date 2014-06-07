@@ -1,4 +1,4 @@
-<div class="tutorial-panel" ng-if="!status.tutorial">
+<div class="tutorial-panel" ng-class="{top: !status.tutop}" ng-if="!status.tutorial">
   <tabset>
     <tab heading="Intoduction">
 
@@ -62,8 +62,8 @@
       </div>
       </div>
     </tab>
-    <tab select="status.tutorial = true">
-      <tab-heading>
+    <tab select="status.tutop = true; status.tutorial = true">
+      <tab-heading class="btn btn-xs btn-primary">
         <i class="glyphicon glyphicon-play"></i> Play demo
       </tab-heading>
     </tab>

@@ -10,6 +10,7 @@
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("../utils/init");
+import sanitizer = require("../utils/sanitizer");
 import GraphModule = require("../../common/graph");
 
 
@@ -53,18 +54,14 @@ function defaultComponentData(){
 };
 
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
-    string: (component:AwkComponent, str) => {
-        component.script = str;
-      }
-    })
+  string: (component:AwkComponent, str) => {
+      component.script = str;
+    }
+  })
 
 export var parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions,awkData.parameterOptions, 
-  (component,exec,flags,files,parameters) => {
-    var script = component.script.replace('"','\\"');
-    if(script){
-      script = (/[\n\ #]/.test(script)) ? '"'+script+'"' : script;
-    }    
-    return exec.concat(parameters,script).join(' ');
+  (component,exec,flags,files,parameters) => {    
+    return exec.concat(parameters,sanitizer.sanitizeArgument(component.script)).join(' ');
   })
 
 export var VisualSelectorOptions = awkData.visualSelectorOptions;

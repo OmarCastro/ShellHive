@@ -38,6 +38,7 @@ export var parserCommand = {
   head: require('./commands/head'),
   tail: require('./commands/tail'),
   tr: require('./commands/tr'),
+  wc: require('./commands/wc'),
   tee: require('./commands/tee')
 };
 

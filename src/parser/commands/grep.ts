@@ -22,6 +22,7 @@ grep:
 import $ = require("../utils/optionsParser");
 import parserModule = require("../utils/parserData");
 import common = require("../utils/init");
+import sanitizer = require("../utils/sanitizer");
 import GraphModule = require("../../common/graph");
 
 var selectors = {
@@ -166,7 +167,7 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
 
 export var parseComponent = common.commonParseComponent(grepCommandData.flagOptions,grepCommandData.selectorOptions, null, (component,exec:any[],flags,files:any[]) =>{
   var pattern = component.pattern || ""
-  pattern = (/[\ #]/.test(pattern)) ? '"'+pattern+'"' : pattern
+  pattern = sanitizer.sanitizeArgument(pattern);
   //console.error(pattern + " - " + files.length );
   //console.error(!!pattern + " - " + !!files.length );
   if(flags){exec = exec.concat(flags)}
