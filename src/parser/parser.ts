@@ -476,7 +476,11 @@ export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string
   var real_commands,pretty_printed_commands;
   if(result.fifos.length < 1){
     real_commands = result_commands.concat([timeoutCommand]).join("\n");
-    pretty_printed_commands = result.commands.map(c=>c+" &").join("\n");
+    if(result.commands.length <= 1){
+      pretty_printed_commands = result.commands[0];
+    } else {
+      pretty_printed_commands = result.commands.map(c=>c+" &").join("\n");     
+    }
   } else {
     var mkfifos = ["mkfifo"].concat(result.fifos).join(" ")
     real_commands = [mkfifos].concat(result_commands,[timeoutCommand]).join("\n");

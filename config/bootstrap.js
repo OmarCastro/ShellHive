@@ -10,9 +10,14 @@
 
 var fs = require('fs.extra');
 var rmdir = require('rimraf');
-
+var md = require("marked"); 
+var ejs = require('ejs') 
 
 module.exports.bootstrap = function (cb) {
+
+  ejs.filters.md = function(b) { 
+    return md(b) 
+  }; 
   // It's very important to trigger this callack method when you are finished 
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   // cb();
@@ -44,7 +49,7 @@ module.exports.bootstrap = function (cb) {
   function createDummyProjects(done) {
     var dummyProjects = [
     {
-      name:"public",
+      name:"ShellHive Demo",
       visibility: "global"
     },
     {

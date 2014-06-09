@@ -231,6 +231,10 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
 };
 
 
+function parseFlagsAndSelectors(component:CommandComponent, options):string{
+
+}
+
 export function commonParseComponent(flagOptions, selectorOptions, parameterOptions?, beforeJoin?:(component, exec, flags, files, parameters)=>string){
   var options;
   options = {
@@ -253,10 +257,15 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
       var value = Componentparameters[key];
       var option = parameterOptions[key];
       if (option && value) {
-        result = "-" + parameterOptions[key];
+        var parameterOption = parameterOptions[key]
+        if(parameterOption[0] == "-"){
+          result = parameterOption;
+        } else{ 
+          result = "-" + parameterOption;
+        }
 
         var sanitizedVal = sanitizer.sanitizeArgument(value)
-        if(sanitizer.sanitizedWithSingleQuotes(sanitizedVal)){
+        if(parameterOption[0] == "-" || sanitizer.sanitizedWithSingleQuotes(sanitizedVal)){
            result += " ";
         }
         result += sanitizedVal;

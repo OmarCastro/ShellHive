@@ -36,7 +36,8 @@
     "sails-mysql": "^0.10.0-rc6",
     "shelljs": "^0.3.0",
     "ssh-keygen": "^0.2.1",
-    "tsort": "0.0.1"
+    "tsort": "0.0.1",
+    "marked": "~0.3.2"
   },
   "scripts": {
     "start": "node app.js",

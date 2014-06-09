@@ -71,4 +71,4 @@ gulp.task('watch', function () {
   gulp.watch('test/**/*.js',['coverage']);
 });
 
-gulp.task('default', ['ts','ls','mocha','watch']);
+gulp.task('default', ['ts','mocha','watch']);
