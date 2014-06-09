@@ -47,7 +47,7 @@ module.exports = {
       body.componentId, body.startPort, body.position,
       function(err, result){
         if(err) {
-          res.json({
+          return res.json({
             alert:true,
             message: err,
           })

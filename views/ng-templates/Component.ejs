@@ -2,7 +2,7 @@
 
     <div title="{{title.desc}}" class="title">
       <span class="title-name" ng-bind="title.name"></span>
-      <span class="button-group">
+      <span class="button-group" ng-if="data.type != 'input' && data.type != 'output'">
         <a ng-click="togglecollapse()" 
            class="glyphicon" 
            ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">

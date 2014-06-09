@@ -5,7 +5,7 @@
 
         <h2>Hello Visitor!</h2>
         <p>
-          Before playing the demo there is some instructions on how to use the application.
+          Before playing the demo there are some instructions on how to use the application.
         </p>
         <p>
           This page was created due to the feedback received, so it is still "work in progress"
@@ -23,54 +23,67 @@
       </div>
 
     </tab>
-
-    <tab heading="Create & connect component">
-
-      <h2> Creating and connecting components </h2>
+    <tab heading="Create nodes">
+      <h2> Creating and connecting nodes </h2>
 
       <p>
-        This page contains information on how to create and connect an component
-        it will begin with an intial step to create a popup to create any kind of component
+        You have two ways to create a node, using the top menu, or
+        creating and connecting at the same time, which is explained on the next page.
+      </p>
+      <div class="figure">
+        <img src="//omarcastro.github.com/ShellHive/docs/tutorial/add/dropdown.svg">
+        <div>dropdown menu which shows a list of available commands</div>
+      </div>
+      <p>
+        By creating the node using the menu they will be created at the top left of the
+        view.
+      </p>
+      <p>
+        For now you can only create command nodes using the top menu, to create
+        file nodes, refer to the "Create & connect nodes" page
+      </p>
+    </tab>
+    <tab heading="Create & connect nodes">
+
+      <h2> Creating and connecting nodes </h2>
+
+      <p>
+        This page contains information on how to create and connect an node
+        it will begin with an intial step to create a popup to create any kind of node
         and connect it automatically
       </p>
 
       <h3> Initial steps </h3>
 
       <p>
-        To add and connect a component
-        at the same time you start by
+        To add and connect a node at the same time you start by
         moving your mouse to a "port".
-        A port is where the input and 
-        output of a component is, and
-        it allows to connect a
-        component to another one.
+        A port is where the input and output of a node is, and
+        it allows to connect a node to another one.
       </p>
-      <div class="align-center">
+      <div class="figure">
         <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/hover.svg">
       </div>
       <p>
-        When you click and hold
-        the mouse button, and
-        drag the port to any place,
-        a connection line is created,
+        When you click and hold the mouse button, and
+        drag the port to any place, a connection line is created,
         lets call it a "pipe"
       </p>
-      <div class="align-center">
+      <div class="figure">
         <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/drag.svg">
       </div>
       <p>
-        When you release the mouse
-        button in an empty space, a
-        context menu appears with 
-        options to create a command
+        When you release the mouse button in an empty space, a
+        context menu appears with options to create a command
       </p>
-      <div class="align-center">
+      <div class="figure">
         <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/popup.svg">
       </div>
 
       <h3> Next step </h3>
 
-      <p> In this section contains a tabset which shows different ways to create
+      <p> 
+        In this section contains a tabset which shows different ways to create
         different kind of commands;
       </p>
 
@@ -78,64 +91,105 @@
       <tabset>
         <tab heading="Using mouse">
           <p>Chose one of the commands in the list</p>
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/mouse-select.svg">
           </div>
 
           <p>
-            And the component is created
+            And the node is created
           </p>
 
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/simple-grep-complete.svg">
           </div>    
         </tab>
         <tab heading="Using key (simple command)">
           <p>just write the name of the command you want to create</p>
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/simple-grep.svg">
           </div> 
           <p>
-            And the component is created
+            And the node is created
           </p>
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/simple-grep-complete.svg">
           </div>     
 
         </tab>
 
-        <tab heading="Using key (adanced command)">
+        <tab heading="Using key (advanced command)">
           <p>Write the name of the command along with its argumets</p>
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/advanced-grep.svg">
           </div>
           <p>
             And the command is created with the information
             automatcally updated based on the arguments
           </p> 
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/advanced-grep-complete.svg">
           </div>       
         </tab>
 
-        <tab heading="Using key (file component)">
+        <tab heading="Using key (file node)">
           <p>
             Write in the box the name of the file with the file extension, just having a dot in
-            the text will tell that the component to be created is a file
+            the text will tell that the node to be created is a file
           </p>
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/file.svg">
           </div> 
 
           <p>
-            And the file component is created with the choosen name
+            And the file node is created with the choosen name
           </p>
-          <div class="align-center">
+          <div class="figure">
             <img src="//omarcastro.github.com/ShellHive/docs/tutorial/createConnect/file-complete.svg">
           </div>       
         </tab>
       </tabset>
 
+    </tab>
+    <tab heading="File system">
+      <h2> Using the file system </h2>
+
+      <p>
+        The filesystem contains the files to be acessed from the commands.
+      </p>
+      <div class="figure">
+        <img width="60%" src="//omarcastro.github.com/ShellHive/docs/tutorial/filesystem/sample-filesystem.svg">
+        <div>A sample view of the filesystem</div>
+      </div>
+
+      <p>
+        When running the commands, any new file generated is added to the filesystem, for
+        example, by running a worflow like the next figure:
+      </p>
+
+      <div class="figure">
+        <img width="60%" src="//omarcastro.github.com/ShellHive/docs/tutorial/filesystem/sample-execution.svg">
+        <div>A representation of <code>echo hello > world.txt</code></div>
+      </div>
+
+      <p>
+        The "world.txt" is created, and is automatically added to the filesystem.
+      </p>
+
+      <div class="figure">
+        <img width="60%" src="//omarcastro.github.com/ShellHive/docs/tutorial/filesystem/sample-filesystem-after.svg">
+        <div>A sample view of the filesystem</div>
+      </div>
+
+      <h3>Downloading and uploading</h3>
+      <p>
+        You can upload and files to be processed using the visual interface, and download them
+        after the execution is done.
+      </p>
+
+      <p>
+        There are two ways to upload and download the file, by drag and drop files from and to
+        the desktop, or by using the buttons on the bottom rigth corner of the filesystem view.
+      </p>
     </tab>
     <tab heading="shortcuts">
       <h3> Shortcut </h3>

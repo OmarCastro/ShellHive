@@ -31,16 +31,13 @@ module.exports = {
         Graph.create(data).exec(function(err,created){
           if(err || !created) return next(err);
           CollaborationService.updateMacroList(req.socket);
-          if(command){
-            GraphGeneratorService.addToGraph(created.id, command, function(){
-              res.json({
-                message:"macro created",
-                name:created.data.name,
-                macro: created.id
-              })
-            }, true)
-          }
-
+          GraphGeneratorService.addToGraph(created.id, command, function(){
+            res.json({
+              message:"macro created",
+              name:created.data.name,
+              macro: created.id
+            })
+          }, true)
           sails.log('Created macro with name '+created.name);
         });        
       }

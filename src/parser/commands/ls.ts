@@ -224,7 +224,7 @@ var flags = {
   },
   context:{
     name: "context",
-    option: 'E',
+    option: 'Z',
     description: "print $ after each line",
     active: false
   },

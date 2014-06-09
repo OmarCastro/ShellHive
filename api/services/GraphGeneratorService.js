@@ -7,6 +7,12 @@
 var parser = require('../../lib/parser/parser.js');
 
 function metaGraphfromCommand(command){
+    if(!command){
+      return {
+        components:[],
+        connections:[]
+      }
+    }
     var parsedGraph = parser.parseCommand(command);
     //parsedGraph.connections = parsedGraph.connections.map(function(connection){return connection.toJSON()});
     var componentMap = {}
@@ -120,23 +126,26 @@ module.exports = {
   var metagraph = GraphGeneratorService.metaGraphfromCommand(command);
   var components = metagraph.components;
   var maxPos = 0
+  var midPos = 0
   var componentsToCreate = components.map(function(component){
     if(addInOut){
       component.position.x += 400;
       maxPos = Math.max(maxPos, component.position.x);
+      midPos = Math.max(midPos, component.position.y);
     }
     return {
       graph: graphId,
       data: JSON.stringify(component)
     }
   })
+  midPos /= 2;
 
   if(addInOut){
     componentsToCreate = componentsToCreate.concat({
       graph: graphId,
       data: JSON.stringify({
         type:"input",
-        position: {x:0, y:0},
+        position: {x:0, y:midPos},
         ports:["input"]
       })
 
@@ -144,7 +153,7 @@ module.exports = {
       graph: graphId,
       data: JSON.stringify({
         type:"output",
-        position: {x:maxPos + 400, y:0},
+        position: {x:maxPos + 400, y:midPos},
         ports:["output","error"]
       })
     })

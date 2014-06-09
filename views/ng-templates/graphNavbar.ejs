@@ -55,7 +55,9 @@
         </ul>
       </li>
 
-      <li><a ng-click="status.filesystem = !status.filesystem">Filesystem</a></li>
+      <li ng-class="{active:status.filesystem}">
+        <a ng-click="status.filesystem = !status.filesystem">Filesystem</a>
+      </li>
       <li><a ng-click="shell = true; $emit('runCommand', [])">
         <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
       </a></li>
