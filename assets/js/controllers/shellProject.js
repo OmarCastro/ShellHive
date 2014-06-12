@@ -1,7 +1,8 @@
 
 var viewGraph;
 
-app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($scope, csrf, alerts, modal){
+app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal','$timeout',
+function($scope, csrf, alerts, modal,$timeout){
   var AST, visualData;
   visualData = {};
   $scope.alerts = alerts
@@ -11,7 +12,7 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   $scope.chatMessages = [];
   $scope.clients = [];
   $scope.chat = {open: false};
-
+  $scope.execStatus = false;
   $scope.isImplemented = function(data){
     return this.implementedCommands.indexOf(data.exec) >= 0;
   };
@@ -272,7 +273,12 @@ app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal', function($sc
   });
 
   $scope.$on("runCommand", function(event, message){
+    if($scope.execStatus) return;
+    $scope.execStatus = true;
     console.log('runCommand!');
+    $timeout(function(){
+      $scope.execStatus = false
+    }, 3000)
     io.socket.get('/graph/runGraph/',{_csrf:csrf.csrf}, function(data){
       debugData(data);
       $scope.shellText = [{

@@ -61,8 +61,8 @@
       <li><a ng-click="shell = true; $emit('compileGraph')">
         <span>Compile</span>
       </a></li>
-      <li><a ng-click="shell = true; $emit('runCommand', [])">
-        <span class="glyphicon glyphicon-play">&nbsp;</span><span>Run</span>
+      <li ng-class="{disabled:execStatus}"><a ng-click="shell = true; $emit('runCommand', [])">
+        <span ng-class="'glyphicon-' + ((execStatus)?'time':'play')" class="glyphicon">&nbsp;</span><span ng-bind="(execStatus)?'Running':'Run'"></span>
       </a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
