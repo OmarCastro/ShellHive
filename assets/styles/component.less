@@ -27,7 +27,7 @@
         -webkit-user-select: none; /* Chrome/Safari */        
         -moz-user-select: none; /* Firefox */
         -ms-user-select: none; /* IE10+ */
-        
+	cursor: move;        
         /* Rules below not implemented in browsers yet */
         -o-user-select: none;
         user-select: none;
@@ -45,6 +45,7 @@
         }
         .button-group {
             position: absolute;
+	    cursor:pointer;
             right: 0;
             top: 0;
             font-size:1.1em;
@@ -54,6 +55,10 @@
         }
     }
     .input, .output{
+        -webkit-user-select: none; /* Chrome/Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+ */
+	cursor: move;
         white-space: nowrap;
         [data-port]{
             &:hover, &:active, &.hover{

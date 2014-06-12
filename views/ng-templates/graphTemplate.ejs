@@ -32,11 +32,11 @@
     </div>
   </div>
   <div ng-show="shell" touch-action="all" class="shell">
-    <pre ng-repeat="line in $parent.shellText" ng-class="line.type" ng-bind="line.text"></pre>
+    <pre ng-repeat="line in $parent.shellText | limitTo: -50" ng-class="line.type" ng-bind="line.text"></pre>
   </div>
 </div>
 
-<div class="chat" ng-if="chat.open">
+<div style="z-index:9" class="chat" ng-if="chat.open">
   <button type="button" class="close" ng-click="chat.open = false" aria-hidden="true">&times;</button>
   <div style="overflow:auto; padding-top: 1em; height:30%">
   <div ng-repeat="c in clients track by c.id">
@@ -51,7 +51,7 @@
   </div>
   </div>
   <form role="form" class="form" ng-init="chatMsg = ''" ng-submit='$emit("chat",{text: chatMsg}); chatMsg = ""'>
-    <input type="text" id="name" ng-model="chatMsg" placeholder="send message" class="form-control">
+    <input type="text" id="name" ng-model="chatMsg" placeholder="send chat message" class="form-control">
   </form>
 </div>
 
