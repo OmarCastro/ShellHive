@@ -195,20 +195,20 @@
     </style>
 </head>
 <body>
-<div class="header high">
+<div class="header low">
     <h1>Code coverage report for <span class="entity">api/services/showValidationError.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">100% <small>(17 / 17)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">5.88% <small>(1 / 17)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">66.67% <small>(4 / 6)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">0% <small>(0 / 6)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Functions: <span class="metric">100% <small>(3 / 3)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">0% <small>(0 / 3)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">100% <small>(17 / 17)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">5.88% <small>(1 / 17)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -322,32 +322,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Takes a Sails Model object (e.g. User) and a ValidationError object and translates it into a friendly
  * object for sending via JSON to client-side frameworks.
@@ -387,39 +387,39 @@
  *
  * @returns {Object} An object with friendly validation error conversions.
  */ 
-module.exports = function(model, validationError) {
-  var validation_response = {};
-  var messages = model.validation_messages;
-  validation_fields = Object.keys(messages);
+module.exports = <span class="fstat-no" title="function not covered" >function(model, validationError) {</span>
+<span class="cstat-no" title="statement not covered" >  var validation_response = {};</span>
+<span class="cstat-no" title="statement not covered" >  var messages = model.validation_messages;</span>
+<span class="cstat-no" title="statement not covered" >  validation_fields = Object.keys(messages);</span>
 &nbsp;
-  validation_fields.forEach(function(validation_field) {
+<span class="cstat-no" title="statement not covered" >  validation_fields.forEach(<span class="fstat-no" title="function not covered" >function(validation_field) {</span></span>
 &nbsp;
-    if(validationError[validation_field]) {
-      sails.log(validationError, validation_field)
-      var processField = validationError[validation_field];
-      require("util").inspect(processField);
-      processField.forEach(function(rule) {
-        <span class="missing-if-branch" title="else path not taken" >E</span>if(messages[validation_field][rule.rule]) {
-          <span class="missing-if-branch" title="else path not taken" >E</span>if(!(validation_response[validation_field] instanceof Array)) {
-            validation_response[validation_field] = new Array();
+<span class="cstat-no" title="statement not covered" >    if(validationError[validation_field]) {</span>
+<span class="cstat-no" title="statement not covered" >      sails.log(validationError, validation_field)</span>
+<span class="cstat-no" title="statement not covered" >      var processField = validationError[validation_field];</span>
+<span class="cstat-no" title="statement not covered" >      require("util").inspect(processField);</span>
+<span class="cstat-no" title="statement not covered" >      processField.forEach(<span class="fstat-no" title="function not covered" >function(rule) {</span></span>
+<span class="cstat-no" title="statement not covered" >        if(messages[validation_field][rule.rule]) {</span>
+<span class="cstat-no" title="statement not covered" >          if(!(validation_response[validation_field] instanceof Array)) {</span>
+<span class="cstat-no" title="statement not covered" >            validation_response[validation_field] = new Array();</span>
           }
 &nbsp;
-          var newMessage={};
-          newMessage[rule.rule] = messages[validation_field][rule.rule];
-          validation_response[validation_field].push(newMessage);
+<span class="cstat-no" title="statement not covered" >          var newMessage={};</span>
+<span class="cstat-no" title="statement not covered" >          newMessage[rule.rule] = messages[validation_field][rule.rule];</span>
+<span class="cstat-no" title="statement not covered" >          validation_response[validation_field].push(newMessage);</span>
         }
       });
 &nbsp;
     }
   });
 &nbsp;
-  return validation_response;
+<span class="cstat-no" title="statement not covered" >  return validation_response;</span>
 };</pre></td></tr>
 </table></pre>
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 12 2014 15:37:41 GMT+0000 (UTC)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 12 2014 19:54:16 GMT+0000 (UTC)</div>
 </div>
 
 <script src="../../prettify.js"></script>
