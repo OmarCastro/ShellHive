@@ -231,10 +231,6 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
 };
 
 
-function parseFlagsAndSelectors(component:CommandComponent, options):string{
-
-}
-
 export function commonParseComponent(flagOptions, selectorOptions, parameterOptions?, beforeJoin?:(component, exec, flags, files, parameters)=>string){
   var options;
   options = {
