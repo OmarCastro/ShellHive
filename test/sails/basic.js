@@ -383,7 +383,7 @@ describe("Sails test", function(){
   //  });
   //});
 
-  require("../e2e/test")
+  //require("../e2e/test")
 
 
   /**
