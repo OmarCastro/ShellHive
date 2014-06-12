@@ -31,7 +31,7 @@ describe('common module test', function(){
       graph1.components.should.have.length(2);
       graph1.connections.should.have.length(1);
       graph1.containsComponent(componentToRemove).should.be.false;
-      parser.parseGraph(graph1).should.equal('grep "hello world" cenas.txt');
+      parser.parseGraph(graph1).should.equal("grep 'hello world' cenas.txt");
     })
 
     it('should not do anything on an unknown component', function(){

@@ -180,11 +180,9 @@ describe("Sails test", function(){
     it('should compile a graph in a database', function (done) {
       global.GraphGeneratorService.compileGraph(1,function(err, result){
        expect(result.pretty).to.equal(
-        ["mkfifo /tmp/fifo-1-file0 /tmp/fifo-3-input"
-        ,"cat /tmp/fifo-1-file0 > /tmp/fifo-3-input &"
-        ,"pv json.txt > /tmp/fifo-1-file0 &"
-        ,"grep < /tmp/fifo-3-input Gloss &"
-        ,"timeout 10 parallel < /tmp/sHiveExec.sh -uj 3"].join("\n")); 
+"mkfifo /tmp/fifo-1-file0\n\
+cat /tmp/fifo-1-file0 | grep Gloss &\n\
+pv -f json.txt > /tmp/fifo-1-file0 &"); 
        done();
       });
     });
