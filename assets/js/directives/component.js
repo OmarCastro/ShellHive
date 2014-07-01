@@ -92,12 +92,14 @@ app.directive("component", function($document){
     switch(datanode.type){
     case 'file':
       scope.title = {
-        name: "file"
+        name: "file",
+        buttons: true
       }
       break;
     case 'command':
       scope.title = {
-        name: datanode.exec
+        name: datanode.exec,
+        buttons: true
       }
       break;
     case 'macro':
@@ -106,7 +108,21 @@ app.directive("component", function($document){
         name: macro.name,
         description: macro.description
       }
+      buttons: true
       break;
+    case 'input':
+      scope.title = {
+        name: "INPUT",
+        buttons: false
+      }
+      break;
+    case 'output':
+      scope.title = {
+        name: "OUTPUT",
+        buttons: false
+      }
+      break;
+  
     }
 
 

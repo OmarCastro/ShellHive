@@ -177,9 +177,8 @@ app.directive("graph", function($document){
           update();
         };
         MouseWheelHandler = function(event){
-          if (!event.altKey) {
-            return;
-          }
+          var ispopup = $(event.target).closest(".popupArea").length > 0
+          if (!event.altKey && ispopup) { return; }
           event.preventDefault();
           event.stopPropagation();
           if ((event.wheelDelta || -event.detail) > 0) {

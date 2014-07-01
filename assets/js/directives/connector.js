@@ -17,11 +17,35 @@ app.directive("connector", function($document){
       var endPosition = endComponent.position;
       scope.endsPositions = [startPosition,endPosition]
       
+      function queryConnectorInfo(){
+        var Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']");
+        var StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box");
+        var Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']");
+        var EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box");
+        StartPortOffset = {
+          top: StartPort.offsetTop + StartPort.offsetHeight * 0.75,
+          left: StartPort.offsetLeft,
+          right: StartPort.offsetLeft + StartPort.offsetWidth
+        };
+        EndPortOffset = {
+          top: EndPort.offsetTop + EndPort.offsetHeight * 0.75,
+          left: EndPort.offsetLeft
+        };
+      }
+
+
+
        function update(startPos, endPos){
+          if(!StartPortOffset || !EndPortOffset){
+            queryConnectorInfo();
+          }
           startPosition = startPos || startPosition
           endPosition = endPos || endPosition
           scope.endsPositions[0] = startPosition
           scope.endsPositions[1] = endPosition
+
+
+
          //console.log('updating edge')
           setEdgePath(startPosition.x + StartPortOffset.right - 2, 
                       startPosition.y + StartPortOffset.top,
@@ -63,21 +87,11 @@ app.directive("connector", function($document){
       };
      
       scope.update = update;
+
+
       
       scope.reset = function(){
-        var Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']");
-        var StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box");
-        var Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']");
-        var EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box");
-        StartPortOffset = {
-          top: StartPort.offsetTop + StartPort.offsetHeight * 0.75,
-          left: StartPort.offsetLeft,
-          right: StartPort.offsetLeft + StartPort.offsetWidth
-        };
-        EndPortOffset = {
-          top: EndPort.offsetTop + EndPort.offsetHeight * 0.75,
-          left: EndPort.offsetLeft
-        };
+        queryConnectorInfo();
         update();
       };
       requestAnimationFrame(function(){

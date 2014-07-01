@@ -2,7 +2,7 @@
 
     <div title="{{title.desc}}" class="title">
       <span class="title-name" ng-bind="title.name"></span>
-      <span class="button-group" ng-if="data.type != 'input' && data.type != 'output'">
+      <span class="button-group" ng-if="title.buttons">
         <a ng-click="togglecollapse()" 
            class="glyphicon" 
            ng-class="(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'">
@@ -30,7 +30,6 @@
 
 
   <div ng-switch-when="input">
-    <div class="title"> INPUTS </div>
     <div class="ports">
       <div class="output">
         <div>
@@ -48,7 +47,6 @@
   </div>
 
   <div ng-switch-when="output">
-    <div class="title"> OUTPUTS </div>
     <div class="ports">
       <div class="input">
         <div>
@@ -58,9 +56,10 @@
           <button  ng-if="!collapsed" ng-click="data.ports.splice($index,1)" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-remove"></span>
         </button>        </div>
-        </div>
 
         <button ng-click="data.ports.push('')" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+        </div>
+
       </div>
     </div>
   </div>
