@@ -115,6 +115,9 @@ function createAndConnectComponent(projectId, graphId, command, componentId, sta
 
 
 
+
+
+
 module.exports = {
   
   metaGraphfromCommand:metaGraphfromCommand, 
@@ -186,6 +189,25 @@ module.exports = {
       components: function (cb) {Component.destroy({id:id}).exec(cb)},
       connections: function (cb) {Connection.destroy().where({or:[{startNode:id},{endNode:id}]}).exec(cb)}
     }, callback);
+  },
+
+  removeComponentFilePort:  /* istanbul ignore next */ function(id, port, callback){
+    var portToremove = "file"+port
+    async.series([
+      function (cb) {Connection.destroy().where({endNode:id, endPort: portToremove}).exec(cb)},
+      function (cb) {Connection.find({endNode:id, endPort: {contains:"file"}}).exec(function(err,results){
+      /* istanbul ignore if */ if(err || !results) return cb(err);
+        var updatedRecords = []
+        results.forEach(function(res){
+          var resPort = parseInt(res.endPort.slice(4));
+          if(resPort > port){
+            res.endPort = "file" + ( resPort + 1 )
+            res.save(function(){});
+            updatedRecords.push(res);
+          }
+        })
+        cb(null, updatedRecords);
+      })}],callback);
   },
   
   createGraphfromCommand: /* istanbul ignore next */ function(params, command){ 

@@ -6,7 +6,22 @@ import GraphModule = require("../../common/graph");
 
 
 
-
+var parameters = {
+    set1:{
+      name:'set1',
+      option: null,
+      type: "string",
+      description:"URL of the application",
+      defaultValue: ""
+    },
+    set2:{
+      name:'set2',
+      option: null,
+      type: "numeric parameter",
+      description:"Maximum  time  in  seconds that you allow the whole operation to take",
+      defaultValue: ""
+    }
+}
 
 var flags = {
   complement: {
@@ -40,7 +55,8 @@ var flags = {
 }
 
 var config:parserModule.Config = {
-  flags:flags
+  flags:flags,
+  parameters: parameters
 }
 
 
@@ -56,28 +72,22 @@ shortOptions['C'] = $.switchOn(flags.complement);
 
 export class TrComponent extends GraphModule.CommandComponent {
   public exec:string = "tr"
-  public set1:string = ""
-  public set2:string = ""
 }
 
 
 function defaultComponentData(){
   var component = new TrComponent();
   component.selectors = bzipData.componentSelectors
+  component.parameters = bzipData.componentParameters
   component.flags = bzipData.componentFlags
   return component;
 };
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData,{
     string: (component, str)=>{
-        if(component.set1 == ""){component.set1 = str} else{component.set2 = str};
+        if(component.parameters.set1 == ""){component.parameters.set1 = str} else{component.parameters.set2 = str};
     }
   });
-export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions, bzipData.parameterOptions,
-  (component,exec,flags,files) => {    
-    return exec.concat(flags, component.set1, component.set2).join(' ');
-  }
-
-  );
+export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions, bzipData.parameterOptions);
 export var VisualSelectorOptions = bzipData.visualSelectorOptions;
 export var componentClass = TrComponent

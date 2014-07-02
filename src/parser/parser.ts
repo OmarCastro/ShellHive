@@ -38,8 +38,9 @@ export var parserCommand = {
   head: require('./commands/head'),
   tail: require('./commands/tail'),
   tr: require('./commands/tr'),
+  tee: require('./commands/tee'),
+  uniq: require('./commands/uniq'),
   wc: require('./commands/wc'),
-  tee: require('./commands/tee')
 };
 
 export var implementedCommands:any[] = [];

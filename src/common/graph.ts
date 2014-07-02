@@ -293,7 +293,7 @@ export class Boundary{
     var x = 0, y = 0, bottom = 350;
     
     if(boundaries.length){
-      x = maxX + 450
+      x = maxX + 350
       y = Math.max((prevBound.bottom - 350) / 2, 0)
       bottom = Math.max(prevBound.bottom,350)
     }

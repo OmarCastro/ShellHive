@@ -39,6 +39,23 @@ module.exports = {
       })
     });
   },
+
+  removeComponentFilePort: function(req, res, next){
+    GraphGeneratorService.removeComponentFilePort(req.body.id,req.body.port,function(err,res){
+      Component.update(id,{
+        data: req.body.componentBody
+      }, function(err,updated){
+        CollaborationService.emitMessageToGraph(req.socket.graphId, 'action', {
+          type:"multiaction",
+          actions: [
+            {type:"updateComponent", id:id, data:componentBody},
+            {type:"removeComponent",components:[], connections:res[0]},
+            {type:"updateConections", connections:res[1]}
+          ]
+        });
+      });
+    });
+  },
   
   createAndConnectComponent: function(req,res, next){
     var body = req.body;

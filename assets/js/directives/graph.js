@@ -26,7 +26,7 @@ app.directive("graph", function($document){
         var $svgElem = $(svgElem);
         var workspace = elem.querySelector(".workspace");
         var $workspace = $(workspace);
-        var popup = elem.querySelector(".popup");
+        var popup = elem.querySelector(".create-component-popup");
         var $popup = $(popup);
         var popupHeight = $popup.find("form").height();
         var $popupInput = $popup.find("input");
@@ -177,7 +177,7 @@ app.directive("graph", function($document){
           update();
         };
         MouseWheelHandler = function(event){
-          var ispopup = $(event.target).closest(".popupArea").length > 0
+          var ispopup = $(event.target).closest(".popupArea, .shell").length > 0
           if (!event.altKey && ispopup) { return; }
           event.preventDefault();
           event.stopPropagation();
@@ -230,7 +230,13 @@ app.directive("graph", function($document){
           popupState.startPort = startPort;
           popupState.endNode = endNode;
           popupState.endPort = endPort;
+
+          if(endNode) $popup.addClass("left-side");
+          else $popup.removeClass("left-side");
+
           popup.style[cssTransform] = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
+          
+
           $popup.show();
           $popupInput.focus();
           return scope.safedigest();

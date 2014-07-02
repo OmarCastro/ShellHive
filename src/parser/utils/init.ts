@@ -84,6 +84,12 @@ export function addFileComponent(componentData, connections, filename, id:number
 };*/
 
 
+
+
+
+/**
+  Algorthm commonly used to parse commands
+*/
 export function commonParseCommand(optionsParserData, defaultComponentData, argNodeParsing?){
   return function(argsNode, parser, tracker, previousCommand){
     var  stdoutRedirection:Component, 
@@ -231,6 +237,13 @@ function parseFlagsAndSelectors(component:CommandComponent, options):string{
 };
 
 
+
+
+/**
+  Algorthm commonly used to parse components
+
+  the parsing of the flags and selectos are on a different function "parseFlagsAndSelectors"
+*/
 export function commonParseComponent(flagOptions, selectorOptions, parameterOptions?, beforeJoin?:(component, exec, flags, files, parameters)=>string){
   var options;
   options = {
@@ -251,7 +264,9 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
 
     for (var key in Componentparameters) {
       var value = Componentparameters[key];
+
       var option = parameterOptions[key];
+
       if (option && value) {
         var parameterOption = parameterOptions[key]
         if(parameterOption[0] == "-"){
@@ -270,6 +285,17 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
         parameters.push(sanitizer.sanitizeArgument(value));
       }
     }
+
+
+
+      console.log(":::parameters:::",  parameters);
+
+
+
+
+
+
+
 
     var files = !component.files ? [] : component.files.map(file => {
         if (file instanceof Array) { //TODO: remove this "if" when removing old command generator

@@ -56,13 +56,19 @@ app.directive("port", function($document){
         pointedElem = document.elementFromPoint(event.clientX, event.clientY);
         $pointedElem = $(pointedElem);
 
+
+
+
         if (graphController.isFreeSpace(pointedElem)) {
           if (scope.isOutputNode) {
             graphController.showPopup(event, scope.componentId, attr.port, null, 'input');
           } else {
             graphController.showPopup(event, null, 'output', scope.componentId, attr.port);
           }
-        } else {
+        }
+
+
+         else {
           graphController.endEdge();
 
           outAttr = $pointedElem.attr("data-port") || $pointedElem.parent().attr("data-port");

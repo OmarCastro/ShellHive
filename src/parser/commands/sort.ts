@@ -118,7 +118,7 @@ var parameters = {
     name:'key',
     option: 'k',
     type: "string",
-    description:"filter entries by anything other than the content",
+    description:"sort via a key",
     defaultValue: ""
   }
 }
@@ -183,6 +183,7 @@ function defaultComponentData(){
   var component = new SortComponent();
   component.selectors = sortData.componentSelectors
   component.flags = sortData.componentFlags
+  component.parameters = sortData.componentParameters
   return component;
 };
 

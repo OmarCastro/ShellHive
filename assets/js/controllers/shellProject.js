@@ -212,6 +212,32 @@ function($scope, csrf, alerts, modal,$timeout){
       var connections = data.pipes.map(function(connection){return connection.id})
       visualData.connections = visualData.connections.filter(function(connection){return connections.indexOf(connection.id) < 0})   
       $scope.compileGraph()
+    },
+
+    updateConnections: function(data){
+
+
+      console.log("updateConnections:", data);
+      var connections = visualData.connections;
+      var upConnections = data.connections;
+
+      for (var i = connections.length - 1; i >= 0; i--) {
+        for (var j = upConnections.length - 1; j >= 0; j--) {
+          if(connections[i].id == upConnections[j]){
+            connections[i] = upConnections[j];
+            break;
+          }
+        }
+      }
+      $scope.compileGraph()
+    },
+
+    multiaction: function(data){
+      $scope.haltCompileGraph();
+      data.actions.forEach(function(action){
+        actionReceiveCallbacks[action.type](action);
+      });
+      $scope.resumeCompileGraph();
     }
 
   }
@@ -289,7 +315,19 @@ function($scope, csrf, alerts, modal,$timeout){
     });
   });
 
+  $scope.haltCompileGraph = function(event, message){
+    $scope.compileGraphHalted = true;
+  };
+
+  $scope.resumeCompileGraph = function(event, message){
+    $scope.compileGraphHalted = false;
+    $scope.compileGraph();
+  };
+
   $scope.compileGraph = function(event, message){
+    if($scope.compileGraphHalted){
+      return;
+    }
     console.log('compileGraph!');
     io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
       debugData(data);
