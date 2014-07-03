@@ -2,8 +2,14 @@
   <div class="create-component-popup dropdown open">
     <ul class="dropdown-menu well">
       <form ng:submit="graph.popupSubmit(popupText)">
-        <div class="input-group input-group-sm"><span class="input-group-addon glyphicon glyphicon-tasks"></span>
+        <div class="input-group input-group-sm tip"><span class="input-group-addon glyphicon glyphicon-tasks"></span>
           <input type="text" ng-model="popupText" class="form-control">
+          <div class="tooltip">
+            <b>Hint1:</b> Use file + extension to create file component
+            ,e.g. <i>file.txt</i>
+            <br><b>Hint2:</b> Write commands with arguments to autofill, 
+            e.g. <i>grep -F hello</i>
+          </div>
         </div>
       </form>
       <li ng-show="comms.length" class="dropdown-header">

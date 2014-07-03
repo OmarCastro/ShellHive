@@ -27,7 +27,8 @@
         -webkit-user-select: none; /* Chrome/Safari */        
         -moz-user-select: none; /* Firefox */
         -ms-user-select: none; /* IE10+ */
-	cursor: move;        
+	       cursor: move;   
+           position: relative;     
         /* Rules below not implemented in browsers yet */
         -o-user-select: none;
         user-select: none;
@@ -58,7 +59,7 @@
         -webkit-user-select: none; /* Chrome/Safari */
         -moz-user-select: none; /* Firefox */
         -ms-user-select: none; /* IE10+ */
-	cursor: move;
+	    cursor: move;
         white-space: nowrap;
         [data-port]{
             &:hover, &:active, &.hover{
@@ -90,6 +91,9 @@
         width:1em;
         background-color:#aaa;
         border-radius:.1em;
+    }
+    .relative{
+        position: relative;
     }
     label {
         font-weight:normal;
@@ -149,3 +153,63 @@
     margin-left: -2px;
 }
 
+
+
+
+
+
+
+.tip .tooltip {
+  background: #1496bb;
+  bottom: 100%;
+  color: #fff;
+  display: block;
+  width:25em;
+  left: 50%;
+  margin-bottom: 15px;
+  opacity: 0;
+  padding: 20px;
+  pointer-events: none;
+  white-space: initial;
+  position: absolute;
+  text-align: left;
+  font-weight: normal;
+  transform: translate(-50%);
+  transition: all .2s ease-out;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+}
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+//.tip .tooltip:before {
+//  bottom: -20px;
+//  content: " ";
+//  display: block;
+//  height: 20px;
+//  left: 0;
+//  position: absolute;
+//  width: 100%;
+//}  
+
+/* CSS Triangles - see Trevor's post */
+.tip .tooltip:after {
+  border-left: solid transparent 10px;
+  border-right: solid transparent 10px;
+  border-top: solid #1496bb 10px;
+  bottom: -10px;
+  content: " ";
+  height: 0;
+  left: 50%;
+  margin-left: -13px;
+  position: absolute;
+  width: 0;
+}
+  
+.tip:hover .tooltip {
+  opacity: 1;
+  //transform: translateY(-50%,0px);
+}
+
+.tip:active .tooltip {
+  display: none;
+  //transform: translateY(-50%,0px);
+}
