@@ -60,8 +60,13 @@ module.exports = {
   createAndConnectComponent: function(req,res, next){
     var body = req.body;
     GraphGeneratorService.createAndConnectComponent(
-      req.socket.projectId, req.socket.graphId, body.command,
-      body.componentId, body.startPort, body.position,
+      req.socket.projectId, 
+      req.socket.graphId,
+      body.command,
+      body.componentId,
+      body.startPort,
+      body.position,
+      body.fromInput,
       function(err, result){
         if(err) {
           return res.json({

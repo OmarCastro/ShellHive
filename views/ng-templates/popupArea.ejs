@@ -7,7 +7,7 @@
           <div class="tooltip">
             <b>Hint1:</b> Use file + extension to create file component
             ,e.g. <i>file.txt</i>
-            <br><b>Hint2:</b> Write commands with arguments to autofill, 
+            <br><b>Hint2:</b> Write commands with arguments to autofill the created component, 
             e.g. <i>grep -F hello</i>
           </div>
         </div>
@@ -45,7 +45,7 @@
 
 
   <div class="edgepopup" ng-repeat="c in edgePopups track by c.index" ng-style="{transform:c.transform, WebkitTransform:c.transform, MsTransform:c.transform}">
-    <div class="content well well-sm" ng-class="(c.y < 120)?'bottom':'top'">  
+    <div class="content" ng-class="(c.y < 120)?'bottom':'top'">  
     <div>Remove the connection?</div>
     <button class="btn btn-sm btn-success" ng-click="$emit('removePipe',{id: c.id});
     edgePopups.splice($index,1)">Remove</button>

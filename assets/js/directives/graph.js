@@ -168,6 +168,11 @@ app.directive("graph", function($document){
             return;
           }
           hidePopupAndEdge();
+          var newScale = scale * amount
+          if(newScale > 0.9 && newScale < 1.1){
+            amount = 1/scale;
+          }
+
           ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
           relpointX = x - graphX;
           relpointY = y - graphY;
@@ -244,11 +249,18 @@ app.directive("graph", function($document){
         var popupSubmit = function(content){
           var comp;
 
-          scope.$emit('addAndConnectComponent', {
+          scope.$emit('addAndConnectComponent', (popupState.startNode) ? {
             command: content,
             componentId: popupState.startNode,
             startPort: popupState.startPort,
-            position: {x: popupState.x , y: popupState.y}
+            position: {x: popupState.x , y: popupState.y},
+            fromInput: false
+          } : {
+            command: content,
+            componentId: popupState.endNode,
+            startPort: popupState.endPort,
+            position: {x: popupState.x - 150 , y: popupState.y},
+            fromInput: true
           })
           hidePopup();
           endEdge();

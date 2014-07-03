@@ -170,24 +170,137 @@ div[graph]{
     }
 }
 
+@tooltip-color: darken(#1496bb,10%);
+
+
 .edgepopup{
     position:absolute;
     z-index:10;
     text-align: center;
     margin: 0;
     .content{
+        background: @tooltip-color;
+        padding: 10px;
+        color: white;
         position:absolute;
         white-space: nowrap;
         margin: 0;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+
     }
     .content.top{
-        transform: translate(-50%,-100%)
+        bottom: 100%;
+        transform: translate(-50%, -10px)
     }
     .content.bottom{
-        transform: translate(-50%)
+        transform: translate(-50%, 10px)
+
     }
 }
-    
+
+
+
+
+.tip .tooltip {
+  background: @tooltip-color;
+  bottom: 100%;
+  color: #fff;
+  display: block;
+  width:25em;
+  left: 50%;
+  margin-bottom: 15px;
+  opacity: 0;
+  padding: 20px;
+  pointer-events: none;
+  white-space: initial;
+  position: absolute;
+  text-align: left;
+  font-weight: normal;
+  transform: translate(-50%);
+  transition: all .2s ease-out;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+}
+
+.tip.bottom .tooltip {
+  border-left: solid transparent 11px;
+  bottom: initial;
+  margin-bottom: initial;
+  margin-top: 15px;
+  top: 100%;
+}
+
+.tip.left .tooltip {
+  transform: translate(-5%);
+}
+
+.tip.right .tooltip {
+  transform: translate(-95%);
+}
+
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+//.tip .tooltip:before {
+//  bottom: -20px;
+//  content: " ";
+//  display: block;
+//  height: 20px;
+//  left: 0;
+//  position: absolute;
+//  width: 100%;
+//}  
+
+/* CSS Triangles - see Trevor's post */
+.edgepopup .content:after, .tip .tooltip:after {
+  border-left: solid transparent 11px;
+  border-right: solid transparent 11px;
+  border-top: solid @tooltip-color 11px;
+  bottom: -10px;
+  content: " ";
+  height: 0;
+  left: 50%;
+  margin-left: -13px;
+  position: absolute;
+  width: 0;
+}
+
+.tip.left .tooltip:after {
+  left: 5%;
+}
+
+
+.tip.right .tooltip:after {
+  left: 95%;
+}
+
+.edgepopup .content.bottom:after, .tip.bottom .tooltip:after {
+  border-top: none;
+  border-bottom: solid @tooltip-color 11px;
+  top: -10px;
+  bottom: initial;
+}
+
+.edgepopup .content{
+    background: #444;
+}
+
+.edgepopup .content.bottom:after{
+  border-bottom: solid #444 11px;
+}
+
+.edgepopup .content.top:after{
+  border-top: solid #444 11px;
+}
+  
+.tip:hover .tooltip {
+  opacity: 1;
+  //transform: translateY(-50%,0px);
+}
+
+.no-tooltip .tip .tooltip,.tip:active .tooltip {
+  display: none;
+  //transform: translateY(-50%,0px);
+}
+
 .create-component-popup{
     a {
         padding-top:0;

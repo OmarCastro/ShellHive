@@ -1,8 +1,11 @@
-<div class="tutorial-panel" ng-class="{top: !status.tutop}" ng-if="!status.tutorial">
+<div class="tutorial-panel" ng-if="status.tutorial">
   <tabset class="tabs-left" vertical="true" type="tabs">
     <tab heading="Intoduction">
       <div class="bigger-text">
+        <label class="pull-right">
+          hide help tooltips <input type="checkbox" ng-model="status.noTooltip">
 
+        </label>
         <h2>Hello Visitor!</h2>
         <p>
           
@@ -11,15 +14,15 @@
         <p>
 	It also tries to simplify other things such as sharing and
 	 collaborating the graphs with other people, so that is easier to understand
-	 for people with high and low experience with SH scripts (such as trainees),
+	 for people with high and low experience with Unix Shell scripts (such as trainees),
 	 it can also be used to teach other people how to write those scripts.
         </p>
-	<p style="color:red"> Before playing the demo please read the manual 
+	<!--p style="color:red"> Before playing the demo please read the manual 
 	(tabs on the left above "Play demo"), which allows to give you
 	basic information on how to use the application
         <p>
           To play the demo, click on "<i class="glyphicon glyphicon-play"></i> Play demo" tab
-        </p>
+        </p-->
       </div>
 
     </tab>
@@ -241,7 +244,7 @@ to execute a workflow you just click on the \"Run\" button on the top menu" | md
         </div>
       </div>
     </tab>
-    <tab select="status.tutop = true; status.tutorial = true">
+    <tab select="status.tutorial = false">
       <tab-heading class="btn btn-primary">
       <i class="glyphicon glyphicon-play"></i> Play demo
     </tab-heading>

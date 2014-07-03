@@ -1,3 +1,4 @@
+<div ng-class="{'no-tooltip': status.noTooltip}">
 <div class="alerts">
   <div>
   <alert ng-repeat="alert in alerts.alerts" type="{{alert.type}}" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}
@@ -54,4 +55,4 @@
     <input type="text" id="name" ng-model="chatMsg" placeholder="send chat message" class="form-control">
   </form>
 </div>
-
+</div>

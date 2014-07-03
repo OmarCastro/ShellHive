@@ -93,13 +93,25 @@ function createComponent(projectId, graphId, command, position, cb){
 }
 
 /* istanbul ignore next */
-function createAndConnectComponent(projectId, graphId, command, componentId, startPort, position, cb){
+function createAndConnectComponent(projectId, graphId, command, componentId, port, position, fromInput, cb){
+  if(typeof fromInput == "function"){
+    cb = fromInput;
+    fromInput = false;
+  }
   createComponent(projectId, graphId, command,position, function(err,created, endPort){
     if(err) return cb(err);
-    var connectionData = {
+
+
+    var connectionData = (fromInput) ? {
+      graph     : graphId,
+      startNode : created.id,
+      startPort : (endPort=="input")?"output": "macroOut0",
+      endNode   : componentId,
+      endPort   : port
+    }: {
       graph     : graphId,
       startNode : componentId,
-      startPort : startPort,
+      startPort : port,
       endNode   : created.id,
       endPort   : endPort
     }
