@@ -1,7 +1,7 @@
 {
   "name": "ShellHive",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.5",
   "description": "A Visual data-flow programming web application to create UNIX Shell workflows",
   "keywords": [
     "Unix Shell"
