@@ -101,6 +101,13 @@
       </a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
+
+        <li><a class="tip bottom"  ng-click="status.noTooltip = !status.noTooltip">
+        <b class="badge" ng-style="{background: ((status.noTooltip)? '#A14F36':'#529130')}">HELP MODE {{(status.noTooltip)? "OFF": "ON"}}</b>
+          <div class="tooltip">
+            In this mode, the tooltips are shown, to hide them, disable this mode by clicking the button
+          </div>
+      </a></li>
       <li><a class="tip bottom" href="https://docs.google.com/forms/d/1gcaVGYNhoKEG-v5j42dNg-3nqG4WkJpFtxWAy1RYZ14/viewform" target="_blank">
         <b class="badge">FEEDBACK</b>
           <div class="tooltip">
