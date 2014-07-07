@@ -327,8 +327,10 @@ function($scope, csrf, alerts, modal,$timeout){
   $scope.compileGraph = function(event, message){
     if($scope.compileGraphHalted){
       return;
+    } else if (!$scope.shell){
+      return $scope.$digest();
     }
-    console.log('compileGraph!');
+    //console.log('compileGraph!');
     io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
       debugData(data);
       $scope.shellText = [{
@@ -342,49 +344,49 @@ function($scope, csrf, alerts, modal,$timeout){
   $scope.$on("compileGraph", $scope.compileGraph);
 
  $scope.$on("chat", function(event, message){
-    console.log('chat '+message+' !');
+    //console.log('chat '+message+' !');
     io.socket.post('/project/chat/', {data:message, _csrf:csrf.csrf}, debugData);
   });
 
   $scope.$on("removeComponent", function(event, message){
-    console.log('removeComponent '+message+' !');
+    //console.log('removeComponent '+message+' !');
     io.socket.post('/graph/removeComponent/', {id:message, _csrf:csrf.csrf}, debugData);
   });
 
   $scope.$on("addAndConnectComponent", function(event, message){
-    console.log('addAndConnectComponent ', message,' !');
+    //console.log('addAndConnectComponent ', message,' !');
     message._csrf = csrf.csrf
     io.socket.post('/graph/createAndConnectComponent/', message, debugData);
   });
 
     $scope.$on("addComponent", function(event, message){
-    console.log('addComponent ', message,' !');
+    //console.log('addComponent ', message,' !');
     message._csrf = csrf.csrf
     io.socket.post('/graph/createComponent/', message, debugData);
   });
   
   $scope.$on("updateComponent", function(event, message){
-    console.log('updateComponent:' , message);
+    //console.log('updateComponent:' , message);
     message._csrf = csrf.csrf
     var dataid = message.id;
     io.socket.put('/component/'+dataid, message, debugData);
   });
 
   $scope.$on("updateMacro", function(event, message){
-    console.log('updateMacro:' , message);
+    //console.log('updateMacro:' , message);
     message._csrf = csrf.csrf
     io.socket.put('/macro/setData', message, debugData);
   });
 
   $scope.$on("deleteMacro", function(event, message){
-    console.log('deleteMacro:' , message);
+    //console.log('deleteMacro:' , message);
     message._csrf = csrf.csrf
     io.socket.put('/macro/remove', message, debugData);
   });
 
 
   $scope.$on("connectComponent", function(event, message){
-    console.log('connectComponent:' , message);
+    //console.log('connectComponent:' , message);
     message = {
       data: message,
       _csrf: csrf.csrf
@@ -394,7 +396,7 @@ function($scope, csrf, alerts, modal,$timeout){
 
 
   $scope.$on("removePipe", function(event, message){
-    console.log('removePipe:' , message);
+    //console.log('removePipe:' , message);
     message = {
       data: message,
       _csrf: csrf.csrf

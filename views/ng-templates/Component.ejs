@@ -1,7 +1,7 @@
-<div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform, WebkitTransform:transform, MsTransform:transform}" class="{{data.type}}-component component">
+<div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform}" class="{{data.type}}-component component">
 
     <div class="tip title">
-      <div class="tooltip"> Drag me to move me! </div>
+      <div class="tooltip" ng-if="showTooltip" ng-style="{transform:'translate(-50%) scale('+(1/transformScale())+')'}"> Drag me to move me! </div>
       <span class="title-name" ng-bind="title.name"></span>
       <span class="button-group" ng-if="title.buttons">
         <a ng-click="togglecollapse()" 
@@ -16,7 +16,7 @@
           <div class="tip" data-port="{{port.name}}" ng-repeat="port in inputPorts">        
             <span class="box"></span>
             <span class="relative">
-              <div class="tooltip"> 
+              <div class="tooltip" ng-if="showTooltip" ng-style="{transform:'translate(-50%) scale('+(1/transformScale())+')'}"> 
 
             Drag me to create a pipe.
             <br>Drop it on an empty space to
@@ -32,7 +32,7 @@
         <div class="tip" data-port="{{port.name}}" ng-repeat="port in outputPorts"> 
           <span class="text" ng-bind="port.text"></span>
           <span class="relative">
-              <div class="tooltip"> 
+              <div class="tooltip" ng-if="showTooltip" ng-style="{transform:'translate(-50%) scale('+(1/transformScale())+')'}"> 
 
             Drag me to create a pipe.
             <br>Drop it on an empty space to

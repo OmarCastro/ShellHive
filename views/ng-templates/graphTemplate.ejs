@@ -1,4 +1,3 @@
-<div ng-class="{'no-tooltip': status.noTooltip}">
 <div class="alerts">
   <div>
   <alert ng-repeat="alert in alerts.alerts" type="{{alert.type}}" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}
@@ -11,10 +10,10 @@
   </alert>
   </div>
 </div>
-<% include popupArea %>
+<% include popupArea   %>
 <% include graphNavbar %>
-<% include directory %>
-<% include tutorial %>
+<% include directory   %>
+<% include tutorial    %>
 <div ui-layout class="layout">
   <div class="toplayout">
     <div class="background">
@@ -32,7 +31,7 @@
       </div>
     </div>
   </div>
-  <div ng-show="shell" touch-action="all" class="shell">
+  <div ng-show="$root.shell" touch-action="all" class="shell">
     <pre ng-repeat="line in $parent.shellText | limitTo: -100" ng-class="line.type" ng-bind="line.text"></pre>
   </div>
 </div>
@@ -54,5 +53,4 @@
   <form role="form" class="form" ng-init="chatMsg = ''" ng-submit='$emit("chat",{text: chatMsg}); chatMsg = ""'>
     <input type="text" id="name" ng-model="chatMsg" placeholder="send chat message" class="form-control">
   </form>
-</div>
 </div>

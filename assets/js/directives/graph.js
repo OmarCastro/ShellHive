@@ -101,11 +101,21 @@ app.directive("graph", function($document){
           $document.unbind("pointermove", mousemove);
           $document.unbind("pointerup", mouseup);
         };
+
+        $workspace.bind("contextmenu", function(ev){
+            var event = ev.originalEvent;
+            if (event.shiftKey) { return; }
+            ev.preventDefault();
+            ev.stopPropagation();
+            showPopup(event, null, null, null, null);
+        })
+
         $workspace.bind("pointerdown", function(ev){
+          console.log(ev);
+          var event = ev.originalEvent;
           if (ev.which === 3) {
             return false;
           }
-          var event = ev.originalEvent;
           var targetTag = event.target.tagName;
           if (pointerId || 
             (  targetTag === 'SPAN' 
@@ -247,21 +257,30 @@ app.directive("graph", function($document){
           return scope.safedigest();
         };
         var popupSubmit = function(content){
+          console.log("popupSubmit:", content);
           var comp;
 
-          scope.$emit('addAndConnectComponent', (popupState.startNode) ? {
-            command: content,
-            componentId: popupState.startNode,
-            startPort: popupState.startPort,
-            position: {x: popupState.x , y: popupState.y},
-            fromInput: false
-          } : {
-            command: content,
-            componentId: popupState.endNode,
-            startPort: popupState.endPort,
-            position: {x: popupState.x - 150 , y: popupState.y},
-            fromInput: true
-          })
+          if(popupState.startNode || popupState.endNode){
+
+            scope.$emit('addAndConnectComponent', (popupState.startNode) ? {
+              command: content,
+              componentId: popupState.startNode,
+              startPort: popupState.startPort,
+              position: {x: popupState.x , y: popupState.y},
+              fromInput: false
+            } : {
+              command: content,
+              componentId: popupState.endNode,
+              startPort: popupState.endPort,
+              position: {x: popupState.x - 150 , y: popupState.y},
+              fromInput: true
+            })
+          } else {
+            scope.$emit('addComponent', {
+              command: content,
+              position: {x: popupState.x , y: popupState.y}
+            });
+          }
           hidePopup();
           endEdge();
           
@@ -289,6 +308,10 @@ app.directive("graph", function($document){
             scope.updatePorts();
             requestAnimationFrame(scope.resetConnections)
           })
+        }
+
+        scope.transformScale = function(){
+          return scale;
         }
 
 

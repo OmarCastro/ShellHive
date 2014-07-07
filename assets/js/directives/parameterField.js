@@ -7,10 +7,11 @@ app.directive("parameterField", ['$timeout', function($timeout){
       function sendUpdate (){
         scope.$emit('updateComponent',scope.data)
       }
-      var promise = $timeout(function() {console.log("yay!!")}, 1000);
+      var promise;
 
-      element.bind('change', function() {
-        promise = $timeout(sendUpdate, 400);        
+      element.bind('keyup', function() {
+        $timeout.cancel(promise);
+        promise = $timeout(sendUpdate, 500);        
       });
       element.bind('blur', function() {
         $timeout.cancel(promise);

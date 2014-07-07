@@ -14,7 +14,7 @@
     <ul class="nav navbar-nav">
       <li class="dropdown" ng-controller="macroCtrl">
       <a href="#" data-toggle="dropdown" class="tip bottom left dropdown-toggle" is-open="status.macroDropdown">
-        <div class="tooltip">Here you create and edit macros</div>
+        <div class="tooltip" ng-if="showTooltip">Here you create and edit macros</div>
         Macro <b class="caret"></b>
       </a>
         <ul class="dropdown-menu">
@@ -26,13 +26,11 @@
       </li>
 
 
-
-
       <li class="dropdown" is-open="status.isopen">
 
 
       <a href="#" data-toggle="dropdown" class="tip bottom dropdown-toggle">
-        <div class="tooltip">To create command components, prefer dragging a component connector to an empty area</div>
+        <div class="tooltip" ng-if="showTooltip">To create command components, prefer dragging a component connector to an empty area</div>
           Add Command 
           <b class="caret"></b>
         </a>
@@ -49,13 +47,13 @@
         <a href="#" data-toggle="dropdown" class="tip bottom dropdown-toggle">
           View<b class="caret"></b>
 
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             Here you can view macros and other graphs, hide or show the console.
           </div>
         </a>
 
         <ul class="dropdown-menu">
-          <li><a mousetrap="Shift+S" ng-click="status.filesystem = false; $parent.shell = !shell; $parent.shell && $emit('compileGraph'); status.isopen2=false">Toogle Terminal View</a></li>
+          <li><a mousetrap="Shift+S" ng-click="status.filesystem = false; $root.shell = !shell; $root.shell && $emit('compileGraph'); status.isopen2=false">Toogle Console View</a></li>
           <li><a mousetrap="Shift+R" ng-click="status.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
           <li><a mousetrap="Shift+F" ng-click="status.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
           <li class="divider"></li>
@@ -66,36 +64,36 @@
 
       <li class="dropdown" is-open="status.isopen3">
         <a href="#" data-toggle="dropdown" class="tip bottom dropdown-toggle">
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             Here you can do extra actions, for now you can collapse components and hide the tooltips.
           </div>
         Action<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li><a mousetrap="Ctrl+Shift+up" ng-click="status.filesystem = false; collapseAll(); status.isopen3=false">Collapse all components</a></li>
+          <li><a mousetrap="Ctrl+Shift+up" ng-click="status.filesystSem = false; collapseAll(); status.isopen3=false">Collapse all components</a></li>
           <li><a mousetrap="Ctrl+Shift+down" ng-click="status.filesystem = false; uncollapseAll(); status.isopen3=false;">Uncollapse all components</a></li>
-          <li><a mousetrap="Shift+H" ng-click="status.noTooltip = !status.noTooltip; status.isopen3=false;">{{status.noTooltip ? "Show": "Hide"}} helpfull tooltips</a></li>
+          <li><a mousetrap="Alt+H" ng-click="status.noTooltip = !status.noTooltip; status.isopen3=false;">{{status.noTooltip ? "Show": "Hide"}} helpfull tooltips</a></li>
 
         </ul>
       </li>
 
       <li ng-class="{active:status.filesystem}">
         <a class="tip bottom" ng-click="status.filesystem = !status.filesystem">Filesystem       
-        <div class="tooltip">
+        <div class="tooltip" ng-if="showTooltip">
             Click here to toggle the filesystem view. Here you can download and upload files
             in the server, were you can use them as input to the workflow, or to download
             the results.
           </div></a>
       </li>
-      <li><a class="tip bottom" ng-click="shell = true; $emit('compileGraph')">
+      <li><a class="tip bottom" ng-click="$root.shell = true; $emit('compileGraph')">
         <span>Compile</span>
-        <div class="tooltip">
+        <div class="tooltip" ng-if="showTooltip">
             Click here to compile the workflow, the compiled command will be shown in the console, note
             that when the console is open, and you modify the graph, it will be <b>compiled automatically</b>.
           </div>
       </a></li>
-      <li ng-class="{disabled:execStatus}"><a class="tip bottom" ng-click="shell = true; $emit('runCommand', [])">
+      <li ng-class="{disabled:execStatus}"><a class="tip bottom" ng-click="$root.shell = true; $emit('runCommand', [])">
         <span ng-class="'glyphicon-' + ((execStatus)?'time':'play')" class="glyphicon">&nbsp;</span><span ng-bind="(execStatus)?'Running':'Run'"></span>
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             Click here to execute the workflow, the output will be shown in the console.
           </div>
       </a></li>
@@ -104,20 +102,21 @@
 
         <li><a class="tip bottom"  ng-click="status.noTooltip = !status.noTooltip">
         <b class="badge" ng-style="{background: ((status.noTooltip)? '#A14F36':'#529130')}">HELP MODE {{(status.noTooltip)? "OFF": "ON"}}</b>
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             In this mode, the tooltips are shown, to hide them, disable this mode by clicking the button
+            <hr><b>Shortcut: </b> <kbd>Alt</kbd>+<kbd>H</kbd>
           </div>
       </a></li>
       <li><a class="tip bottom" href="https://docs.google.com/forms/d/1gcaVGYNhoKEG-v5j42dNg-3nqG4WkJpFtxWAy1RYZ14/viewform" target="_blank">
         <b class="badge">FEEDBACK</b>
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             This link will send you to a survey which allows the developer to orgainze the feedback.<br>
             Communication is always good, and feedback is always appreciated by the developer. 
           </div>
       </a></li>
-      <li><a class="tip bottom right" ng-click="status.tutorial = !status.tutorial">Help
+      <li><a class="tip bottom" ng-click="status.tutorial = !status.tutorial">Help
 
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             Here will be shown a manual.
           </div>
       </a></li>
@@ -125,7 +124,7 @@
         <a class="tip bottom right" ng-click="chat.open = !chat.open">
           <span class="glyphicon glyphicon-user"></span> 
           <span class="badge" ng-if="clients.length > 1" ng-bind="clients.length - 1"></span>
-          <div class="tooltip">
+          <div class="tooltip" ng-if="showTooltip">
             Click here to toggle the chat view, when a number is shown in front of the icon, it
             means that there are other peers connected, the number is the number of other connected users.
           </div>
@@ -143,8 +142,14 @@
         <li><a href="/logout">Logout</a></li>
 
       <% } else { %>
-        <li><a>Visitor</a></li>
-        <li><a class="glyphicon glyphicon-user user-icon"></a></li>
+        <li><a class="tip bottom right user-info">
+          <span class="user-label"> Visitor </span>
+          <span class="glyphicon glyphicon-user user-icon"></span>
+          <div class="tooltip" ng-if="showTooltip">
+            In a real app this button tound show the user information, with options to logout.
+            Since this is a demo, nothing happens
+          </div>
+        </a></li>
       <% } %>
     </ul>
   </div>
