@@ -65,7 +65,7 @@ app.directive("minimap", function(){
           var newY = (point.y - midY)
           
 
-          console.log(point, {x: midX, y:midY, w:width, h:height} , {newX: newX, newY:newY});
+          //console.log(point, {x: midX, y:midY, w:width, h:height} , {newX: newX, newY:newY});
 
           graphController.moveScene(-newX,-newY);
           event.preventDefault();
