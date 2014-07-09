@@ -183,33 +183,38 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
 
 
 
+
+
+
   VisualData.components.forEach(component => {
     var portList = IndexedGraph.inConnectedComponent[component.id]
     var byPortList = portList.byPortList
     var keys = Object.keys(byPortList);
 
 
-    if(portList.list.length == 1 &&  keys[0] == "input" && component.type != MacroComponent.type && (!component["files"] || component["files"].length == 0)){
-      var prevNodeId = portList.list[0].startNode
-      var prevPortList = IndexedGraph.outConnectedComponent[prevNodeId];
+    if(portList.list.length == 1 &&  keys[0] == "input" && component.type != MacroComponent.type){
+       if (!component["files"] || component["files"].length == 0)){
+        var prevNodeId = portList.list[0].startNode
+        var prevPortList = IndexedGraph.outConnectedComponent[prevNodeId];
 
 
-      if(prevPortList.list.length == 1 && prevPortList.byPortList["output"]){
-        if(component.type == CommandComponent.type){
-          redirect[component.id] = {
-            "as": "pipe",
-            "command": parserCommand[component["exec"]].parseComponent(component, {}, {}, {}),
-            "commandIndex": null
+        if(prevPortList.list.length == 1 && prevPortList.byPortList["output"]){
+          if(component.type == CommandComponent.type){
+            redirect[component.id] = {
+              "as": "pipe",
+              "command": parserCommand[component["exec"]].parseComponent(component, {}, {}, {}),
+              "commandIndex": null
+            }
+            return;
+
+          } else if(component.type == FileComponent.type){
+            redirect[component.id] = {
+              "as": "overwrite",
+              "file":component["filename"],
+            }
+            return;
+
           }
-          return;
-
-        } else if(component.type == FileComponent.type){
-          redirect[component.id] = {
-            "as": "overwrite",
-            "file":component["filename"],
-          }
-          return;
-
         }
       }
     }
@@ -230,6 +235,9 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
   });
 
 
+
+
+
   VisualData.components.forEach(function(component){
   var afterCommand = "";
   var outConnection = IndexedGraph.outConnectedComponent[component.id];
@@ -238,6 +246,10 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
   var inByPort = inConnection.byPortList;
   var len = outConnections.length;
   var componentRedirect = redirect[component.id]
+
+
+
+
 
   function appendSingleOutput(parsedExec, output){
     if(redirect[output.endNode]["as"] == "pipe"){
@@ -259,6 +271,20 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
 
   switch (component.type) {
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   case CommandComponent.type:
     var outputs = outConnection.byPortList["output"]
     var errors = outConnection.byPortList["error"]
@@ -269,14 +295,20 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
       var files = <any[]> component["files"]
       component["files"] = files.map((file, idx) => {
         var connections = inByPort["file"+idx]
-        if(!connections) return "-";
-        else if(connections.length > 1){
+        if(!connections){
+          return "-";
+        } else if(connections.length > 1){
           var fifo = fifoPrepend+component.id+"-file"+idx;
           commands.push("find "+fifo+"-* | xargs grep -h --line-buffered ^ > "+fifo);
           return fifo;
         } else return fifoPrepend+component.id+"-file"+idx
       });
     }
+
+
+
+
+
     var parsedExec = parserCommand[component["exec"]].parseComponent(component, {}, {}, {});
     
 
@@ -345,6 +377,8 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
       }
     }
 
+
+
     if(componentRedirect["as"] == "pipe"){
       if(componentRedirect.commandIndex !== null){
         console.log("commands::",commands);
@@ -359,6 +393,20 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
       commands.push(parsedExec);
     } 
     return 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   case MacroComponent.type:
     var result = aux_parseVisualDataExperimental(component["macro"], fifoPrepend+component.id+"-")
@@ -379,10 +427,12 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
         commands.push(command);
       });
     }
-
-
-
     return 
+
+
+
+
+
 
   case FileComponent.type:
     if(componentRedirect["as"] == "overwrite")return;
@@ -462,6 +512,10 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
   }
   });
 
+
+
+
+
   return {
     fifos: fifos,
     commands: commands,
@@ -494,6 +548,21 @@ export function parseVisualDataExperimental(VisualData:Graph, fifoPrepend:string
 }
 
 ////////// END NEW COMMAND GENERATOR ////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

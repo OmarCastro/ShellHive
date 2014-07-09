@@ -77,8 +77,7 @@ app.directive("connector", function($document){
       });
 
       var setEdgePath = function(iniX, iniY, endX, endY){
-        var xpoint;
-        xpoint = (endX - iniX) / 4;
+        var xpoint = (endX - iniX) / 4;
         elem.setAttribute(
           'd', "M " + iniX + " " + iniY 
             + " H " + (iniX + 0.5 * xpoint) 

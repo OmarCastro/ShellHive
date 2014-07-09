@@ -20,7 +20,7 @@
   </head>
   <body ng-app="app">
     <div ng-controller="shellProject" style="height:100%">
-      <div graph options="options" class="visual-builder border data-flow"></div>
+      <div graph options="options" class="visual-builder border data-flow" ng-class="{'chat-open':chat.open}"></div>
     </div>
   </body>
     <script src="/bower_components/pointerevents-polyfill/pointerevents.min.js"></script>
@@ -46,6 +46,7 @@
     <script src="/js/directives/directoryFile.js"></script>
     <script src="/js/directives/filesystem.js"></script>
     <script src="/js/directives/graph.js"></script>
+    <script src="/js/directives/minimap.js"></script>
     <script src="/js/directives/mousetrap.js"></script>
     <script src="/js/directives/parameterField.js"></script>
     <script src="/js/directives/port.js"></script>

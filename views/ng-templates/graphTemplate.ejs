@@ -26,7 +26,9 @@
       </svg>
       <div touch-action="none" class="workspace">
         <div class="nodes">
+        <div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform}" class="{{data.type}}-component component">
           <% include Component.ejs %>
+          </div>
         </div>
       </div>
     </div>
@@ -35,9 +37,11 @@
     <pre ng-repeat="line in $parent.shellText | limitTo: -100" ng-class="line.type" ng-bind="line.text"></pre>
   </div>
 </div>
+<% include minimap %>
+
 
 <div style="z-index:9" class="chat" ng-if="chat.open">
-  <button type="button" class="close" ng-click="chat.open = false" aria-hidden="true">&times;</button>
+  <button type="button" class="close" ng-click="chat.open = false, graph.updateLater()" aria-hidden="true">&times;</button>
   <div style="overflow:auto; padding-top: 1em; height:30%">
   <div ng-repeat="c in clients track by c.id">
     <b ng-style="{color:c.color}" ng-bind="c.name"></b>

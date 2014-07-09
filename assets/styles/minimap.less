@@ -1,0 +1,77 @@
+[minimap]{
+	border: 2px solid #663399;
+	position: absolute;
+	bottom: 1em;
+	right: 1em;
+	background: #888;
+	z-index: 2;
+	overflow: hidden;
+
+	.viewbox{
+		position: absolute;
+		border: 1px solid white;
+	}
+
+	[component] *{
+		visibility: hidden;
+		pointer-events:none;
+	}
+}
+
+.chat-open [minimap]{
+	right: 17em;
+}
+
+.minimap-nodes{
+	transform-origin: 0 0
+}
+
+
+.mini-component{
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	background: #eee;
+	&.file-component{
+		border: 10px solid #33f;
+    	background:#aaf;
+	}
+
+	&.command-component {
+		border: 10px solid #2c2;
+        background:#cdc;
+    }
+
+	&.macro-component{ 
+		border: 10px solid #A89238;
+        background:#fdc;
+	}
+}
+
+.mini-edges{
+	path{
+		stroke-width:inherit;
+	}
+
+	path.from-file-output{
+	    stroke:#33f;
+	}
+
+	path.from-command-output{
+		text-transform: translateY(-30px);
+	    stroke:#2c2;
+	}
+
+	path.from-command-error{
+	    stroke:#f33;
+	}
+
+	path.from-command-retcode{
+	    text-transform: translateY(30px);
+	}
+
+	path.from-macro{
+	    stroke:#A89238;
+	}
+}
+

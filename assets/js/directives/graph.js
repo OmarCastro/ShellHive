@@ -8,7 +8,7 @@ app.directive("graph", function($document){
         useWheelHandler, mousewheelevt, setEdgePath, popupState, startEdge, moveEdge,
         endEdge, showPopup, hidePopup, hidePopupAndEdge;
         
-        
+        var _this = this;
         var pointerId = 0;
         var scale = 1;
         var graphX = 0;
@@ -28,6 +28,11 @@ app.directive("graph", function($document){
         var $workspace = $(workspace);
         var popup = elem.querySelector(".create-component-popup");
         var $popup = $(popup);
+
+        var minimap = elem.querySelector("[minimap]");
+        var $minimap = $(minimap);
+
+
         var popupHeight = $popup.find("form").height();
         var $popupInput = $popup.find("input");
         var toplayout = elem.querySelector(".toplayout");
@@ -85,9 +90,16 @@ app.directive("graph", function($document){
           var transform;
           transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
           nodesElemStyle[cssTransform] = transform;
-          return edgesElemStyle[cssTransform] = transform;
+          edgesElemStyle[cssTransform] = transform;
+          var scope = $minimap.scope()
+           scope.updateViewport({
+            x1: graphX/scale,
+            y1: graphY/scale,
+            x2: (graphX + nodesElem.offsetWidth)/scale,
+            y2: (graphY + nodesElem.offsetHeight)/scale
+          });
         };
-        update();
+
         mousemove = function(ev){
           var event = ev.originalEvent;
           graphX += event.screenX - startX;
@@ -96,6 +108,13 @@ app.directive("graph", function($document){
           startY = event.screenY;
           update();
         };
+
+        moveScene = function(x, y){
+          graphX = x*scale;
+          graphY = y*scale;
+          update();
+        };
+
         mouseup = function(){
           pointerId = 0;
           $document.unbind("pointermove", mousemove);
@@ -166,12 +185,27 @@ app.directive("graph", function($document){
             y: Math.round(event.pageY - offset.top)
           };
         };
+
+
+
+
         mapPointToScene = function(x, y){
           return {
             x: (x - graphX) / scale,
             y: (y - graphY) / scale
           };
         };
+
+        var scaleGraph = function(amount){
+          if ((scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)) {
+            return;
+          }
+          var newScale = scale * amount
+          if(newScale > 0.9 && newScale < 1.1){
+            scale = 1;
+          } else scale *= amount;
+        }
+
         scaleFromMouse = function(amount, event){
           var ref$, x, y, relpointX, relpointY;
           if ((scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)) {
@@ -343,7 +377,10 @@ app.directive("graph", function($document){
         this.newCommandComponent = newCommandComponent;
         this.startEdge = startEdge;
         this.moveEdge = moveEdge;
+        this.moveScene = moveScene;
         this.endEdge = endEdge;
+        this.updateLater = function(){requestAnimationFrame(update)};
+        this.scaleGraph = scaleGraph
         this.mapPointToScene = mapPointToScene;
         this.mapMouseToScene = mapMouseToScene;
         this.mapMouseToView = mapMouseToView;

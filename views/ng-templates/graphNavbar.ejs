@@ -53,7 +53,7 @@
         </a>
 
         <ul class="dropdown-menu">
-          <li><a mousetrap="Shift+S" ng-click="status.filesystem = false; $root.shell = !shell; $root.shell && $emit('compileGraph'); status.isopen2=false">Toogle Console View</a></li>
+          <li><a mousetrap="Shift+S" ng-click="status.filesystem = false; $root.shell = !shell; $root.shell && $emit('compileGraph'); status.isopen2=false; graph.updateLater()">Toogle Console View</a></li>
           <li><a mousetrap="Shift+R" ng-click="status.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
           <li><a mousetrap="Shift+F" ng-click="status.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
           <li class="divider"></li>
@@ -84,14 +84,14 @@
             the results.
           </div></a>
       </li>
-      <li><a class="tip bottom" ng-click="$root.shell = true; $emit('compileGraph')">
+      <li><a class="tip bottom" ng-click="$root.shell = true; $emit('compileGraph'); graph.updateLater()">
         <span>Compile</span>
         <div class="tooltip" ng-if="showTooltip">
             Click here to compile the workflow, the compiled command will be shown in the console, note
             that when the console is open, and you modify the graph, it will be <b>compiled automatically</b>.
           </div>
       </a></li>
-      <li ng-class="{disabled:execStatus}"><a class="tip bottom" ng-click="$root.shell = true; $emit('runCommand', [])">
+      <li ng-class="{disabled:execStatus}"><a class="tip bottom" ng-click="$root.shell = true; $emit('runCommand', []); graph.updateLater()">
         <span ng-class="'glyphicon-' + ((execStatus)?'time':'play')" class="glyphicon">&nbsp;</span><span ng-bind="(execStatus)?'Running':'Run'"></span>
           <div class="tooltip" ng-if="showTooltip">
             Click here to execute the workflow, the output will be shown in the console.
@@ -121,7 +121,7 @@
           </div>
       </a></li>
       <li>
-        <a class="tip bottom right" ng-click="chat.open = !chat.open">
+        <a class="tip bottom right" ng-click="chat.open = !chat.open; graph.updateLater()">
           <span class="glyphicon glyphicon-user"></span> 
           <span class="badge" ng-if="clients.length > 1" ng-bind="clients.length - 1"></span>
           <div class="tooltip" ng-if="showTooltip">

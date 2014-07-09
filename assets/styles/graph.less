@@ -119,14 +119,19 @@ div[graph]{
     position:absolute;
     top:0;
     left:0;
-    width:100%;
-    height:100%;
+    right:0;
+    bottom:0;
     transform-origin:0 0;
     -webkit-transform-origin:0 0;
   }
-  
+  &.chat-open{
+    svg, .workspace{
+        right:16em;
+    }
+  }
   svg, .workspace{
     overflow:hidden
+
   }
   a.user-info{
     padding-top: 3px;
@@ -370,6 +375,9 @@ div[sidebar] {
     transition:all 0.3s linear;
     background-color:#ddd;
 }
+
+
+
 
 path {
     fill:none;
