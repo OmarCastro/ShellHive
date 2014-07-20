@@ -26,11 +26,12 @@ module.exports.routes = {
   // default view engine) your home page.
   // 
   // (Alternatively, remove this and add an `index.html` file in your `assets` directory)
-  '/': {
-    view: 'static/homepage',
-    locals:{
-      homeBg:true
-    }
+  '/': function(req,res,next){
+    sails.log(req);
+    return res.view('static/homepage',{
+      homeBg:true,
+      layout:true
+    })
   },
   '/login': 'AuthController.login',
   '/logout': 'AuthController.logout',
