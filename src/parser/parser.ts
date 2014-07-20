@@ -193,7 +193,7 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
 
 
     if(portList.list.length == 1 &&  keys[0] == "input" && component.type != MacroComponent.type){
-       if (!component["files"] || component["files"].length == 0)){
+       if ( !component["files"] || component["files"].length == 0 ){
         var prevNodeId = portList.list[0].startNode
         var prevPortList = IndexedGraph.outConnectedComponent[prevNodeId];
 
@@ -436,25 +436,26 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
 
   case FileComponent.type:
     if(componentRedirect["as"] == "overwrite")return;
+    var filename = sanitizer.sanitizeArgument(component["filename"]);
     if(inByPort["input"]){
 
         var fifo = fifoPrepend+component.id+"-input";
         var len = inByPort["input"].length
         if(len > 1){
-          commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >  "+ component["filename"]);
-        } else commands.push("cat "+fifo+" > " + component["filename"] );
+          commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >  "+ filename);
+        } else commands.push("cat "+fifo+" > " + filename );
 
     } else if(inByPort["append"]){
 
       var fifo = fifoPrepend+component.id+"-append";
       var len = inByPort["append"].length
       if(len > 1){
-        commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >>  "+ component["filename"]);
-      } else commands.push("cat "+fifo+" >> " + component["filename"] );
+        commands.push("find "+fifo+"-* | xargs -P"+len+" grep -h --line-buffered ^ >>  "+ filename);
+      } else commands.push("cat "+fifo+" >> " + filename );
 
     } else if(outConnections && outConnections.length > 0){
 
-      parsedExec = "pv -f " + component["filename"];
+      parsedExec = "pv -f " + filename;
       var len = outConnections.length - 1
       if(len > 0){
         parsedExec += " | tee" 

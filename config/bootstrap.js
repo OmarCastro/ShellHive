@@ -55,6 +55,10 @@ module.exports.bootstrap = function (cb) {
     {
       name:"project miel picante",
       members: [1,2]
+    },
+    {
+      name:"ShellHive Thesis Demonstration",
+      visibility: "global"
     }];
 
     Project.count().exec(function(err, count) {
@@ -82,6 +86,10 @@ module.exports.bootstrap = function (cb) {
         type:"root"
       },
       {
+        project:3,
+        type:"root"
+      },
+      {
         data:{
           inputs:["input"],
           outputs:["output", "error"],
@@ -93,7 +101,7 @@ module.exports.bootstrap = function (cb) {
       }
     ];
 
-    var dummyCommands = ["cat events.txt |  tr -d [:punct:] | tr [:space:] '\\n' | sort | uniq -c > mapreduced.txt", "curl http://get.docker.io/ubuntu/ | grep \"#\"", "cat mini.txt"];
+    var dummyCommands = ["cat events.txt |  tr -d [:punct:] | tr [:space:] '\\n' | sort | uniq -c > mapreduced.txt", "curl http://get.docker.io/ubuntu/ | grep \"#\"", "cat mini.txt", "cat mini.txt"];
 
     Graph.count().exec(function(err, count) {
       if (err || count > 0) return done(err);
