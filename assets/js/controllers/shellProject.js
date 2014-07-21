@@ -51,8 +51,8 @@ function($scope, csrf, alerts, modal,$timeout){
 
 
     if(data.visitor){
-      var visitorName = sessionStorage.visitorName
-      var visitorColor = sessionStorage.visitorColor
+      var visitorName = (projId == 3)? "anon" : sessionStorage.visitorName
+      var visitorColor = (projId == 3)? "blue" : sessionStorage.visitorColor
       if(visitorName && visitorColor){
         io.socket.post('/project/setmyname', {
           name:visitorName, color: visitorColor, _csrf:csrf.csrf});
@@ -74,6 +74,8 @@ function($scope, csrf, alerts, modal,$timeout){
           sessionStorage.visitorName = form.name;
           sessionStorage.visitorColor = data.you.color;
         });
+
+
       }
     }
 
