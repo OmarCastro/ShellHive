@@ -45,6 +45,7 @@
 
       <li class="dropdown" is-open="status.isopen2">
         <a href="#" data-toggle="dropdown" class="tip bottom dropdown-toggle">
+          
           View<b class="caret"></b>
 
           <div class="tooltip" ng-if="showTooltip">
@@ -57,6 +58,8 @@
           <li><a mousetrap="Shift+R" ng-click="status.filesystem = false; viewGraph(rootGraph); status.isopen2=false;">View Root Graph</a></li>
           <li><a mousetrap="Shift+F" ng-click="status.filesystem = true; status.isopen2=false;">View FileSystem</a></li>
           <li class="divider"></li>
+          <li><a mousetrap="Shift+V" ng-click="status.videobeam = !status.videobeam; status.noTooltip = true; status.isopen2=false;">project mode</a></li>
+
           <li class="dropdown-header">Macros</li>
           <li ng-repeat="macro in graphModel.macroList"><a ng-bind="macro" ng-click="status.filesystem = false; viewGraph(graphModel.macros[macro]); status.isopen2=false"></a></li>
         </ul>
@@ -76,6 +79,8 @@
         </ul>
       </li>
 
+
+
       <li ng-class="{active:status.filesystem}">
         <a class="tip bottom" ng-click="status.filesystem = !status.filesystem">Filesystem       
         <div class="tooltip" ng-if="showTooltip">
@@ -84,6 +89,10 @@
             the results.
           </div></a>
       </li>
+
+
+
+
       <li><a class="tip bottom" ng-click="$root.shell = true; $emit('compileGraph'); graph.updateLater()">
         <span>Compile</span>
         <div class="tooltip" ng-if="showTooltip">
@@ -91,6 +100,10 @@
             that when the console is open, and you modify the graph, it will be <b>compiled automatically</b>.
           </div>
       </a></li>
+
+
+
+
       <li ng-class="{disabled:execStatus}"><a class="tip bottom" ng-click="$root.shell = true; $emit('runCommand', []); graph.updateLater()">
         <span ng-class="'glyphicon-' + ((execStatus)?'time':'play')" class="glyphicon">&nbsp;</span><span ng-bind="(execStatus)?'Running':'Run'"></span>
           <div class="tooltip" ng-if="showTooltip">
@@ -107,7 +120,8 @@
             <hr><b>Shortcut: </b> <kbd>Alt</kbd>+<kbd>H</kbd>
           </div>
       </a></li>
-      <li><a class="tip bottom" href="https://docs.google.com/forms/d/1gcaVGYNhoKEG-v5j42dNg-3nqG4WkJpFtxWAy1RYZ14/viewform" target="_blank">
+      <li class="feedback">
+        <a class="tip bottom" href="https://docs.google.com/forms/d/1gcaVGYNhoKEG-v5j42dNg-3nqG4WkJpFtxWAy1RYZ14/viewform" target="_blank">
         <b class="badge">FEEDBACK</b>
           <div class="tooltip" ng-if="showTooltip">
             This link will send you to a survey which allows the developer to orgainze the feedback.<br>

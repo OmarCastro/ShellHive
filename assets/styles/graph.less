@@ -1,6 +1,42 @@
 @tooltip-color: darken(#1496bb,10%);
 
 
+@media screen and (max-width: 1024px){
+    body{
+        font-size: 12px;
+    }
+    .badge{
+        font-size: 10px;
+    }
+    .nav > li > a{
+        padding: 8px 10px !important;
+        &.user-info{
+            padding: 0px 4px !important;
+        }
+    }
+
+    .navbar{
+        min-height: 40px;
+    }
+
+    .layout, .tips, .new-project, .directory, .alerts, .tutorial-panel, .create-component-popup,.selectpopup{
+        top:40px  !important;;
+    }
+
+    div[graph] .user-icon{
+        font-size: 17px !important;
+    }
+}
+
+@media screen and (max-width: 800px){
+    body{
+        font-size: 10px;
+    }
+    .badge{
+        font-size: 9px;
+    }
+}
+
 @media print
 {
   @page { size:14in 10in; margin: 0cm }
@@ -105,6 +141,7 @@ div[graph]{
 
     li a {
         cursor: pointer;
+
     }
 
 
@@ -131,6 +168,20 @@ div[graph]{
         right:16em;
     }
   }
+
+  &.videobeam{
+    .feedback{
+        display: none;
+    }
+    .background{
+        background-color:#aaa;
+    }
+    .nav > li > a{
+        color: white !important;
+    }
+
+  }
+
   svg, .workspace{
     overflow:hidden
 
