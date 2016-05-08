@@ -121,6 +121,7 @@ module.exports.bootstrap = function (cb) {
         async.series(series,done);
       });
     });
+    done()
   }
 
   async.series([

@@ -7,7 +7,7 @@
     "Unix Shell"
   ],
   "dependencies": {
-    "bcrypt": "~0.7.7",
+    "bcrypt": "^0.8.6",
     "coverage-percentage": "0.0.2",
     "ejs": "~0.8.4",
     "fs.extra": "^1.2.1",
