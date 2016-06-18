@@ -1,5 +1,5 @@
 [![Stories in Ready](https://badge.waffle.io/omarcastro/shellhive.png?label=ready&title=Ready)](https://waffle.io/omarcastro/shellhive)
-[![Build Status](https://drone.io/github.com/OmarCastro/ShellHive/status.png)](https://drone.io/github.com/OmarCastro/ShellHive/latest)
+[![Build Status](https://travis-ci.org/OmarCastro/ShellHive.svg?branch=master)](https://travis-ci.org/OmarCastro/ShellHive)
 [![Coverage Status](http://omarcastro.github.io/ShellHive/coverage/badge.svg)](http://omarcastro.github.io/ShellHive/coverage/lcov-report/index.html)
 # ShellHive
 
