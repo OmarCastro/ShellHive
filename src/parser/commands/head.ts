@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 
   -c, --bytes=[-]K         print the first K bytes of each file;
@@ -10,12 +13,6 @@
   -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
 
 */
-
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
 
 
 var selectors = {
@@ -82,7 +79,7 @@ var optionsParser = $.optionParserFromConfig(config);
 var lsCommandData = new parserModule.ParserData(config);
 
 
-export class HeadComponent extends GraphModule.CommandComponent {
+export class HeadComponent extends CommandComponent {
   public exec:string = "head"
   public files: any[] = []
 }

@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -12,12 +15,6 @@
 --fast              alias for -1
 --best              alias for -9
 */
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
 
 
 var flags = {
@@ -69,7 +66,7 @@ var gunzipData = new parserModule.ParserData(config);
 
 $.generate(optionsParser);
 
-export class GunzipComponent extends GraphModule.CommandComponent {
+export class GunzipComponent extends CommandComponent {
   public exec:string = "gunzip"
   public files: any[] = []
 }

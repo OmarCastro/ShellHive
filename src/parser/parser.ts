@@ -4,18 +4,9 @@ var parser:any = {};
 
 var astBuilder:{parse:(string)=>any} = require('./ast-builder/ast-builder');
 
-import GraphModule = require("../common/graph");
-import sanitizer = require("./utils/sanitizer");
+import {Graph, Macro, IndexedGraph, Connection, Component, GraphComponent, MacroComponent, CommandComponent, FileComponent} from "../graph/graph"
 
-export import Graph = GraphModule.Graph
-export import Macro = GraphModule.Macro
-export import GraphComponent = GraphModule.GraphComponent
-export import MacroComponent = GraphModule.MacroComponent
-export import Component = GraphModule.Component
-export import Connection = GraphModule.Connection
-export import FileComponent = GraphModule.FileComponent
-export import CommandComponent = GraphModule.CommandComponent
-export import IndexedGraph = GraphModule.IndexedGraph
+import sanitizer = require("./utils/sanitizer");
 
 
 export var parserCommand = {
@@ -100,7 +91,7 @@ export function parseAST(ast, tracker = {id: 0}):Graph{
       CommandComponent = result.firstMainComponent;
       if (LastCommandComponent) {
         comp = LastCommandComponent instanceof Array ? LastCommandComponent[1] : LastCommandComponent;
-        var connection = new GraphModule.Connection(comp,'output',CommandComponent,'input');
+        var connection = new Connection(comp,'output',CommandComponent,'input');
         connections.push(connection);
       }
       LastCommandComponent = (result_aux instanceof Array) ? [result_aux[0], CommandComponent] : CommandComponent
@@ -509,7 +500,6 @@ export function aux_parseVisualDataExperimental(VisualData:Graph, fifoPrepend:st
       }
     })
     return;
-    console.log("..component...",JSON.stringify(component))
   }
   });
 

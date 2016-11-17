@@ -1,10 +1,4 @@
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
-
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 var parameters = {
     set1:{
@@ -70,7 +64,7 @@ var shortOptions = optionsParser.shortOptions
 shortOptions['C'] = $.switchOn(flags.complement);
 
 
-export class TrComponent extends GraphModule.CommandComponent {
+export class TrComponent extends CommandComponent {
   public exec:string = "tr"
 }
 

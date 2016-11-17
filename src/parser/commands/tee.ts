@@ -1,9 +1,5 @@
+import {Graph, parserModule, $, CommandComponent, common, sanitizer, Boundary, Connection}  from "./_common.imports";
 
-import $ = require("../utils/init");
-import GraphModule = require("../../common/graph")
-import Graph = GraphModule.Graph;
-import Boundary = GraphModule.Boundary;
-import Connection = GraphModule.Connection;
 /**
   Arranges the nodes using a hierarchical layout
 */
@@ -44,7 +40,7 @@ export function parseCommand(argsNode, parser, tracker, previousCommand, nextcom
   var connectTo = connector(parser, previousCommand[1], result, boundaries, tracker);
   for (i$ = 0, len$ = argsNode.length; i$ < len$; ++i$) {
     argNode = argsNode[i$];
-    if($.typeOf(argNode) == 'outToProcess'){
+    if(common.typeOf(argNode) == 'outToProcess'){
       connectTo(argNode[1])
     }
   }

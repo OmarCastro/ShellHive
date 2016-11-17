@@ -1,3 +1,4 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 /*
  -d   If given, decompression is done instead.
@@ -12,13 +13,6 @@
  -r   Recursive. If a filename is a directory, descend
 
 */
-
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
 
 var flags = {
   // keep: {
@@ -76,7 +70,7 @@ var config:parserModule.Config = {
 var gzipData = new parserModule.ParserData(config);
 var optionsParser = $.optionParserFromConfig(config)
 
-export class CompressComponent extends GraphModule.CommandComponent {
+export class CompressComponent extends CommandComponent {
   public exec:string = "compress"
   public files: any[] = []
 }

@@ -1,7 +1,7 @@
 /**
-  A rectangle class
+  A rectanglular area
 */
-class Rectangle{
+export class Rectangle{
   public x:number = 0
   public y:number = 0
   public width:number = 0
@@ -43,5 +43,3 @@ class Rectangle{
     this.y += point.y
   }
 }
-
-export = Rectangle

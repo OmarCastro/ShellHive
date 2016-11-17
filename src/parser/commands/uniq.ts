@@ -1,8 +1,5 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
 
 
 /*
@@ -69,7 +66,7 @@ var optionsParser = $.optionParserFromConfig(config);
 var shortOptions = optionsParser.shortOptions
 
 
-export class UniqComponent extends GraphModule.CommandComponent {
+export class UniqComponent extends CommandComponent {
   public exec:string = "uniq"
 }
 

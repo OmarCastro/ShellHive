@@ -1,3 +1,5 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
 /*  -c, --bytes            exibe as contagens de byte
   -m, --chars            exibe as contagens de caractere
   -l, --lines            exibe as contagens de nova linha
@@ -10,12 +12,6 @@
       --version  mostrar a informação de versão e sair
 */
 
-
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
 
 
 var flags = {
@@ -60,7 +56,7 @@ var config:parserModule.Config = { flags:flags }
 var WcData = new parserModule.ParserData(config);
 var optionsParser = $.optionParserFromConfig(config);
 
-export class WcComponent extends GraphModule.CommandComponent {
+export class WcComponent extends CommandComponent {
   public exec:string = "wc"
   public files: any[] = []
 }

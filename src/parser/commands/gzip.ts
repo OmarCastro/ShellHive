@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -12,12 +15,6 @@
 --fast              alias for -1
 --best              alias for -9
 */
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
 
 var selectors = {
   ratio:{
@@ -147,7 +144,7 @@ var config:parserModule.Config = {
 var gzipData = new parserModule.ParserData(config);
 var optionsParser = $.optionParserFromConfig(config)
 
-export class GZipComponent extends GraphModule.CommandComponent {
+export class GZipComponent extends CommandComponent {
   public exec:string = "gzip"
   public files: any[] = []
 }

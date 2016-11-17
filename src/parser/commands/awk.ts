@@ -7,11 +7,7 @@
 
 
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import sanitizer = require("../utils/sanitizer");
-import GraphModule = require("../../common/graph");
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 var config = {
@@ -40,7 +36,7 @@ var optionsParser = {
 $.generate(optionsParser)
 
 
-export class AwkComponent extends GraphModule.CommandComponent {
+export class AwkComponent extends CommandComponent {
   public exec:string = "awk"
   public script:string = ""
   public files: any[] = []

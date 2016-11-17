@@ -1,3 +1,5 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
 /*
 -d --decompress     force decompression
 -z --compress       force compression
@@ -13,10 +15,6 @@
 --best              alias for -9
 */
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
 
 var flags = {
   keep: {
@@ -63,7 +61,7 @@ var config:parserModule.Config = {
 var optionsParser = $.optionParserFromConfig(config)
 var zcatData = new parserModule.ParserData(config);
 
-export class ZcatComponent extends GraphModule.CommandComponent {
+export class ZcatComponent extends CommandComponent {
   public exec:string = "zcat"
   public files: any[] = []
 }

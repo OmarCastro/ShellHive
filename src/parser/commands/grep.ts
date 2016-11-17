@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 grep:
   Matcher Selection:
@@ -18,12 +21,6 @@ grep:
         - ["x","--line-regexp","Select only those matches that exactly match the whole line."]
 
 */
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import sanitizer = require("../utils/sanitizer");
-import GraphModule = require("../../common/graph");
 
 var selectors = {
   patternType:{
@@ -139,7 +136,7 @@ var grepCommandData = new parserModule.ParserData(config);
 
 
 
-export class GrepComponent extends GraphModule.CommandComponent {
+export class GrepComponent extends CommandComponent {
   public exec:string = "grep"
   public files: any[] = []
   public pattern:string = null

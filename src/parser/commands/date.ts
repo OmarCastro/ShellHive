@@ -1,9 +1,4 @@
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 var config = {
   parameters:{
@@ -32,7 +27,7 @@ optionsParser.shortOptions['d'] =  $.setParameter(config.parameters.date.name)
 optionsParser.longOptions['date'] =  optionsParser.shortOptions['d']
 
 
-export class DateComponent extends GraphModule.CommandComponent {
+export class DateComponent extends CommandComponent {
   public exec:string = "date"
 }
 

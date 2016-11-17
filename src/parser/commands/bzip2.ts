@@ -13,10 +13,7 @@
 --best              alias for -9
 */
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 var selectors = {
@@ -188,7 +185,7 @@ var longOptions = {
 }*/
 
 
-export class BZipComponent extends GraphModule.CommandComponent {
+export class BZipComponent extends CommandComponent {
   public exec:string = "bzip2"
   public files: any[] = []
 }

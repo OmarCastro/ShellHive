@@ -1,7 +1,4 @@
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 var selectors = {
   lineNumber:{
@@ -84,7 +81,7 @@ longOptions['show-all'] = shortOptions['A']
 longOptions['number'] = shortOptions['n']
 
 
-export class CatComponent extends GraphModule.CommandComponent {
+export class CatComponent extends CommandComponent {
   public exec:string = "cat"
   public files: any[] = []
 }

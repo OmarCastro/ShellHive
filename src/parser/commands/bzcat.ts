@@ -13,11 +13,7 @@
 --best              alias for -9
 */
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 
@@ -145,7 +141,7 @@ var optionsParser = {
 
 $.generate(optionsParser);
 
-export class BzcatComponent extends GraphModule.CommandComponent {
+export class BzcatComponent extends CommandComponent {
   public exec:string = "bzcat"
   public files: any[] = []
 }

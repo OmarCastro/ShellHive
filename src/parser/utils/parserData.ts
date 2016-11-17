@@ -21,6 +21,8 @@
       a flag in the command
 */
 
+export namespace parserData {
+
 export class ParserData{
   public selectorData:Dictionary<SelectorInfo>
   public selectors:Dictionary<Dictionary<SelectorOptionInfo> > = {}
@@ -210,4 +212,6 @@ export interface ComponentSelector{
   name:string;
   type:string;
   value?:any;
+}
+
 }

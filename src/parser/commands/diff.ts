@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 
 NAME
@@ -210,12 +213,6 @@ DESCRIPTION
 */
 
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
-
 var selectors = {
   format:{
     name:"format",
@@ -286,7 +283,7 @@ var longOptions = optionsParser.shortOptions
     longOptions['brief'] = shortOptions['q']
 
 
-export class DiffComponent extends GraphModule.CommandComponent {
+export class DiffComponent extends CommandComponent {
   public exec:string = "diff"
   public files: any[] = []
 }

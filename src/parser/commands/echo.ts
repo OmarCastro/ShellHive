@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 grep:
   Matcher Selection:
@@ -18,12 +21,6 @@ grep:
         - ["x","--line-regexp","Select only those matches that exactly match the whole line."]
 
 */
-
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
 
 
 var parameters = {
@@ -62,7 +59,7 @@ var echoData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
 
-export class EchoComponent extends GraphModule.CommandComponent {
+export class EchoComponent extends CommandComponent {
   public exec:string = "echo"
 }
 

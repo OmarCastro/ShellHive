@@ -1,3 +1,6 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+
+
 /*
 
   -c, --bytes=[-]K         print the first K bytes of each file;
@@ -10,12 +13,6 @@
   -v, --verbose            mostrar sempre cabeçalhos com nomes de ficheiros
 
 */
-
-
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
 
 
 var selectors = {
@@ -77,7 +74,7 @@ var tailData = new parserModule.ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
 
-export class TailComponent extends GraphModule.CommandComponent {
+export class TailComponent extends CommandComponent {
   public exec:string = "tail"
   public files: any[] = []
 }

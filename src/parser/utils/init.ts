@@ -5,14 +5,8 @@ import Iterator = optionsParser.Iterator;
 import parser = require("../parser");
 import sanitizer = require("./sanitizer");
 
-import GraphModule = require("../../common/graph");
-import Boundary = GraphModule.Boundary;
-import Graph = GraphModule.Graph;
-import IndexedGraph = GraphModule.IndexedGraph;
-import Connection = GraphModule.Connection;
-import Component = GraphModule.Component;
-import CommandComponent = GraphModule.CommandComponent;
-import FileComponent = GraphModule.FileComponent;
+import {Graph, IndexedGraph, Connection, Component, CommandComponent, FileComponent} from "../../graph/graph"
+import {Boundary} from "../../math/math"
 
 
 /**
@@ -27,6 +21,7 @@ import FileComponent = GraphModule.FileComponent;
 
   @returns {string} the type os argument
 */
+
 export function typeOf(arg:string):string;
 export function typeOf(arg:string[]):string;
 export function typeOf(arg:any):string{
@@ -324,4 +319,3 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
 export var select = optionsParser.select;
 export var sameAs = optionsParser.sameAs;
 export var switchOn = optionsParser.switchOn;
-export var select = optionsParser.select;

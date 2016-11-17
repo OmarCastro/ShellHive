@@ -1,3 +1,4 @@
+import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 
@@ -171,11 +172,6 @@
 
 
 
-import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
-import common = require("../utils/init");
-import GraphModule = require("../../common/graph");
-
 
 var config = {
   parameters:{
@@ -221,7 +217,7 @@ var optionsParser = $.optionParserFromConfig(config);
 $.generate(optionsParser)
 
 
-export class CurlComponent extends GraphModule.CommandComponent {
+export class CurlComponent extends CommandComponent {
   public exec:string = "curl"
   public files: any[] = []
 }
