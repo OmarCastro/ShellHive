@@ -1,12 +1,12 @@
 
 import optionsParser = require("../utils/optionsParser");
-import Iterator = optionsParser.Iterator;
+import { Iterator } from "./iterator.class"
 
 import parser = require("../parser");
 import sanitizer = require("./sanitizer");
 
-import {Graph, IndexedGraph, Connection, Component, CommandComponent, FileComponent} from "../../graph/graph"
-import {Boundary} from "../../math/math"
+import {Graph, IndexedGraph, Connection, Component, CommandComponent, FileComponent} from "../../graph"
+import {Boundary} from "../../math"
 
 
 /**

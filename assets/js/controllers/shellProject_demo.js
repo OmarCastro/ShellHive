@@ -25,7 +25,7 @@ app.controller('shellProject', ['$scope', function($scope){
 
 
   // Subscribe to the user model classroom and instance room
-  socket.get('/demo/subscribe', function(data){
+  io.socket.get('/demo/subscribe', function(data){
     $scope.implementedCommands = data.implementedCommands
     $scope.options             = data.SelectionOptions;
     viewGraph();

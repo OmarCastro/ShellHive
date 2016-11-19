@@ -1,4 +1,4 @@
-import { Component } from "../graph/component/component" 
+import { Component } from "../graph/component" 
 
 
 export class Boundary{

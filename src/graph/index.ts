@@ -1,5 +1,5 @@
-export * from "./component/component"
+export * from "./component"
 export { Graph } from "./graph.class"
-export { IndexedGraph } from "./indexed_graph.class"
+export { IndexedGraph } from "./indexed-graph.class"
 export { Macro } from "./macro.class"
 export { Connection } from "./connection.class"

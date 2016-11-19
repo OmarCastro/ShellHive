@@ -19,16 +19,17 @@ var cssTransform = getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTrans
 
 var app = angular.module('app', ['ui.bootstrap','ngAnimate', 'ui.layout']);
 
-var socket = io.socket;
+var socket = io();
 var pathArray = window.location.pathname.split( '/' );
 var projId = pathArray[pathArray.length - 1];
 
 window.projId = projId;
+window.socket = socket;
 
 socket.on('mess', function(data){ console.log('mess', data) });
 socket.on('message', function(data){ console.log('message', data) });
 socket.on('connect', function socketConnected() {
-  console.log("This is from the connect: ", this.socket.sessionid);
+  //console.log("This is from the connect: ", this.socket.sessionid);
 });
 
 Mousetrap.bind("shift+p", function(){

@@ -3,8 +3,8 @@ declare function require(path:string):any;
 var parser:any = {};
 
 var astBuilder:{parse:(string)=>any} = require('./ast-builder/ast-builder');
-
-import {Graph, Macro, IndexedGraph, Connection, Component, GraphComponent, MacroComponent, CommandComponent, FileComponent} from "../graph/graph"
+ 
+import {Graph, Macro, IndexedGraph, Connection, Component, GraphComponent, MacroComponent, CommandComponent, FileComponent} from "../graph"
 
 import sanitizer = require("./utils/sanitizer");
 

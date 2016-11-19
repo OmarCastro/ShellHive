@@ -90,14 +90,14 @@ module.exports.bootstrap = function (cb) {
         type:"root"
       },
       {
+        project:2,
         data:{
           inputs:["input"],
           outputs:["output", "error"],
           name:"macroTest",
           description:"a test macro"
         },
-        type: "macro",
-        project:2
+        type: "macro"
       }
     ];
 
@@ -106,6 +106,8 @@ module.exports.bootstrap = function (cb) {
     Graph.count().exec(function(err, count) {
       if (err || count > 0) return done(err);
       Graph.create(dummyGraphs).exec(function(err, res){
+        console.log(err)
+        console.log(res)
         if (err) return done(err);
         if (!res) return done();
         var toMap = (res.length < dummyCommands.length)?res:dummyCommands
@@ -121,7 +123,6 @@ module.exports.bootstrap = function (cb) {
         async.series(series,done);
       });
     });
-    done()
   }
 
   async.series([

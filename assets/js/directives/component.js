@@ -184,7 +184,7 @@ app.directive("component", function($document){
             })
         
         //
-        //socket.get('/users/3',function serverSays(err,users){
+        //io.socket.get('/users/3',function serverSays(err,users){
         //    if (err)
         //        console.log(err)
         //    console.log(JSON.stringify(users));

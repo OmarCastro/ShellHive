@@ -1,4 +1,4 @@
-import { Component } from "./component/component";
+import { Component } from "./component";
 
 /**
 	Represents a connection between 2 components

@@ -36,15 +36,15 @@ function($scope, csrf, alerts, modal,$timeout){
 
 
   // Subscribe to the user model classroom and instance room
-  socket.get('/project/subscribe', {id:projId}, function(data){
+  io.socket.get('/project/subscribe', {id:projId}, function(data){
     $scope.implementedCommands = data.implementedCommands
     $scope.options             = data.SelectionOptions;
     $scope.clients             = data.clients;
     $scope.page = "graph";
-    $scope.chatterId = io.socket.socket.sessionid;
+    $scope.chatterId = socket.io.engine.id;
     $scope.chat = {open: $scope.clients.length > 1};
 
-    console.log("socket.id =" ,io.socket.socket.sessionid);
+    console.log("socket.id =" , socket.io.engine.id);
 
     $scope.$digest();
 

@@ -1,0 +1,5 @@
+export { Component } from "./component.class"
+export { CommandComponent } from "./command-component.class"
+export { FileComponent } from "./file-component.class"
+export { GraphComponent } from "./graph-component.class"
+export { MacroComponent } from "./macro-component.class"

@@ -1,4 +1,4 @@
-import { Component } from "./component/component"
+import { Component } from "./component"
 import { Graph } from "./graph.class"
 
 export class IndexedGraph{

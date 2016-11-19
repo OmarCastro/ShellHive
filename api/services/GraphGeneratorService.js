@@ -54,7 +54,7 @@ function createComponent(projectId, graphId, command, position, cb){
         type:"file",
         data: { type:"file", filename: firstWord }
       };
-    
+      continue_exec();
   } else if(parser.isImplemented(firstWord)){
       var metagraph = metaGraphfromCommand(command);  
       componentData = {
@@ -62,6 +62,7 @@ function createComponent(projectId, graphId, command, position, cb){
         type:"command",
         data: metagraph.components[0]
       };
+      continue_exec();
   } else {
     Graph.find({project:projectId}).exec(function(err, res){
       res
@@ -76,11 +77,13 @@ function createComponent(projectId, graphId, command, position, cb){
             input = "macroIn0";
             return true
           } else return false
-        })
+        });
+        continue_exec();
     })
   }
 
-  if(!componentData){
+  function continue_exec(){
+    if(!componentData){
     return cb("unable to create component \""+firstWord+"\"");
   }
   
@@ -89,7 +92,10 @@ function createComponent(projectId, graphId, command, position, cb){
   }
   Component.create(componentData).exec(function(err,res){
     cb(err,res,input);
-  });   
+  });  
+  }
+
+   
 }
 
 /* istanbul ignore next */

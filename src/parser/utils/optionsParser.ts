@@ -1,30 +1,6 @@
 
-export class Iterator{
-  public index:number = 0;
-  public argList:any[];
-  public length:number;
-  public current:any;
-
-  public constructor(ArgList:any[]){
-    this.argList = ArgList;
-    this.length = ArgList.length;
-    this.current = ArgList[0];
-  }
-
-  public hasNext(){ return this.index !== this.length }
-  public next(){return this.current = this.argList[this.index++] }
-  public rest(){return this.argList.slice(this.index) }
-}
-
-export function parseShortOptions(options,componentData,argsNodeIterator){
-  var option,
-      shortOptions = options.shortOptions,
-      iter = new Iterator(argsNodeIterator.current.slice(1))
-  while(option = iter.next()){
-    var arg = shortOptions[option]
-    if(arg && arg(componentData,argsNodeIterator,iter)){ break }
-  }
-}
+import { Iterator } from "./iterator.class"
+export { parseShortOptions } from "./short-options-parser.namesapce"
 
 export var parseLongOptions = function(options, componentData, argsNodeIterator){
     var longOptions, optionStr, indexOfSep, iter, optionKey, arg;

@@ -1,6 +1,7 @@
 function project_room(id){return 'project_room_'+id}
 function graph_room(graphId, projectID){return 'graph_'+graphId}
 var parser = require('../../lib/parser/parser.js');
+var socketService = require('./socketsService.js');
 
 /**
 * CollaborationService.js
@@ -67,7 +68,9 @@ var CollaborationService = module.exports = {
 
     io.sockets.in(projectRoom).emit('new user', data);
     socket.join(projectRoom)
-    var existingClients = io.sockets.clients(projectRoom);
+    var existingClients = socketService.getClientListInRoom(projectRoom)
+
+    console.log("existingClients: %o",existingClients);
     var clientsData = existingClients.map(function(client){
       return client.collabData;
     });
@@ -88,7 +91,8 @@ var CollaborationService = module.exports = {
   },
   
   joinUserToGraph: function(req, res, graph){
-    
+    console.log("new user!!")
+
     if(req.socket && req.socket.projectId == graph.project){
       var id = graph.id;
       var graphRoom = graph_room(id);
