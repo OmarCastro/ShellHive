@@ -22,10 +22,8 @@ var cssFilesToInject = [
 // Client-side javascript files to inject in order
 // (uses Grunt-style wildcard/glob/splat expressions)
 var jsFilesToInject = [
-	'bower_components/lazy.js/lazy.js',
-	'bower_components/angular/angular.min.js',
-	'bower_components/angular-animate/angular-animate.min.js',
-	'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'
+	'bower_components/lazy.js/lazy.js'
+	
 	// Dependencies like sails.io.js, jQuery, or Angular
 	// are brought in here
 	//'linker/js/dependencies/*.js'
@@ -36,12 +34,13 @@ var jsFilesToInject = [
 ];
 
 var appJsFilesToInject = [
-	'js/app.js',
+	'dist/js/app.js',
 	'js/services/*.js',
 	'js/directives/*.js',
 	'js/controllers/*.js',
 	'!js/controllers/shellProject_demo.js',
-	'!js/controllers/shellProject.js'
+	'!js/controllers/shellProject.js',
+	'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'
 ];
 
 

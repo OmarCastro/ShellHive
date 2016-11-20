@@ -1,21 +1,19 @@
-app.controller('macroCtrl', ['$scope','$modal','alerts','csrf', function(scope, modal, alerts, csrf){
+import * as app from "../app.module"
+import { SocketService } from "../socket.service"
+import { projectId } from "../utils"
+import  * as newMacroModal  from "../modals/new-macro.modal"
+import  * as alerts  from "../services/alerts"
+import  * as csrf  from "../services/csrf"
+
+
+app.controller('macroCtrl', ['$scope','$modal',alerts.serviceName, macroCtrlFunction]);
+
+
+function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
 
 
   scope.newMacroModal = function(){
-    var form = { name: '',  description: '',  command: ''  };
-    var modalInstance = modal.open({
-      templateUrl: 'myModalContent.html',
-      controller: function($scope, $modalInstance){
-        $scope.form = form;
-        $scope.cancel = function(){
-          return $modalInstance.dismiss('cancel');
-        };
-        $scope.ok = function(){
-          $modalInstance.close(form);
-        };
-      }
-    });
-    return modalInstance.result.then(function(selectedItem){
+    return newMacroModal.showModal(modal).then(function(form){
       scope.newMacro(form.name, form.description, form.command);
       return form.name = form.description = '';
     });
@@ -75,16 +73,24 @@ app.controller('macroCtrl', ['$scope','$modal','alerts','csrf', function(scope, 
     }
     var message = {
       data:{
-        project: projId,
+        project: projectId,
         data: data,
         type:'macro'
       },
       command: command,
-      _csrf: csrf.csrf
+      _csrf: csrf.CSRF.csrfToken
 
     }
 
-    io.socket.post('/macro/create/', message, function(data){
+    interface ICreateMacroResult{
+      alert: boolean
+      message: string
+      status: number
+      errors: string[]
+      macro: any
+    }
+
+    SocketService.sailsSocket.post<ICreateMacroResult>('/macro/create/', message, function(data){
        console.log(data);
       if(data.alert){
         alerts.addAlert({type:'danger', msg: data.message});
@@ -105,4 +111,6 @@ app.controller('macroCtrl', ['$scope','$modal','alerts','csrf', function(scope, 
     //}
     //graphModel.macroList = res$;
   };
-}]);
+}
+
+export = {init: function(){}}

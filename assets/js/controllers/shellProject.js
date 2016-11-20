@@ -41,10 +41,10 @@ function($scope, csrf, alerts, modal,$timeout){
     $scope.options             = data.SelectionOptions;
     $scope.clients             = data.clients;
     $scope.page = "graph";
-    $scope.chatterId = socket.io.engine.id;
+    $scope.chatterId = socket.id;
     $scope.chat = {open: $scope.clients.length > 1};
 
-    console.log("socket.id =" , socket.io.engine.id);
+    console.log("socket.id =" , $scope.chatterId);
 
     $scope.$digest();
 

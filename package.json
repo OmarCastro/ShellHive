@@ -53,6 +53,13 @@
   "author": "Omar Castro",
   "license": "",
   "devDependencies": {
+    "@types/angular": "^1.5.20",
+    "@types/angular-animate": "^1.5.5",
+    "@types/mousetrap": "^1.5.32",
+    "@types/socket.io-client": "^1.4.28",
+    "angular": "^1.5.8",
+    "angular-animate": "^1.5.8",
+    "browserify": "^13.1.1",
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",
     "chai-properties": "^1.1.0",
@@ -62,11 +69,16 @@
     "gulp-mocha": "~0.4.1",
     "gulp-newer": "~0.3.0",
     "gulp-protractor": "0.0.7",
+    "gulp-sourcemaps": "^2.2.0",
     "gulp-tsc": "~0.7.0",
+    "gulp-uglify": "^2.0.0",
     "gulp-util": "~2.2.14",
     "mocha": "~1.18.2",
+    "mousetrap": "^1.6.0",
     "run-sequence": "~0.3.6",
     "supertest": "^0.13.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
     "webdriverjs": "^1.6.1"
   }
 }

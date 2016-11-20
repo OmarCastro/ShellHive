@@ -6,6 +6,12 @@
   @return{string} the supported proprierty
 */
 
+import {SocketService} from "./socket.service"
+import * as Mousetrap from "mousetrap"
+import macroCtrl = require("./controllers/macro.controller")
+import tip = require("./directives/tip.directive")
+macroCtrl.init()
+tip.init()
 function getCSSSupportedProp(proparray){
   var root = document.documentElement;
   for (var i = 0, len = proparray.length; i < len; ++i) {
@@ -15,16 +21,10 @@ function getCSSSupportedProp(proparray){
   }
 }
 
-var cssTransform = getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
+var cssTransform = window["cssTransform"]= getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
 
-var app = angular.module('app', ['ui.bootstrap','ngAnimate', 'ui.layout']);
+var socket = window["socket"] = SocketService.socket
 
-var socket = io();
-var pathArray = window.location.pathname.split( '/' );
-var projId = pathArray[pathArray.length - 1];
-
-window.projId = projId;
-window.socket = socket;
 
 socket.on('mess', function(data){ console.log('mess', data) });
 socket.on('message', function(data){ console.log('message', data) });
