@@ -1,8 +1,8 @@
 import * as app from "../app.module"
 
 
-var serviceDeclaration : (Function | string | Function)[] = ["$timeout", alertService] 
-export var serviceName = "alerts"
+const serviceDeclaration : (Function | string | Function)[] = ["$timeout", alertService] 
+export const serviceName = "alerts"
 
 app.service(serviceName,serviceDeclaration)
 
@@ -24,8 +24,8 @@ export interface IAlertService {
 }
 
 function alertService($timeout: angular.ITimeoutService){
-  var alerts = [];
-  var service: IAlertService = this;
+  const alerts = [];
+  const service: IAlertService = this;
   service.alerts = alerts;
 
   service.addAlert = function(msg: AlertMsg) {
@@ -42,7 +42,7 @@ function alertService($timeout: angular.ITimeoutService){
 
   service.removeAfter = function(msg: AlertMsg, time: number) {
     $timeout(function(){
-      var indx = alerts.indexOf(msg)
+      const indx = alerts.indexOf(msg)
       if(indx < 0) return;
       service.closeAlert(indx)
     },time)

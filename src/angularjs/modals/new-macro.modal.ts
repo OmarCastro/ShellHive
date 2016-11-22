@@ -1,8 +1,16 @@
+import * as app from "../app.module"
 
-var modalController = ["$scope", "$modalInstance", modalControllerFunction]
+const modalController = ["$scope", "$modalInstance", modalControllerFunction]
+
+interface IModalResult {
+  name: string;
+  description: string;
+  command: string;
+}
+
 
 function modalControllerFunction($scope, $modalInstance){
-	var form = { name: '',  description: '',  command: ''  };
+	const form: IModalResult = { name: '',  description: '',  command: ''  };
   $scope.form = form;
   $scope.cancel = function(){
     return $modalInstance.dismiss('cancel');
@@ -13,12 +21,12 @@ function modalControllerFunction($scope, $modalInstance){
 }
 
 
-function showModalFunction(modalservice){
-  var modalInstance = modalservice.open({
+function showModalFunction(modalservice) : angular.IPromise<IModalResult>{
+  const modalInstance = modalservice.open({
     templateUrl: 'myModalContent.html',
     controller: modalController
   });
   return modalInstance.result;
 }
 
-export var showModal = showModalFunction
+export const showModal = showModalFunction

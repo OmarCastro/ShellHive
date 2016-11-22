@@ -21,10 +21,10 @@ export class Rectangle{
     and the other rectangle
   */
   public expand(other:Rectangle):void {
-    var x:number = Math.min(this.x, other.x);
-    var y:number = Math.min(this.y, other.y);
-    var w:number = Math.max(this.right, other.right); - x;
-    var h:number = Math.max(this.bottom, other.bottom) - y;
+    const x:number = Math.min(this.x, other.x);
+    const y:number = Math.min(this.y, other.y);
+    const w:number = Math.max(this.right, other.right); - x;
+    const h:number = Math.max(this.bottom, other.bottom) - y;
     this.x = x;
     this.y = y;
     this.width = w;

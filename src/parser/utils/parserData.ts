@@ -69,19 +69,19 @@ export class ParserData{
   */
   private setSelector(selectorData:Dictionary<SelectorInfo> = {}){
     this.selectorData = selectorData
-    var selectors      = this.selectors;
-    var selectorOptions= this.selectorOptions;
-    var visualSelectorOptions = this.visualSelectorOptions;
-    var regexToReplace = / /g
+    const selectors      = this.selectors;
+    const selectorOptions= this.selectorOptions;
+    const visualSelectorOptions = this.visualSelectorOptions;
+    const regexToReplace = / /g
 
-    for (var key in selectorData) {
-      var subkeys = selectorData[key];
-      var keySelector = selectors[subkeys.name] = {};
-      var keySelectorOption = selectorOptions[subkeys.name] = {};
-      var VisualSelectorOption = visualSelectorOptions[subkeys.name] = [];
+    for (let key in selectorData) {
+      const subkeys = selectorData[key];
+      const keySelector = selectors[subkeys.name] = {};
+      const keySelectorOption = selectorOptions[subkeys.name] = {};
+      const VisualSelectorOption = visualSelectorOptions[subkeys.name] = [];
 
-      for (var subkey in subkeys.options) {
-        var value = subkeys.options[subkey];
+      for (let subkey in subkeys.options) {
+        const value = subkeys.options[subkey];
         keySelector[value.name] = value;
         keySelectorOption[value.name] = value.option;
         VisualSelectorOption.push(value.name);  

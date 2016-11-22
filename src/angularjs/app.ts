@@ -13,17 +13,17 @@ import tip = require("./directives/tip.directive")
 macroCtrl.init()
 tip.init()
 function getCSSSupportedProp(proparray){
-  var root = document.documentElement;
-  for (var i = 0, len = proparray.length; i < len; ++i) {
+  const root = document.documentElement;
+  for (let i = 0, len = proparray.length; i < len; ++i) {
     if (proparray[i] in root.style) {
       return proparray[i];
     }
   }
 }
 
-var cssTransform = window["cssTransform"]= getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
+const cssTransform = window["cssTransform"]= getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
 
-var socket = window["socket"] = SocketService.socket
+const socket = window["socket"] = SocketService.socket
 
 
 socket.on('mess', function(data){ console.log('mess', data) });

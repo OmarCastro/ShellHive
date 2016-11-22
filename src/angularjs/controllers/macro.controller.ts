@@ -2,9 +2,18 @@ import * as app from "../app.module"
 import { SocketService } from "../socket.service"
 import { projectId } from "../utils"
 import  * as newMacroModal  from "../modals/new-macro.modal"
+import  * as editMacroModal  from "../modals/edit-macro.modal"
 import  * as alerts  from "../services/alerts"
 import  * as csrf  from "../services/csrf"
 
+
+interface ICreateMacroResult{
+  alert: boolean
+  message: string
+  status: number
+  errors: string[]
+  macro: any
+}
 
 app.controller('macroCtrl', ['$scope','$modal',alerts.serviceName, macroCtrlFunction]);
 
@@ -21,57 +30,33 @@ function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
 
 
   scope.macroEditModal = function(macroName){
-    var macro, form, modalInstance;
-    var graphModel = scope.graphModel;
-    macro = graphModel.macros[macroName];
-    form = {
-      name: macro.name,
-      description: macro.description
-    };
-    modalInstance = modal.open({
-      templateUrl: 'MacroEditModal.html',
-      controller: function($scope, $modalInstance){
-        $scope.form = form;
-        $scope.cancel = function(){
-          return $modalInstance.dismiss('cancel');
-        };
-        $scope.edit = function(){
-          $modalInstance.close({ result: "edit" });
-        };
-        $scope['delete'] = function(){
-          $modalInstance.close({ result: "delete" });
-        };
-        $scope.view = function(){
-          $modalInstance.close({ result: "view" });
-        };
-      }
-    });
-    return modalInstance.result.then(function(selectedItem){
+    const graphModel = scope.graphModel;
+    const macro = graphModel.macros[macroName];
+    editMacroModal.showModal(modal, macro).then(function(selectedItem){
       switch (selectedItem.result) {
-      case "edit":
-        scope.$emit("updateMacro", {macroId: macro.id, data:{
-          name: form.name,
-          description: form.description,
-          inputs: macro.inputs,
-          outputs: macro.outputs
-        }})
+        case "edit":
+          scope.$emit("updateMacro", {macroId: macro.id, data:{
+            name: selectedItem.form.name,
+            description: selectedItem.form.description,
+            inputs: macro.inputs,
+            outputs: macro.outputs
+          }});
+          break;
       case "delete":
           scope.$emit("deleteMacro", {id: macro.id});
         break;
       case "view":
         scope.graph.setGraphView(graphModel.macros[macroName].id);
       }
-      return form.name = form.description = '';
     });
   };
 
   scope.newMacro = function(name, descr, command){
-    var res$, key;
-    var data = {
+    const data = {
       name: name,
       description: descr
     }
-    var message = {
+    const message = {
       data:{
         project: projectId,
         data: data,
@@ -82,13 +67,7 @@ function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
 
     }
 
-    interface ICreateMacroResult{
-      alert: boolean
-      message: string
-      status: number
-      errors: string[]
-      macro: any
-    }
+    
 
     SocketService.sailsSocket.post<ICreateMacroResult>('/macro/create/', message, function(data){
        console.log(data);
@@ -104,9 +83,10 @@ function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
         scope.graph.setGraphView(data.macro);
       }
     });
+
     //graphModel.macros[name] = shellParser.createMacro(name, descr, command);
-    //res$ = [];
-    //for (key in graphModel.macros) {
+    //const res$ = [];
+    //for (let key in graphModel.macros) {
     //  res$.push(key);
     //}
     //graphModel.macroList = res$;

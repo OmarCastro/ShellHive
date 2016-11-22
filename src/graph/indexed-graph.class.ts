@@ -7,9 +7,9 @@ export class IndexedGraph{
 	public outputConnections:any = {}
 
 	public constructor(graph:Graph){
-		var components = this.components
-		var outputConnections = this.outputConnections
-		var inputConnections = this.inputConnections
+		const components = this.components
+		const outputConnections = this.outputConnections
+		const inputConnections = this.inputConnections
 		
 		graph.components.forEach(component => {
 			components[component.id] = component

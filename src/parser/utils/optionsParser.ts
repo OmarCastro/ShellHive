@@ -2,21 +2,20 @@
 import { Iterator } from "./iterator.class"
 export { parseShortOptions } from "./short-options-parser.namesapce"
 
-export var parseLongOptions = function(options, componentData, argsNodeIterator){
-    var longOptions, optionStr, indexOfSep, iter, optionKey, arg;
-    longOptions = options.longOptions;
-    optionStr = argsNodeIterator.current.slice(2);
-    indexOfSep = optionStr.indexOf('=');
+export const parseLongOptions = function(options, componentData, argsNodeIterator){
+    const longOptions = options.longOptions;
+    const optionStr = argsNodeIterator.current.slice(2);
+    const indexOfSep = optionStr.indexOf('=');
     if (indexOfSep > -1) {
-      iter = new Iterator(optionStr);
+      const iter = new Iterator(optionStr);
       iter.index = indexOfSep + 1;
-      optionKey = optionStr.slice(0, indexOfSep);
-      arg = longOptions[optionKey] || longOptions[optionStr];
+      const optionKey = optionStr.slice(0, indexOfSep);
+      const arg = longOptions[optionKey] || longOptions[optionStr];
       if (arg) {
         return arg(componentData, argsNodeIterator, iter);
       }
     } else {
-      arg = longOptions[optionStr];
+      const arg = longOptions[optionStr];
       if (arg) {
         return arg(componentData);
       }
@@ -25,7 +24,7 @@ export var parseLongOptions = function(options, componentData, argsNodeIterator)
   /**
     activates flags (flags)
   */
-export var switchOn = function(...flags:any[]){
+export const switchOn = function(...flags:any[]){
     flags = flags.map(flag => {return (flag.name) ? flag.name : flag});
     return function(Component, state, substate){
       flags.forEach(flag => {Component.flags[flag] = true});
@@ -35,10 +34,10 @@ export var switchOn = function(...flags:any[]){
   /**
     set parameter (param)
   */
-export var setParameter = function(param){
-    var paramFn:any = function(Component, state, substate){
-      var hasNext = substate.hasNext();
-      var parameter = hasNext
+export const setParameter = function(param){
+    const paramFn: any = function(Component, state, substate){
+      const hasNext = substate.hasNext();
+      const parameter = hasNext
         ? substate.rest()
         : state.next();
       Component.parameters[param] = parameter;

@@ -18,14 +18,14 @@ export class CSRF {
 	static waitingToken: any[] = []
 
 	static getToken(fn: (token: string) => any){
-		if(this.csrfToken == null){
+		if(CSRF.csrfToken == null){
 			CSRF.waitingToken.push(fn);
 		} else {
 			fn(CSRF.csrfToken);
 		}
   }
   static printget(reqdata){
-    this.getToken((data) => {
+    CSRF.getToken((data) => {
       SocketService.sailsSocket.post('/graph/action', {message:reqdata,_csrf:CSRF.csrfToken}, function(data){
       console.log(data);
       });
@@ -36,7 +36,7 @@ export class CSRF {
   window['printget'] = CSRF.printget;
 
 
-export var serviceName = 'csrf'
+export const serviceName = 'csrf'
 
 app.service(serviceName,function(){
   Object.defineProperty(this, "csrf", {

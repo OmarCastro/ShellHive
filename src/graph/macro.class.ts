@@ -14,7 +14,7 @@ export class Macro extends Graph {
 
 
   public static fromGraph(name:string, description:string, graphData:Graph):Macro{
-    var newmacro = new Macro(name, description);
+    const newmacro = new Macro(name, description);
     newmacro.components = graphData.components
     newmacro.connections = graphData.connections
     return newmacro;

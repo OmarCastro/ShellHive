@@ -20,35 +20,35 @@ interface ICreationPopupService {
 
 }
 
-var serviceName = 'creationPopup'
-var serviceDeclaration : (Function | string | Function)[] = ["$rootScope", creationPopupService]
+const serviceName = 'creationPopup'
+const serviceDeclaration : (Function | string | Function)[] = ["$rootScope", creationPopupService]
 
 
 app.service(serviceName, serviceDeclaration)
 
 function creationPopupService($rootScope: angular.IRootScopeService){
   
-  var service: ICreationPopupService = this;
-  var popupState: IPopupState = {
+  let service: ICreationPopupService = this;
+  let popupState: IPopupState = {
     x: 0,
     y: 0,
     startNode: 0,
     startPort: 0
   };
   service.popupText = ''
-  var popup: HTMLElement = <HTMLElement> document.querySelector("div[graph] .popup");
-  var $popup = $(popup);
-  var popupHeight = $popup.find("form").height();
-  var $popupInput = $popup.find("input");
-  var simpleEdge = document.querySelector('.emptyEdge');
-  var scope;
+  const popup: HTMLElement = <HTMLElement> document.querySelector("div[graph] .popup");
+  const $popup = $(popup);
+  const popupHeight = $popup.find("form").height();
+  const $popupInput = $popup.find("input");
+  const simpleEdge = document.querySelector('.emptyEdge');
+  let scope;
 
   $popup.hide();
 
 
   service.showPopup = function(event, startNode, startPort, endNode, endPort){
     service.popupText = '';
-    var {x,y} = window["mapMouseToView"](event);
+    const {x,y} = window["mapMouseToView"](event);
     popupState.x = x; 
     popupState.y = y;
     popupState.startNode = startNode;
@@ -60,8 +60,7 @@ function creationPopupService($rootScope: angular.IRootScopeService){
     $popupInput.focus();
     $rootScope.$digest();
   };
-  var popupSubmit = function(content){
-    var comp;
+  const popupSubmit = function(content){
     scope.$emit('addAndConnectComponent', {
       command: content,
       componentId: popupState.startNode,

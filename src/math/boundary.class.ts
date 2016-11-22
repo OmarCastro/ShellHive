@@ -11,11 +11,7 @@ export class Boundary{
   ){}
 
   public static createFromXY(x:number, y:number, component:Component){
-    var bottom:number;
-    if(component.type === "file"){
-      bottom = y + 100
-    }
-    else{ bottom = y + 350 }
+    const bottom = y + component.type === "file" ? 100: 350;
     return new this(x,x,y,bottom,[component]);
   }
 
