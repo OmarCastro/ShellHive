@@ -3,7 +3,7 @@ import {Graph, ParserData, Config, $, CommandComponent, common, sanitizer, Bound
 /**
   Arranges the nodes using a hierarchical layout
 */
-function arrangeLayout(previousCommand, boundaries:Boundary[]){
+function arrangeLayout(previousCommand: CommandComponent, boundaries:Boundary[]){
   var maxX = 0;
   var minY = previousCommand.position.y - (boundaries.length - 1) * 250;
   if (minY < 0) {
@@ -18,7 +18,7 @@ function arrangeLayout(previousCommand, boundaries:Boundary[]){
     prevBound = boundary;
   });
 }
-function connector(parser, previousCommand, result:Graph, boundaries, tracker){
+function connector(parser, previousCommand: CommandComponent, result:Graph, boundaries, tracker){
   return function(commandList){
     var subresult:Graph = parser.parseAST(commandList, tracker);
     boundaries.push(Boundary.createFromComponents(subresult.components));

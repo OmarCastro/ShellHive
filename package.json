@@ -8,6 +8,7 @@
   ],
   "dependencies": {
     "bcrypt": "^0.8.6",
+    "circular-json": "^0.3.1",
     "coverage-percentage": "0.0.2",
     "ejs": "~0.8.4",
     "fs.extra": "^1.2.1",
@@ -55,7 +56,10 @@
   "devDependencies": {
     "@types/angular": "^1.5.20",
     "@types/angular-animate": "^1.5.5",
+    "@types/circular-json": "^0.1.30",
+    "@types/express": "^4.0.34",
     "@types/mousetrap": "^1.5.32",
+    "@types/passport": "^0.2.34",
     "@types/socket.io-client": "^1.4.28",
     "angular": "^1.5.8",
     "angular-animate": "^1.5.8",

@@ -25,17 +25,16 @@ import {Boundary} from "../../math"
 export function typeOf(arg:string):string;
 export function typeOf(arg:string[]):string;
 export function typeOf(arg:any):string{
-  if (typeof arg === 'string' && arg.length > 0){
-    if (arg[0] === '-' && arg.length > 1) {
-      if (arg[1] === '-') { return 'longOption' }
-      else return 'shortOptions'
-    } else {
-      return 'string';
-    }
-  }
-  else if (arg instanceof Array) {
+  if(arg instanceof Array){
     return arg[0];
-  } else return 'string';
+  }
+  if(typeof arg === 'string' && arg.lastIndexOf("--",0) === 0 ){
+    return 'longOption'
+  }
+  if(typeof arg === 'string' && arg.lastIndexOf("-",0) === 0 ){
+    return 'shortOptions'
+  }
+  return 'string'
 }
 
 
@@ -54,11 +53,11 @@ export function typeOf(arg:any):string{
 /**
   Adds a file component to the
 */
-export function addFileComponent(componentData, connections, filename, id:number){
-  var newComponent = new FileComponent(filename)
+export function addFileComponent(componentData, connections: Connection[], filename, id:number){
+  const newComponent = new FileComponent(filename)
   newComponent.id = id
   
-  var inputPort = "file" + (componentData.files.length);
+  const inputPort = "file" + (componentData.files.length);
   connections.push(new Connection(newComponent, 'output', componentData, inputPort));
 
   componentData.files.push(filename);
