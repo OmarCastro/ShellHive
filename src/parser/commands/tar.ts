@@ -23,7 +23,7 @@ Examples:
 
 /*
 import $ = require("../utils/optionsParser");
-import parserModule = require("../utils/parserData");
+import ParserData = require("../utils/parserData");
 import common = require("./_init");
 
 
@@ -84,14 +84,14 @@ var flags = {
   },
 }
 
-var config:parserModule.Config = {
+var config:Config = {
   selectors:selectors,
   flags:flags
 }
 
 
 
-var bzipData = new parserModule.ParserData(config);
+var bzipData = new ParserData(config);
 
 
 

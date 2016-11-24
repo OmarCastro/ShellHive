@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 var config = {
   parameters:{
@@ -20,10 +20,10 @@ var config = {
     }
   }
 }
-var dateData = new parserModule.ParserData(config);
+var dateData = new ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
-optionsParser.shortOptions['d'] =  $.setParameter(config.parameters.date.name)
+optionsParser.shortOptions['d'] =  $.setParameter(config.parameters.date)
 optionsParser.longOptions['date'] =  optionsParser.shortOptions['d']
 
 

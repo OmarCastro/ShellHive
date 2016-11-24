@@ -1,3 +1,4 @@
+import { Dictionary, SelectorOptionInfo, Config, SelectorInfo, ParameterInfo, FlagInfo, ComponentSelector } from "./interfaces"
 
 /**
   CompilerData gives information to be used
@@ -20,8 +21,6 @@
   flags:
       a flag in the command
 */
-
-export namespace parserData {
 
 export class ParserData{
   public selectorData:Dictionary<SelectorInfo>
@@ -113,15 +112,17 @@ export class ParserData{
 
 
 
+  private entriesOf<T>(obj: Dictionary<T>): [string, T][]{
+     return Object.keys(obj).map((key) => <[string, T]>[key, obj[key]])
+  }
 
   public get componentFlags() : Dictionary<boolean>{
-    var componentFlags:Dictionary<boolean> = {}
-    var flags = this.flags
-    for (var key in flags) {
-      var value = flags[key]
-      componentFlags[value.name] = value.active
-    }
-    return componentFlags;
+    const flags = this.flags
+    return Object.keys(flags).reduce((map, key)=> {
+      const value = flags[key]
+      map[value.name] = value.active;
+      return map
+    }, {});
   }
 
   public get componentSelectors():Dictionary<ComponentSelector>{
@@ -156,62 +157,5 @@ export class ParserData{
     }
     return componentParameters;
   }
-
-}
-
-
-
-
-export enum SelectorOptionType{
-  OPTION,
-  PARAMETER,
-  NUMERIC_PARAMETER
-}
-
-export interface Dictionary<T>{
-  [s:string]:T
-}
-
-export interface SelectorOptionInfo{
- name:string;
- type:string
- option:string;
- description:string;
- default?:boolean;
- defaultValue?:any;
-}
-
-export interface FlagInfo{
-  name:string;
-  option:string;
-  description:string;
-  active:boolean;
-}
-
-export interface ParameterInfo{
-  name:string;
-  option:string;
-  description:string;
-  type:string;
-  defaultValue:string;
-}
-
-export interface SelectorInfo{
-  name:string;
-  description:string;
-  options: Dictionary<SelectorOptionInfo>
-}
-
-export interface Config{
-  selectors?:any
-  flags?:any
-  parameters?:any
-}
-
-export interface ComponentSelector{
-  name:string;
-  type:string;
-  value?:any;
-}
 
 }

@@ -1,5 +1,5 @@
 
-import optionsParser = require("../utils/optionsParser");
+import optionsParser = require("../parser-configuration/optionsParser");
 import { Iterator } from "./iterator.class"
 
 import parser = require("../parser");
@@ -317,5 +317,4 @@ export function commonParseComponent(flagOptions, selectorOptions, parameterOpti
 
 
 export var select = optionsParser.select;
-export var sameAs = optionsParser.sameAs;
 export var switchOn = optionsParser.switchOn;

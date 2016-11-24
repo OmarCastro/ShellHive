@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 var parameters = {
     set1:{
@@ -48,14 +48,14 @@ var flags = {
   },
 }
 
-var config:parserModule.Config = {
+var config:Config = {
   flags:flags,
   parameters: parameters
 }
 
 
 
-var bzipData = new parserModule.ParserData(config);
+var bzipData = new ParserData(config);
 
 
 var optionsParser = $.optionParserFromConfig(config);

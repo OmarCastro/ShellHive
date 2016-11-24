@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 
@@ -173,7 +173,7 @@ import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.i
 
 
 
-var config = {
+var config: Config = {
   parameters:{
     separator:{
       name:'url',
@@ -208,13 +208,10 @@ var config = {
   }
 }
 
-var cUrlData = new parserModule.ParserData(config);
+var cUrlData = new ParserData(config);
 
 
 var optionsParser = $.optionParserFromConfig(config);
-
-
-$.generate(optionsParser)
 
 
 export class CurlComponent extends CommandComponent {

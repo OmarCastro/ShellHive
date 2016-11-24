@@ -1,4 +1,4 @@
-import {Graph, parserModule, $, CommandComponent, common, sanitizer, Boundary, Connection}  from "./_common.imports";
+import {Graph, ParserData, Config, $, CommandComponent, common, sanitizer, Boundary, Connection}  from "./_common.imports";
 
 /**
   Arranges the nodes using a hierarchical layout

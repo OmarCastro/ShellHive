@@ -13,7 +13,7 @@
 --best              alias for -9
 */
 
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import { ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 var selectors = {
@@ -146,14 +146,14 @@ var flags = {
 }
 
 
-var config:parserModule.Config = {
+var config:Config = {
   selectors:selectors,
   flags:flags
 }
 
 
 
-var bzipData = new parserModule.ParserData(config);
+var bzipData = new ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config)
 

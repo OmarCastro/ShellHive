@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 /*
@@ -134,14 +134,14 @@ var flags = {
 }
 
 
-var config:parserModule.Config = {
+var config:Config = {
   selectors:selectors,
   flags:flags
 }
 
 
 
-var gzipData = new parserModule.ParserData(config);
+var gzipData = new ParserData(config);
 var optionsParser = $.optionParserFromConfig(config)
 
 export class GZipComponent extends CommandComponent {

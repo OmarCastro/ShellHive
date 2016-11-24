@@ -7,33 +7,35 @@
 
 
 
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
-var config = {
-  parameters:{
-    separator:{
+const parameters = {
+  separator:{
       name:'field separator',
       option: 'F',
       type: "string",
       description:"filter entries by anything other than the content",
-      defaultValue: ""
+      defaultValue: "",
     }
-  }
 }
-var awkData = new parserModule.ParserData(config);
+
+var config: Config = {
+  parameters: parameters
+}
+var awkData = new ParserData(config);
 
 
 var optionsParser = { 
   shortOptions:{
-    F : $.setParameter(config.parameters.separator.name)
+    F : $.setParameter(parameters.separator)
   },
   longOptions:{
-    "field-separator" : $.sameAs('F')  
+    "field-separator" : $.setParameter(parameters.separator)
   }
 }
 
-$.generate(optionsParser)
+
 
 
 export class AwkComponent extends CommandComponent {

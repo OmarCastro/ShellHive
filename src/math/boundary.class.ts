@@ -47,7 +47,7 @@ export class Boundary{
     boundary.top    += y
     boundary.bottom += y
     boundary.components.forEach(component => {
-      var position = component.position;
+      const position = component.position;
       position.x += x
       position.y += y
     });
@@ -57,23 +57,24 @@ export class Boundary{
   /**
   arranges the layout
   */
-  public static arrangeLayout(boundaries:Boundary[]):any[]{
-    var maxX:number = 0
-    var prevBound = null
-    var components:any[] = []
+  public static arrangeLayout(boundaries:Boundary[]):[Boundary, {x:number,y:number}]{
+    let maxX:number = 0
+    let components:any[] = []
     boundaries.forEach(boundary => {
       maxX = Math.max(boundary.rigth, maxX)
       components = components.concat(boundary.components)
     });
 
+    let prevBound = null
+
     boundaries.forEach(boundary => {
-      var translateX = maxX - boundary.rigth
-      var translateY = prevBound ? prevBound.bottom - boundary.top : 0
+      const translateX = maxX - boundary.rigth
+      const translateY = prevBound ? prevBound.bottom - boundary.top : 0
       boundary.translateXY(translateX,translateY)
       prevBound = boundary
     });
 
-    var x = 0, y = 0, bottom = 350;
+    let x = 0, y = 0, bottom = 350;
     
     if(boundaries.length){
       x = maxX + 350

@@ -1,7 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
-import SelectorInfo = parserModule.SelectorInfo;
-
-
+import {ParserData, Config, $, CommandComponent, common, sanitizer, SelectorInfo}  from "./_common.imports";
 
 
 var selectors = {
@@ -274,7 +271,7 @@ var parameters = {
   }
 }
 
-var config:parserModule.Config = {
+var config:Config = {
   selectors:selectors,
   flags:flags,
   parameters:parameters,
@@ -289,7 +286,7 @@ function extend(option, additional){
   }
 }
 
-extend(optionsParser.shortOptions, {
+const shortOptionsExt = {
   c  :  $.ignore ,
   C  :  $.ignore,
   d  :  $.ignore,
@@ -297,7 +294,7 @@ extend(optionsParser.shortOptions, {
   f  :  $.ignore ,
   H  :  $.ignore ,
   i  :  $.ignore ,
-  I  :  $.setParameter(parameters.ignore.name),
+  I  :  $.setParameter(parameters.ignore),
   k  :  $.ignore  ,
   L  :  $.ignore,
   N  :  $.ignore  ,
@@ -311,36 +308,40 @@ extend(optionsParser.shortOptions, {
   w  :  $.ignore  ,
   x  :  $.ignore  ,
   1 :  $.ignore
-});
+}
 
-extend(optionsParser.longOptions, {
-  "all" :                   $.sameAs('a'),
-  "almost-all" :            $.sameAs('A'),
-  "escape" :                $.sameAs('b'),
-  "directory" :             $.sameAs('d'),
-  "classify" :              $.sameAs('F'),
-  "no-group" :              $.sameAs('G'),
-  "human-readable" :        $.sameAs('h'),
-  "inode" :                 $.sameAs('i'),
-  "kibibytes" :             $.sameAs('k'),
-  "dereference" :           $.sameAs('l'),
-  "numeric-uid-gid" :       $.sameAs('n'),
-  "literal" :               $.sameAs('N'),
-  "indicator-style=slash" : $.sameAs('p'),
-  "hide-control-chars" :    $.sameAs('q'),
-  "quote-name" :            $.sameAs('Q'),
-  "reverse" :               $.sameAs('r'),
-  "recursive" :             $.sameAs('R'),
-  "size" :                  $.sameAs('S'),
-  "context" :               $.sameAs('Z')
-});
+extend(optionsParser.shortOptions, shortOptionsExt);
 
-$.generate(optionsParser);
-
-
+const longOptions = {
+  "all" :                   optionsParser.shortOptions['a'],
+  "almost-all" :            optionsParser.shortOptions['A'],
+  "escape" :                optionsParser.shortOptions['b'],
+  "directory" :             optionsParser.shortOptions['d'],
+  "classify" :              optionsParser.shortOptions['F'],
+  "no-group" :              optionsParser.shortOptions['G'],
+  "human-readable" :        optionsParser.shortOptions['h'],
+  "inode" :                 optionsParser.shortOptions['i'],
+  "kibibytes" :             optionsParser.shortOptions['k'],
+  "dereference" :           optionsParser.shortOptions['l'],
+  "numeric-uid-gid" :       optionsParser.shortOptions['n'],
+  "literal" :               optionsParser.shortOptions['N'],
+  "indicator-style=slash" : optionsParser.shortOptions['p'],
+  "hide-control-chars" :    optionsParser.shortOptions['q'],
+  "quote-name" :            optionsParser.shortOptions['Q'],
+  "reverse" :               optionsParser.shortOptions['r'],
+  "recursive" :             optionsParser.shortOptions['R'],
+  "size" :                  optionsParser.shortOptions['S'],
+  "context" :               optionsParser.shortOptions['Z']
+}
 
 
-var lsCommandData = new parserModule.ParserData(config);
+
+extend(optionsParser.longOptions, longOptions);
+
+
+
+
+var lsCommandData = new ParserData(config);
 
 
 export class LsComponent extends CommandComponent {

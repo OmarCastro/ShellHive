@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 /*
  -d   If given, decompression is done instead.
@@ -61,13 +61,13 @@ var flags = {
 }
 
 
-var config:parserModule.Config = {
+var config:Config = {
   flags:flags
 }
 
 
 
-var gzipData = new parserModule.ParserData(config);
+var gzipData = new ParserData(config);
 var optionsParser = $.optionParserFromConfig(config)
 
 export class CompressComponent extends CommandComponent {

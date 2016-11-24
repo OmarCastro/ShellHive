@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 /*  -c, --bytes            exibe as contagens de byte
   -m, --chars            exibe as contagens de caractere
@@ -52,8 +52,8 @@ var flags = {
   },
 }
 
-var config:parserModule.Config = { flags:flags }
-var WcData = new parserModule.ParserData(config);
+var config:Config = { flags:flags }
+var WcData = new ParserData(config);
 var optionsParser = $.optionParserFromConfig(config);
 
 export class WcComponent extends CommandComponent {

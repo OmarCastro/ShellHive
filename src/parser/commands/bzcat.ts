@@ -13,7 +13,7 @@
 --best              alias for -9
 */
 
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {Config, ParserData , $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 
@@ -85,14 +85,14 @@ var flags = {
 }
 
 
-var config:parserModule.Config = {
+var config:Config = {
   selectors:selectors,
   flags:flags
 }
 
 
 
-var bzipData = new parserModule.ParserData(config);
+var bzipData = new ParserData(config);
 
 
 
@@ -118,17 +118,17 @@ var shortOptions = {
 }
 
 var longOptions = {
-  'decompress': $.sameAs('d'),
-  'compress': $.sameAs('z'),
-  'keep': $.sameAs('k'),
-  'force': $.sameAs('f'),
-  'test': $.sameAs('t'),
-  'stdout': $.sameAs('c'),
-  'quiet': $.sameAs('q'),
-  'verbose': $.sameAs('v'),
-  'small': $.sameAs('s'),
-  'fast': $.sameAs('1'),
-  'best': $.sameAs('9')
+  'decompress': shortOptions.d,
+  'compress':   shortOptions.z,
+  'keep':       shortOptions.k,
+  'force':      shortOptions.f,
+  'test':       shortOptions.t,
+  'stdout':     shortOptions.c,
+  'quiet':      shortOptions.q,
+  'verbose':    shortOptions.v,
+  'small':      shortOptions.s,
+  'fast':       shortOptions[1],
+  'best':       shortOptions[9]
 }
 
 
@@ -137,9 +137,6 @@ var optionsParser = {
   shortOptions: shortOptions,
   longOptions: longOptions
 };
-
-
-$.generate(optionsParser);
 
 export class BzcatComponent extends CommandComponent {
   public exec:string = "bzcat"

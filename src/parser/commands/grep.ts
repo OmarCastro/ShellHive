@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 /*
@@ -99,39 +99,41 @@ var flags = {
 
 
 
-var optionsParser = {
-  shortOptions:{
-    E  :  $.select(selectors.patternType, selectors.patternType.options.extRegex),
-    F  :  $.select(selectors.patternType, selectors.patternType.options.fixedStrings),
-    G  :  $.select(selectors.patternType, selectors.patternType.options.basicRegex),
-    i  :  $.switchOn(flags.ignoreCase),
-    //P  :  $.select(selectors.patternType, patternTypeSelector.perlRegex),
-    v  :  $.switchOn(flags.invertMatch),
-    x  :  $.select(selectors.match, selectors.match.options.line),
-    w  :  $.selectIfUnselected(selectors.match.name, selectors.match.options.word.name, selectors.match.options.line.name),
-    y  :  $.switchOn(flags.ignoreCase)
-  },
-  longOptions:{
-    "extended-regexp" : $.sameAs("E"),
-    "fixed-strings" :   $.sameAs("F"),
-    "basic-regexp" :    $.sameAs("G"),
-    "perl-regexp" :     $.sameAs("P"),
-    "ignore-case" :     $.sameAs("i"),
-    "invert-match" :    $.sameAs("v"),
-    "word-regexp" :     $.sameAs("w"),
-    "line-regexp" :     $.sameAs("x")
-  }
+const shortOptions = {
+  E  :  $.select(selectors.patternType, selectors.patternType.options.extRegex),
+  F  :  $.select(selectors.patternType, selectors.patternType.options.fixedStrings),
+  G  :  $.select(selectors.patternType, selectors.patternType.options.basicRegex),
+  i  :  $.switchOn(flags.ignoreCase),
+  //P  :  $.select(selectors.patternType, patternTypeSelector.perlRegex),
+  v  :  $.switchOn(flags.invertMatch),
+  x  :  $.select(selectors.match, selectors.match.options.line),
+  w  :  $.selectIfUnselected(selectors.match.name, selectors.match.options.word.name, selectors.match.options.line.name),
+  y  :  $.switchOn(flags.ignoreCase)
+};
+const longOptions = {
+  "extended-regexp" : shortOptions.E,
+  "fixed-strings" :   shortOptions.F,
+  "basic-regexp" :    shortOptions.G,
+  //"perl-regexp" :     shortOptions.P,
+  "ignore-case" :     shortOptions.i,
+  "invert-match" :    shortOptions.v,
+  "word-regexp" :     shortOptions.w,
+  "line-regexp" :     shortOptions.x
 }
-$.generate(optionsParser)
 
-var config:parserModule.Config = {
+var optionsParser = {
+  shortOptions, longOptions
+}
+
+
+var config:Config = {
   selectors:selectors,
   flags:flags
 }
 
 
 
-var grepCommandData = new parserModule.ParserData(config);
+var grepCommandData = new ParserData(config);
 
 
 

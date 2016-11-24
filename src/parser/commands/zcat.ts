@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 /*
 -d --decompress     force decompression
@@ -54,12 +54,12 @@ var flags = {
   }
 }
 
-var config:parserModule.Config = {
+var config:Config = {
   flags:flags
 }
 
 var optionsParser = $.optionParserFromConfig(config)
-var zcatData = new parserModule.ParserData(config);
+var zcatData = new ParserData(config);
 
 export class ZcatComponent extends CommandComponent {
   public exec:string = "zcat"

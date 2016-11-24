@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 /*
@@ -71,12 +71,12 @@ var config = {
   selectors:selectors
 }
 
-var headData = new parserModule.ParserData(config);
+var headData = new ParserData(config);
 
 var optionsParser = $.optionParserFromConfig(config);
 
 
-var lsCommandData = new parserModule.ParserData(config);
+var lsCommandData = new ParserData(config);
 
 
 export class HeadComponent extends CommandComponent {

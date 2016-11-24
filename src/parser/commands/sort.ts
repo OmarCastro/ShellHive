@@ -1,4 +1,4 @@
-import {parserModule, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 var nullstr:string = null;
@@ -120,7 +120,7 @@ var parameters = {
   }
 }
 
-var config:parserModule.Config = {
+var config:Config = {
   selectors:selectors,
   flags:flags,
   parameters:parameters
@@ -128,46 +128,45 @@ var config:parserModule.Config = {
 
 
 
-var sortData = new parserModule.ParserData(config);
+var sortData = new ParserData(config);
 
-var optionsParser = {
-  shortOptions: {
-    b: $.switchOn(flags.ignoreLeadingBlanks),
-    d: $.ignore,
-    f: $.switchOn(flags.ignoreCase),
-    g: $.select(selectors.sort, selectors.sort.options.generalNumeric),
-    i: $.switchOn(flags.ignoreNonprinting),
-    M: $.select(selectors.sort, selectors.sort.options.Month),
-    h: $.select(selectors.sort, selectors.sort.options.humanNumeric),
-    n: $.select(selectors.sort, selectors.sort.options.numeric),
-    R: $.select(selectors.sort, selectors.sort.options.random),
-    r: $.switchOn(flags.reverse),
-    V: $.select(selectors.sort, selectors.sort.options.version),
-    c: $.select(selectors.action, selectors.action.options.check),
-    C: $.select(selectors.action, selectors.action.options.silentCheck),
-    k: $.setParameter(parameters.key.name),
-    m: $.select(selectors.action, selectors.action.options.merge),
-    o: $.ignore,
-    s: $.ignore,
-    S: $.ignore,
-    t: $.ignore,
-    T: $.ignore,
-    u: $.switchOn(flags.unique),
-    z: $.ignore,
-  },
-  longOptions: {
-    "ignore-leading-blanks": $.sameAs('b'),
-    "dictionary-order":  $.ignore,
-    "ignore-case": $.sameAs('f'),
-    "general-numeric": $.sameAs('g'),
-    "ignore-nonprinting": $.sameAs('i'),
-    "month-sort":  $.sameAs('M'),
-    "human-numeric-sort": $.sameAs('h'),
-    "numeric-sort":  $.sameAs('n'),
-    "unique":$.sameAs('u')
-  }
-};
-$.generate(optionsParser);
+const shortOptions = {
+  b: $.switchOn(flags.ignoreLeadingBlanks),
+  d: $.ignore,
+  f: $.switchOn(flags.ignoreCase),
+  g: $.select(selectors.sort, selectors.sort.options.generalNumeric),
+  i: $.switchOn(flags.ignoreNonprinting),
+  M: $.select(selectors.sort, selectors.sort.options.Month),
+  h: $.select(selectors.sort, selectors.sort.options.humanNumeric),
+  n: $.select(selectors.sort, selectors.sort.options.numeric),
+  R: $.select(selectors.sort, selectors.sort.options.random),
+  r: $.switchOn(flags.reverse),
+  V: $.select(selectors.sort, selectors.sort.options.version),
+  c: $.select(selectors.action, selectors.action.options.check),
+  C: $.select(selectors.action, selectors.action.options.silentCheck),
+  k: $.setParameter(parameters.key),
+  m: $.select(selectors.action, selectors.action.options.merge),
+  o: $.ignore,
+  s: $.ignore,
+  S: $.ignore,
+  t: $.ignore,
+  T: $.ignore,
+  u: $.switchOn(flags.unique),
+  z: $.ignore,
+}; 
+const longOptions = {
+  "ignore-leading-blanks": shortOptions.b,
+  "dictionary-order":      $.ignore,
+  "ignore-case":           shortOptions.f,
+  "general-numeric":       shortOptions.g,
+  "ignore-nonprinting":    shortOptions.i,
+  "month-sort":            shortOptions.M,
+  "human-numeric-sort":    shortOptions.h,
+  "numeric-sort":          shortOptions.n,
+  "unique":                shortOptions.u
+}
+
+  var optionsParser = { shortOptions, longOptions };
 
 
 
