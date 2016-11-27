@@ -176,5 +176,5 @@ export var parseComponent = common.commonParseComponent(grepCommandData.flagOpti
   else return exec.join(' ')
 })
 
-export var VisualSelectorOptions = grepCommandData.visualSelectorOptions;
+export var visualSelectorOptions = grepCommandData.visualSelectorOptions;
 export var componentClass = GrepComponent

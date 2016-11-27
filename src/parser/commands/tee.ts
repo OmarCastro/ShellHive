@@ -1,4 +1,4 @@
-import {Graph, ParserData, Config, $, CommandComponent, common, sanitizer, Boundary, Connection}  from "./_common.imports";
+import {ITeeCommandParser, Graph, ParserData, Config, $, CommandComponent, common, sanitizer, Boundary, Connection}  from "./_common.imports";
 
 /**
   Arranges the nodes using a hierarchical layout
@@ -28,7 +28,7 @@ function connector(parser, previousCommand: CommandComponent, result:Graph, boun
   };
 }
 
-export function parseCommand(argsNode, parser, tracker, previousCommand, nextcommands, firstMainComponent, components, connections){
+export function parseCommand(argsNode: any, parser: any, tracker: any, previousCommand: any, nextcommands?, firstMainComponent?, components?, connections?): Graph{
   var boundaries:any[], i$, len$, argNode;
   boundaries = [];
 
@@ -51,3 +51,7 @@ export function parseCommand(argsNode, parser, tracker, previousCommand, nextcom
   result.counter = tracker.id;
   return result;
 };
+
+export var commandParser : ITeeCommandParser = {
+  parseCommand: parseCommand
+}

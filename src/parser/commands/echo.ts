@@ -77,6 +77,6 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
       }
     })
 export var parseComponent = common.commonParseComponent(echoData.flagOptions, echoData.selectorOptions,echoData.parameterOptions)
-export var VisualSelectorOptions = echoData.visualSelectorOptions;
+export var visualSelectorOptions = echoData.visualSelectorOptions;
 export var componentClass = EchoComponent
 

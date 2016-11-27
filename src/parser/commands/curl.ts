@@ -233,5 +233,5 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
 
 export var parseComponent = common.commonParseComponent(cUrlData.flagOptions, cUrlData.selectorOptions,cUrlData.parameterOptions)
 
-export var VisualSelectorOptions = cUrlData.visualSelectorOptions;
+export var visualSelectorOptions = cUrlData.visualSelectorOptions;
 export var componentClass = CurlComponent

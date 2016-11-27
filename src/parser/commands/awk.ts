@@ -7,7 +7,7 @@
 
 
 
-import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
+import {ICommandParser, ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_common.imports";
 
 
 const parameters = {
@@ -51,16 +51,20 @@ function defaultComponentData(){
   return component;
 };
 
-export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData,{
-  string: (component:AwkComponent, str) => {
+export var commandParser : ICommandParser = {
+  parseCommand: common.commonParseCommand(optionsParser,defaultComponentData,{ string: (component:AwkComponent, str) => {
       component.script = str;
     }
-  })
-
-export var parseComponent = common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions,awkData.parameterOptions, 
+  }),
+  parseComponent: common.commonParseComponent(awkData.flagOptions, awkData.selectorOptions,awkData.parameterOptions, 
   (component,exec,flags,files,parameters) => {    
     return exec.concat(parameters,sanitizer.sanitizeArgument(component.script)).join(' ');
-  })
+  }),
+  visualSelectorOptions: awkData.visualSelectorOptions,
+  componentClass: AwkComponent
+}
 
-export var VisualSelectorOptions = awkData.visualSelectorOptions;
-export var componentClass = AwkComponent
+export var parseCommand = commandParser.parseCommand
+export var parseComponent = commandParser.parseComponent
+export var visualSelectorOptions = commandParser.visualSelectorOptions;
+export var componentClass = commandParser.componentClass

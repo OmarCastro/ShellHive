@@ -76,5 +76,5 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(zcatData.flagOptions, zcatData.selectorOptions);
-export var VisualSelectorOptions = zcatData.visualSelectorOptions;
+export var visualSelectorOptions = zcatData.visualSelectorOptions;
 export var componentClass = ZcatComponent

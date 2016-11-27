@@ -159,5 +159,5 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
-export var VisualSelectorOptions = gzipData.visualSelectorOptions;
+export var visualSelectorOptions = gzipData.visualSelectorOptions;
 export var componentClass = GZipComponent

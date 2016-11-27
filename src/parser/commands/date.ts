@@ -42,7 +42,7 @@ export var parseCommand = common.commonParseCommand(optionsParser,defaultCompone
   string: (component, str)=>{component.parameters.date = str} 
 })
 export var parseComponent = common.commonParseComponent(dateData.flagOptions, dateData.selectorOptions,dateData.parameterOptions)
-export var VisualSelectorOptions = dateData.visualSelectorOptions;
+export var visualSelectorOptions = dateData.visualSelectorOptions;
 export var componentClass = DateComponent
 
 

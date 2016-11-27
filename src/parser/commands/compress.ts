@@ -14,7 +14,7 @@ import {ParserData, Config, $, CommandComponent, common, sanitizer}  from "./_co
 
 */
 
-var flags = {
+const flags = {
   // keep: {
   //   name: "keep files",
   //   option: 'k',
@@ -61,14 +61,14 @@ var flags = {
 }
 
 
-var config:Config = {
+const config:Config = {
   flags:flags
 }
 
 
 
-var gzipData = new ParserData(config);
-var optionsParser = $.optionParserFromConfig(config)
+const gzipData = new ParserData(config);
+const optionsParser = $.optionParserFromConfig(config)
 
 export class CompressComponent extends CommandComponent {
   public exec:string = "compress"
@@ -77,13 +77,13 @@ export class CompressComponent extends CommandComponent {
 
 
 function defaultComponentData(){
-  var component = new CompressComponent();
+  const component = new CompressComponent();
   component.selectors = gzipData.componentSelectors
   component.flags = gzipData.componentFlags
   return component;
 };
 
-export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
-export var parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
-export var VisualSelectorOptions = gzipData.visualSelectorOptions;
-export var componentClass = CompressComponent
+export const parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
+export const parseComponent = common.commonParseComponent(gzipData.flagOptions, gzipData.selectorOptions);
+export const visualSelectorOptions = gzipData.visualSelectorOptions;
+export const componentClass = CompressComponent

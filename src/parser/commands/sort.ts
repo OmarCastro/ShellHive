@@ -185,5 +185,5 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(sortData.flagOptions, sortData.selectorOptions,sortData.parameterOptions);
-export var VisualSelectorOptions = sortData.visualSelectorOptions;
+export var visualSelectorOptions = sortData.visualSelectorOptions;
 export var componentClass = SortComponent

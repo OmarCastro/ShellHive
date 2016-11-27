@@ -93,5 +93,5 @@ function defaultComponentData(){
 
 export var parseCommand   = common.commonParseCommand(optionsParser,defaultComponentData)
 export var parseComponent = common.commonParseComponent(headData.flagOptions,headData.selectorOptions)
-export var VisualSelectorOptions = headData.visualSelectorOptions;
+export var visualSelectorOptions = headData.visualSelectorOptions;
 export var componentClass = HeadComponent

@@ -362,5 +362,5 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser,defaultComponentData)
 export var parseComponent = common.commonParseComponent(lsCommandData.flagOptions,lsCommandData.selectorOptions,lsCommandData.parameterOptions)
-export var VisualSelectorOptions = lsCommandData.visualSelectorOptions;
+export var visualSelectorOptions = lsCommandData.visualSelectorOptions;
 export var componentClass = LsComponent

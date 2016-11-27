@@ -83,5 +83,5 @@ export var parseCommand = common.commonParseCommand(optionsParser, defaultCompon
     }
   });
 export var parseComponent = common.commonParseComponent(bzipData.flagOptions, bzipData.selectorOptions, bzipData.parameterOptions);
-export var VisualSelectorOptions = bzipData.visualSelectorOptions;
+export var visualSelectorOptions = bzipData.visualSelectorOptions;
 export var componentClass = TrComponent

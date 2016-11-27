@@ -70,5 +70,5 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(WcData.flagOptions, WcData.selectorOptions);
-export var VisualSelectorOptions = WcData.visualSelectorOptions;
+export var visualSelectorOptions = WcData.visualSelectorOptions;
 export var componentClass = WcComponent

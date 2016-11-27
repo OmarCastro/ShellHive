@@ -80,5 +80,5 @@ function defaultComponentData(){
 
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(uniqData.flagOptions, uniqData.selectorOptions, uniqData.parameterOptions);
-export var VisualSelectorOptions = uniqData.visualSelectorOptions;
+export var visualSelectorOptions = uniqData.visualSelectorOptions;
 export var componentClass = UniqComponent

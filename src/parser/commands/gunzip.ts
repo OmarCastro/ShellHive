@@ -80,5 +80,5 @@ function defaultComponentData(){
 };
 export var parseCommand = common.commonParseCommand(optionsParser, defaultComponentData);
 export var parseComponent = common.commonParseComponent(gunzipData.flagOptions, gunzipData.selectorOptions);
-export var VisualSelectorOptions = gunzipData.visualSelectorOptions;
+export var visualSelectorOptions = gunzipData.visualSelectorOptions;
 export var componentClass = GunzipComponent
