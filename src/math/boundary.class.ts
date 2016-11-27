@@ -10,26 +10,27 @@ export class Boundary{
     public components:Component[]
   ){}
 
-  public static createFromXY(x:number, y:number, component:Component){
+  public static createFromXY(x:number, y:number, component:Component): Boundary{
     const bottom = y + component.type === "file" ? 100: 350;
     return new this(x,x,y,bottom,[component]);
   }
 
-  public static createFromPoint(point:{x:number; y:number}, component:Component){
+  public static createFromPoint(point:{x:number; y:number}, component:Component): Boundary{
     return this.createFromXY(point.x,point.y,component);
   }
 
-  public static createFromComponent(component:Component){
+  public static createFromComponent(component:Component): Boundary{
     return this.createFromPoint(component.position,component);
   }
 
-  public static createFromComponents(components:Component[]){
-    if(components.length === 0){ return null; }
-    var boundary = this.createFromComponent(components[0])
-    for(var i = 1,len = components.length; i < len; ++i){
-      boundary.extend(this.createFromComponent(components[i]))
-    }
+  public static createFromComponents(components:Component[]): Boundary{
+    if(components == null || components.length === 0){ return null; }
+    const boundary = this.createFromComponent(components[0])
+    components.slice(1).forEach(component => {
+      boundary.extend(this.createFromComponent(component))
+    });
     return boundary;
+
   }
 
   public extend(boundary2: Boundary){

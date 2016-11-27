@@ -1,6 +1,6 @@
 declare function require(path:string):any;
 
-var parser:any = {};
+export var parser:any = {};
 
 var astBuilder:{parse:(string)=>any} = require('./ast-builder/ast-builder');
  
