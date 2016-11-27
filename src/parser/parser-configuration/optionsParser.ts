@@ -5,6 +5,7 @@ import { optionsConfig, Config } from "./interfaces"
 export { parseShortOptions } from "./short-options.namesapce"
 export { parseLongOptions } from "./long-options.namesapce"
 export { setParameter } from "./parameters.fn"
+import { activateFlags } from "./flags"
 import { CommandComponent } from "../../graph/component/command-component.class"
 
 export interface ParseFunction{
@@ -15,13 +16,7 @@ export interface ParseFunction{
   /**
     activates flags (flags)
   */
-export const switchOn = function(...flags:any[]): ParseFunction{
-    flags = flags.map(flag => {return (flag.name) ? flag.name : flag});
-    return function(Component, state, substate){
-      flags.forEach(flag => {Component.flags[flag] = true});
-      return false;
-    };
-  };
+export const switchOn = activateFlags;
 
 
 /**
@@ -30,17 +25,17 @@ export const switchOn = function(...flags:any[]): ParseFunction{
 export function select(key:{name:string}, value:{name:string}, type?:string);
 export function select(key:string, value:string, type?:string);
 export function select(key:any, value:any, type:string = "option"): ParseFunction{
-  if(key.name){key = key.name}
-  if(value.name){value = value.name}
+  if(key.name){ key = key.name }
+  if(value.name){ value = value.name }
   if(type == "option"){
-    return function(Component){
+    return (Component) => {
       Component.selectors[key] = {
         type:type,
         name:value
       }
     }
   } else if(type == "numeric parameter"){
-    return function(Component, state, substate){
+    return (Component, state, substate) => {
       const parameter = substate.hasNext() ? substate.rest() : state.next();
       Component.selectors[key] = {
         type:type,

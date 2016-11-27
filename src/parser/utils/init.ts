@@ -1,9 +1,13 @@
 
 import optionsParser = require("../parser-configuration/optionsParser");
+import { optionsConfig } from "../parser-configuration/interfaces"
+
 import { Iterator } from "./iterator.class"
 
 import parser = require("../parser");
 import sanitizer = require("./sanitizer");
+
+
 
 import {Graph, IndexedGraph, Connection, Component, CommandComponent, FileComponent} from "../../graph"
 import {Boundary} from "../../math"
@@ -84,11 +88,11 @@ export function addFileComponent(componentData, connections: Connection[], filen
 /**
   Algorthm commonly used to parse commands
 */
-export function commonParseCommand(optionsParserData, defaultComponentData, argNodeParsing?){
-  return function(argsNode, parser, tracker, previousCommand){
+export function commonParseCommand(optionsParserData: optionsConfig, defaultComponentData: () => CommandComponent, argNodeParsing?){
+  return function(argsNode, parser, tracker, previousCommand) : [Boundary, Graph]{
     var  stdoutRedirection:Component, 
       stderrRedirection:Component, argNode, newComponent, inputPort, subresult, ref$, y;
-    var componentData = defaultComponentData();
+    const componentData = defaultComponentData();
     
     var boundaries:Boundary[] = [];
     if (previousCommand) { boundaries.push(previousCommand[0]) }
@@ -154,7 +158,7 @@ export function commonParseCommand(optionsParserData, defaultComponentData, argN
         stderrRedirection = newComponent;
       }
     }
-    var bbox:any[] = Boundary.arrangeLayout(boundaries);
+    var bbox = Boundary.arrangeLayout(boundaries);
     componentData.position = bbox[1];
     componentData.id = tracker.id;
     if (stdoutRedirection) {
