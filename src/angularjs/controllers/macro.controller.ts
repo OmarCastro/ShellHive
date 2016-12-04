@@ -92,5 +92,3 @@ function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
     //graphModel.macroList = res$;
   };
 }
-
-export = {init: function(){}}

@@ -25,7 +25,7 @@ function shellProjectController($scope, csrf, alerts, modal,$timeout){
 
   viewGraph = $scope.viewGraph = function viewGraph(graph){
     if(graph.id){graph = graph.id}
-    router.get('/graph/subscribe/', {id:graph}, res => $scope.$applyAsync(()=>{
+    router.subscribeGraph({id:graph}).request(res => $scope.$applyAsync(()=>{
       console.log(res);
       $scope.graphData.components = res.graph.components.map(function(component){
         component.data.id = component.id;
@@ -41,7 +41,7 @@ function shellProjectController($scope, csrf, alerts, modal,$timeout){
   }
 
   // Subscribe to the user model classroom and instance room
-  router.get('/project/subscribe', {id:projectId}, function(data){
+  router.subscribeProject({id:projectId}).request((data) => {
     $scope.implementedCommands = data.implementedCommands
     $scope.options             = data.SelectionOptions;
     $scope.clients             = data.clients;
@@ -59,7 +59,7 @@ function shellProjectController($scope, csrf, alerts, modal,$timeout){
       var visitorName = projectId == "3" ? "anon" : sessionStorage["visitorName"];
       var visitorColor = projectId == "3" ? "blue" : sessionStorage["visitorColor"];
       if(visitorName && visitorColor){
-        router.post('/project/setmyname', {name:visitorName, color: visitorColor});
+        router.setUserName({name:visitorName, color: visitorColor}).request
       } else {
         const form = { name: ''};
         var modalInstance = modal.open({
@@ -74,7 +74,7 @@ function shellProjectController($scope, csrf, alerts, modal,$timeout){
 
         });
         modalInstance.result.then(function(selectedItem){
-          router.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});
+          router.setUserName({name:form.name, _csrf:csrf.csrf}).request;
           sessionStorage["visitorName"] = form.name;
           sessionStorage["visitorColor"] = data.you.color;
         });
@@ -408,5 +408,3 @@ function shellProjectController($scope, csrf, alerts, modal,$timeout){
     io.socket.put('/graph/removePipe/', message, debugData);
   });
 };
-
-export = {init: function(){}}

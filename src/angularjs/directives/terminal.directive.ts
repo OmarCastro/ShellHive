@@ -1,27 +1,17 @@
 import * as app from "../app.module"
-
-
-interface TipScope extends angular.IScope {
-    shellText: TextLine[]
-}
+import {SocketService} from "../socket.service"
 
 interface TextLine {
     text: string
     type: string
 }
 
-
-declare var io
-
 app.directive("terminal", [function () {
     return {
         restrict: "A",
         scope: true,
-        template: '<pre ng-repeat="line in shellText" ng-class="line.type" ng-bind="line.text"></pre>',
-        link: function (scope: TipScope, element: JQuery, attr: angular.IAttributes) {
+        link: function (scope: angular.IScope, element: JQuery, attr: angular.IAttributes) {
             const shellText: TextLine[] = []
-            scope.shellText = shellText;
-
             function addLines(lines: TextLine[]){
                 shellText.push(...lines)
                 const htmlToAppend = lines.map(line => `<pre class="${line.type}">${line.text}</pre>`).join('');
@@ -38,12 +28,10 @@ app.directive("terminal", [function () {
 
             scope.$on("Terminal::AddLines", (event, params) => addLines(params));
 
-            io.socket.on('commandCall', (data: string) => addText(data, "call"));
-            io.socket.on('stdout', (data: string) => addText(data, "info"));
-            io.socket.on('stderr', (data: string) => addText(data, "error"));
-            io.socket.on('retcode', (data: string) => addLines([{text: "command finished with code " + data,type: "call"}]));
+            SocketService.socket.on('commandCall', (data: string) => addText(data, "call"));
+            SocketService.socket.on('stdout', (data: string) => addText(data, "info"));
+            SocketService.socket.on('stderr', (data: string) => addText(data, "error"));
+            SocketService.socket.on('retcode', (data: string) => addLines([{text: "command finished with code " + data,type: "call"}]));
         }
     }
 }]);
-
-export = { init: function () { } }

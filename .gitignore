@@ -116,3 +116,4 @@ nbproject
 .idea
 .node_history
 fs
+lib/**/*.js.map

@@ -1,7 +1,8 @@
 
-import { requestParams, CsrfRequest, Router as BaseRouter } from "../../routes/graph.route"
+import { requestParams, CsrfRequest, Router as BaseRouter, Route } from "../../routes/router"
 import {SocketService} from "../socket.service"
 import {CSRF} from "../services/csrf"
+import { projectId } from "../utils"
 
 class Router extends BaseRouter {
     request<T,V>(params: requestParams<T,V>){
@@ -15,6 +16,10 @@ class Router extends BaseRouter {
             }
         }
     }
+
+    get directoriesOfCurrentProject(){return this.callable(this.directoriesOfProject(projectId));}
+    get uploadToCurrentProject(){return this.callable(this.uploadToProject(projectId));}
+
 
     
 }

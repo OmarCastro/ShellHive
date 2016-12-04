@@ -1,11 +1,13 @@
-var gulp        = require('gulp'),
-    tsc         = require('gulp-tsc'),
-    newer       = require('gulp-newer'),
-    jison       = require('gulp-jison'),
-    istanbul    = require('gulp-istanbul')
-    runSequence = require('run-sequence'),
-    mocha       = require('gulp-mocha');
+var gulp        = require('gulp');
+var tsc         = require('gulp-tsc');
+var ts          = require('gulp-typescript');
+var newer       = require('gulp-newer');
+var jison       = require('gulp-jison');
+var istanbul    = require('gulp-istanbul');
+var runSequence = require('run-sequence');
+var mocha       = require('gulp-mocha');
 
+var watchify = require('watchify');
 var browserify = require('browserify');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
@@ -13,11 +15,14 @@ var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
-
+var assign = require('lodash.assign');
 
 
 
 var jisonPath = 'src/parser/ast-builder/ast-builder.jison';
+
+
+var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('tsc', function () {
   return gulp
@@ -28,6 +33,12 @@ gulp.task('tsc', function () {
     .pipe(gulp.dest('lib'));
     //.pipe( livereload( server ));
 });
+
+gulp.task('tsc2', function () {
+  var tsResult = gulp.src(['src/**/*.ts','node_modules/@types/**/*.d.ts',"!node_modules/@types/**/node_modules/**/index.d.ts"]).pipe(tsProject())
+    return tsResult.js.pipe(gulp.dest('lib'));
+});
+
 
 
 
@@ -88,13 +99,16 @@ gulp.task('ts', function () {
   runSequence('tsc',  'javascript')
 });
 
-gulp.task('javascript', function () {
-  // set up the browserify instance on a task basis
-  var b = browserify({
-    entries: './lib/angularjs/app.js',
-    debug: true
-  });
+// add custom browserify options here
+var customOpts = {
+  entries: './lib/angularjs/app.js',
+  debug: true
+};
+var opts = assign({}, watchify.args, customOpts);
+var b = watchify(browserify(opts)); 
 
+
+gulp.task('javascript', function () {
   return b.bundle()
     .pipe(source('app.js'))
     .pipe(buffer())

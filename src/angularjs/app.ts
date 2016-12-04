@@ -9,13 +9,14 @@
 import {SocketService} from "./socket.service"
 import * as Mousetrap from "mousetrap"
 import macroCtrl = require("./controllers/macro.controller")
-import tip = require("./directives/tip.directive")
 import shellProject = require("./controllers/shell-project.controller")
+import tip      = require("./directives/tip.directive")
 import terminal = require("./directives/terminal.directive")
-macroCtrl.init()
-shellProject.init()
-tip.init()
-terminal.init()
+import filesystem = require("./directives/filesystem.directive")
+import directoryFile = require("./directives/directory-file.directive")
+
+var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile];
+
 const socket = window["socket"] = SocketService.socket
 
 

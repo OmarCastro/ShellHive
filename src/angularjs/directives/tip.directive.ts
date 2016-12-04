@@ -25,5 +25,3 @@ app.directive("tip", [function(){
       )}
   };
 }]); 
-
-export = {init: function(){}}
