@@ -89,8 +89,8 @@ app.directive("graph", function($document){
         update = function(){
           var transform;
           transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
-          nodesElemStyle[cssTransform] = transform;
-          edgesElemStyle[cssTransform] = transform;
+          nodesElemStyle.transform = transform;
+          edgesElemStyle.transform = transform;
           var scope = $minimap.scope()
            scope.updateViewport({
             x1: graphX/scale,
@@ -283,7 +283,7 @@ app.directive("graph", function($document){
           if(endNode) $popup.addClass("left-side");
           else $popup.removeClass("left-side");
 
-          popup.style[cssTransform] = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
+          popup.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
           
 
           $popup.show();

@@ -10,19 +10,12 @@ import {SocketService} from "./socket.service"
 import * as Mousetrap from "mousetrap"
 import macroCtrl = require("./controllers/macro.controller")
 import tip = require("./directives/tip.directive")
+import shellProject = require("./controllers/shell-project.controller")
+import terminal = require("./directives/terminal.directive")
 macroCtrl.init()
+shellProject.init()
 tip.init()
-function getCSSSupportedProp(proparray){
-  const root = document.documentElement;
-  for (let i = 0, len = proparray.length; i < len; ++i) {
-    if (proparray[i] in root.style) {
-      return proparray[i];
-    }
-  }
-}
-
-const cssTransform = window["cssTransform"]= getCSSSupportedProp(['transform', 'WebkitTransform', 'MsTransform']);
-
+terminal.init()
 const socket = window["socket"] = SocketService.socket
 
 

@@ -1,6 +1,8 @@
 import { Component } from "../graph/component" 
 
-
+/**
+ * this class is responsible to show the boundary of the selected components 
+ */
 export class Boundary{
   public constructor(
     public left:number,
@@ -66,7 +68,7 @@ export class Boundary{
       components = components.concat(boundary.components)
     });
 
-    let prevBound = null
+    let prevBound: Boundary = null
 
     boundaries.forEach(boundary => {
       const translateX = maxX - boundary.rigth

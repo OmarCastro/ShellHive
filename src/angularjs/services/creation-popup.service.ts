@@ -21,7 +21,7 @@ interface ICreationPopupService {
 }
 
 const serviceName = 'creationPopup'
-const serviceDeclaration : (Function | string | Function)[] = ["$rootScope", creationPopupService]
+const serviceDeclaration : (Function | string)[] = ["$rootScope", creationPopupService]
 
 
 app.service(serviceName, serviceDeclaration)

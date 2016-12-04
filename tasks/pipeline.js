@@ -39,7 +39,6 @@ var appJsFilesToInject = [
 	'js/directives/*.js',
 	'js/controllers/*.js',
 	'!js/controllers/shellProject_demo.js',
-	'!js/controllers/shellProject.js',
 	'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'
 ];
 

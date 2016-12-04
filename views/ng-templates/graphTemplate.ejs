@@ -33,9 +33,7 @@
       </div>
     </div>
   </div>
-  <div ng-show="$root.shell" touch-action="all" class="shell">
-    <pre ng-repeat="line in $parent.shellText | limitTo: -100" ng-class="line.type" ng-bind="line.text"></pre>
-  </div>
+  <div data-terminal ng-show="$root.shell" touch-action="all" class="shell"></div>
 </div>
 <% include minimap %>
 

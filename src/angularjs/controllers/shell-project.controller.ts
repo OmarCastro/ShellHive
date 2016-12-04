@@ -1,9 +1,15 @@
+import * as app from "../app.module"
+import { projectId } from "../utils"
+import {SocketService} from "../socket.service"
+import router from "../router"
 
-var viewGraph;
+let viewGraph = null;
+declare var io;
+app.controller('shellProject',['$scope','csrf' ,'alerts','$modal','$timeout', shellProjectController]);
 
-app.controller('shellProject', ['$scope','csrf' ,'alerts','$modal','$timeout',
-function($scope, csrf, alerts, modal,$timeout){
-  var AST, visualData;
+
+function shellProjectController($scope, csrf, alerts, modal,$timeout){
+  var visualData;
   visualData = {};
   $scope.alerts = alerts
   $scope.filesystem = 0
@@ -19,7 +25,7 @@ function($scope, csrf, alerts, modal,$timeout){
 
   viewGraph = $scope.viewGraph = function viewGraph(graph){
     if(graph.id){graph = graph.id}
-    io.socket.get('/graph/subscribe/', {id:graph}, function(res){
+    router.get('/graph/subscribe/', {id:graph}, res => $scope.$applyAsync(()=>{
       console.log(res);
       $scope.graphData.components = res.graph.components.map(function(component){
         component.data.id = component.id;
@@ -30,18 +36,17 @@ function($scope, csrf, alerts, modal,$timeout){
         return component.data
       }); 
       $scope.graphData.connections = res.graph.connections; 
-      $scope.$digest();
-    });
+
+      }));
   }
 
-
   // Subscribe to the user model classroom and instance room
-  io.socket.get('/project/subscribe', {id:projId}, function(data){
+  router.get('/project/subscribe', {id:projectId}, function(data){
     $scope.implementedCommands = data.implementedCommands
     $scope.options             = data.SelectionOptions;
     $scope.clients             = data.clients;
     $scope.page = "graph";
-    $scope.chatterId = socket.id;
+    $scope.chatterId = SocketService.socket.id;
     $scope.chat = {open: $scope.clients.length > 1};
 
     console.log("socket.id =" , $scope.chatterId);
@@ -51,13 +56,12 @@ function($scope, csrf, alerts, modal,$timeout){
 
 
     if(data.visitor){
-      var visitorName = (projId == 3)? "anon" : sessionStorage.visitorName
-      var visitorColor = (projId == 3)? "blue" : sessionStorage.visitorColor
+      var visitorName = projectId == "3" ? "anon" : sessionStorage["visitorName"];
+      var visitorColor = projectId == "3" ? "blue" : sessionStorage["visitorColor"];
       if(visitorName && visitorColor){
-        io.socket.post('/project/setmyname', {
-          name:visitorName, color: visitorColor, _csrf:csrf.csrf});
+        router.post('/project/setmyname', {name:visitorName, color: visitorColor});
       } else {
-        var form = { name: ''};
+        const form = { name: ''};
         var modalInstance = modal.open({
           backdrop: 'static',
           templateUrl: 'UserNameModal.html',
@@ -70,9 +74,9 @@ function($scope, csrf, alerts, modal,$timeout){
 
         });
         modalInstance.result.then(function(selectedItem){
-          io.socket.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});
-          sessionStorage.visitorName = form.name;
-          sessionStorage.visitorColor = data.you.color;
+          router.post('/project/setmyname', {name:form.name, _csrf:csrf.csrf});
+          sessionStorage["visitorName"] = form.name;
+          sessionStorage["visitorColor"] = data.you.color;
         });
 
 
@@ -83,7 +87,7 @@ function($scope, csrf, alerts, modal,$timeout){
     var graphs = data.graphs
     var len = graphs.length;
     if(len == 0){
-        var form = {command: ""}
+        const form = {command: ""}
         var modalInstance = modal.open({
           templateUrl: 'projectCreationModal.html',
           controller: function($scope, $modalInstance){
@@ -95,7 +99,7 @@ function($scope, csrf, alerts, modal,$timeout){
         });
         return modalInstance.result.then(function(selectedItem){
           console.log(selectedItem);
-          io.socket.post('/graph/createfromcommand/', {project:projId, type:'root',
+          io.socket.post('/graph/createfromcommand/', {project:projectId, type:'root',
             command:form.command, _csrf:csrf.csrf}, function(res){
               console.log(res);
               if(res.graph){
@@ -105,7 +109,6 @@ function($scope, csrf, alerts, modal,$timeout){
               }
             });
         });
-      $scope.$digest();      
       // is a new project
     } else {        
       var macros = visualData.macros = {};
@@ -147,13 +150,13 @@ function($scope, csrf, alerts, modal,$timeout){
         position.x = data.movepos.x;
         position.y = data.movepos.y;
 
-        var compScope = $('.component[data-node-id="'+ data.componentId +'"]').scope();
+        var compScope:any = $('.component[data-node-id="'+ data.componentId +'"]').scope();
         compScope.update(); 
         compScope.$digest();
         
 
         $('path[connector]').each(function(index){
-          var scope = $(this).scope();
+          var scope:any = $(this).scope();
           if(scope.endsPositions[0] == position || scope.endsPositions[1] == position){
             scope.update();
           }
@@ -194,7 +197,7 @@ function($scope, csrf, alerts, modal,$timeout){
       for (var i = components.length - 1; i >= 0; i--) {
         if(components[i].id == data.id){
           var component = components[i];
-          for(j in data.data){
+          for(const j in data.data){
             if(j == "position"){
               var comPosition = component.position
               var dataPosition = data.data.position
@@ -333,13 +336,12 @@ function($scope, csrf, alerts, modal,$timeout){
       return $scope.$digest();
     }
     //console.log('compileGraph!');
-    io.socket.get('/graph/compile/',{_csrf:csrf.csrf}, function(data){
+    io.socket.get('/graph/compile/', function(data){
       debugData(data);
-      $scope.shellText = [{
+      $scope.$broadcast("Terminal::AddLines",  [{
         text: data.command,
         type: "call"
-      }];
-      $scope.$digest();
+      }]);
     });
   }
 
@@ -405,54 +407,6 @@ function($scope, csrf, alerts, modal,$timeout){
     }
     io.socket.put('/graph/removePipe/', message, debugData);
   });
+};
 
-
-
-
-
-
-  io.socket.on('commandCall', function(data){
-    var x;
-    $scope.shellText = $scope.shellText.concat((function(){
-      var i$, ref$, len$, results$ = [];
-      for (i$ = 0, len$ = (ref$ = data.split("\n")).length; i$ < len$; ++i$) {
-        x = ref$[i$];
-        results$.push({
-          text: x,
-          type: "call"
-        });
-      }
-      return results$;
-    }()));
-    return $scope.$digest();
-  });
-
-
-
-  io.socket.on('stdout', function(data){
-    $scope.shellText = $scope.shellText.concat(data.split("\n").map(function(record){
-      return {text: record, type: "info"}
-    }));
-    if ($scope.shellText.length > 100) {
-      $scope.shellText = slice$.call($scope.shellText, -100);
-    }
-    $scope.$digest();
-  });
-  io.socket.on('stderr', function(data){
-    $scope.shellText = $scope.shellText.concat(data.split("\n").map(function(record){
-      return {text: record, type: "error"}
-    }));
-    if ($scope.shellText.length > 100) {
-      $scope.shellText = slice$.call($scope.shellText, -100);
-    }
-    $scope.$digest();
-  });
-  io.socket.on('retcode', function(data){
-    $scope.shellText.push({
-      text: "command finished with code "+x,
-      type: "call"
-    });
-    $scope.$digest();
-  });
-}]);
-
+export = {init: function(){}}

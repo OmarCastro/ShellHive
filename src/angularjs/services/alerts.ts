@@ -1,7 +1,7 @@
 import * as app from "../app.module"
 
 
-const serviceDeclaration : (Function | string | Function)[] = ["$timeout", alertService] 
+const serviceDeclaration : (Function | string)[] = ["$timeout", alertService] 
 export const serviceName = "alerts"
 
 app.service(serviceName,serviceDeclaration)
