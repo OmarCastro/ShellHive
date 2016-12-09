@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "moduleResolution": "node",
         "module": "commonjs",
         "removeComments": false,
         "preserveConstEnums": true,
@@ -12,5 +13,9 @@
     ],
     "exclude": [
         "node_modules"
+    ],
+    "typeRoots": [
+      "./node_modules/@types/",
+      "src/@types/"
     ]
 }

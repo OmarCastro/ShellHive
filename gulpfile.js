@@ -1,5 +1,4 @@
 var gulp        = require('gulp');
-var tsc         = require('gulp-tsc');
 var ts          = require('gulp-typescript');
 var newer       = require('gulp-newer');
 var jison       = require('gulp-jison');
@@ -25,21 +24,13 @@ var jisonPath = 'src/parser/ast-builder/ast-builder.jison';
 var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('tsc', function () {
-  return gulp
-    .src('src/**/*.ts', {read: false})
-    .pipe(newer('target'))
-    .pipe(tsc({target:'ES5', module: 'commonjs', sourcemap: false, outDir: 'target'}))
-    .on('error', gutil.log)
-    .pipe(gulp.dest('lib'));
-    //.pipe( livereload( server ));
-});
-
-gulp.task('tsc2', function () {
-  var tsResult = gulp.src(['src/**/*.ts','node_modules/@types/**/*.d.ts',"!node_modules/@types/**/node_modules/**/index.d.ts"]).pipe(tsProject())
+  var tsResult = tsProject.src().pipe(tsProject())
     return tsResult.js.pipe(gulp.dest('lib'));
 });
 
-
+gulp.task('copyHtmlAssets', function(){
+  gulp.src(['src/**/*.html']).pipe(gulp.dest('lib/'))
+});
 
 
 gulp.task('mocha', function() {

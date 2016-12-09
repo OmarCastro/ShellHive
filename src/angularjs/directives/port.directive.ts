@@ -1,19 +1,21 @@
+import * as app from "../app.module"
+import html from "./port.html"
 
-app.directive("port", function($document){
-  return {
+
+app.directive("port", ['$document',($document) => ({
     require: '^graph',
+    template: html,
     scope: true,
-    link: function(scope, element, attr, graphController){
-      var ref$, ConnectIfOk, mousemove, mouseup;
+    link: function(scope:any, element: JQuery, attr:any, graphController:any){
       var datanode = scope.$parent.data;
       var title = datanode.title;
       var position = datanode.position;
-      var elem = element[0];
-      var imstyle = elem.style;
+      const elem = element[0];
+      const imstyle = elem.style;
       scope.componentId = datanode.id;
 
-      var mIn= "macroIn"
-      var mOut= "macroOut"
+      const mIn= "macroIn"
+      const mOut= "macroOut"
 
       if(datanode.type == "input" || (attr.port.slice(0,mOut.length) == mOut && datanode.type != "output")){
         scope.isOutputNode = true
@@ -24,8 +26,7 @@ app.directive("port", function($document){
       }
 
       element.bind("pointerdown", function(ev){
-        var event = ev.originalEvent;
-        graphController.startEdge(elem, datanode.type, attr.port, position, event);
+        graphController.startEdge(elem, datanode.type, attr.port, position, (ev as any).originalEven);
         $document.bind("pointermove", mousemove);
         $document.bind("pointerup", mouseup);
         return false;
@@ -38,7 +39,7 @@ app.directive("port", function($document){
         function(){ $(this).removeClass('hover') }
       )
 
-      var ConnectIfOk = function(startNode, startPort, endNode, endPort){
+      function ConnectIfOk(startNode, startPort, endNode, endPort){
         scope.$emit('connectComponent',{
           startNode: startNode,
           startPort: startPort,
@@ -46,15 +47,15 @@ app.directive("port", function($document){
           endPort: endPort
         });
       };
-      mousemove = function(ev){
+      function mousemove(ev){
         graphController.moveEdge(ev.originalEvent);
         return true;
       };
-      mouseup = function(ev){
-        var event, pointedElem, $pointedElem, ref$, outAttr, outPortScope, x$;
-        event = ev.originalEvent;
-        pointedElem = document.elementFromPoint(event.clientX, event.clientY);
-        $pointedElem = $(pointedElem);
+      function mouseup(ev){
+        var outPortScope;
+        const event = ev.originalEvent;
+        const pointedElem = document.elementFromPoint(event.clientX, event.clientY);
+        const $pointedElem = $(pointedElem);
 
 
 
@@ -71,9 +72,9 @@ app.directive("port", function($document){
          else {
           graphController.endEdge();
 
-          outAttr = $pointedElem.attr("data-port") || $pointedElem.parent().attr("data-port");
+          const outAttr = $pointedElem.attr("data-port") || $pointedElem.parent().attr("data-port");
           if (outAttr) {
-            outPortScope = $pointedElem.scope();
+            const outPortScope = $pointedElem.scope() as any;
             if (scope.isOutputNode !== outPortScope.isOutputNode) {
               if (scope.isOutputNode) {
                 ConnectIfOk(scope.componentId, attr.port, outPortScope.componentId, outAttr);
@@ -87,5 +88,4 @@ app.directive("port", function($document){
         $document.unbind("pointerup", mouseup);
       };
     }
-  };
-});
+  })]);

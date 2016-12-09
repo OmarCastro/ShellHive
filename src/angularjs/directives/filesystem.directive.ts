@@ -10,8 +10,7 @@ interface FileSystemScope extends angular.IScope{
     selectFile: (file: any) => void
 }
 
-app.directive("filesystem", ['csrf','alerts','$rootScope',(csrf, alerts, rootScope) => {
-  return {
+app.directive("filesystem", ['csrf','alerts','$rootScope',(csrf, alerts, rootScope) => ({
     scope: true,
     template: `
     <div class="container-fluid">
@@ -72,6 +71,5 @@ app.directive("filesystem", ['csrf','alerts','$rootScope',(csrf, alerts, rootSco
 
       updateFileSystem();
     }
-  };
-}]);
+  })]);
 
