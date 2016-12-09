@@ -1,11 +1,3 @@
-/**
-  gets the first supported proprieties in CSS
-  used to resolve prefixes
-
-  @param {Array.<string>} proparray - a list of arrays
-  @return{string} the supported proprierty
-*/
-
 import {SocketService} from "./socket.service"
 import * as Mousetrap from "mousetrap"
 import macroCtrl = require("./controllers/macro.controller")
@@ -14,8 +6,10 @@ import tip      = require("./directives/tip.directive")
 import terminal = require("./directives/terminal.directive")
 import filesystem = require("./directives/filesystem.directive")
 import directoryFile = require("./directives/directory-file.directive")
+import connectorsLayer = require("./directives/connectors-layer.directive")
+import connector = require("./directives/connector.directive")
 
-var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile];
+var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer, connector]; //force load them
 
 const socket = window["socket"] = SocketService.socket
 

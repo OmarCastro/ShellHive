@@ -106,9 +106,9 @@ app.directive("component", function($document){
       var macro = findMacro();
       scope.title = {
         name: macro.name,
-        description: macro.description
+        description: macro.description,
+        buttons: true
       }
-      buttons: true
       break;
     case 'input':
       scope.title = {

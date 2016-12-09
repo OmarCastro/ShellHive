@@ -1,27 +1,66 @@
 
-import { requestParams, CsrfRequest, Router as BaseRouter, Route } from "../../routes/router"
-import {SocketService} from "../socket.service"
-import {CSRF} from "../services/csrf"
-import { projectId } from "../utils"
+import { Route, method } from "../../routes/routes.model"
+import { SocketService } from "../socket.service"
+import { CSRF } from "../services/csrf"
+import RouteTable from "../../routes/route-table"
+export const routeTable = RouteTable
 
-class Router extends BaseRouter {
-    request<T,V>(params: requestParams<T,V>){
+class TransactionHandler<Input, Output>{
 
-        switch(params.type){
-            case "get" : return SocketService.sailsSocket.get(params.url,params.data,params.onSuccess)
-            case "post": {
-                const data = (params.data as CsrfRequest)
-                data._csrf = data._csrf || CSRF.csrfToken
-                return SocketService.sailsSocket.post(params.url,data,params.onSuccess)
-            }
-        }
-    }
+    public reponseHandlers: ((data: Output) => void)[] = []
+    public errorHandlers: (() => void)[] = []
 
-    get directoriesOfCurrentProject(){return this.callable(this.directoriesOfProject(projectId));}
-    get uploadToCurrentProject(){return this.callable(this.uploadToProject(projectId));}
+    handleReponses(data: Output) { this.reponseHandlers.forEach(handler => handler(data)) }
+    handleErrors() { this.errorHandlers.forEach(handler => handler()) }
 
-
-    
 }
 
-export default new Router()
+class Transaction<Input, Output>{
+    constructor(
+        private handlers: TransactionHandler<Input, Output>,
+        public readonly payload: Input,
+        public readonly routeUsed: Route<Input, Output>
+    ) { }
+
+    onResponse(responseHandler: (data: Output) => void) {
+        this.handlers.reponseHandlers.push(responseHandler)
+    }
+
+    onError(responseHandler: () => void) {
+        this.handlers.reponseHandlers.push(responseHandler)
+    }
+}
+
+interface SendInputParams<Input, Output>{
+    payload?: Input,
+    useRoute: Route<Input, Output>
+}
+
+class Network {
+    fetch<Output>(route: Route<void, Output>):Transaction<void, Output>{
+        return this.send({useRoute: route});
+    }
+
+    send<Input, Output>(params: SendInputParams<Input, Output>):Transaction<Input, Output>  {
+
+        const payload = params.payload
+        const useRoute = params.useRoute
+        const handlers = new TransactionHandler<Input, Output>()
+        const transaction = new Transaction<Input, Output>(handlers, payload, useRoute);
+
+        switch (useRoute.method) {
+            case method.get: SocketService.sailsSocket.get(useRoute.url, payload, handlers.handleReponses.bind(handlers))
+            case method.post: {
+                CSRF.getToken((token)=>{
+                    (payload as any)._csrf = (payload as any)._csrf || token
+                    SocketService.sailsSocket.post(useRoute.url, payload, handlers.handleReponses.bind(handlers))
+                });
+                
+            }
+        }
+
+        return transaction;
+    }
+}
+
+export default new Network()

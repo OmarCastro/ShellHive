@@ -17,13 +17,7 @@
 <div ui-layout class="layout">
   <div class="toplayout">
     <div class="background">
-      <svg touch-action="none">
-        <g class="edges">
-          <path class="emptyEdge"></path>
-          <path connector ng-repeat="edge in visualData.connections" class="back"></path>
-          <path connector ng-repeat="edge in visualData.connections"></path>
-        </g>
-      </svg>
+      <div data-connectors-layer></div>
       <div touch-action="none" class="workspace">
         <div class="nodes">
         <div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform}" class="{{data.type}}-component component">

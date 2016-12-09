@@ -1,8 +1,26 @@
-app.directive("connector", function($document){
+import * as app from "../app.module"
+import { projectId } from "../utils"
+import {SocketService} from "../socket.service"
+import router from "../router"
+import { Graph, Connection } from "../../graph"
+
+interface ConnectorsScope extends angular.IScope{
+  $parent: any
+  graphElement: JQuery;
+  endsPositions: {x: number, y:number}[]
+  $index: number
+  edgePopups: any[]
+  update: (startPos?, endPos?) => void
+  reset: () => void
+
+}
+
+app.directive("connector", [function(){
   "use strict"
   return {
     scope: true,
-    link: function(scope, element, attr){
+    restrict: "A",
+    link: function(scope: ConnectorsScope, element, attr){
       var StartPortOffset, EndPortOffset;
       
       var dataedge = scope.$parent.edge;
@@ -18,10 +36,10 @@ app.directive("connector", function($document){
       scope.endsPositions = [startPosition,endPosition]
       
       function queryConnectorInfo(){
-        var Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']");
-        var StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box");
-        var Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']");
-        var EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box");
+        const Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']") as HTMLElement;
+        const StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box") as HTMLElement;
+        const Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']") as HTMLElement;
+        const EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box") as HTMLElement;
         StartPortOffset = {
           top: StartPort.offsetTop + StartPort.offsetHeight * 0.75,
           left: StartPort.offsetLeft,
@@ -35,7 +53,7 @@ app.directive("connector", function($document){
 
 
 
-       function update(startPos, endPos){
+       function update(startPos?, endPos?){
           if(!StartPortOffset || !EndPortOffset){
             queryConnectorInfo();
           }
@@ -58,12 +76,14 @@ app.directive("connector", function($document){
       elem.classList.add(elementClass+"-"+dataedge.startPort);
       
       element.bind("pointerdown", function(event){
-        var orig = event.originalEvent;
+        const orig = event.originalEvent;
+        const clientX = (orig as any).clientX
+        const clientY = (orig as any).clientY
         scope.$apply(function(){
           var data = {
-            x: orig.clientX,
-            y: orig.clientY,
-            transform: "translate("+orig.clientX+"px,"+orig.clientY+"px)",
+            x: clientX,
+            y: clientY,
+            transform: `translate(${clientX}px,${clientY}px)`,
             index: scope.$index,
             id: dataedge.id
           }
@@ -93,6 +113,7 @@ app.directive("connector", function($document){
         queryConnectorInfo();
         update();
       };
+
       requestAnimationFrame(function(){
         scope.$watch('edge.endPort', scope.reset);
         //scope.$watch('endsPositions',scope.update,true)
@@ -100,4 +121,4 @@ app.directive("connector", function($document){
       });
     }
   };
-});
+}]);

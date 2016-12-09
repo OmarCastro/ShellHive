@@ -104,9 +104,9 @@ var customOpts = {
   entries: './lib/angularjs/app.js',
   debug: true
 };
-var opts = assign({}, watchify.args, customOpts);
-var b = watchify(browserify(opts)); 
-
+//var opts = assign({}, watchify.args, customOpts);
+//var b = watchify(browserify(opts)); 
+var b = browserify(customOpts);
 
 gulp.task('javascript', function () {
   return b.bundle()

@@ -1,7 +1,7 @@
 import * as app from "../app.module"
 import { projectId } from "../utils"
 import {SocketService} from "../socket.service"
-import router from "../router"
+import network, { routeTable } from "../router"
 
 
 interface FileSystemScope extends angular.IScope{
@@ -36,14 +36,14 @@ app.directive("filesystem", ['csrf','alerts','$rootScope',(csrf, alerts, rootSco
       //scope.sails = sails
 
       function updateFileSystem(){
-        router.directoriesOfCurrentProject.request(data => {
+        network.fetch(routeTable.directoriesOfProject(projectId)).onResponse(data => {
           scope.directoryContent = data
           scope.$digest();
         })
       }
 
       (<any>element).dropzone({ 
-        url: router.uploadToCurrentProject.url,
+        url: routeTable.uploadToProject(projectId).url,
         maxFilesize: 100,
         maxThumbnailFilesize: 5,
         clickable: ".upload",

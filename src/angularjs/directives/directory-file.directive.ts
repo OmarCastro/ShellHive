@@ -7,7 +7,7 @@ interface FileScope extends angular.IScope{
   record: any
 }
 
-app.directive("directoryfile", ['$document', function($document){
+app.directive("directoryfile", [function(){
   return {
     scope: true,
     template: `
