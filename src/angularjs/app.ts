@@ -9,10 +9,12 @@ import directoryFile = require("./directives/directory-file.directive")
 import connectorsLayer = require("./directives/connectors-layer.directive")
 import connector = require("./directives/connector.directive")
 import port = require("./directives/port.directive")
+import inputPort = require("./directives/input-port.directive")
+import outputPort = require("./directives/output-port.directive")
 import parameterField = require("./directives/parameter-field.directive")
 import mousetrap = require("./directives/mousetrap.directive")
 
-var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer, connector, port,
+var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer, connector, inputPort, outputPort, port,
 parameterField,mousetrap]; //force browserify to add the requires
 
 const socket = window["socket"] = SocketService.socket

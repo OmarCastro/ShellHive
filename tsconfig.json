@@ -12,7 +12,9 @@
          "src/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "src/**/*.html.ts"
+
     ],
     "typeRoots": [
       "./node_modules/@types/",

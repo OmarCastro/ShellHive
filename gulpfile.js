@@ -5,8 +5,7 @@ var jison       = require('gulp-jison');
 var istanbul    = require('gulp-istanbul');
 var runSequence = require('run-sequence');
 var mocha       = require('gulp-mocha');
-
-var watchify = require('watchify');
+var rename       = require('gulp-rename');
 var browserify = require('browserify');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
@@ -15,25 +14,32 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
 var assign = require('lodash.assign');
-
+var stringify = require('stringify');
 
 
 var jisonPath = 'src/parser/ast-builder/ast-builder.jison';
-
-
 var tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('tsc', function () {
+var tasks = {
+   typescript: 'tsc',
+   copyHtmlAssets: 'copyHtmlAssets',
+   mocha: 'mocha'
+}
+
+
+gulp.task(tasks.typescript, function () {
   var tsResult = tsProject.src().pipe(tsProject())
     return tsResult.js.pipe(gulp.dest('lib'));
 });
 
-gulp.task('copyHtmlAssets', function(){
-  gulp.src(['src/**/*.html']).pipe(gulp.dest('lib/'))
+gulp.task(tasks.copyHtmlAssets, function(){
+  gulp.src(['src/**/*.html']).pipe(rename({
+    extname: ".html.js"
+  })).pipe(gulp.dest('lib/'))
 });
 
 
-gulp.task('mocha', function() {
+gulp.task(tasks.mocha, function() {
   return gulp.src('test/test.js')
     .pipe(mocha({reporter: 'spec'}))
     .on('error', function (error) {
@@ -43,6 +49,39 @@ gulp.task('mocha', function() {
     });
 }); 
 
+// add custom browserify options here
+var customOpts = {
+  entries: './lib/angularjs/app.js',
+  debug: true
+};
+
+var b = browserify(customOpts).transform(stringify, {
+      appliesTo: { includeExtensions: ['.hjs', '.html', 'html.js', '.whatever'] }
+    });
+gulp.task('browserify-only', function () {
+  return b.bundle()
+    .pipe(source('app.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./assets/dist/js/'));
+});
+
+gulp.task('browserify', [tasks.typescript, tasks.copyHtmlAssets], function(){
+  runSequence('browserify-only')
+});
+
+gulp.task('browserify-prod', [tasks.typescript, tasks.copyHtmlAssets], function () {
+  return b.bundle()
+    .pipe(source('app.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+        // Add transformation tasks to the pipeline here.
+        .pipe(uglify())
+        .on('error', gutil.log)
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./assets/dist/js/'));
+});
 
 
 
@@ -79,36 +118,10 @@ gulp.task('jison', function() {
 
 
 gulp.task('watch', function () {
-  gulp.watch('src/**/*.ts',function(event) { runSequence('tsc',  'javascript', 'coverage') });
+  gulp.watch('src/**/*.ts',function(event) { runSequence('browserify', 'coverage') });
   gulp.watch('src/**/*.ls',function(event) { runSequence('ls',   'coverage') });
   gulp.watch(jisonPath,    function(event) { runSequence('jison','coverage') });
   gulp.watch('test/**/*.js',['coverage']);
 });
 
-
-gulp.task('ts', function () {
-  runSequence('tsc',  'javascript')
-});
-
-// add custom browserify options here
-var customOpts = {
-  entries: './lib/angularjs/app.js',
-  debug: true
-};
-//var opts = assign({}, watchify.args, customOpts);
-//var b = watchify(browserify(opts)); 
-var b = browserify(customOpts);
-
-gulp.task('javascript', function () {
-  return b.bundle()
-    .pipe(source('app.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-        // Add transformation tasks to the pipeline here.
-        .pipe(uglify())
-        .on('error', gutil.log)
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./assets/dist/js/'));
-});
-
-gulp.task('default', ['tsc','mocha','watch']);
+gulp.task('default', ['browserify','mocha','watch']);

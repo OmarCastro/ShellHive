@@ -3,6 +3,7 @@ import { projectId } from "../utils"
 import {SocketService} from "../socket.service"
 import router from "../router"
 import { Graph, Connection } from "../../graph"
+import { Position } from "../../math"
 
 interface ConnectorsScope extends angular.IScope{
   $parent: any
@@ -15,24 +16,23 @@ interface ConnectorsScope extends angular.IScope{
 
 }
 
-app.directive("connector", [function(){
-  "use strict"
-  return {
+app.directive("connector", ['$timeout', ($timeout) => ({
     scope: true,
     restrict: "A",
     link: function(scope: ConnectorsScope, element, attr){
-      var StartPortOffset, EndPortOffset;
+      const StartPortOffset = {top: 0, left:0, right: 0, isNull: true};
+      const EndPortOffset = {top: 0, left:0, isNull: true} ;
       
-      var dataedge = scope.$parent.edge;
-      var elem = element[0];
-      var $graphElement = scope.graphElement;
-      var graphElement = $graphElement[0];
+      const dataedge: Connection = scope.$parent.edge;
+      const elem = element[0];
+      const $graphElement = scope.graphElement;
+      const graphElement = $graphElement[0];
       
       
-      var startComponent = dataedge.startComponent;
-      var startPosition = startComponent.position;
-      var endComponent = dataedge.endComponent;
-      var endPosition = endComponent.position;
+      const startComponent = dataedge.startComponent;
+      const startPosition = startComponent.position;
+      const endComponent = dataedge.endComponent;
+      const endPosition = endComponent.position;
       scope.endsPositions = [startPosition,endPosition]
       
       function queryConnectorInfo(){
@@ -40,38 +40,37 @@ app.directive("connector", [function(){
         const StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box") as HTMLElement;
         const Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']") as HTMLElement;
         const EndPort = Endnode.querySelector("[data-port='" + dataedge.endPort + "'] > .box") as HTMLElement;
-        StartPortOffset = {
-          top: StartPort.offsetTop + StartPort.offsetHeight * 0.75,
-          left: StartPort.offsetLeft,
-          right: StartPort.offsetLeft + StartPort.offsetWidth
-        };
-        EndPortOffset = {
-          top: EndPort.offsetTop + EndPort.offsetHeight * 0.75,
-          left: EndPort.offsetLeft
-        };
+        
+        StartPortOffset.top = StartPort.offsetTop + StartPort.offsetHeight * 0.75;
+        StartPortOffset.left = StartPort.offsetLeft;
+        StartPortOffset.right = StartPort.offsetLeft + StartPort.offsetWidth
+        StartPortOffset.isNull = false;
+
+        EndPortOffset.top = EndPort.offsetTop + EndPort.offsetHeight * 0.75,
+        EndPortOffset.left = EndPort.offsetLeft
+        EndPortOffset.isNull = false;
       }
 
-
-
-       function update(startPos?, endPos?){
-          if(!StartPortOffset || !EndPortOffset){
+       function update(startPos?: Position, endPos?: Position){
+          if(StartPortOffset.isNull || EndPortOffset.isNull){
             queryConnectorInfo();
           }
-          startPosition = startPos || startPosition
-          endPosition = endPos || endPosition
-          scope.endsPositions[0] = startPosition
-          scope.endsPositions[1] = endPosition
+          if(startPos){
+            startPosition.x = startPos.x;
+            startPosition.y = startPos.y; 
+          }
+          if(endPos){
+            endPosition.x = endPos.x;
+            endPosition.y = endPos.y; 
+          }
 
-
-
-         //console.log('updating edge')
           setEdgePath(startPosition.x + StartPortOffset.right - 2, 
                       startPosition.y + StartPortOffset.top,
                       endPosition.x + EndPortOffset.left + 2,
                       endPosition.y + EndPortOffset.top);
       };
       
-      var elementClass = "from-"+startComponent.type;
+      const elementClass = "from-"+startComponent.type;
       elem.classList.add(elementClass);
       elem.classList.add(elementClass+"-"+dataedge.startPort);
       
@@ -80,7 +79,7 @@ app.directive("connector", [function(){
         const clientX = (orig as any).clientX
         const clientY = (orig as any).clientY
         scope.$apply(function(){
-          var data = {
+          const data = {
             x: clientX,
             y: clientY,
             transform: `translate(${clientX}px,${clientY}px)`,
@@ -96,8 +95,8 @@ app.directive("connector", [function(){
         });
       });
 
-      var setEdgePath = function(iniX, iniY, endX, endY){
-        var xpoint = (endX - iniX) / 4;
+      function setEdgePath(iniX, iniY, endX, endY){
+        const xpoint = (endX - iniX) / 4;
         elem.setAttribute(
           'd', "M " + iniX + " " + iniY 
             + " H " + (iniX + 0.5 * xpoint) 
@@ -114,11 +113,9 @@ app.directive("connector", [function(){
         update();
       };
 
-      requestAnimationFrame(function(){
+      $timeout(function(){
         scope.$watch('edge.endPort', scope.reset);
-        //scope.$watch('endsPositions',scope.update,true)
         requestAnimationFrame(scope.reset)
       });
     }
-  };
-}]);
+})]);

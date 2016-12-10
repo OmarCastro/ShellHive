@@ -1,10 +1,7 @@
 import * as app from "../app.module"
-import html from "./port.html"
-
 
 app.directive("port", ['$document',($document) => ({
     require: '^graph',
-    template: html,
     scope: true,
     link: function(scope:any, element: JQuery, attr:any, graphController:any){
       var datanode = scope.$parent.data;
