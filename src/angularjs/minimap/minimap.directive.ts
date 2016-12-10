@@ -1,10 +1,31 @@
-app.directive("minimap", function(){
-  return {
+import * as app from "../app.module"
+import { projectId } from "../utils"
+import { SocketService } from "../socket.service"
+import router from "../router"
+import { Graph, Connection } from "../../graph"
+import { Position, Boundary } from "../../math"
+import { ConnectorsScope } from "../directives/connector.directive"
+import { CSRF } from "../services/csrf"
+import template = require("./minimap.html")
+
+interface MinimapScope extends angular.IScope{
+  graphElement: JQuery
+  scale: number
+  mapSize: number
+  updateViewport: (viewport) => any
+  viewport: any
+  transform: string
+  boundaries: () => {x1:number,y1:number,x2:number,y2:number}
+  visualData: Graph
+}
+
+app.directive("minimap", () => ({
     scope: true,
     require: '^graph',
-    link: function(scope, element, attr, graphController){
+    template: template,
+    link: function(scope: MinimapScope, element, attr, graphController: any){
       var $graphElement = scope.graphElement;
-      var workspace = $graphElement[0].querySelector(".workspace");
+      var workspace = $graphElement[0].querySelector(".workspace") as HTMLElement;
       var elem = element[0];
       var boundary = {x1:0,y1:0,x2:0,y2:0};
       var graphX = 0
@@ -30,12 +51,14 @@ app.directive("minimap", function(){
       requestAnimationFrame(function(){
         scope.updateViewport({x1:0,y1:0,x2:workspace.offsetWidth,y2:workspace.offsetHeight})
       });
-        mapMouseToScene = function(event){
+
+        function mapMouseToScene(event){
           var ref$, x, y;
           ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
           return mapPointToScene(x, y);
         };
-        mapMouseToView = function(event){
+
+        function mapMouseToView(event){
           var offset;
           offset = element.offset();
           return {
@@ -44,7 +67,7 @@ app.directive("minimap", function(){
           };
         };
 
-        mapPointToScene = function(x, y){
+        function mapPointToScene(x, y){
           var scale = scope.scale;
           return {
             x: (x/ scale - graphX) ,
@@ -79,7 +102,7 @@ app.directive("minimap", function(){
           event.preventDefault();
           event.stopPropagation();
         };
-        mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+        const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
         elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
 
       scope.boundaries = function(){
@@ -122,79 +145,5 @@ app.directive("minimap", function(){
         })
       }, true);
     }
-  };
-});
-
-
-app.directive("minicomponent", function(){
-  return {
-    scope: true,
-    link: function(scope, element, attr){
-      var datanode = scope.data;
-      var $graphElement = scope.graphElement;
-      var graphElement = $graphElement[0];
-
-      scope.offsetWidth = 100
-      scope.offsetHeight = 100
-
-      var update = function(){
-        var elem = graphElement.querySelector(".nodes .component[data-node-id='" + datanode.id + "']");
-        scope.offsetWidth = (elem) ? elem.offsetWidth:100
-        scope.offsetHeight = (elem) ? elem.offsetHeight:100
-        scope.$digest();
-      }
-
-      if(datanode.files !== null){
-        scope.$watch("data.files.length",function(){
-          requestAnimationFrame(update);
-        })
-      }
-
-      scope.$watch("data",function(){
-        requestAnimationFrame(update);
-      })
-      requestAnimationFrame(update);
-    }
-  }
-});
-
-app.directive("miniconnector", function(){
-  return {
-    scope: true,
-    link: function(scope, element, attr){
-
-      var dataedge = scope.$parent.edge;
-      var elem = element[0];
-      
-      
-      var startComponent = dataedge.startComponent;
-      var startPosition = startComponent.position;
-      var endComponent = dataedge.endComponent;
-      var endPosition = endComponent.position;
-      scope.endPos = endPosition
-      scope.startPos = startPosition
-
-      function updateEdge(){
-        var iniX = startPosition.x + 50
-        var iniY = startPosition.y + 50
-        var endX = endPosition.x + 50
-        var endY = endPosition.y + 50
-        var xpoint = (endX - iniX) / 4;
-
-        elem.setAttribute(
-          'd', "M " + iniX + " " + iniY 
-            + " H " + (iniX + 0.5 * xpoint) 
-            + " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY
-            + " H " + endX);
-      }
-
-      var elementClass = "from-"+startComponent.type;
-      elem.classList.add(elementClass);
-      elem.classList.add(elementClass+"-"+dataedge.startPort);
-      scope.$watch("endPos",updateEdge, true);
-      scope.$watch("startPos",updateEdge, true);
-      
-    }
-  };
-});
+}));
 
