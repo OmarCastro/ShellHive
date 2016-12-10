@@ -117,3 +117,4 @@ nbproject
 .node_history
 fs
 lib/**/*.js.map
+lib/angularjs
