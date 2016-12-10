@@ -1,10 +1,24 @@
-app.directive("component", function($document){
+import * as app from "../app.module"
+import { projectId } from "../utils"
+import {SocketService} from "../socket.service"
+import router from "../router"
+import { Graph, Connection } from "../../graph"
+import { Position } from "../../math"
+import {ConnectorsScope} from "./connector.directive"
+import { CSRF } from "../services/csrf"
+
+interface ComponentScope extends angular.IScope{
+
+
+}
+
+app.directive("component", ['$document', function($document){
   var pointerId;
   pointerId = 0;
   return {
     require: '^graph',
     scope: true,
-    link: function(scope, element, attr, graphModelController){
+    link: function(scope: any, element, attr, graphModelController: any){
 
       var datanode = scope.data;
       function findMacro(){
@@ -67,7 +81,7 @@ app.directive("component", function($document){
         updatePorts();
         requestAnimationFrame(function(){
            $('path[connector]').each(function(index){
-              var scope = $(this).scope();
+              const scope = $(this).scope() as ConnectorsScope;
               if(scope.endsPositions && scope.endsPositions[0] == position || scope.endsPositions[1] == position){
                 scope.reset();
               }
@@ -144,18 +158,18 @@ app.directive("component", function($document){
         }
         graphModelController.hidePopupAndEdge();
         event = ev.originalEvent;
-        targetTag = event.target.tagName;
+        targetTag = (event.target as HTMLElement).tagName;
         console.log(targetTag);
-        if (pointerId || in$(targetTag, 'INPUT SELECT LABEL BUTTON A TEXTAREA'.split(" "))) {
+        if (pointerId || 'INPUT SELECT LABEL BUTTON A TEXTAREA'.split(" ").indexOf(targetTag) >= 0) {
           return true;
         }
         var drag = false;
-        pointerId = event.pointerId;
+        pointerId = (event as any).pointerId;
         x$ = $document;
         x$.bind("pointermove", mousemove);
         x$.bind("pointerup", mouseup);
-        startX = event.screenX;
-        startY = event.screenY;
+        startX = ev.screenX;
+        startY = ev.screenY;
         
         
         return false;
@@ -170,10 +184,10 @@ app.directive("component", function($document){
       moveBy = function(x, y){
         drag = true;
         graphModelController.translateNode(datanode.id, position, x, y);
-        printget({type: 'move', componentId:scope.data.id, movepos: position});
+        CSRF.printget({type: 'move', componentId:scope.data.id, movepos: position});
         scope.update();
          $('path[connector]').each(function(index){
-              var scope = $(this).scope();
+              var scope = $(this).scope() as ConnectorsScope;
               if(scope.edge){
                 if(scope.edge.startNode == datanode.id){
                   scope.update(position);
@@ -206,4 +220,4 @@ app.directive("component", function($document){
       };
     }
   };
-});
+}]);

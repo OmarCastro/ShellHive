@@ -13,9 +13,10 @@ import inputPort = require("./directives/input-port.directive")
 import outputPort = require("./directives/output-port.directive")
 import parameterField = require("./directives/parameter-field.directive")
 import mousetrap = require("./directives/mousetrap.directive")
+import component = require("./directives/component.directive")
 
 var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer, connector, inputPort, outputPort, port,
-parameterField,mousetrap]; //force browserify to add the requires
+parameterField,mousetrap,component]; //force browserify to add the requires
 
 const socket = window["socket"] = SocketService.socket
 

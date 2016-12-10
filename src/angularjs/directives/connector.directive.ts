@@ -5,11 +5,12 @@ import router from "../router"
 import { Graph, Connection } from "../../graph"
 import { Position } from "../../math"
 
-interface ConnectorsScope extends angular.IScope{
+export interface ConnectorsScope extends angular.IScope{
   $parent: any
   graphElement: JQuery;
   endsPositions: {x: number, y:number}[]
   $index: number
+  edge: Connection
   edgePopups: any[]
   update: (startPos?, endPos?) => void
   reset: () => void
