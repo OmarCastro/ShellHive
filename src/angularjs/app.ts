@@ -7,17 +7,16 @@ import terminal = require("./directives/terminal.directive")
 import filesystem = require("./directives/filesystem.directive")
 import directoryFile = require("./directives/directory-file.directive")
 import connectorsLayer = require("./directives/connectors-layer.directive")
-import connector = require("./directives/connector.directive")
 import port = require("./directives/port.directive")
 import inputPort = require("./directives/input-port.directive")
 import outputPort = require("./directives/output-port.directive")
 import parameterField = require("./directives/parameter-field.directive")
 import mousetrap = require("./directives/mousetrap.directive")
-import component = require("./directives/component.directive")
-import minimap = require("./minimap")
+import components = require("./components")
+import minimap = require("./components/minimap")
 
-var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer, connector, inputPort, outputPort, port,
-parameterField,mousetrap,component, minimap]; //force browserify to add the requires
+var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer, inputPort, outputPort, port,
+parameterField,mousetrap,components, minimap]; //force browserify to add the requires
 
 const socket = window["socket"] = SocketService.socket
 

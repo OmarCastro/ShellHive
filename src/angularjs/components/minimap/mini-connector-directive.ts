@@ -1,11 +1,7 @@
-import * as app from "../app.module"
-import { projectId } from "../utils"
-import { SocketService } from "../socket.service"
-import router from "../router"
-import { Graph, Connection } from "../../graph"
-import { Position, Boundary } from "../../math"
-import { ConnectorsScope } from "../directives/connector.directive"
-import { CSRF } from "../services/csrf"
+import * as app from "../../app.module"
+import { Graph, Connection } from "../../../graph"
+import { Position } from "../../../math"
+
 
 interface MiniConnectorScope extends angular.IScope{
   graphElement: JQuery

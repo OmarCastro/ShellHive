@@ -1,9 +1,9 @@
-app.directive("graph", function($document){
-  return {
-    replace: false,
-    scope: true,
-    templateUrl: 'graphTemplate.html',
-    controller: ['$scope', '$element', '$attrs', function(scope, element, attr){
+import * as app from "../../app.module"
+import {CSRF} from "../../services/csrf"
+import {MinimapScope} from "../minimap/minimap.directive"
+import * as angular from "angular";
+
+app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', function(scope: any, element, attr, $document){
         var key, val, x$, $sp, update, mousemove, mouseup, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, 
         useWheelHandler, mousewheelevt, setEdgePath, popupState, startEdge, moveEdge,
         endEdge, showPopup, hidePopup, hidePopupAndEdge;
@@ -91,7 +91,7 @@ app.directive("graph", function($document){
           transform = "translate(" + graphX + "px, " + graphY + "px) scale(" + scale + ")";
           nodesElemStyle.transform = transform;
           edgesElemStyle.transform = transform;
-          var scope = $minimap.scope()
+          var scope = $minimap.scope() as MinimapScope
            scope.updateViewport({
             x1: graphX/scale,
             y1: graphY/scale,
@@ -109,7 +109,7 @@ app.directive("graph", function($document){
           update();
         };
 
-        moveScene = function(x, y){
+        function moveScene(x, y){
           graphX = x*scale;
           graphY = y*scale;
           update();
@@ -122,20 +122,19 @@ app.directive("graph", function($document){
         };
 
         $workspace.bind("contextmenu", function(ev){
-            var event = ev.originalEvent;
-            if (event.shiftKey) { return; }
+            if (ev.shiftKey) { return; }
             ev.preventDefault();
             ev.stopPropagation();
             showPopup(event, null, null, null, null);
         })
 
-        $workspace.bind("pointerdown", function(ev){
+        $workspace.bind("pointerdown", function(ev: any){
           console.log(ev);
           var event = ev.originalEvent;
           if (ev.which === 3) {
             return false;
           }
-          var targetTag = event.target.tagName;
+          var targetTag = (event.target as HTMLElement).tagName;
           if (pointerId || 
             (  targetTag === 'SPAN' 
             || targetTag === 'LI'
@@ -148,8 +147,8 @@ app.directive("graph", function($document){
             return;
           }
           hidePopupAndEdge();
-          var mx = event.clientX
-          var my = event.clientY
+          var mx = ev.clientX
+          var my = ev.clientY
           $workspace.hide()
           var elonpointer = document.elementFromPoint(mx, my)
           $workspace.show()
@@ -225,7 +224,7 @@ app.directive("graph", function($document){
           scale *= amount;
           update();
         };
-        MouseWheelHandler = function(event){
+        function MouseWheelHandler(event){
           var ispopup = $(event.target).closest(".popupArea, .shell").length > 0
           if (!event.altKey && ispopup) { return; }
           event.preventDefault();
@@ -321,7 +320,7 @@ app.directive("graph", function($document){
         };
         hidePopup = function(){
           $popup.hide();
-          document.activeElement.blur();
+          (document.activeElement as HTMLElement).blur();
           scope.edgePopups.length = 0;
           scope.sel = { open: false };
           scope.safedigest();
@@ -337,7 +336,7 @@ app.directive("graph", function($document){
 
         scope.collapseAll = function(){
           $('[component]').each(function(index){
-            var scope = $(this).scope();
+            var scope = $(this).scope() as any;
             scope.collapsed = true
             scope.updatePorts();
             requestAnimationFrame(scope.resetConnections)
@@ -352,7 +351,7 @@ app.directive("graph", function($document){
 
         scope.uncollapseAll = function(){
           $('[component]').each(function(index){
-            var scope = $(this).scope();
+            var scope = $(this).scope() as any;
             scope.collapsed = false
             scope.updatePorts();
             requestAnimationFrame(scope.resetConnections)
@@ -366,7 +365,7 @@ app.directive("graph", function($document){
         }
 
         scope.resetConnections = function(){
-          $('path[connector]').each(function(index){ $(this).scope().reset() });
+            scope.$broadcast("Graph::Connector::Reset");
         }
 
         this.showPopup = showPopup;
@@ -420,7 +419,7 @@ app.directive("graph", function($document){
         };
         this.removeComponent = function(component){
           scope.visualData.removeComponent(component);
-          printget({type: 'remove component', componentId: component.id});
+          CSRF.printget({type: 'remove component', componentId: component.id});
         };
         this.isFreeSpace = function(elem){
           return elem === svgElem || elem === workspace || elem === nodesElem;
@@ -433,7 +432,7 @@ app.directive("graph", function($document){
         };
         this.setGraphView = function(viewId){
           hidePopupAndEdge();
-          viewGraph(viewId);
+          scope.viewGraph(viewId);
         };
         this.revertToRoot = function(){
           scope.visualData = graphModel;
@@ -445,26 +444,14 @@ app.directive("graph", function($document){
           scope.$digest();
         };
       }
-    ]
-  };
-});
+    ]);
 
-
-function in$(x, xs){
+    function in$(x, xs) {
   var i = -1, l = xs.length >>> 0;
   while (++i < l) if (x === xs[i]) return true;
   return false;
 }
-function importAll$(obj, src){
+function importAll$(obj, src) {
   for (var key in src) obj[key] = src[key];
   return obj;
 }
-
-
-app.directive("elscope", function($document){
-  return {
-    link: function(scope, element){
-      scope.scopedElement = element;
-    }
-  };
-});

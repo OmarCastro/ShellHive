@@ -1,14 +1,10 @@
-import * as app from "../app.module"
-import { projectId } from "../utils"
-import { SocketService } from "../socket.service"
-import router from "../router"
-import { Graph, Connection } from "../../graph"
-import { Position, Boundary } from "../../math"
-import { ConnectorsScope } from "../directives/connector.directive"
-import { CSRF } from "../services/csrf"
+import * as app from "../../app.module"
+import { projectId } from "../../utils"
+import { SocketService } from "../../socket.service"
+import { Graph, Connection } from "../../../graph"
 import template = require("./minimap.html")
 
-interface MinimapScope extends angular.IScope{
+export interface MinimapScope extends angular.IScope{
   graphElement: JQuery
   scale: number
   mapSize: number
@@ -40,7 +36,7 @@ app.directive("minimap", () => ({
 
       scope.updateViewport = function(viewport){
         scope.viewport = viewport;
-        var scale = scope.scale;
+        const scale = scope.scale;
         viewbox.css({
           transform: "translate("+(-viewport.x1)+"px, "+(-viewport.y1)+"px)",
           width: (viewport.x2-viewport.x1),
@@ -53,14 +49,12 @@ app.directive("minimap", () => ({
       });
 
         function mapMouseToScene(event){
-          var ref$, x, y;
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+          const {x,y} = mapMouseToView(event);
           return mapPointToScene(x, y);
         };
 
         function mapMouseToView(event){
-          var offset;
-          offset = element.offset();
+          const offset = element.offset();
           return {
             x: Math.round(event.pageX - offset.left),
             y: Math.round(event.pageY - offset.top)
@@ -68,7 +62,7 @@ app.directive("minimap", () => ({
         };
 
         function mapPointToScene(x, y){
-          var scale = scope.scale;
+          const scale = scope.scale;
           return {
             x: (x/ scale - graphX) ,
             y: (y/ scale - graphY)

@@ -1,11 +1,11 @@
-import * as app from "../app.module"
-import { projectId } from "../utils"
-import {SocketService} from "../socket.service"
-import router from "../router"
-import { Graph, Connection } from "../../graph"
-import { Position } from "../../math"
+import * as app from "../../app.module"
+import { projectId } from "../../utils"
+import {SocketService} from "../../socket.service"
+import router from "../../router"
+import { Graph, Connection } from "../../../graph"
+import { Position } from "../../../math"
 
-export interface ConnectorsScope extends angular.IScope{
+interface ConnectorsScope extends angular.IScope{
   $parent: any
   graphElement: JQuery;
   endsPositions: {x: number, y:number}[]
@@ -107,9 +107,22 @@ app.directive("connector", ['$timeout', ($timeout) => ({
      
       scope.update = update;
 
-
+      scope.$on("Graph::Connector::Reset", () => reset())
+      scope.$on("Graph::Connector::ResetOfComponent", (event, componentId) => {
+        if(scope.edge.startNode == componentId || scope.edge.endNode == componentId) reset()
+      })
+      scope.$on("Graph::Connector::Update", (event, params) => update(params.startPos, params.endPos))
+      scope.$on("Graph::Connector::UpdateOfComponent", (event, componentId, position) => {
+          if (scope.edge) {
+            if (scope.edge.startNode === componentId) {
+              scope.update(position);
+            } else if (scope.edge.endNode === componentId) {
+              scope.update(null, position);
+            }
+          }
+      })
       
-      scope.reset = function(){
+      function reset(){
         queryConnectorInfo();
         update();
       };

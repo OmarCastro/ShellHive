@@ -33,9 +33,7 @@ gulp.task(tasks.typescript, function () {
 });
 
 gulp.task(tasks.copyHtmlAssets, function(){
-  gulp.src(['src/**/*.html']).pipe(rename({
-    extname: ".html.js"
-  })).pipe(gulp.dest('lib/'))
+  gulp.src(['src/**/*.html']).pipe(gulp.dest('lib/'))
 });
 
 
@@ -56,7 +54,9 @@ var customOpts = {
 };
 
 var b = browserify(customOpts).transform(stringify, {
-      appliesTo: { includeExtensions: ['.hjs', '.html', 'html.js', '.whatever'] }
+      appliesTo: { includeExtensions: ['.hjs', '.html', 'html', '.whatever'] },
+      minify: true,
+      minifyAppliesTo: { includeExtensions: ['.html'] },
     });
 gulp.task('browserify-only', function () {
   return b.bundle()

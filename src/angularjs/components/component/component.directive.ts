@@ -1,24 +1,34 @@
-import * as app from "../app.module"
-import { projectId } from "../utils"
-import { SocketService } from "../socket.service"
-import router from "../router"
-import { Graph, Connection } from "../../graph"
-import { Position } from "../../math"
-import { ConnectorsScope } from "./connector.directive"
-import { CSRF } from "../services/csrf"
+import * as app from "../../app.module"
+import { projectId } from "../../utils"
+import { SocketService } from "../../socket.service"
+import router from "../../router"
+import { Graph, Connection } from "../../../graph"
+import { CSRF } from "../../services/csrf"
 
 interface ComponentScope extends angular.IScope {
-
-
+  data:any
+  graphData: any
+  inputPorts: any[]
+  outputPorts: any[]
+  collapsed: boolean
+  togglecollapse: () => void
+  update: () => void
+  transform: string
+  updatePorts: () => void
+  title :{
+            name: string
+            description?: string
+            buttons: boolean
+          }
 }
 
-app.directive("component", ['$document', function ($document: angular.IDocumentService) {
+app.directive("component", ['$document', '$rootScope', function ($document: angular.IDocumentService, $rootScope: angular.IRootScopeService) {
   var pointerId;
   pointerId = 0;
   return {
     require: '^graph',
     scope: true,
-    link: function (scope: any, element, attr, graphModelController: any) {
+    link: function (scope: ComponentScope, element, attr, graphModelController: any) {
 
       var datanode = scope.data;
       function findMacro() {
@@ -82,12 +92,7 @@ app.directive("component", ['$document', function ($document: angular.IDocumentS
         scope.collapsed = !scope.collapsed;
         updatePorts();
         requestAnimationFrame(function () {
-          $('path[connector]').each(function (index) {
-            const scope = $(this).scope() as ConnectorsScope;
-            if (scope.endsPositions && scope.endsPositions[0] == position || scope.endsPositions[1] == position) {
-              scope.reset();
-            }
-          })
+          $rootScope.$broadcast("Graph::Connector::ResetOfComponent", datanode.id)
         });
       };
       scope.update = function () {
@@ -187,24 +192,7 @@ app.directive("component", ['$document', function ($document: angular.IDocumentS
         graphModelController.translateNode(datanode.id, position, x, y);
         CSRF.printget({ type: 'move', componentId: scope.data.id, movepos: position });
         scope.update();
-        $('path[connector]').each(function (index) {
-          var scope = $(this).scope() as ConnectorsScope;
-          if (scope.edge) {
-            if (scope.edge.startNode == datanode.id) {
-              scope.update(position);
-            } else if (scope.edge.endNode == datanode.id) {
-              scope.update(null, position);
-            }
-          }
-        })
-
-        //
-        //io.socket.get('/users/3',function serverSays(err,users){
-        //    if (err)
-        //        console.log(err)
-        //    console.log(JSON.stringify(users));
-        //});
-
+        $rootScope.$broadcast("Graph::Connector::UpdateOfComponent",datanode.id,position)
       };
 
       function mouseup(ev) {
