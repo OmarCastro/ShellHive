@@ -64,7 +64,7 @@ gulp.task('browserify-only', function () {
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./assets/dist/js/'));
+    .pipe(gulp.dest('./assets/js/'));
 });
 
 gulp.task('browserify', [tasks.typescript, tasks.copyHtmlAssets], function(){
@@ -80,7 +80,7 @@ gulp.task('browserify-prod', [tasks.typescript, tasks.copyHtmlAssets], function 
         .pipe(uglify())
         .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./assets/dist/js/'));
+    .pipe(gulp.dest('./assets/js/'));
 });
 
 

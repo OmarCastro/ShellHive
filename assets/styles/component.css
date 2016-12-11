@@ -1,0 +1,187 @@
+.component,
+.inline-component {
+  font-size: 12px;
+  position: absolute;
+  background-color: #ddd;
+  border-radius: 4px;
+  border: 2px solid #999;
+  z-index: auto;
+}
+.component:hover,
+.inline-component:hover {
+  z-index: 1;
+}
+.component .input-group-addon,
+.inline-component .input-group-addon,
+.input-group-btn .component > .btn,
+.input-group-btn .inline-component > .btn,
+.component .form-control,
+.inline-component .form-control {
+  height: 24px;
+  padding: 2px 10px;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+.component .input-group-addon,
+.inline-component .input-group-addon {
+  border: initial;
+  background-color: initial;
+  padding-left: 2px;
+}
+.component .input-group-addon,
+.inline-component .input-group-addon,
+.component .input-group-btn,
+.inline-component .input-group-btn {
+  width: initial;
+}
+.component .form-control,
+.inline-component .form-control {
+  float: initial;
+  width: initial;
+  background-color: #ddd;
+}
+.component .title,
+.inline-component .title {
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */
+  cursor: move;
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+  text-align: center;
+  background-color: #ccc;
+  position: relative;
+  height: 1.5em;
+  font-family: monospace;
+  font-weight: bolder;
+  border-top-left-radius: .1em;
+  border-top-right-radius: .1em;
+}
+.component .title > .title-name,
+.inline-component .title > .title-name {
+  padding-left: 4em;
+  padding-right: 4em;
+}
+.component .title .button-group,
+.inline-component .title .button-group {
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+  top: 0;
+  font-size: 1.1em;
+}
+.component .title .button-group a,
+.inline-component .title .button-group a {
+  text-decoration: none;
+}
+.component .input,
+.inline-component .input,
+.component .output,
+.inline-component .output {
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */
+  cursor: move;
+  white-space: nowrap;
+}
+.component .input [data-port]:hover,
+.inline-component .input [data-port]:hover,
+.component .output [data-port]:hover,
+.inline-component .output [data-port]:hover,
+.component .input [data-port]:active,
+.inline-component .input [data-port]:active,
+.component .output [data-port]:active,
+.inline-component .output [data-port]:active,
+.component .input [data-port].hover,
+.inline-component .input [data-port].hover,
+.component .output [data-port].hover,
+.inline-component .output [data-port].hover {
+  background-color: #ddd;
+}
+.component .input,
+.inline-component .input {
+  float: left;
+}
+.component .input > div,
+.inline-component .input > div {
+  float: left;
+}
+.component .output,
+.inline-component .output {
+  float: right;
+  text-align: right;
+  padding-left: 10px;
+}
+.component .output > div,
+.inline-component .output > div {
+  display: block;
+  width: auto;
+}
+.component .box,
+.inline-component .box {
+  display: inline-block;
+  margin-top: .2em;
+  height: .7em;
+  width: 1em;
+  background-color: #aaa;
+  border-radius: .1em;
+}
+.component .relative,
+.inline-component .relative {
+  position: relative;
+}
+.component label,
+.inline-component label {
+  font-weight: normal;
+  margin: 0;
+}
+.component input[type="number"],
+.inline-component input[type="number"] {
+  width: 7em;
+}
+.file-component {
+  border-color: #99f;
+}
+.file-component [data-port="output"] > .box {
+  background-color: #77a;
+}
+.file-component .title {
+  background-color: #ccf;
+}
+.command-component {
+  border-color: #7a7;
+}
+.command-component [data-port="output"] > .box {
+  background-color: #595;
+}
+.command-component [data-port="error"] > .box {
+  background-color: #944;
+}
+.command-component [data-port="retcode"] > .box {
+  background-color: #777;
+}
+.command-component .title {
+  background-color: #cdc;
+}
+.macro-component {
+  border-color: #B8703D;
+}
+.macro-component .output .box {
+  background-color: #B8703D;
+}
+.macro-component .title {
+  background-color: #e0ddcd;
+}
+.output .box {
+  margin-right: -2px;
+}
+.input .box {
+  margin-left: -2px;
+}

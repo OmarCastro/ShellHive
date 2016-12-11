@@ -17,6 +17,7 @@ function modalControllerFunction($scope, $modalInstance){
 
 
 function showModalFunction(modalservice) : angular.IPromise<IModalResult>{
+  debugger;
   const modalInstance = modalservice.open({
       backdrop: 'static',
     templateUrl: 'UserNameModal.html',

@@ -9,8 +9,12 @@ class TransactionHandler<Input, Output>{
 
     public reponseHandlers: ((data: Output) => void)[] = []
     public errorHandlers: (() => void)[] = []
+    public transaction: Transaction<Input, Output>
 
-    handleReponses(data: Output) { this.reponseHandlers.forEach(handler => handler(data)) }
+    handleReponses(data: Output) {
+        this.reponseHandlers.forEach(handler => handler(data))
+        this.reponseHandlers = [];
+     }
     handleErrors() { this.errorHandlers.forEach(handler => handler()) }
 
 }
@@ -20,7 +24,7 @@ class Transaction<Input, Output>{
         private handlers: TransactionHandler<Input, Output>,
         public readonly payload: Input,
         public readonly routeUsed: Route<Input, Output>
-    ) { }
+    ) { handlers.transaction = this }
 
     onResponse(responseHandler: (data: Output) => void) {
         this.handlers.reponseHandlers.push(responseHandler)

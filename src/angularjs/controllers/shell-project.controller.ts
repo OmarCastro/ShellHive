@@ -45,14 +45,18 @@ function shellProjectController($scope, csrf, alerts, modal, $timeout) {
     }));
   }
 
+console.log("subscribe project!!")
   router.send({
     payload: { id: projectId },
     useRoute: routeTable.projectSubscription()
   }).onResponse((data) => {
+    console.log("subscribe project response!!")
+
     $scope.implementedCommands = data.implementedCommands
     $scope.options = data.SelectionOptions;
     $scope.clients = data.clients;
     $scope.page = "graph";
+    if(SocketService.socket.id == null) return;
     $scope.chatterId = SocketService.socket.id;
     $scope.chat = { open: $scope.clients.length > 1 };
 

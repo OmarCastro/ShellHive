@@ -1,21 +1,18 @@
 import * as app from "../../app.module"
 import { Graph, Connection } from "../../../graph"
-import { Position } from "../../../math"
-
 
 interface MiniConnectorScope extends angular.IScope{
   graphElement: JQuery
-  $parent: any
-  endPos: Position
-  startPos: Position
+  edge: Connection
+  endPos: Point
+  startPos: Point
 }
 
 app.directive("miniconnector", function(){
   return {
     scope: true,
     link: function(scope:MiniConnectorScope , element, attr){
-
-      const dataedge: Connection = scope.$parent.edge;
+      const dataedge: Connection = scope.edge;
       const elem = element[0];
       const startComponent = dataedge.startComponent;
       const startPosition = startComponent.position;
