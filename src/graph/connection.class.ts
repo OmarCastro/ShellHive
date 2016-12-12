@@ -3,7 +3,7 @@ import { Component } from "./component";
 /**
 	Represents a connection between 2 components
 */
-export class Connection{
+export class Connection implements graph.IConnection{
 	public readonly id: string;
 	public constructor(
 		public startComponent:Component,

@@ -21,7 +21,7 @@ function modalControllerFunction($scope, $modalInstance){
 }
 
 
-function showModalFunction(modalservice) : angular.IPromise<IModalResult>{
+function showModalFunction(modalservice: angular.ui.bootstrap.IModalService) : angular.IPromise<IModalResult>{
   const modalInstance = modalservice.open({
     templateUrl: 'myModalContent.html',
     controller: modalController

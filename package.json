@@ -57,6 +57,7 @@
   "devDependencies": {
     "@types/angular": "^1.5.20",
     "@types/angular-animate": "^1.5.5",
+    "@types/angular-ui-bootstrap": "^0.13.35",
     "@types/circular-json": "^0.1.30",
     "@types/express": "^4.0.34",
     "@types/mousetrap": "^1.5.32",
@@ -64,6 +65,8 @@
     "@types/socket.io-client": "^1.4.28",
     "angular": "^1.5.8",
     "angular-animate": "^1.5.8",
+    "angular-ui-bootstrap": "^2.3.1",
+    "angular-ui-layout": "^1.4.2",
     "browserify": "^13.1.1",
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",

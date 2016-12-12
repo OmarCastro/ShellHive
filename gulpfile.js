@@ -124,4 +124,11 @@ gulp.task('watch', function () {
   gulp.watch('test/**/*.js',['coverage']);
 });
 
+
+gulp.task('watch-no-test', function () {
+  gulp.watch('src/**/*.ts',function(event) { runSequence('browserify') });
+  gulp.watch(jisonPath,    function(event) { runSequence('jison') });
+});
+
+
 gulp.task('default', ['browserify','mocha','watch']);

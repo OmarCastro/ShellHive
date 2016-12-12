@@ -1,6 +1,4 @@
 import { Route, method } from "./routes.model"
-import { subscribeProjectResponse, subscribeGraphResponse, subscribeGraphRequest } from "./routes-graph.interfaces"
-import { UserConfigRequest } from "./routes-user.interfaces"
 
 
 export class RouteTable {

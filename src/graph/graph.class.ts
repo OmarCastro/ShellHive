@@ -2,7 +2,7 @@ import { Component } from "./component";
 import { Connection } from "./connection.class";
 
 
-export class Graph{
+export class Graph implements graph.IGraph{
 	public constructor(
 	public components:Component[] = [],
 	public connections:Connection[] = [],

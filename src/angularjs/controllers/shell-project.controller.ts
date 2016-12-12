@@ -5,14 +5,13 @@ import router, { routeTable } from "../router"
 import  * as welcomeUserModal  from "../modals/welcome-user.modal"
 import  * as projectCreationModal  from "../modals/project-creation.modal"
 
-let viewGraph = null;
 declare var io;
 app.controller('shellProject', ['$scope', 'csrf', 'alerts', '$modal', '$timeout', shellProjectController]);
 
 
+
 function shellProjectController($scope, csrf, alerts, modal, $timeout) {
-  var visualData;
-  visualData = {};
+  const visualData = {} as jsmodels.IGraphData;
   $scope.alerts = alerts
   $scope.filesystem = 0
   $scope.graphData = visualData;
@@ -25,13 +24,14 @@ function shellProjectController($scope, csrf, alerts, modal, $timeout) {
     return this.implementedCommands.indexOf(data.exec) >= 0;
   };
 
-  viewGraph = $scope.viewGraph = function viewGraph(graph) {
+  function viewGraph(graph) {
     if (graph.id) { graph = graph.id }
     router.send({
       payload: { id: graph },
       useRoute: routeTable.graphSubscription()
     }).onResponse(res => $scope.$applyAsync(() => {
       console.log(res);
+      debugger;
       $scope.graphData.components = res.graph.components.map(function (component) {
         component.data.id = component.id;
         res.graph.connections.forEach(function (connection) {
@@ -44,6 +44,7 @@ function shellProjectController($scope, csrf, alerts, modal, $timeout) {
 
     }));
   }
+  $scope.viewGraph = viewGraph
 
 console.log("subscribe project!!")
   router.send({
