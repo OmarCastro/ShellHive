@@ -2,6 +2,7 @@ import * as app from "../app.module"
 import { projectId } from "../utils"
 import {SocketService} from "../socket.service"
 import network, { routeTable } from "../router"
+import {CSRF}  from "../services/csrf"
 
 interface FileSystemScope extends angular.IScope{
     directoryContent: any[]
@@ -9,7 +10,7 @@ interface FileSystemScope extends angular.IScope{
     selectFile: (file: any) => void
 }
 
-app.directive("filesystem", ['csrf','alerts','$rootScope',(csrf, alerts, rootScope) => ({
+app.directive("filesystem", ['alerts','$rootScope',(alerts, rootScope) => ({
     scope: true,
     template: require("./filesystem.html"),
     link: function(scope: FileSystemScope, element, attr){
@@ -37,7 +38,7 @@ app.directive("filesystem", ['csrf','alerts','$rootScope',(csrf, alerts, rootSco
           console.log(errorMessage)
         },
         sending:function(file,xhr){
-          xhr.setRequestHeader('X-CSRF-Token', csrf.csrf);
+          xhr.setRequestHeader('X-CSRF-Token', CSRF.csrfToken);
         },
         uploadprogress: function(file, progress){
           file.__notification.progress = ~~progress

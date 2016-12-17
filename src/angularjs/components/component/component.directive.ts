@@ -29,12 +29,12 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
     scope: true,
     link: function (scope: ComponentScope, element, attr, graphModelController: any) {
 
-      var datanode = scope.data;
+      const datanode = scope.data;
       function findMacro() {
-        var macros = scope.graphData.macros;
-        var ref = scope.graphData.macroList
-        for (var i = ref.length - 1; i >= 0; i--) {
-          var macro = macros[ref[i]];
+        const macros = scope.graphData.macros;
+        const ref = scope.graphData.macroList
+        for (let i = ref.length - 1; i >= 0; i--) {
+          const macro = macros[ref[i]];
           if (macro.id == datanode.graph) {
             return macro
           }
@@ -81,11 +81,10 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
 
 
 
-      var startX, startY, title, position, elem, imstyle;
-      startX = 0;
-      startY = 0;
-      title = datanode.title;
-      position = datanode.position;
+      let startX = 0;
+      let startY = 0;
+      const title = datanode.title;
+      const position = datanode.position;
       scope.collapsed = false;
       scope.togglecollapse = function () {
         scope.collapsed = !scope.collapsed;
@@ -149,12 +148,12 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
       scope.updatePorts = updatePorts;
 
       scope.update();
-      elem = element[0];
-      imstyle = elem.style;
+      const elem = element[0];
       //scope.$watch('data.position',scope.update, true);
-      var drag = false;
+      let drag = false;
       element.bind("pointerdown", function (ev) {
-        var event, targetTag;
+       const event = ev.originalEvent;
+       const targetTag = (event.target as HTMLElement).tagName;
         //console.log(datanode);
         switch (ev.which) {
           case 2:
@@ -163,13 +162,11 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
             return false;
         }
         graphModelController.hidePopupAndEdge();
-        event = ev.originalEvent;
-        targetTag = (event.target as HTMLElement).tagName;
         console.log(targetTag);
         if (pointerId || 'INPUT SELECT LABEL BUTTON A TEXTAREA'.split(" ").indexOf(targetTag) >= 0) {
           return true;
         }
-        var drag = false;
+        drag = false;
         pointerId = (event as any).pointerId;
         $document.bind("pointermove", mousemove);
         $document.bind("pointerup", mouseup);

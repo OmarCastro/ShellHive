@@ -4,13 +4,14 @@ import { SocketService } from "../socket.service"
 import router, { routeTable } from "../router"
 import  * as welcomeUserModal  from "../modals/welcome-user.modal"
 import  * as projectCreationModal  from "../modals/project-creation.modal"
+import {CSRF}  from "../services/csrf"
 
 declare var io;
-app.controller('shellProject', ['$scope', 'csrf', 'alerts', '$modal', '$timeout', shellProjectController]);
+app.controller('shellProject', ['$scope', 'alerts', '$modal', '$timeout', shellProjectController]);
 
 
 
-function shellProjectController($scope, csrf, alerts, modal, $timeout) {
+function shellProjectController($scope, alerts, modal, $timeout) {
   const visualData = {} as jsmodels.IGraphData;
   $scope.alerts = alerts
   $scope.filesystem = 0
@@ -91,7 +92,7 @@ console.log("subscribe project!!")
         console.log(form);
         io.socket.post('/graph/createfromcommand/', {
           project: projectId, type: 'root',
-          command: form.command, _csrf: csrf.csrf
+          command: form.command, _csrf: CSRF.csrfToken
         }, function (res) {
           console.log(res);
           if (res.graph) {
@@ -302,7 +303,7 @@ console.log("subscribe project!!")
     $timeout(function () {
       $scope.execStatus = false
     }, 3000)
-    io.socket.get('/graph/runGraph/', { _csrf: csrf.csrf }, function (data) {
+    io.socket.get('/graph/runGraph/', { _csrf: CSRF.csrfToken }, function (data) {
       debugData(data);
       $scope.shellText = [{
         text: data.command.pretty,
@@ -341,42 +342,42 @@ console.log("subscribe project!!")
 
   $scope.$on("chat", function (event, message) {
     //console.log('chat '+message+' !');
-    io.socket.post('/project/chat/', { data: message, _csrf: csrf.csrf }, debugData);
+    io.socket.post('/project/chat/', { data: message, _csrf: CSRF.csrfToken }, debugData);
   });
 
   $scope.$on("removeComponent", function (event, message) {
     //console.log('removeComponent '+message+' !');
-    io.socket.post('/graph/removeComponent/', { id: message, _csrf: csrf.csrf }, debugData);
+    io.socket.post('/graph/removeComponent/', { id: message, _csrf: CSRF.csrfToken }, debugData);
   });
 
   $scope.$on("addAndConnectComponent", function (event, message) {
     //console.log('addAndConnectComponent ', message,' !');
-    message._csrf = csrf.csrf
+    message._csrf = CSRF.csrfToken
     io.socket.post('/graph/createAndConnectComponent/', message, debugData);
   });
 
   $scope.$on("addComponent", function (event, message) {
     //console.log('addComponent ', message,' !');
-    message._csrf = csrf.csrf
+    message._csrf = CSRF.csrfToken
     io.socket.post('/graph/createComponent/', message, debugData);
   });
 
   $scope.$on("updateComponent", function (event, message) {
     //console.log('updateComponent:' , message);
-    message._csrf = csrf.csrf
+    message._csrf = CSRF.csrfToken
     var dataid = message.id;
     io.socket.put('/component/' + dataid, message, debugData);
   });
 
   $scope.$on("updateMacro", function (event, message) {
     //console.log('updateMacro:' , message);
-    message._csrf = csrf.csrf
+    message._csrf = CSRF.csrfToken
     io.socket.put('/macro/setData', message, debugData);
   });
 
   $scope.$on("deleteMacro", function (event, message) {
     //console.log('deleteMacro:' , message);
-    message._csrf = csrf.csrf
+    message._csrf = CSRF.csrfToken
     io.socket.put('/macro/remove', message, debugData);
   });
 
@@ -385,7 +386,7 @@ console.log("subscribe project!!")
     //console.log('connectComponent:' , message);
     message = {
       data: message,
-      _csrf: csrf.csrf
+      _csrf: CSRF.csrfToken
     }
     io.socket.put('/graph/connect/', message, debugData);
   });
@@ -395,7 +396,7 @@ console.log("subscribe project!!")
     //console.log('removePipe:' , message);
     message = {
       data: message,
-      _csrf: csrf.csrf
+      _csrf: CSRF.csrfToken
     }
     io.socket.put('/graph/removePipe/', message, debugData);
   });

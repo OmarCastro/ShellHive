@@ -1,0 +1,30 @@
+<ul class="dropdown-menu well">
+  <form ng:submit="popupSubmit(popupText)">
+    <div class="input-group input-group-sm tip"><span class="input-group-addon glyphicon glyphicon-tasks"></span>
+      <input type="text" ng-model="popupText" class="form-control">
+      <div class="tooltip">
+        <b>Hint1:</b> Use file + extension to create file component ,e.g. <i>file.txt</i><br>
+        <b>Hint2:</b> Write commands with arguments to autofill the created component, e.g. <i>grep -F hello</i>
+      </div>
+    </div>
+  </form>
+  <li ng-show="comms.length" class="dropdown-header">
+    <b>command component</b>
+  </li>
+  <li ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms = (implementedCommands | filter:popupText)">
+    <a ng-click="popupSubmit(foo)">{{foo}}</a>
+  </li>
+  <li ng-show="comms2.length && isRootView()" class="dropdown-header">
+    <b>macro component</b>
+  </li>
+  <li ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-repeat="foo in comms2 = (macroViewList() | filter:popupText)">
+    <a ng-click="popupSubmit(foo)">{{foo}}</a>
+  </li>
+  <li ng-if="popupText.indexOf('.') > -1" class="dropdown-header">
+    <b>file component</b>
+  </li>
+  <li ng-class="cl" ng-mouseenter="cl = 'active'" ng-mouseleave="cl = ''" ng-if="popupText.indexOf('.') > -1">
+    <a ng-click="popupSubmit(popupText)">{{popupText}}</a>
+  </li>
+</ul>
+

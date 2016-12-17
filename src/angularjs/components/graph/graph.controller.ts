@@ -3,12 +3,23 @@ import {CSRF} from "../../services/csrf"
 import {MinimapScope} from "../minimap/minimap.directive"
 import * as angular from "angular";
 
-app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', function(scope: any, element, attr, $document){
-        var key, val, x$, $sp, update, mousemove, mouseup, newCommandComponent, mapMouseToScene, mapMouseToView, mapPointToScene, scaleFromMouse, 
-        useWheelHandler, mousewheelevt, setEdgePath, popupState, startEdge, moveEdge,
-        endEdge, showPopup, hidePopup, hidePopupAndEdge;
+export interface GraphController {
+  mapPointToScene: (x: number, y: number) => IPoint
+  mapMouseToScene: (event: MouseEvent) => IPoint
+  mapMouseToView: (event: MouseEvent) => IPoint
+  showPopup: (event, startNode: number, startPort: string, endNode: number, endPort:string) => void
+  hidePopup: () => void
+  hidePopupAndEdge: () => void
+  endEdge: () => void
+  isOutputPort: (port : string) => boolean
+}
+
+app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', function(scope, element, attr, $document){
+        var key, val, x$, $sp, update, mousemove, scaleFromMouse, useWheelHandler, setEdgePath;
         
-        var _this = this;
+        const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+
+
         var pointerId = 0;
         var scale = 1;
         var graphX = 0;
@@ -26,20 +37,13 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
         var $svgElem = $(svgElem);
         var workspace = elem.querySelector(".workspace");
         var $workspace = $(workspace);
-        var popup = elem.querySelector(".create-component-popup");
-        var $popup = $(popup);
 
         var minimap = elem.querySelector("[minimap]");
         var $minimap = $(minimap);
-
-
-        var popupHeight = $popup.find("form").height();
-        var $popupInput = $popup.find("input");
         var toplayout = elem.querySelector(".toplayout");
         var splitbar = elem.querySelector(".ui-splitbar");
         var graphModel = scope.graphModel = scope.graphData;       
       
-        $popup.hide();
 
         scope.edgePopups = [];
 
@@ -115,18 +119,22 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
           update();
         };
 
-        mouseup = function(){
+        function mouseup(){
           pointerId = 0;
           $document.unbind("pointermove", mousemove);
           $document.unbind("pointerup", mouseup);
         };
 
-        $workspace.bind("contextmenu", function(ev){
+        $workspace.bind("contextmenu", function(ev: JQueryEventObject){
             if (ev.shiftKey) { return; }
             ev.preventDefault();
             ev.stopPropagation();
-            showPopup(event, null, null, null, null);
+            showPopup(ev, null, null, null, null);
         })
+
+        function showPopup(event, startNode: number, startPort: string, endNode: number, endPort: string){
+           scope.$broadcast("createComponentPopup::show",event, startNode, startPort, endNode, endPort );
+        }
 
         $workspace.bind("pointerdown", function(ev: any){
           console.log(ev);
@@ -161,6 +169,7 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
 
           pointerId = event.pointerId;
           $document.bind("pointermove", mousemove);
+          
           $document.bind("pointerup", mouseup);
           startX = event.screenX;
           startY = event.screenY;
@@ -168,34 +177,32 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
           event.stopPropagation();
         });
 
-        newCommandComponent = function(command, position){
+        function newCommandComponent(command, position){
           scope.$emit('addComponent', {})
         };
-        mapMouseToScene = function(event){
-          var ref$, x, y;
-          ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
+
+
+        function mapMouseToScene(event: MouseEvent):IPoint{
+          const {x, y} = mapMouseToView(event);
           return mapPointToScene(x, y);
         };
-        mapMouseToView = function(event){
-          var offset;
-          offset = $workspace.offset();
+
+        function mapMouseToView(event: MouseEvent):IPoint{
+          const offset = $workspace.offset();
           return {
             x: Math.round(event.pageX - offset.left),
             y: Math.round(event.pageY - offset.top)
           };
         };
 
-
-
-
-        mapPointToScene = function(x, y){
+        function mapPointToScene(x: number, y: number):IPoint{
           return {
             x: (x - graphX) / scale,
             y: (y - graphY) / scale
           };
         };
 
-        var scaleGraph = function(amount){
+        function scaleGraph(amount){
           if ((scale < 0.2 && amount < 1) || (scale > 20 && amount > 1)) {
             return;
           }
@@ -235,7 +242,6 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
             return scaleFromMouse(0.9, event);
           }
         };
-        mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
         elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
         var simpleEdge = element.find('.emptyEdge')[0];
 
@@ -248,84 +254,34 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
                 " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY +
                 " H " + endX);
         };
-        popupState = {
-          x: 0,
-          y: 0,
-          startNode: 0,
-          startPort: 0
-        };
-        startEdge = function(elem, type, port , position, ev){
-          this.hidePopup();
+        function startEdge(elem, type, port , position, ev){
+          hidePopup();
           elem = elem.querySelector(".box") || elem;
           simpleEdge.setAttribute("class", "emptyEdge from-"+type+"-"+port+" from-"+type)
           edgeIniX = elem.offsetLeft + position.x;
           edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
           return setEdgePath(edgeIniX, edgeIniY, edgeIniX, edgeIniY);
         };
-        moveEdge = function(event){
-          var ref$, x, y;
-          ref$ = mapMouseToScene(event), x = ref$.x, y = ref$.y;
+        function moveEdge(event){
+          const {x,y} = mapMouseToScene(event)
           return setEdgePath(edgeIniX, edgeIniY, x, y);
         };
-        endEdge = function(){
+
+        function endEdge(){
           return simpleEdge.setAttribute('d', "M 0 0");
         };
-        showPopup = function(event, startNode, startPort, endNode, endPort){
-          scope.popupText = '';
-          var ref$ = mapMouseToView(event), x = ref$.x, y = ref$.y;
-          importAll$(popupState, mapMouseToScene(event));
-          popupState.startNode = startNode;
-          popupState.startPort = startPort;
-          popupState.endNode = endNode;
-          popupState.endPort = endPort;
 
-          if(endNode) $popup.addClass("left-side");
-          else $popup.removeClass("left-side");
 
-          popup.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
-          
 
-          $popup.show();
-          $popupInput.focus();
-          return scope.safedigest();
-        };
-        var popupSubmit = function(content){
-          console.log("popupSubmit:", content);
-          var comp;
-
-          if(popupState.startNode || popupState.endNode){
-
-            scope.$emit('addAndConnectComponent', (popupState.startNode) ? {
-              command: content,
-              componentId: popupState.startNode,
-              startPort: popupState.startPort,
-              position: {x: popupState.x , y: popupState.y},
-              fromInput: false
-            } : {
-              command: content,
-              componentId: popupState.endNode,
-              startPort: popupState.endPort,
-              position: {x: popupState.x - 150 , y: popupState.y},
-              fromInput: true
-            })
-          } else {
-            scope.$emit('addComponent', {
-              command: content,
-              position: {x: popupState.x , y: popupState.y}
-            });
-          }
-          hidePopup();
-          endEdge();
-          
-        };
-        hidePopup = function(){
-          $popup.hide();
+        function hidePopup(){
+          scope.$broadcast("createComponentPopup::hide");
           (document.activeElement as HTMLElement).blur();
           scope.edgePopups.length = 0;
           scope.sel = { open: false };
           scope.safedigest();
         };
-        hidePopupAndEdge = function(){ hidePopup(); endEdge();   };
+        
+        function hidePopupAndEdge(){ hidePopup(); endEdge();   };
 
         scope.newCommandAtTopLeft = function(command,event){
           scope.$emit("addComponent",{
@@ -368,23 +324,22 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
             scope.$broadcast("Graph::Connector::Reset");
         }
 
-        this.showPopup = showPopup;
-        this.popupSubmit = popupSubmit;
-        this.hidePopup = hidePopup;
-        this.hidePopupAndEdge = hidePopupAndEdge;
+        const _this = this as GraphController 
         this.nodesElement = nodesElem;
         this.newCommandComponent = newCommandComponent;
         this.startEdge = startEdge;
         this.moveEdge = moveEdge;
         this.moveScene = moveScene;
-        this.endEdge = endEdge;
+        _this.endEdge = endEdge;
         this.updateLater = function(){requestAnimationFrame(update)};
         this.scaleGraph = scaleGraph
-        this.mapPointToScene = mapPointToScene;
-        this.mapMouseToScene = mapMouseToScene;
-        this.mapMouseToView = mapMouseToView;
-
-        this.isOutputPort = function(port){
+        _this.hidePopup = hidePopup;
+        _this.showPopup = showPopup;
+        _this.hidePopupAndEdge = hidePopupAndEdge;
+        _this.mapPointToScene = mapPointToScene;
+        _this.mapMouseToScene = mapMouseToScene;
+        _this.mapMouseToView = mapMouseToView;
+        _this.isOutputPort = function(port){
           return port === 'output' || port === 'error' || port === 'retcode';
         }
 
@@ -438,20 +393,9 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
           scope.visualData = graphModel;
         };
         this.translateNode = function(id, position, x, y){
-          var i$, ref$, len$, el;
           position.x += x / scale;
           position.y += y / scale;
           scope.$digest();
         };
       }
     ]);
-
-    function in$(x, xs) {
-  var i = -1, l = xs.length >>> 0;
-  while (++i < l) if (x === xs[i]) return true;
-  return false;
-}
-function importAll$(obj, src) {
-  for (var key in src) obj[key] = src[key];
-  return obj;
-}

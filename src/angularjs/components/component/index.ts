@@ -1,2 +1,3 @@
 import connector = require("./component.directive")
-export const imports = [connector]
+import port = require("./port.directive")
+export const imports = [connector, port]

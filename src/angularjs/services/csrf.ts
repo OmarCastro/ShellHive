@@ -32,15 +32,3 @@ export class CSRF {
     });
   }
 }
-
-  window['printget'] = CSRF.printget;
-
-
-export const serviceName = 'csrf'
-
-app.service(serviceName,function(){
-  Object.defineProperty(this, "csrf", {
-    get: () => CSRF.csrfToken
-  })
-
-})
