@@ -1,12 +1,17 @@
 import * as app from "../../app.module"
 import {GraphController} from "../graph/graph.controller"
 
+interface PortScope extends angular.IScope {
+  componentId: number
+  data: dbmodels.IComponent
+  isOutputNode: boolean
+}
 
 app.directive("port", ['$document',($document: angular.IDocumentService) => ({
     require: '^graph',
     scope: true,
-    link: function(scope:any, element: JQuery, attr, graphController:GraphController){
-      const datanode = scope.$parent.data;
+    link: function(scope:PortScope, element: JQuery, attr, graphController:GraphController){
+      const datanode = scope.data;
       const position = datanode.position;
       const portName: string = attr["port"]; 
       const elem = element[0];
@@ -46,6 +51,7 @@ app.directive("port", ['$document',($document: angular.IDocumentService) => ({
           endPort: endPort
         });
       };
+      
       function mousemove(ev){
         graphController.moveEdge(ev.originalEvent);
         return true;
@@ -61,15 +67,12 @@ app.directive("port", ['$document',($document: angular.IDocumentService) => ({
           } else {
             graphController.showPopup(event, null, 'output', scope.componentId, portName);
           }
-        }
-
-
-         else {
+        } else {
           graphController.endEdge();
 
           const outAttr = $pointedElem.attr("data-port") || $pointedElem.parent().attr("data-port");
           if (outAttr) {
-            const outPortScope = $pointedElem.scope() as any;
+            const outPortScope = $pointedElem.scope() as PortScope;
             if (scope.isOutputNode !== outPortScope.isOutputNode) {
               if (scope.isOutputNode) {
                 ConnectIfOk(scope.componentId, portName, outPortScope.componentId, outAttr);

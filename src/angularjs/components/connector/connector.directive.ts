@@ -7,24 +7,14 @@ import router from "../../router"
 
 import { Graph, Connection } from "../../../graph"
 
-
-interface EdgePopup {
-  x: number,
-  y: number,
-  transform: string,
-  index: number,
-  id: string
-}
-
 interface ConnectorsScope extends angular.IScope {
   edge: Connection
   graphElement: JQuery;
   endsPositions: Point[]
   $index: number
-  edgePopups: EdgePopup[]
 }
 
-app.directive("connector", ['$timeout', ($timeout) => ({
+app.directive("connector", ['$timeout','$rootScope', ($timeout, $rootScope: angular.IRootScopeService) => ({
   scope: true,
   restrict: "A",
   link: function (scope: ConnectorsScope, element, attr) {
@@ -83,24 +73,9 @@ app.directive("connector", ['$timeout', ($timeout) => ({
     elem.classList.add(elementClass + "-" + dataedge.startPort);
 
     element.bind("pointerdown", function (event) {
-      const orig = event.originalEvent;
-      const clientX = (orig as any).clientX
-      const clientY = (orig as any).clientY
-      scope.$apply(function () {
-        const data: EdgePopup = {
-          x: clientX,
-          y: clientY,
-          transform: `translate(${clientX}px,${clientY}px)`,
-          index: scope.$index,
-          id: dataedge.id
-        }
-        if (scope.edgePopups.length) {
-          scope.edgePopups[0] = data;
-        } else {
-          scope.edgePopups.push(data);
-        }
-
-      });
+      const x = event.clientX
+      const y = event.clientY
+      $rootScope.$broadcast("Graph::Popup::SetEdgePopup", {x,y}, dataedge.id, scope.$index)
     });
 
     function setEdgePath(iniX, iniY, endX, endY) {

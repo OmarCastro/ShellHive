@@ -17,6 +17,10 @@ declare module "angular" {
         $broadcast(name: "Graph::Minimap::UpdateViewPort", viewport: IViewBox);
         $on(name: "Graph::Minimap::UpdateViewPort", listener: (event, viewport: IViewBox) => any);
 
-        
+        //edge popup signals
+        $broadcast(name:"Graph::Popup::SetEdgePopup", position: IPoint, target: string, index: number);
+        $on(name:"Graph::Popup::SetEdgePopup", listener: (event, position: IPoint, target: string, index: number) => void);
+        $broadcast(name:"Graph::Popup::CloseEdgePopup");
+        $on(name:"Graph::Popup::CloseEdgePopup", listener: () => void);
     }
 }

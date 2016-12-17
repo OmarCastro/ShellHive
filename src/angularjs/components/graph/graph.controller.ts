@@ -1,6 +1,7 @@
 import * as app from "../../app.module"
 import {CSRF} from "../../services/csrf"
-import {MinimapScope} from "../minimap/minimap.directive"
+import {Graph} from "../../../graph"
+import {ConnectorPathMaker} from "../../services/connector-path-maker"
 import * as angular from "angular";
 
 export interface GraphController {
@@ -21,17 +22,35 @@ export interface GraphController {
   moveScene(x: number, y: number)
 }
 
-app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', function(scope, element, attr, $document){
+interface GraphControllerScope extends angular.IScope {
+  visualData: Graph
+  sel: any
+  graphModel: any
+  graphData: any
+  options:any
+  viewGraph: any
+  graphElement: any
+  shell: any
+  toNatNum: any
+  newCommandAtTopLeft: any
+  graph: GraphController;
+  isRootView: () => boolean
+  macroViewList: () => any[]
+  swapPrevious: any
+  transformScale: any
+  collapseAll: () => void
+  uncollapseAll: () => void
+  toggleShell: () => void
+  resetConnections: () => void
+}
+
+app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControllerScope, element){
         const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
         
         var pointerId = 0;
         var scale = 1;
         var graphX = 0;
         var graphY = 0;
-        var startX = 0;
-        var startY = 0;
-        var edgeIniX = 0;
-        var edgeIniY = 0;
         var elem = element[0];
         var nodesElem = elem.querySelector(".nodes");
         var nodesElemStyle = nodesElem.style;
@@ -137,18 +156,9 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
           scope.$digest();
         };
 
-
-
-        scope.edgePopups = [];
-
         scope.graphElement = element
-        scope.safedigest = function(){
-          if (!(scope.$$phase || scope.$root.$$phase)) {
-            scope.$digest();
-          }
-        };
+        
         scope.toNatNum = function(num){ return num.replace(/[^\d]/, '') };
-        scope.popupText = '';
         scope.graph = this;
         scope.$watch("shell", function(){
           if (!scope.shell) {
@@ -160,23 +170,20 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
           }
         });
         scope.visualData = scope.graphModel;
-        scope.isArray = angular.isArray;
-        scope.isString = angular.isString;
         scope.isRootView = function(){  return scope.visualData == scope.graphModel };
-        scope.macroViewList = function(){ return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : [] }
-        scope.swapPrevious = function(array, index, id){
-          var ref$, i$, len$, connection, results$ = [];
+        scope.macroViewList = function(){ 
+          return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : []
+        }
+        scope.swapPrevious = function(array: any[], index: number, id){
+          var i$, len$, results$ = [];
           if (index === 0) {
             return;
           }
-
-
-          ref$ = [array[index - 1], array[index]],
+          const ref$ = [array[index - 1], array[index]];
           array[index] = ref$[0],
           array[index - 1] = ref$[1];
 
-          for(var i = 0, _ref=scope.visualData.connections, length=_ref.length;i<length;++i){
-            var connection = _ref[i];
+          scope.visualData.connections.forEach((connection) => {
             if (connection.endNode === id) {
               if (connection.endPort === "file" + index) {
                 results$.push(connection.endPort = "file" + (index - 1));
@@ -184,7 +191,8 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
                 results$.push(connection.endPort = "file" + index);
               }
             }
-          }
+          })
+
           return results$;
         };
 
@@ -265,6 +273,7 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
           update();
         };
 
+        elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
         function MouseWheelHandler(event){
           var ispopup = $(event.target).closest(".popupArea, .shell").length > 0
           if (!event.altKey && ispopup) { return; }
@@ -276,43 +285,13 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
             return scaleFromMouse(0.9, event);
           }
         };
-        elem.addEventListener(mousewheelevt, MouseWheelHandler, false);
-        var simpleEdge = element.find('.emptyEdge')[0];
 
-        function setEdgePath(iniX, iniY, endX, endY){
-          var xpoint;
-          xpoint = (endX - iniX) / 4;
-          return simpleEdge.setAttribute(
-            'd', "M " + iniX + " " + iniY + 
-                " H " + (iniX + 0.5 * xpoint) + 
-                " C " + (iniX + 2 * xpoint) + "," + iniY + " " + (iniX + xpoint * 2) + "," + endY + " " + (iniX + xpoint * 4) + "," + endY +
-                " H " + endX);
-        };
-        
-        function startEdge(elem, type, port , position: IPoint){
-          hidePopup();
-          elem = elem.querySelector(".box") || elem;
-          simpleEdge.setAttribute("class", "emptyEdge from-"+type+"-"+port+" from-"+type)
-          edgeIniX = elem.offsetLeft + position.x;
-          edgeIniY = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
-          return setEdgePath(edgeIniX, edgeIniY, edgeIniX, edgeIniY);
-        };
-
-        function moveEdge(event){
-          const {x,y} = mapMouseToScene(event)
-          return setEdgePath(edgeIniX, edgeIniY, x, y);
-        };
-
-        function endEdge(){
-          return simpleEdge.setAttribute('d', "M 0 0");
-        };
-
-        function hidePopup(){
+       function hidePopup(){
           scope.$broadcast("createComponentPopup::hide");
+          scope.$broadcast("Graph::Popup::CloseEdgePopup");
           (document.activeElement as HTMLElement).blur();
-          scope.edgePopups.length = 0;
           scope.sel = { open: false };
-          scope.safedigest();
+          scope.$applyAsync();
         };
         
         function hidePopupAndEdge(){ hidePopup(); endEdge();   };
@@ -356,6 +335,31 @@ app.controller("graphCtrl", ['$scope', '$element', '$attrs', '$document', functi
             scope.$broadcast("Graph::Connector::Reset");
         }
 
+        //edge
+        const simpleEdge = element.find('.emptyEdge')[0];
+        const edgeStartPosition: IPoint = {x: 0, y: 0};
+
+        function setEdgePath(edgeInitialPosition: IPoint, edgeEndPosition: IPoint){
+          const path = ConnectorPathMaker.makePath(edgeInitialPosition,edgeEndPosition)
+          return simpleEdge.setAttribute('d', path);
+        };
         
+        function startEdge(elem, type, port , position: IPoint){
+          hidePopup();
+          elem = elem.querySelector(".box") || elem;
+          simpleEdge.setAttribute("class", "emptyEdge from-"+type+"-"+port+" from-"+type)
+          edgeStartPosition.x = elem.offsetLeft + position.x;
+          edgeStartPosition.y = elem.offsetTop + elem.offsetHeight * 0.75 + position.y;
+          return setEdgePath(edgeStartPosition, edgeStartPosition);
+        };
+
+        function moveEdge(event){
+          return setEdgePath(edgeStartPosition, mapMouseToScene(event));
+        };
+
+        function endEdge(){
+          return simpleEdge.setAttribute('d', "M 0 0");
+        };
+
       }
     ]);

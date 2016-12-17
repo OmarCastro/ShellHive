@@ -1,0 +1,22 @@
+<div create-component-popup class="create-component-popup dropdown open"></div>
+
+
+<div ng-if="sel.open" class="selectpopup dropdown open" ng-style="{transform:sel.transform, MsTransform:sel.transform}">
+    <ul class="dropdown-menu">
+        <li ng-repeat="c in options[sel.data.exec][sel.name]">
+            <a ng-click="graph.selectSelection(c)">
+                <span ng-bind="c"></span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="edgepopup" ng-repeat="c in edgePopups track by c.index" ng-style="{transform:c.transform, MsTransform:c.transform}">
+    <div class="content" ng-class="(c.y < 120)?'bottom':'top'">
+        <div> Remove the connection? </div>
+        <button class="btn btn-sm btn-success" ng-click="EdgePopupRemovePipe(c.id)"> Remove </button>
+        <button class="btn btn-sm btn-primary" ng-click="EdgePopupClose()"> No </button>
+    </div>
+
+</div>
