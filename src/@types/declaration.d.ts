@@ -13,6 +13,10 @@ declare module "angular" {
         $broadcast(name: "createComponentPopup::show",event, startNode: number, startPort: string, endNode: number, endPort: string );
         $on(name: "createComponentPopup::show",listener: (event: angular.IAngularEvent, pointerEvent, startNode: number, startPort: string, endNode: number, endPort: string) => any);
 
+        //minimap signals
+        $broadcast(name: "Graph::Minimap::UpdateViewPort", viewport: IViewBox);
+        $on(name: "Graph::Minimap::UpdateViewPort", listener: (event, viewport: IViewBox) => any);
+
         
     }
 }

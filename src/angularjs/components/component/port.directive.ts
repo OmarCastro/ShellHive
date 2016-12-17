@@ -5,10 +5,9 @@ import {GraphController} from "../graph/graph.controller"
 app.directive("port", ['$document',($document: angular.IDocumentService) => ({
     require: '^graph',
     scope: true,
-    link: function(scope:any, element: JQuery, attr, graphController:any){
-      var datanode = scope.$parent.data;
-      var title = datanode.title;
-      var position = datanode.position;
+    link: function(scope:any, element: JQuery, attr, graphController:GraphController){
+      const datanode = scope.$parent.data;
+      const position = datanode.position;
       const portName: string = attr["port"]; 
       const elem = element[0];
       const imstyle = elem.style;
@@ -52,9 +51,8 @@ app.directive("port", ['$document',($document: angular.IDocumentService) => ({
         return true;
       };
       function mouseup(ev){
-        var outPortScope;
         const event = ev.originalEvent;
-        const pointedElem = document.elementFromPoint(event.clientX, event.clientY);
+        const pointedElem = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement;
         const $pointedElem = $(pointedElem);
 
         if (graphController.isFreeSpace(pointedElem)) {

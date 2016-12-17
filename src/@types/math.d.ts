@@ -5,3 +5,9 @@ declare interface Point{
 declare interface IPoint{
     x:number, y:number
 }
+
+
+declare interface IViewBox {
+    topLeft: IPoint
+    bottomRight: IPoint
+}

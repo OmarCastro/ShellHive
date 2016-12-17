@@ -2,13 +2,13 @@ import * as app from "../../app.module"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
 import { Graph, Connection } from "../../../graph"
+import { GraphController } from "../graph/graph.controller"
 import template = require("./minimap.html")
 
 export interface MinimapScope extends angular.IScope{
   graphElement: JQuery
   scale: number
   mapSize: number
-  updateViewport: (viewport) => any
   viewport: any
   transform: string
   boundaries: () => {x1:number,y1:number,x2:number,y2:number}
@@ -19,7 +19,7 @@ app.directive("minimap", () => ({
     scope: true,
     require: '^graph',
     template: template,
-    link: function(scope: MinimapScope, element, attr, graphController: any){
+    link: function(scope: MinimapScope, element, attr, graphController: GraphController){
       var $graphElement = scope.graphElement;
       var workspace = $graphElement[0].querySelector(".workspace") as HTMLElement;
       var elem = element[0];
@@ -34,18 +34,23 @@ app.directive("minimap", () => ({
       scope.mapSize = mapSize;
       var margin = 200 //margin to view all nodes
 
-      scope.updateViewport = function(viewport){
-        scope.viewport = viewport;
+      scope.$on("Graph::Minimap::UpdateViewPort", (event, viewport) => updateViewport(viewport));
+
+      function updateViewport(viewport: IViewBox){
         const scale = scope.scale;
+        const {topLeft, bottomRight} = viewport
         viewbox.css({
-          transform: "translate("+(-viewport.x1)+"px, "+(-viewport.y1)+"px)",
-          width: (viewport.x2-viewport.x1),
-          height: (viewport.y2-viewport.y1),
+          transform: "translate("+(-topLeft.x)+"px, "+(-topLeft.y)+"px)",
+          width: (bottomRight.x-topLeft.x),
+          height: (bottomRight.y-topLeft.y),
           borderWidth: 1/scale+"px"
         })
       }
       requestAnimationFrame(function(){
-        scope.updateViewport({x1:0,y1:0,x2:workspace.offsetWidth,y2:workspace.offsetHeight})
+        updateViewport({
+           topLeft:{x:0, y:0},
+           bottomRight:{x:workspace.offsetWidth,y:workspace.offsetHeight}
+          })
       });
 
         function mapMouseToScene(event){

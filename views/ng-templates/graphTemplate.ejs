@@ -18,7 +18,7 @@
   <div class="toplayout">
     <div class="background">
       <div data-connectors-layer></div>
-      <div touch-action="none" class="workspace">
+      <div touch-action="none" class="workspace" workspace>
         <div class="nodes">
         <div component ng-repeat="data in visualData.components track by data.id" ng-switch on='data.type' data-node-id="{{data.id}}" ng-style="{transform:transform}" class="{{data.type}}-component component">
           <% include Component.ejs %>
