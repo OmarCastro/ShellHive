@@ -34,6 +34,7 @@ app.directive("connector", ['$timeout','$rootScope', ($timeout, $rootScope: angu
     scope.endsPositions = [startPosition, endPosition]
 
     function queryConnectorInfo() {
+      //console.log("queryConnectorInfo")
       const Startnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.startNode + "']") as HTMLElement;
       const StartPort = Startnode.querySelector("[data-port='" + dataedge.startPort + "'] > .box") as HTMLElement;
       const Endnode = graphElement.querySelector(".nodes .component[data-node-id='" + dataedge.endNode + "']") as HTMLElement;

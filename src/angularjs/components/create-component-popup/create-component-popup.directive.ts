@@ -38,12 +38,10 @@ app.directive("createComponentPopup", function () {
                 popupState.startPort = startPort;
                 popupState.endNode = endNode;
                 popupState.endPort = endPort;
-
                 if (endNode) element.addClass("left-side");
                 else element.removeClass("left-side");
 
                 element[0].style.transform = "translate(" + Math.round(x) + "px," + Math.round(y - popupHeight / 2) + "px)";
-
 
                 element.show();
                 $popupInput.focus();

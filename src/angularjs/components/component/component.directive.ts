@@ -11,14 +11,12 @@ interface ComponentScope extends angular.IScope {
   outputPorts: any[]
   collapsed: boolean
   togglecollapse: () => void
-  update: () => void
   transform: string
-  updatePorts: () => void
   title :{
-            name: string
-            description?: string
-            buttons: boolean
-          }
+    name: string
+    description?: string
+    buttons: boolean
+  }
 }
 
 app.directive("component", ['$document', '$rootScope', function ($document: angular.IDocumentService, $rootScope: angular.IRootScopeService) {
@@ -27,9 +25,15 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
   return {
     require: '^graph',
     scope: true,
+    template: require("./component.html"),
     link: function (scope: ComponentScope, element, attr, graphModelController: any) {
+      const datanode = scope.data as jsmodels.IComponent;
+      const elem = element[0];
 
-      const datanode = scope.data;
+      scope.$on("Graph::Component::UpdatePorts", updatePorts)
+      scope.$on("Graph::Component::Collapse", () => { scope.collapsed = true; updatePorts(); })
+      scope.$on("Graph::Component::Uncollapse", () => { scope.collapsed = false; updatePorts(); })
+
       function findMacro() {
         const macros = scope.graphData.macros;
         const ref = scope.graphData.macroList
@@ -40,7 +44,6 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
           }
         };
       };
-
 
       function updatePorts() {
         scope.inputPorts = [];
@@ -78,12 +81,8 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
       }
 
       updatePorts();
-
-
-
       let startX = 0;
       let startY = 0;
-      const title = datanode.title;
       const position = datanode.position;
       scope.collapsed = false;
       scope.togglecollapse = function () {
@@ -93,11 +92,10 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
           $rootScope.$broadcast("Graph::Connector::ResetOfComponent", datanode.id)
         });
       };
-      scope.update = function () {
-        scope.transform = "translate(" + position.x + "px, " + position.y + "px)";
+
+      function update() {
+        elem.style.transform = `translate(${position.x}px, ${position.y}px)`;
       }
-
-
 
       function existConnectionToPort(port) {
         return !scope.graphData.connections.every(function (connection) {
@@ -144,38 +142,37 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
 
       }
 
-
-      scope.updatePorts = updatePorts;
-
-      scope.update();
-      const elem = element[0];
+      update();
       //scope.$watch('data.position',scope.update, true);
       let drag = false;
+
+      function targetsElement(event: JQueryEventObject){
+        const targetTag = (event.target as HTMLElement).tagName;
+        console.log(targetTag);
+        return 'INPUT SELECT LABEL BUTTON A TEXTAREA'.split(" ").indexOf(targetTag.toUpperCase()) >= 0
+      }
+
       element.bind("pointerdown", function (ev) {
        const event = ev.originalEvent;
-       const targetTag = (event.target as HTMLElement).tagName;
         //console.log(datanode);
         switch (ev.which) {
-          case 2:
-            return true;
-          case 3:
-            return false;
+          case 2: return true;
+          case 3: return false;
         }
-        graphModelController.hidePopupAndEdge();
-        console.log(targetTag);
-        if (pointerId || 'INPUT SELECT LABEL BUTTON A TEXTAREA'.split(" ").indexOf(targetTag) >= 0) {
+        graphModelController.hidePopupAndEdge(); 
+        if (pointerId || targetsElement(ev)) {
           return true;
         }
         drag = false;
+        console.log("pointerdown")
         pointerId = (event as any).pointerId;
         $document.bind("pointermove", mousemove);
         $document.bind("pointerup", mouseup);
         startX = ev.screenX;
         startY = ev.screenY;
-
-
         return false;
       });
+
       function mousemove(ev) {
         const event = ev.originalEvent;
         moveBy(event.screenX - startX, event.screenY - startY);
@@ -187,7 +184,7 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
         drag = true;
         graphModelController.translateNode(datanode.id, position, x, y);
         CSRF.printget({ type: 'move', componentId: scope.data.id, movepos: position });
-        scope.update();
+        update();
         $rootScope.$broadcast("Graph::Connector::UpdateOfComponent",datanode.id,position)
       };
 
@@ -199,7 +196,7 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
           scope.$emit('updateComponent', datanode);
           drag = false;
           ev.preventDefault();
-          return false;
+          return false; 
         }
       };
     }

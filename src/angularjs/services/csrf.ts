@@ -27,7 +27,7 @@ export class CSRF {
   static printget(reqdata){
     CSRF.getToken((data) => {
       SocketService.sailsSocket.post('/graph/action', {message:reqdata,_csrf:CSRF.csrfToken}, function(data){
-      console.log(data);
+        //console.log(data);
       });
     });
   }

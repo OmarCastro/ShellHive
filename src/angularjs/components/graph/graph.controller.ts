@@ -41,7 +41,6 @@ interface GraphControllerScope extends angular.IScope {
   collapseAll: () => void
   uncollapseAll: () => void
   toggleShell: () => void
-  resetConnections: () => void
 }
 
 app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControllerScope, element){
@@ -137,9 +136,6 @@ app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControll
           CSRF.printget({type: 'remove component', componentId: component.id});
         };
        
-        this.updateScope = function(){
-          return scope.$digest();
-        };
         this.getVisualData = function(){
           return scope.visualData;
         };
@@ -153,7 +149,7 @@ app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControll
         this.translateNode = function(id, position, x, y){
           position.x += x / scale;
           position.y += y / scale;
-          scope.$digest();
+          scope.$broadcast("Graph::Component::Moved", {id});
         };
 
         scope.graphElement = element
@@ -175,25 +171,22 @@ app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControll
           return ( scope.visualData == scope.graphModel ) ? graphModel.macroList : []
         }
         scope.swapPrevious = function(array: any[], index: number, id){
-          var i$, len$, results$ = [];
-          if (index === 0) {
-            return;
-          }
+          if (index === 0) { return; }
           const ref$ = [array[index - 1], array[index]];
           array[index] = ref$[0],
           array[index - 1] = ref$[1];
 
+          const results = [];
           scope.visualData.connections.forEach((connection) => {
             if (connection.endNode === id) {
               if (connection.endPort === "file" + index) {
-                results$.push(connection.endPort = "file" + (index - 1));
+                results.push(connection.endPort = "file" + (index - 1));
               } else if (connection.endPort ===  "file" + (index - 1)) {
-                results$.push(connection.endPort = "file" + index);
+                results.push(connection.endPort = "file" + index);
               }
             }
           })
-
-          return results$;
+          return results;
         };
 
         function update(){
@@ -304,25 +297,17 @@ app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControll
         };
 
         scope.collapseAll = function(){
-          $('[component]').each(function(index){
-            var scope = $(this).scope() as any;
-            scope.collapsed = true
-            scope.updatePorts();
-            requestAnimationFrame(scope.resetConnections)
-          })
+          scope.$broadcast("Graph::Component::Collapse");
+          requestAnimationFrame(resetConnections)
+        }
+
+         scope.uncollapseAll = function(){
+          scope.$broadcast("Graph::Component::Uncollapse");
+          requestAnimationFrame(resetConnections)
         }
 
         scope.transformScale = function(){
           return scale;
-        }
-
-        scope.uncollapseAll = function(){
-          $('[component]').each(function(index){
-            var scope = $(this).scope() as any;
-            scope.collapsed = false
-            scope.updatePorts();
-            requestAnimationFrame(scope.resetConnections)
-          })
         }
 
         scope.toggleShell = function(){
@@ -331,7 +316,7 @@ app.controller("graphCtrl", ['$scope', '$element', function(scope: GraphControll
           scope.$emit('compileGraph')
         }
 
-        scope.resetConnections = function(){
+        function resetConnections(){
             scope.$broadcast("Graph::Connector::Reset");
         }
 

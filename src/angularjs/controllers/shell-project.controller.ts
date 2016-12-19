@@ -32,7 +32,6 @@ function shellProjectController($scope, alerts, modal, $timeout) {
       useRoute: routeTable.graphSubscription()
     }).onResponse(res => $scope.$applyAsync(() => {
       console.log(res);
-      debugger;
       $scope.graphData.components = res.graph.components.map(function (component) {
         component.data.id = component.id;
         res.graph.connections.forEach(function (connection) {

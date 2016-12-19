@@ -6,4 +6,9 @@ declare namespace jsmodels {
         macros: {[s: string]: any}
     }
 
+    interface IComponent extends dbmodels.IComponent {
+        title: string
+        position: IPoint
+        exec: string
+    }
 }

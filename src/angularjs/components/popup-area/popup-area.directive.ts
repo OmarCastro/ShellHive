@@ -16,7 +16,6 @@ interface EdgePopup {
 }
 
 app.directive("popupArea", () => ({
-    require: 'port',
     restrict: 'A',
     priority: 2,
     template: require("./popup-area.html"),
