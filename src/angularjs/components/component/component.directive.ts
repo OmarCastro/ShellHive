@@ -1,8 +1,11 @@
 import * as app from "../../app.module"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
+import { GraphController } from "../graph/graph.controller"
 import router from "../../router"
 import { CSRF } from "../../services/csrf"
+
+
 
 interface ComponentScope extends angular.IScope {
   data:any
@@ -26,7 +29,7 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
     require: '^graph',
     scope: true,
     template: require("./component.html"),
-    link: function (scope: ComponentScope, element, attr, graphModelController: any) {
+    link: function (scope: ComponentScope, element, attr, graphModelController: GraphController) {
       const datanode = scope.data as jsmodels.IComponent;
       const elem = element[0];
 

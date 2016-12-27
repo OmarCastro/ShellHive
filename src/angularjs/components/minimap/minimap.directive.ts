@@ -138,21 +138,24 @@ app.directive("minimap", () => ({
       handleBoundaryChanges();
     }
 
+    scope.$on("Graph::Component::Moved", () => scope.$applyAsync());
+
+
     function handleBoundaryChanges() {
       console.log("boundariesChanged()");
-      const width = boundary.x2 + margin - boundary.x1 + margin * 2
-      const height = boundary.y2 + margin - boundary.y1 + margin * 2
-      const wScale = mapSize / width
-      const hScale = mapSize / height
+      const width = boundary.x2 + margin - boundary.x1 + margin * 2;
+      const height = boundary.y2 + margin - boundary.y1 + margin * 2;
+      const wScale = mapSize / width;
+      const hScale = mapSize / height;
       const scale = Math.min(wScale, hScale);
-      scope.scale = scale
-      graphX = -boundary.x1 + margin
-      graphY = -boundary.y1 + margin
+      scope.scale = scale;
+      graphX = -boundary.x1 + margin;
+      graphY = -boundary.y1 + margin;
       scope.transform = `scale(${scale}) translate(${graphX}px, ${graphY}px)`;
       viewbox.css({
         borderWidth: 1 / scale + "px"
-      })
-      scope.$digest();
+      });
+      scope.$applyAsync();
     }
 
     scope.$watchCollection("visualData.components", () => updateBoundaries())

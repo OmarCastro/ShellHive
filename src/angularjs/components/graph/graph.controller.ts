@@ -20,6 +20,7 @@ export interface GraphController {
   isFreeSpace(elem: HTMLElement)
   translateGraphXY(x: number, y: number)
   moveScene(x: number, y: number)
+  translateNode(id, position: IPoint, x: number, y: number)
 }
 
 interface GraphControllerScope extends angular.IScope {

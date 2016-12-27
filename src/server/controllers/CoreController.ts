@@ -1,11 +1,9 @@
 import * as express from "express"
 import * as passport from "passport"
 import * as CircularJSON from "circular-json"
-declare var _
+import * as  _str from "underscore.string"
+import * as  _ from "lodash"
 export class CoreController {
-
-
-
 
         /**
          * Clean the name of a method to avoid anything bad.
@@ -15,7 +13,7 @@ export class CoreController {
          * @private
          */
         private _cleanMethodName(method: string): string{
-            return _.str.capitalize(method.replace('_', ''));
+            return _str.capitalize(method.replace('_', ''));
         }
 
 
@@ -58,7 +56,7 @@ export class CoreController {
          * @param options   Object that contains options.
          * @private
          */
-        public __beforeEach(req, res, callback: any, options: any = {}){
+        private __beforeEach(req, res, callback: any, options: any = {}){
             // Default user.
             if(!req.session.user){
                 req.session.user = {
@@ -69,8 +67,7 @@ export class CoreController {
 
             // Add debug information.
             // TODO Use express middleware instead...
-            console.log('---' +
-                '----------------- start -------------------', 'debug');
+            console.log('-------------------- start -------------------', 'debug');
             console.log('Url: ' + req.method + ' ' + req.baseUrl + req._parsedUrl.href, 'debug');
 
             if(!_.isEmpty(req.body)){
@@ -104,9 +101,23 @@ export module CoreController {
     session: any
     target: any
     options: any
+    socket: any
+    body: string
+    params: any
+    file: (param: string) => any
+    param: (param: string) => any
   }
 
   export interface Response extends express.Response {
+      view: (params: any) => any
+      /**
+       * throws a 500 server error to the client
+       */
+      serverError: (error: any) => any
+      /**
+       * throws a 404 not found to the client
+       */
+      notFound: () => any
   }
 
   export interface HandleRequestCallback{

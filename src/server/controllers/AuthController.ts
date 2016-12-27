@@ -13,6 +13,10 @@ import { CoreController } from "./CoreController"
 
 class AuthController extends CoreController {
   
+  /**
+   * Authenticate the user
+   * 
+   */
   login(req, res) { this._handleRequest(req,res,(req, res, options) => {
 
     passport.authenticate('local', function(err, user, info){
