@@ -4,6 +4,7 @@ import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
 import { Graph, Connection } from "../../../graph"
 import { GraphController } from "../graph/graph.controller"
+import { ViewTransform } from "../../../math"
 import template = require("./minimap.html")
 
 interface Boundary {
@@ -15,7 +16,6 @@ interface Boundary {
 
 export interface MinimapScope extends angular.IScope {
   graphElement: JQuery
-  scale: number
   mapSize: number
   viewport: any
   transform: string
@@ -33,33 +33,37 @@ app.directive("minimap", () => ({
     const viewbox = element.find(".viewbox");
     const mapSize = 150;
     const margin = 200 //margin to view all nodes
-
-    const boundary: Boundary = {x1:0,x2:0,y1:0,y2:0};
-    let graphX = 0
-    let graphY = 0
+    const viewport = {} as IViewBox;
+    const boundary: Boundary = { x1: 0, x2: 0, y1: 0, y2: 0 };
+    const transform = new ViewTransform();
     scope.mapSize = mapSize;
-    scope.scale = 1;
+    Object.defineProperty(scope, "scale", {
+      get: () => transform.scale
+    });
 
     elem.style.width = mapSize + "px"
     elem.style.height = mapSize + "px"
 
     scope.$on("Graph::Minimap::UpdateViewPort", (event, viewport) => updateViewport(viewport));
 
-    function updateViewport(viewport: IViewBox) {
-      const scale = scope.scale;
-      const {topLeft, bottomRight} = viewport
+    function updateViewport(newViewport: IViewBox) {
+      const scale = transform.scale;
+      const {topLeft, bottomRight} = newViewport
+      viewport.topLeft = topLeft;
+      viewport.bottomRight = bottomRight;
       viewbox.css({
-        transform: "translate(" + (-topLeft.x) + "px, " + (-topLeft.y) + "px)",
+        transform: "translate(" + topLeft.x + "px, " + topLeft.y + "px)",
         width: (bottomRight.x - topLeft.x),
         height: (bottomRight.y - topLeft.y),
         borderWidth: 1 / scale + "px"
       })
     }
+
+
     requestAnimationFrame(() => updateViewport({
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: workspace.offsetWidth, y: workspace.offsetHeight }
-    })
-    );
+    }));
 
     function mapMouseToScene(event) {
       const {x, y} = mapMouseToView(event);
@@ -74,20 +78,15 @@ app.directive("minimap", () => ({
       };
     };
 
-    function mapPointToScene(x, y) {
-      const scale = scope.scale;
-      return {
-        x: (x / scale - graphX),
-        y: (y / scale - graphY)
-      };
+    function mapPointToScene(x, y): IPoint {
+      return transform.inverseTransformCoordinates(x, y)
     };
 
     function pointerEvent(ev) {
       const event = ev.originalEvent
-      const viewport = scope.viewport;
       const point = mapMouseToScene(event)
-      const width = (viewport.x2 - viewport.x1)
-      const height = (viewport.y2 - viewport.y1)
+      const width = (viewport.bottomRight.x - viewport.topLeft.x)
+      const height = (viewport.bottomRight.y - viewport.topLeft.y)
       const midX = width / 2;
       const midY = height / 2;
       const newX = (point.x - midX)
@@ -148,10 +147,21 @@ app.directive("minimap", () => ({
       const wScale = mapSize / width;
       const hScale = mapSize / height;
       const scale = Math.min(wScale, hScale);
-      scope.scale = scale;
-      graphX = -boundary.x1 + margin;
-      graphY = -boundary.y1 + margin;
-      scope.transform = `scale(${scale}) translate(${graphX}px, ${graphY}px)`;
+      transform.scale = scale;
+      /**
+       * Here we want to invert the tranformation order so the the transformation matrix becomes
+       *  [ scale    0     x*scale ]
+       *  [ 0       scale  y*scale ]
+       *  [ 0        0        1    ]
+       * this matrix is the result of the following transformations
+       *   translate by {x} and {y} then scale by {scale}
+       *
+       * since applying the scale values to the {x} and {y} is enough to apply the inverse order
+       * of tranformation I opted to use this techinque to not create bloated code. 
+       */
+      transform.x = (-boundary.x1 + margin) * scale;
+      transform.y = (-boundary.y1 + margin) * scale;
+      scope.transform = transform.cssTransform;
       viewbox.css({
         borderWidth: 1 / scale + "px"
       });

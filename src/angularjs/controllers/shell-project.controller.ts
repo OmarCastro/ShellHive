@@ -6,7 +6,7 @@ import  * as welcomeUserModal  from "../modals/welcome-user.modal"
 import  * as projectCreationModal  from "../modals/project-creation.modal"
 import {CSRF}  from "../services/csrf"
 
-declare var io;
+declare const io;
 app.controller('shellProject', ['$scope', 'alerts', '$modal', '$timeout', shellProjectController]);
 
 

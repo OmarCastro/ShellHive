@@ -23,7 +23,7 @@ interface ComponentScope extends angular.IScope {
 }
 
 app.directive("component", ['$document', '$rootScope', function ($document: angular.IDocumentService, $rootScope: angular.IRootScopeService) {
-  var pointerId;
+  let pointerId;
   pointerId = 0;
   return {
     require: '^graph',
@@ -64,7 +64,7 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
               , { name: "retcode", text: "return" }]
             break;
           case 'macro':
-            var macro = findMacro();
+            const macro = findMacro();
             scope.inputPorts = macro.inputs.map(function (text, index) {
               return { name: "macroIn" + index, text: text }
             })
@@ -123,7 +123,7 @@ app.directive("component", ['$document', '$rootScope', function ($document: angu
           }
           break;
         case 'macro':
-          var macro = findMacro();
+          const macro = findMacro();
           scope.title = {
             name: macro.name,
             description: macro.description,

@@ -14,6 +14,7 @@ app.directive("workspace", ['$document', function($document){
     scope: true,
     restrict: 'A',
     require: '^graph',
+    template: require("./workspace.html"),
     link: function(scope:MiniConnectorScope , element, attr, graphController: GraphController){
         let pointerId = 0;
         let startX = 0;
@@ -60,7 +61,7 @@ app.directive("workspace", ['$document', function($document){
         });
 
         function mousemove(ev){
-          var event = ev.originalEvent;
+          const event = ev.originalEvent;
           const dx = event.screenX - startX;
           const dy = event.screenY - startY;
           graphController.translateGraphXY(dx, dy);

@@ -11,7 +11,7 @@ import parameterField = require("./directives/parameter-field.directive")
 import mousetrap = require("./directives/mousetrap.directive")
 import components = require("./components")
 
-var j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer,
+const j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer,
 parameterField,mousetrap,components]; //force browserify to add the requires
 
 const socket = window["socket"] = SocketService.socket

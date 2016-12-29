@@ -13,8 +13,8 @@ module.exports = {
     },
 
     type:{
-		type:'string',
-		in:["file","command","macro"]
+		  type:'string',
+		  in:["file","command","macro"]
     },
 
     data:{

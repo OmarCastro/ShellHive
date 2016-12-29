@@ -12,15 +12,15 @@ app.directive("minicomponent", function(){
   return {
     scope: true,
     link: function(scope: MiniComponentScope, element, attr){
-      var datanode = scope.data;
-      var $graphElement = scope.graphElement;
-      var graphElement = $graphElement[0];
+      const datanode = scope.data;
+      const $graphElement = scope.graphElement;
+      const graphElement = $graphElement[0];
 
       scope.offsetWidth = 100
       scope.offsetHeight = 100
 
-      var update = function(){
-        var elem = graphElement.querySelector(".nodes .component[data-node-id='" + datanode.id + "']") as HTMLElement;
+      function update(){
+        const elem = graphElement.querySelector(`.nodes .component[data-node-id='${datanode.id}']`) as HTMLElement;
         scope.offsetWidth = (elem) ? elem.offsetWidth:100
         scope.offsetHeight = (elem) ? elem.offsetHeight:100
         scope.$digest();
