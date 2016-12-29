@@ -4,15 +4,12 @@ import macroCtrl = require("./controllers/macro.controller")
 import shellProject = require("./controllers/shell-project.controller")
 import tip      = require("./directives/tip.directive")
 import terminal = require("./directives/terminal.directive")
-import filesystem = require("./directives/filesystem.directive")
-import directoryFile = require("./directives/directory-file.directive")
 import connectorsLayer = require("./directives/connectors-layer.directive")
 import parameterField = require("./directives/parameter-field.directive")
 import mousetrap = require("./directives/mousetrap.directive")
 import components = require("./components")
 
-const j = [macroCtrl,shellProject,tip,terminal,filesystem,directoryFile, connectorsLayer,
-parameterField,mousetrap,components]; //force browserify to add the requires
+const j = [macroCtrl,shellProject,tip,terminal,connectorsLayer,parameterField,mousetrap,components]; //force browserify to add the requires
 
 const socket = window["socket"] = SocketService.socket
 

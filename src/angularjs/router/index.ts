@@ -9,7 +9,7 @@ export const routeTable = RouteTable
  * TransactionHandler class
  * @description Responsible for handling transaction event
  * @type Input - data type that is sent from the client
- * @type Input - data type expected to receive as a response from the server
+ * @type Output - data type expected to receive as a response from the server
  */
 class TransactionHandler<Input, Output>{
 
@@ -41,7 +41,7 @@ class TransactionHandler<Input, Output>{
  * Transaction class
  * @description Representation of a Transaction
  * @type Input - data type that is sent from the client
- * @type Input - data type expected to receive as a response from the server
+ * @type Output - data type expected to receive as a response from the server
  */
 class Transaction<Input, Output>{
     constructor(
@@ -63,7 +63,7 @@ class Transaction<Input, Output>{
  * SendInputParams interface
  * @description data type to be used as argument for the Network::send() method
  * @type Input - data type that is sent from the client
- * @type Input - data type expected to receive as a response from the server
+ * @type Output - data type expected to receive as a response from the server
  */
 interface SendInputParams<Input, Output> {
     payload?: Input,
