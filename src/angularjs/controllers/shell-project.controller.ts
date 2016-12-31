@@ -141,18 +141,9 @@ console.log("subscribe project!!")
         var position = component.position;
         position.x = data.movepos.x;
         position.y = data.movepos.y;
+        $scope.$broadcast("Graph::Connector::UpdateOfComponent", data.componentId, data.movepos)
+        $scope.applyAsync()
 
-        var compScope: any = $('.component[data-node-id="' + data.componentId + '"]').scope();
-        compScope.update();
-        compScope.$digest();
-
-
-        $('path[connector]').each(function (index) {
-          var scope: any = $(this).scope();
-          if (scope.endsPositions[0] == position || scope.endsPositions[1] == position) {
-            scope.update();
-          }
-        })
       })
     },
     removeComponent: function (data) {
@@ -338,11 +329,6 @@ console.log("subscribe project!!")
   }
 
   $scope.$on("compileGraph", $scope.compileGraph);
-
-  $scope.$on("chat", function (event, message) {
-    //console.log('chat '+message+' !');
-    io.socket.post('/project/chat/', { data: message, _csrf: CSRF.csrfToken }, debugData);
-  });
 
   $scope.$on("removeComponent", function (event, message) {
     //console.log('removeComponent '+message+' !');

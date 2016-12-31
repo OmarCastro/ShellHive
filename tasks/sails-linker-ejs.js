@@ -3,7 +3,7 @@ module.exports = {
 			options: {
 				startTag: '<!--SCRIPTS-->',
 				endTag: '<!--SCRIPTS END-->',
-				fileTmpl: '<script src="%s"></script>',
+				fileTmpl: '<script type="text/javascript" src="%s"></script>',
 				appRoot: '.tmp/public'
 			},
 			files: {
@@ -17,7 +17,7 @@ module.exports = {
 			options: {
 				startTag: '<!--ANGULAR SCRIPTS-->',
 				endTag: '<!--ANGULAR SCRIPTS END-->',
-				fileTmpl: '<script src="%s"></script>',
+				fileTmpl: '<script type="text/javascript" src="%s"></script>',
 				appRoot: '.tmp/public'
 			},
 			files: {

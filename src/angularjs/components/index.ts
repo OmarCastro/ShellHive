@@ -6,4 +6,5 @@ import componentPopup = require("./create-component-popup")
 import workspace = require("./workspace")
 import popupArea = require("./popup-area")
 import filesystem = require("./filesystem")
-export const imports = [minimap, connector, component, graph,componentPopup, workspace, popupArea, filesystem]
+import chatArea = require("./chat-area")
+export const imports = [minimap, connector, component, graph,componentPopup, workspace, popupArea, filesystem, chatArea]

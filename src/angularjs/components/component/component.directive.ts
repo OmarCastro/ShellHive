@@ -1,15 +1,14 @@
 import * as app from "../../app.module"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
-import { GraphController } from "../graph/graph.controller"
+import { GraphController, GraphControllerScope } from "../graph/graph.controller"
 import router from "../../router"
 import { CSRF } from "../../services/csrf"
 
 
 
-interface ComponentScope extends angular.IScope {
+interface ComponentScope extends GraphControllerScope {
   data:any
-  graphData: jsmodels.IGraphData
   inputPorts: any[]
   outputPorts: any[]
   collapsed: boolean

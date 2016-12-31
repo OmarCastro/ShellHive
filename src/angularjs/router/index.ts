@@ -96,7 +96,7 @@ class Network {
      * creates a transaction between the client and the server
      */
     send<Input, Output>(params: SendInputParams<Input, Output>): Transaction<Input, Output> {
-
+        console.log("sendind frame... %o", params);
         const payload = params.payload
         const useRoute = params.useRoute
         const handlers = new TransactionHandler<Input, Output>()

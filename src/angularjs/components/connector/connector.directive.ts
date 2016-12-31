@@ -2,14 +2,17 @@ import * as app from "../../app.module"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
 import { ConnectorPathMaker } from "../../services/connector-path-maker"
+import { GraphControllerScope } from "../graph/graph.controller"
+
+
+
 import router from "../../router"
 
 
 import { Graph, Connection } from "../../../graph"
 
-interface ConnectorsScope extends angular.IScope {
+interface ConnectorsScope extends GraphControllerScope {
   edge: Connection
-  graphElement: JQuery;
   endsPositions: Point[]
   $index: number
 }

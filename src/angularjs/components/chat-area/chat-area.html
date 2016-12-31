@@ -1,0 +1,17 @@
+<button type="button" class="close" ng-click="chat.open = false; graph.updateLater()" aria-hidden="true">&times;</button>
+<div style="overflow:auto; padding-top: 1em; height:30%">
+<div ng-repeat="c in ctrl.clients track by c.id">
+    <b ng-style="{color:c.color}" ng-bind="c.name"></b>
+</div>
+</div>
+<hr style="margin:0">
+<div style="overflow:auto; height:calc(70% - 34px)">
+<div ng-repeat="c in ctrl.chatMessages">
+    <b ng-style="{color:c.color}" ng-bind="c.sender"></b>
+    <span ng-bind="c.text"></span>
+</div>
+</div>
+<form role="form" class="form" ng-submit='ctrl.sendChat()'>
+    <input type="text" id="name" ng-model="ctrl.chatMsg" placeholder="...message" class="form-control">
+    <button type="submit">send</button>
+</form>

@@ -3,7 +3,7 @@ import * as angular from "angular"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
 import { Graph, Connection } from "../../../graph"
-import { GraphController } from "../graph/graph.controller"
+import { GraphController, GraphControllerScope } from "../graph/graph.controller"
 import { ViewTransform } from "../../../math"
 import template = require("./minimap.html")
 
@@ -14,13 +14,8 @@ interface Boundary {
   y2: number
 }
 
-export interface MinimapScope extends angular.IScope {
-  graphElement: JQuery
-  mapSize: number
-  viewport: any
+export interface MinimapScope extends GraphControllerScope {
   transform: string
-  boundaries: () => {}
-  visualData: Graph
 }
 
 app.directive("minimap", () => ({
@@ -36,7 +31,6 @@ app.directive("minimap", () => ({
     const viewport = {} as IViewBox;
     const boundary: Boundary = { x1: 0, x2: 0, y1: 0, y2: 0 };
     const transform = new ViewTransform();
-    scope.mapSize = mapSize;
     Object.defineProperty(scope, "scale", {
       get: () => transform.scale
     });

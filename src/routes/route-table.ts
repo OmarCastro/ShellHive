@@ -8,6 +8,7 @@ export class RouteTable {
     directoriesOfProject = (projectId: string) => new Route<void, any[]>(                                     Method.get  ,   '/directories/project/:projectId', {projectId}    )
     uploadToProject = (projectId: string)      => new Route<void,void>(                                       Method.get  ,   '/upload/:projectId',  {projectId}    )
     setUserName = ()                           => new Route<UserConfigRequest, void>(                         Method.post ,   '/project/setmyname'    )
+    chat = ()                                  => new Route<ChatMessage, void>(                                    Method.post ,   '/project/chat'    )
 }
 
 export default new RouteTable();

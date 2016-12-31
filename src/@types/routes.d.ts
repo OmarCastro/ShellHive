@@ -31,3 +31,7 @@ interface UserConfigRequest extends CsrfRequest {
     name: string,
     color?: string,
 }
+
+interface ChatMessage extends CsrfRequest {
+    data: string
+}

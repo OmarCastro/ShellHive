@@ -1,5 +1,5 @@
-function project_room(id){return 'project_room_'+id}
-function graph_room(graphId, projectID){return 'graph_'+graphId}
+function project_room(id){return 'project_room_'+id;}
+function graph_room(graphId, projectID){return 'graph_'+graphId; }
 var parser = require('../../lib/parser/parser.js');
 var socketService = require('./socketsService.js');
 
@@ -52,14 +52,14 @@ var CollaborationService = module.exports = {
     var colors = ['#AE331F', '#D68434', '#116A9F', '#360B95', '#1c8826'];
     var socket = req.socket;
     var io = sails.io;
-    var data = socket.collabData = {}
+    var data = socket.collabData = {};
     if(req.user){
       socket.userId = req.user.id;
       data.name = req.user.name;
-      data.visitor = false
+      data.visitor = false;
     } else {
       socket.userId = -1;
-      data.name = "Anonymous" 
+      data.name = "Anonymous"; 
       data.visitor = true;     
     }
     data.id = socket.id;
@@ -67,14 +67,14 @@ var CollaborationService = module.exports = {
     socket.projectId = project.id;
 
     io.sockets.in(projectRoom).emit('new user', data);
-    socket.join(projectRoom)
-    var existingClients = socketService.getClientListInRoom(projectRoom)
+    socket.join(projectRoom);
+    var existingClients = socketService.getClientListInRoom(projectRoom);
 
     console.log("existingClients: %o",existingClients);
     var clientsData = existingClients.map(function(client){
       return client.collabData;
     });
-    sails.log('socket '+socket.id+' joined project room ' + id)
+    sails.log('socket '+socket.id+' joined project room ' + id);
     //Project.subscribe( req.socket, project); //at the time of development it wasnt working well
     var response = {
       success: true,
@@ -118,6 +118,7 @@ var CollaborationService = module.exports = {
        res.json("user hasn't join the project yet", 500); 
     }
   },
+
   emitMessageToGraph: function(id, type ,content){
     sails.io.sockets.in(graph_room(id)).emit(type,  content);
   },

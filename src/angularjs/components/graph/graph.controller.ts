@@ -25,11 +25,11 @@ export interface GraphController {
   translateNode(id, position: IPoint, x: number, y: number)
 }
 
-interface GraphControllerScope extends angular.IScope {
-  visualData: Graph
+export interface GraphControllerScope extends angular.IScope {
+  visualData: jsmodels.IGraphData
   sel: any
   graphModel: any
-  graphData: any
+  graphData: jsmodels.IGraphData
   options: any
   viewGraph: any
   graphElement: any
