@@ -16,7 +16,7 @@ export interface GraphControllerScope extends angular.IScope {
   graphElement: any
   shell: any
   newCommandAtTopLeft: any
-  graph: GraphController;
+  graphCtrl: GraphController;
   isRootView: () => boolean
   macroViewList: () => any[]
   swapPrevious: any
@@ -97,6 +97,9 @@ export class GraphController {
     }.bind(this);
 
   }
+
+  get components(): graph.IComponent[]{ return this.scope.visualData.components }
+  get connections(): graph.IConnection[]{ return this.scope.visualData.connections }
 
   newCommandAtTopLeft(command: string) {
     this.createCommandComponent({

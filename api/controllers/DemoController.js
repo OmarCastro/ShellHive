@@ -10,7 +10,7 @@ module.exports = {
 
 
   subscribe: function(req,res){
-    var parser = CollaborationService.parser
+    var parser = CollaborationService.parser;
     res.json({
       implementedCommands: parser.implementedCommands,
       SelectionOptions: parser.VisualSelectorOptions,
@@ -18,7 +18,7 @@ module.exports = {
   },
 
   startproject: function(req,res){
-    var parser = CollaborationService.parser
+    var parser = CollaborationService.parser;
   	var socket = req.socket;
   	sails.log(socket);
   	var command = req.body.command;
@@ -27,7 +27,7 @@ module.exports = {
     parsedGraph.connections = parsedGraph.connections.map(function(connection){return connection.toJSON()});
     res.json({
     	graph:parsedGraph.toJSON()
-    })
+    });
   }
   
 };

@@ -107,7 +107,7 @@ app.directive("minimap", () => ({
     }
 
     function getBoundary(): Boundary {
-      const components = scope.visualData.components;
+      const components = graphController.components;
       if (!components || components.length == 0) return null;
       const firstComponentPosition = components[0].position
       let minX = firstComponentPosition.x;
@@ -162,7 +162,7 @@ app.directive("minimap", () => ({
       scope.$applyAsync();
     }
 
-    scope.$watchCollection("visualData.components", () => updateBoundaries())
+    scope.$watchCollection("graphCtrl.components", () => updateBoundaries())
     scope.$on("Graph::Component::Moved", () => updateBoundaries());
   }
 }));

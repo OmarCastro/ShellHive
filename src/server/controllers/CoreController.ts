@@ -102,7 +102,7 @@ export module CoreController {
     target: any
     options: any
     socket: any
-    body: string
+    body: any
     params: any
     file: (param: string) => any
     param: (param: string) => any
