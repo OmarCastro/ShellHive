@@ -66,6 +66,7 @@
     "@types/mousetrap": "^1.5.32",
     "@types/passport": "^0.2.34",
     "@types/socket.io-client": "^1.4.28",
+    "@types/underscore": "^1.7.36",
     "@types/underscore.string": "0.0.30",
     "angular": "^1.5.8",
     "angular-animate": "^1.5.8",

@@ -2,7 +2,7 @@ import * as app from "../../app.module"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
 import { GraphController, GraphControllerScope } from "../graph/graph.controller"
-import router from "../../router"
+import network from "../../router"
 import { CSRF } from "../../services/csrf"
 
 

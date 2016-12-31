@@ -1,7 +1,7 @@
 import * as app from "../../app.module"
 import { projectId } from "../../utils"
 import { SocketService } from "../../socket.service"
-import router from "../../router"
+import network from "../../router"
 
 interface FileScope extends angular.IScope {
   record: any

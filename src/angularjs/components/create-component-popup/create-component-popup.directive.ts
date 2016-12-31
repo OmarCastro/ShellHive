@@ -72,10 +72,11 @@ app.directive("createComponentPopup", function () {
                             fromInput: true
                         })
                 } else {
-                    scope.$emit('addComponent', {
+                    graphController.createCommandComponent({
                         command: content,
-                        position: { x: popupState.x, y: popupState.y }
-                    });
+                        position: popupState
+                    })
+                   
                 }
                 graphController.hidePopupAndEdge();
             }

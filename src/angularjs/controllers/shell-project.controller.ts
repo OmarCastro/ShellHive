@@ -1,7 +1,7 @@
 import * as app from "../app.module"
 import { projectId } from "../utils"
 import { SocketService } from "../socket.service"
-import router, { routeTable } from "../router"
+import network, { routeTable } from "../router"
 import  * as welcomeUserModal  from "../modals/welcome-user.modal"
 import  * as projectCreationModal  from "../modals/project-creation.modal"
 import {CSRF}  from "../services/csrf"
@@ -27,7 +27,7 @@ function shellProjectController($scope, alerts, modal, $timeout) {
 
   function viewGraph(graph) {
     if (graph.id) { graph = graph.id }
-    router.send({
+    network.send({
       payload: { id: graph },
       useRoute: routeTable.graphSubscription()
     }).onResponse(res => $scope.$applyAsync(() => {
@@ -47,7 +47,7 @@ function shellProjectController($scope, alerts, modal, $timeout) {
   $scope.viewGraph = viewGraph
 
 console.log("subscribe project!!")
-  router.send({
+  network.send({
     payload: { id: projectId },
     useRoute: routeTable.projectSubscription()
   }).onResponse((data) => {
@@ -71,10 +71,10 @@ console.log("subscribe project!!")
       var visitorName: string = projectId == "3" ? "anon" : sessionStorage["visitorName"];
       var visitorColor: string = projectId == "3" ? "blue" : sessionStorage["visitorColor"];
       if (visitorName && visitorColor) {
-        router.send({payload: { name: visitorName, color: visitorColor }, useRoute: routeTable.setUserName()});
+        network.send({payload: { name: visitorName, color: visitorColor }, useRoute: routeTable.setUserName()});
       } else {
         welcomeUserModal.showModal(modal).then((form) => {
-          router.send({payload: { name: form.name }, useRoute: routeTable.setUserName()});
+          network.send({payload: { name: form.name }, useRoute: routeTable.setUserName()});
           sessionStorage["visitorName"] = form.name;
           sessionStorage["visitorColor"] = data.you.color;
         });
@@ -339,12 +339,6 @@ console.log("subscribe project!!")
     //console.log('addAndConnectComponent ', message,' !');
     message._csrf = CSRF.csrfToken
     io.socket.post('/graph/createAndConnectComponent/', message, debugData);
-  });
-
-  $scope.$on("addComponent", function (event, message) {
-    //console.log('addComponent ', message,' !');
-    message._csrf = CSRF.csrfToken
-    io.socket.post('/graph/createComponent/', message, debugData);
   });
 
   $scope.$on("updateComponent", function (event, message) {

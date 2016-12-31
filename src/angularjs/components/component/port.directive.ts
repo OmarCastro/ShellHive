@@ -30,7 +30,7 @@ app.directive("port", ['$document',($document: angular.IDocumentService) => ({
       }
 
       element.bind("pointerdown", function(ev){
-        graphController.startEdge(elem, datanode.type, portName, position, (ev as any).originalEven);
+        graphController.startEdge(elem, datanode.type, portName, position);
         $document.bind("pointermove", mousemove);
         $document.bind("pointerup", mouseup);
         return false;

@@ -66,7 +66,7 @@
   </div>
 
   <div ng-switch-when="macro">
-    <div class="btn btn-sm btn-primary" ng-click="graph.setGraphView(data.graph)">
+    <div class="btn btn-sm btn-primary" ng-click="graphCtrl.setGraphView(data.graph)">
       view macro
     </div>
   </div>
@@ -82,10 +82,10 @@
         <button ng-if="!collapsed" ng-click="data.files.splice($index,1);$emit('updateComponent',data)" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-remove"></span>
         </button>
-        <button ng-click="swapPrevious(data.files,$index,data.id);$emit('updateComponent',data)" ng-if="$index && !collapsed" class="btn btn-xs btn-default">
+        <button ng-click="graphCtrl.swapPrevious(data.files,$index,data.id);$emit('updateComponent',data)" ng-if="$index && !collapsed" class="btn btn-xs btn-default">
           <span class="glyphicon glyphicon-chevron-up"></span>
         </button>
-        <button ng-click="swapPrevious(data.files,$index + 1,data.id);$emit('updateComponent',data)" ng-if="$index != data.files.length -1 && !collapsed"
+        <button ng-click="graphCtrl.swapPrevious(data.files,$index + 1,data.id);$emit('updateComponent',data)" ng-if="$index != data.files.length -1 && !collapsed"
           class="btn btn-xs btn-default">
         <span class="glyphicon glyphicon-chevron-down"></span>
         </button><br>
@@ -124,7 +124,7 @@
           <input type="number" name="field" ng-model="data.selectors[name].value" ng-if="data.selectors[name].type == 'numeric parameter'"
             min="0" required class="form-control">
           <div class="input-group-btn">
-            <button elscope type="button" ng-click="graph.setSelection({data:data, name:name},scopedElement)" class="btn btn-default">
+            <button elscope type="button" ng-click="graphCtrl.setSelection({data:data, name:name},scopedElement)" class="btn btn-default">
               <span ng-bind="data.selectors[name].name"></span><span class="caret"></span>
             </button>
           </div>

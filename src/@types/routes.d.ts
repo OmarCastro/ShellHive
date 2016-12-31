@@ -35,3 +35,8 @@ interface UserConfigRequest extends CsrfRequest {
 interface ChatMessage extends CsrfRequest {
     data: string
 }
+
+interface ICreateComponentParams extends CsrfRequest {
+    command: string
+    position: IPoint
+}

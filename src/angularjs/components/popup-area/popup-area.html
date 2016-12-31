@@ -4,7 +4,7 @@
 <div ng-if="sel.open" class="selectpopup dropdown open" ng-style="{transform:sel.transform, MsTransform:sel.transform}">
     <ul class="dropdown-menu">
         <li ng-repeat="c in options[sel.data.exec][sel.name]">
-            <a ng-click="graph.selectSelection(c)">
+            <a ng-click="graphCtrl.selectSelection(c)">
                 <span ng-bind="c"></span>
             </a>
         </li>

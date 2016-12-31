@@ -6,7 +6,7 @@ import { GraphControllerScope } from "../graph/graph.controller"
 
 
 
-import router from "../../router"
+import network from "../../router"
 
 
 import { Graph, Connection } from "../../../graph"
