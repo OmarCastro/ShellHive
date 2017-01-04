@@ -6,19 +6,17 @@ export const serviceName = "alerts"
 
 app.service(serviceName,serviceDeclaration)
 
- 
-declare module alertService {
 
-}
-interface AlertMsg {
-  type: "info" | "danger";
+export interface AlertMsg {
+  type?: "info" | "danger";
   msg: string
+  progress?: number
 }
 
 export interface IAlertService {
   alerts: AlertMsg[];
   addAlert: (msg: AlertMsg) => void;
-  addNotification: (msg: AlertMsg) => void;
+  addNotification: (msg: AlertMsg) => AlertMsg;
   removeAfter: (msg: AlertMsg, time: number) => void;
   closeAlert: (index: number) => void;
 }

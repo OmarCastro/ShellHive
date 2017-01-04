@@ -3,6 +3,8 @@ import { projectId } from "../../utils"
 import {SocketService} from "../../socket.service"
 import network, { routeTable } from "../../router"
 import {CSRF}  from "../../services/csrf"
+import {IAlertService, AlertMsg}  from "../../services/alerts"
+import dropzone = require("dropzone")
 
 interface FileSystemScope extends angular.IScope{
     directoryContent: any[]
@@ -10,10 +12,44 @@ interface FileSystemScope extends angular.IScope{
     selectFile: (file: any) => void
 }
 
-app.directive("filesystem", ['alerts','$rootScope',(alerts, rootScope) => ({
+interface UploadingFile {
+  file: Dropzone.DropzoneFile
+  notification: AlertMsg
+}
+
+
+
+app.directive("filesystem", ['alerts','$rootScope',(alerts: IAlertService, rootScope) => { 
+  
+  class FileUploadManager {
+    private files = [] as UploadingFile[]
+    notificationOf(file: Dropzone.DropzoneFile){
+      for(const fileUpload of this.files){
+        if(fileUpload.file === file) return [fileUpload.notification];
+      }
+      return [];
+    }
+    
+    pushFile(file: Dropzone.DropzoneFile){
+      this.files.push({
+            file, 
+            notification: alerts.addNotification({msg: 'Uploading ' + file.name})
+        })
+    }
+
+    pullFile(file: Dropzone.DropzoneFile){
+      this.files = this.files.reduce((result, fileUpload) => {
+        if(fileUpload.file !== file){ result.push(fileUpload); }
+        return result;
+      }, [])
+    }
+}
+  
+  
+  return {
     scope: true,
     template: require("./filesystem.html"),
-    link: function(scope: FileSystemScope, element, attr){
+    link: function(scope: FileSystemScope, element: JQuery, attr){
       scope.directoryContent = []
       scope.selectedFile = null
       scope.selectFile = function(file){
@@ -29,7 +65,9 @@ app.directive("filesystem", ['alerts','$rootScope',(alerts, rootScope) => ({
         })
       }
 
-      (<any>element).dropzone({ 
+      const uploadingFiles = new FileUploadManager()
+
+      new dropzone(element[0],{ 
         url: routeTable.uploadToProject(projectId).url,
         maxFilesize: 100,
         maxThumbnailFilesize: 5,
@@ -41,17 +79,20 @@ app.directive("filesystem", ['alerts','$rootScope',(alerts, rootScope) => ({
           xhr.setRequestHeader('X-CSRF-Token', CSRF.csrfToken);
         },
         uploadprogress: function(file, progress){
-          file.__notification.progress = ~~progress
+          uploadingFiles.notificationOf(file).map(_ => _.progress = ~~progress)
           rootScope.$apply();
         },
         addedfile: function(file){
           console.log(file)
-          file.__notification = alerts.addNotification({msg: 'Uploading ' + file.name})
+          uploadingFiles.pushFile(file)
         },
         success: function(file){
-          file.__notification.msg = 'File "' + file.name + '" uploaded'
-          delete file.__notification.progress
-          alerts.removeAfter(file.__notification, 5000);
+          uploadingFiles.notificationOf(file).map(_ => {
+            _.msg = 'File "' + file.name + '" uploaded';
+            _.progress = null
+            alerts.removeAfter(_, 5000);
+          })
+          uploadingFiles.pullFile(file);
           rootScope.$apply();
           updateFileSystem();
         }
@@ -59,5 +100,5 @@ app.directive("filesystem", ['alerts','$rootScope',(alerts, rootScope) => ({
 
       updateFileSystem();
     }
-  })]);
+}}]);
 
