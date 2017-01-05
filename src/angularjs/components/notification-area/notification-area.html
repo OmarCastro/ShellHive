@@ -1,0 +1,9 @@
+<div>
+  <alert ng-repeat="notification in ctrl.notifications" type="{{notification.type}}" class="repeated-item" close="notification.closeNotification($index)">{{notification.msg}}
+    <div class="progress progress-striped active" ng-if="notification.progress">
+      <div class="progress-bar"  role="progressbar" aria-valuenow="{{notification.progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{notification.progress}}%">
+        <span>{{notification.progress}}%</span>
+      </div>
+    </div>
+  </alert>
+</div>

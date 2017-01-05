@@ -4,16 +4,16 @@ import { SocketService } from "../socket.service"
 import network, { routeTable } from "../router"
 import  * as welcomeUserModal  from "../modals/welcome-user.modal"
 import  * as projectCreationModal  from "../modals/project-creation.modal"
+import notificationService, {Alert} from "../components/notification-area/notifications.service"
 import {CSRF}  from "../services/csrf"
 
 declare const io;
-app.controller('shellProject', ['$scope', 'alerts', '$modal', '$timeout', shellProjectController]);
+app.controller('shellProject', ['$scope', '$modal', '$timeout', shellProjectController]);
 
 
 
-function shellProjectController($scope, alerts, modal, $timeout) {
+function shellProjectController($scope, modal, $timeout) {
   const visualData = {} as jsmodels.IGraphData;
-  $scope.alerts = alerts
   $scope.filesystem = 0
   $scope.graphData = visualData;
   $scope.implementedCommands = [];
@@ -233,11 +233,15 @@ console.log("subscribe project!!")
   function debugData(data) {
     console.log(data);
     if (data.alert) {
-      alerts.addAlert({ type: 'danger', msg: data.message });
+      const notification = { type: 'danger', msg: data.message } as Alert
+      notificationService.pushNotification(notification)
+      notificationService.closeNotificationOnTimeout(notification, 5000)
       $scope.$digest();
     } else if (data.status == 500 && data.errors) {
       data.errors.forEach(function (message) {
-        alerts.addAlert({ type: 'danger', msg: message })
+        const notification = { type: 'danger', msg: message } as Alert
+        notificationService.pushNotification(notification)
+        notificationService.closeNotificationOnTimeout(notification, 5000)
       })
     }
   }

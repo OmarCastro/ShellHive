@@ -1,14 +1,4 @@
-<div class="alerts">
-  <div>
-  <alert ng-repeat="alert in alerts.alerts" type="{{alert.type}}" class="repeated-item" close="alerts.closeAlert($index)">{{alert.msg}}
-    <div class="progress progress-striped active" ng-if="alert.progress">
-      <div class="progress-bar"  role="progressbar" aria-valuenow="{{alert.progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{alert.progress}}%">
-        <span>{{alert.progress}}%</span>
-      </div>
-    </div>
-  </alert>
-  </div>
-</div>
+<notification-area class="alerts"></notification-area>
 <div class="popupArea" data-popup-area></div>
 <% include graphNavbar %>
 <div class="directory directory-manager" filesystem ng-if="status.filesystem"></div>

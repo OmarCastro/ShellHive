@@ -3,7 +3,7 @@ import { SocketService } from "../socket.service"
 import { projectId } from "../utils"
 import  * as newMacroModal  from "../modals/new-macro.modal"
 import  * as editMacroModal  from "../modals/edit-macro.modal"
-import  * as alerts  from "../services/alerts"
+import notificationService, {Alert} from "../components/notification-area/notifications.service"
 import  * as csrf  from "../services/csrf"
 
 
@@ -15,10 +15,10 @@ interface ICreateMacroResult{
   macro: any
 }
 
-app.controller('macroCtrl', ['$scope','$modal',alerts.serviceName, macroCtrlFunction]);
+app.controller('macroCtrl', ['$scope','$modal', macroCtrlFunction]);
 
 
-function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
+function macroCtrlFunction(scope, modal){
 
 
   scope.newMacroModal = function(){
@@ -71,13 +71,17 @@ function macroCtrlFunction(scope, modal, alerts: alerts.IAlertService){
 
     SocketService.sailsSocket.post<ICreateMacroResult>('/macro/create/', message, function(data){
        console.log(data);
-      if(data.alert){
-        alerts.addAlert({type:'danger', msg: data.message});
-      } else if(data.status == 500 && data.errors){
-        data.errors.forEach(function(message){
-          alerts.addAlert({type:'danger', msg: message})
-        })
-      }
+       if (data.alert) {
+          const notification = { type: 'danger', msg: data.message } as Alert
+          notificationService.pushNotification(notification)
+          notificationService.closeNotificationOnTimeout(notification, 5000)
+        } else if (data.status == 500 && data.errors) {
+          data.errors.forEach(function (message) {
+            const notification = { type: 'danger', msg: message } as Alert
+            notificationService.pushNotification(notification)
+            notificationService.closeNotificationOnTimeout(notification, 5000)
+          })
+        }
       scope.$digest();
       if(data.macro){
         scope.graph.setGraphView(data.macro);

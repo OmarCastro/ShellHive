@@ -3,7 +3,8 @@ import { projectId } from "../../utils"
 import {SocketService} from "../../socket.service"
 import network, { routeTable } from "../../router"
 import {CSRF}  from "../../services/csrf"
-import {IAlertService, AlertMsg}  from "../../services/alerts"
+import notificationService, {ProgressNotification} from "../notification-area/notifications.service"
+import {FileUploadManager} from "./file-upload-manager.service"
 import dropzone = require("dropzone")
 
 interface FileSystemScope extends angular.IScope{
@@ -12,41 +13,7 @@ interface FileSystemScope extends angular.IScope{
     selectFile: (file: any) => void
 }
 
-interface UploadingFile {
-  file: Dropzone.DropzoneFile
-  notification: AlertMsg
-}
-
-
-
-app.directive("filesystem", ['alerts','$rootScope',(alerts: IAlertService, rootScope) => { 
-  
-  class FileUploadManager {
-    private files = [] as UploadingFile[]
-    notificationOf(file: Dropzone.DropzoneFile){
-      for(const fileUpload of this.files){
-        if(fileUpload.file === file) return [fileUpload.notification];
-      }
-      return [];
-    }
-    
-    pushFile(file: Dropzone.DropzoneFile){
-      this.files.push({
-            file, 
-            notification: alerts.addNotification({msg: 'Uploading ' + file.name})
-        })
-    }
-
-    pullFile(file: Dropzone.DropzoneFile){
-      this.files = this.files.reduce((result, fileUpload) => {
-        if(fileUpload.file !== file){ result.push(fileUpload); }
-        return result;
-      }, [])
-    }
-}
-  
-  
-  return {
+app.directive("filesystem", [() => ({ 
     scope: true,
     template: require("./filesystem.html"),
     link: function(scope: FileSystemScope, element: JQuery, attr){
@@ -80,7 +47,7 @@ app.directive("filesystem", ['alerts','$rootScope',(alerts: IAlertService, rootS
         },
         uploadprogress: function(file, progress){
           uploadingFiles.notificationOf(file).map(_ => _.progress = ~~progress)
-          rootScope.$apply();
+          scope.$applyAsync()
         },
         addedfile: function(file){
           console.log(file)
@@ -90,15 +57,14 @@ app.directive("filesystem", ['alerts','$rootScope',(alerts: IAlertService, rootS
           uploadingFiles.notificationOf(file).map(_ => {
             _.msg = 'File "' + file.name + '" uploaded';
             _.progress = null
-            alerts.removeAfter(_, 5000);
+            notificationService.closeNotificationOnTimeout(_, 5000).then(()=>scope.$applyAsync());
           })
           uploadingFiles.pullFile(file);
-          rootScope.$apply();
+          scope.$applyAsync()
           updateFileSystem();
         }
       });
-
       updateFileSystem();
     }
-}}]);
+})]);
 

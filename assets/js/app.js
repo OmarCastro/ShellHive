@@ -23,7 +23,7 @@ Mousetrap.bind("shift+p", function () {
     document.body.classList.remove("sr-shoot");
 });
 
-},{"./components":28,"./controllers/macro.controller":40,"./controllers/shell-project.controller":41,"./directives/connectors-layer.directive":42,"./directives/mousetrap.directive":44,"./directives/parameter-field.directive":45,"./directives/terminal.directive":46,"./directives/tip.directive":47,"./socket.service":56,"mousetrap":73}],2:[function(require,module,exports){
+},{"./components":29,"./controllers/macro.controller":45,"./controllers/shell-project.controller":46,"./directives/connectors-layer.directive":47,"./directives/mousetrap.directive":49,"./directives/parameter-field.directive":50,"./directives/terminal.directive":51,"./directives/tip.directive":52,"./socket.service":61,"mousetrap":78}],2:[function(require,module,exports){
 "use strict";
 var angular = require("angular");
 var ngAnimate = require("angular-animate");
@@ -34,7 +34,7 @@ window["app"] = ModuleDeclaration;
 window["angular"] = angular;
 module.exports = ModuleDeclaration;
 
-},{"angular":71,"angular-animate":65,"angular-ui-bootstrap":67,"angular-ui-layout":68}],3:[function(require,module,exports){
+},{"angular":76,"angular-animate":70,"angular-ui-bootstrap":72,"angular-ui-layout":73}],3:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 var router_1 = require("../../router");
@@ -63,7 +63,7 @@ app.component("chat", {
     }
 });
 
-},{"../../app.module":2,"../../router":52,"./chat-area.html":4}],4:[function(require,module,exports){
+},{"../../app.module":2,"../../router":57,"./chat-area.html":4}],4:[function(require,module,exports){
 module.exports = "<button type=button class=close ng-click=\"chat.open = false; graphCtrl.updateLater()\" aria-hidden=true>&times;</button><div style=\"overflow:auto; padding-top: 1em; height:30%\"><div ng-repeat=\"c in ctrl.clients track by c.id\"><b ng-style={color:c.color} ng-bind=c.name></b></div></div><hr style=margin:0><div style=\"overflow:auto; height:calc(70% - 34px)\"><div ng-repeat=\"c in ctrl.chatMessages\"><b ng-style={color:c.color} ng-bind=c.sender></b> <span ng-bind=c.text></span></div></div><form role=form class=form ng-submit=ctrl.sendChat()><input type=text id=name ng-model=ctrl.chatMsg placeholder=...message class=form-control> <button type=submit>send</button></form>";
 
 },{}],5:[function(require,module,exports){
@@ -248,7 +248,7 @@ app.directive("component", ['$document', '$rootScope', function ($document, $roo
         };
     }]);
 
-},{"../../app.module":2,"../../services/csrf":55,"./component.html":7}],7:[function(require,module,exports){
+},{"../../app.module":2,"../../services/csrf":60,"./component.html":7}],7:[function(require,module,exports){
 module.exports = "<div class=\"tip title\"><div class=tooltip ng-if=showTooltip ng-style=\"{transform:'translate(-50%) scale('+(1/transformScale())+')'}\">Drag me to move me!</div><span class=title-name ng-bind=title.name></span> <span class=button-group ng-if=title.buttons><a ng-click=togglecollapse() class=glyphicon ng-class=\"(collapsed)?'glyphicon-chevron-up':'glyphicon-chevron-down'\"></a> <a ng-click=\"$emit('removeComponent', data.id)\" class=\"close-button glyphicon glyphicon-remove\"></a></span></div><div class=ports><div class=input><div><div class=tip data-input-port data-port={{port.name}} ng-repeat=\"port in inputPorts\"></div></div></div><div class=output><div class=tip data-output-port data-port={{port.name}} ng-repeat=\"port in outputPorts\"></div></div><div style=\"clear: both\"></div></div><div ng-switch on=data.type><div ng-switch-when=input><div class=ports><div class=output><div class=\"input-group input-group-sm\"><div ng-repeat=\"port in data.ports track by $index\"><button ng-if=!collapsed ng-click=data.ports.splice($index,1) class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-remove\"></span></button> <input type=text ng-model=data.ports[$index] class=form-control> <span data-port=\"{{'macroIn'+$index}}\"><span class=box></span></span></div></div><button ng-click=\"data.ports.push('')\" class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-plus\"></span></button></div></div></div><div ng-switch-when=output><div class=ports><div class=input><div class=\"input-group input-group-sm\"><div ng-repeat=\"port in data.ports track by $index\"><span data-port=\"{{'macroOut'+$index}}\"><span class=box></span></span> <input type=text ng-model=data.ports[$index] class=form-control> <button ng-if=!collapsed ng-click=data.ports.splice($index,1) class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-remove\"></span></button></div><button ng-click=\"data.ports.push('')\" class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-plus\"></span></button></div></div></div></div><div ng-switch-when=file><div class=\"input-group input-group-sm\"><input parameter-field class=\"filename form-control\" type=text ng-model=data.filename></div></div><div ng-switch-when=macro><div class=\"btn btn-sm btn-primary\" ng-click=graphCtrl.setGraphView(data.graph)>view macro</div></div><div ng-switch-when=command><div ng-if=\"data.files !== undefined && (!collapsed || data.files.length)\">files :<br ng-if=\"data.files.length > 0\"><div ng-repeat=\"file in data.files track by $index\"><span data-port=file{{$index}}><span class=box></span></span> <span ng-bind=\"'entry' + $index\" ng-if=isString(data.files[$index])></span> <span ng-bind-template=\"{{' '+data.files[$index][0]+' '}}\" ng-if=isArray(data.files[$index])></span> <button ng-if=!collapsed ng-click=\"data.files.splice($index,1);$emit('updateComponent',data)\" class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-remove\"></span></button> <button ng-click=\"graphCtrl.swapPrevious(data.files,$index,data.id);$emit('updateComponent',data)\" ng-if=\"$index && !collapsed\" class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-chevron-up\"></span></button> <button ng-click=\"graphCtrl.swapPrevious(data.files,$index + 1,data.id);$emit('updateComponent',data)\" ng-if=\"$index != data.files.length -1 && !collapsed\" class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-chevron-down\"></span></button><br></div><button ng-if=!collapsed ng-click=\"data.files.push('');$emit('updateComponent',data)\" class=\"btn btn-xs btn-default\"><span class=\"glyphicon glyphicon-plus\"></span></button><br></div><div ng-if=\"data.exec == 'awk'\">script:<br><textarea parameter-field type=text ng-model=data.script></textarea></div><div ng-if=data.parameters><form name=myForm ng-repeat=\"(name, option) in data.parameters track by name\"><div ng-class=\"{'has-error': myForm.field.$invalid}\" class=\"input-group input-group-sm\"><label ng-bind=name class=input-group-addon></label><input parameter-field type=text name=field ng-model=data.parameters[name] ng-if=\"data.exec == 'curl' && name!='url'\" size=4 class=form-control> <input parameter-field type=text name=field ng-model=data.parameters[name] ng-if=\"data.exec != 'curl' || name=='url'\" class=form-control></div></form></div><div ng-if=\"data.exec == 'grep'\"><div><label>pattern: <input parameter-field type=text ng-model=data.pattern></label><br></div></div><div ng-if=\"isImplemented(data) &amp;&amp; data.selectors\"><form name=myForm ng-repeat=\"(name, option) in data.selectors track by name\"><div ng-class=\"{'has-error': myForm.field.$invalid}\" class=\"input-group input-group-sm\"><label ng-bind=name class=input-group-addon></label><input type=number name=field ng-model=data.selectors[name].value ng-if=\"data.selectors[name].type == 'numeric parameter'\" min=0 required class=form-control><div class=input-group-btn><button elscope type=button ng-click=\"graphCtrl.setSelection({data:data, name:name},scopedElement)\" class=\"btn btn-default\"><span ng-bind=data.selectors[name].name></span><span class=caret></span></button></div><input type=text ng-model=data.selectors[name].value name=field ng-if=\"data.selectors[name].type == 'parameter'\" class=form-control></div></form></div><div><span ng-repeat=\"(name, val) in data.flags track by name\" ng-click=\"data.flags[name] = !val;$emit('updateComponent',data)\" ng-if=\"!collapsed || data.flags[name]\"><label ng-class=\"(val)?'glyphicon-check':'glyphicon-unchecked'\" class=glyphicon></label><label ng-bind=name></label><br></span></div></div></div>";
 
 },{}],8:[function(require,module,exports){
@@ -449,7 +449,7 @@ app.directive("connector", ['$timeout', '$rootScope', function ($timeout, $rootS
         }
     }); }]);
 
-},{"../../app.module":2,"../../services/connector-path-maker":54}],15:[function(require,module,exports){
+},{"../../app.module":2,"../../services/connector-path-maker":59}],15:[function(require,module,exports){
 "use strict";
 var connector = require("./connector.directive");
 exports.imports = [connector];
@@ -566,108 +566,115 @@ app.directive("directoryfile", [function () { return ({
         }
     }); }]);
 
-},{"../../app.module":2,"../../utils":57,"./directory-file.html":20}],20:[function(require,module,exports){
+},{"../../app.module":2,"../../utils":62,"./directory-file.html":20}],20:[function(require,module,exports){
 module.exports = "<p class=\"icon-container text-center\"><span class=\"icon glyphicon glyphicon-file\"></span></p><p class=\"icon-label text-center\" ng-bind=record.name></p>";
 
 },{}],21:[function(require,module,exports){
+"use strict";
+var notifications_service_1 = require("../notification-area/notifications.service");
+var FileUploadManager = (function () {
+    function FileUploadManager() {
+        this.files = [];
+    }
+    FileUploadManager.prototype.notificationOf = function (file) {
+        for (var _i = 0, _a = this.files; _i < _a.length; _i++) {
+            var fileUpload = _a[_i];
+            if (fileUpload.file === file)
+                return [fileUpload.notification];
+        }
+        return [];
+    };
+    FileUploadManager.prototype.pushFile = function (file) {
+        var progressNotification = { type: "info", msg: 'Uploading ' + file.name };
+        notifications_service_1.default.pushNotification(progressNotification);
+        this.files.push({
+            file: file,
+            notification: progressNotification
+        });
+    };
+    FileUploadManager.prototype.pullFile = function (file) {
+        this.files = this.files.reduce(function (result, fileUpload) {
+            if (fileUpload.file !== file) {
+                result.push(fileUpload);
+            }
+            return result;
+        }, []);
+    };
+    return FileUploadManager;
+}());
+exports.FileUploadManager = FileUploadManager;
+
+},{"../notification-area/notifications.service":38}],22:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 var utils_1 = require("../../utils");
 var router_1 = require("../../router");
 var csrf_1 = require("../../services/csrf");
+var notifications_service_1 = require("../notification-area/notifications.service");
+var file_upload_manager_service_1 = require("./file-upload-manager.service");
 var dropzone = require("dropzone");
-app.directive("filesystem", ['alerts', '$rootScope', function (alerts, rootScope) {
-        var FileUploadManager = (function () {
-            function FileUploadManager() {
-                this.files = [];
-            }
-            FileUploadManager.prototype.notificationOf = function (file) {
-                for (var _i = 0, _a = this.files; _i < _a.length; _i++) {
-                    var fileUpload = _a[_i];
-                    if (fileUpload.file === file)
-                        return [fileUpload.notification];
-                }
-                return [];
+app.directive("filesystem", [function () { return ({
+        scope: true,
+        template: require("./filesystem.html"),
+        link: function (scope, element, attr) {
+            scope.directoryContent = [];
+            scope.selectedFile = null;
+            scope.selectFile = function (file) {
+                console.log(file);
+                scope.selectedFile = (scope.selectedFile == file) ? null : file;
             };
-            FileUploadManager.prototype.pushFile = function (file) {
-                this.files.push({
-                    file: file,
-                    notification: alerts.addNotification({ msg: 'Uploading ' + file.name })
+            //scope.sails = sails
+            function updateFileSystem() {
+                router_1.default.fetch(router_1.routeTable.directoriesOfProject(utils_1.projectId)).onResponse(function (data) {
+                    scope.directoryContent = data;
+                    scope.$digest();
                 });
-            };
-            FileUploadManager.prototype.pullFile = function (file) {
-                this.files = this.files.reduce(function (result, fileUpload) {
-                    if (fileUpload.file !== file) {
-                        result.push(fileUpload);
-                    }
-                    return result;
-                }, []);
-            };
-            return FileUploadManager;
-        }());
-        return {
-            scope: true,
-            template: require("./filesystem.html"),
-            link: function (scope, element, attr) {
-                scope.directoryContent = [];
-                scope.selectedFile = null;
-                scope.selectFile = function (file) {
+            }
+            var uploadingFiles = new file_upload_manager_service_1.FileUploadManager();
+            new dropzone(element[0], {
+                url: router_1.routeTable.uploadToProject(utils_1.projectId).url,
+                maxFilesize: 100,
+                maxThumbnailFilesize: 5,
+                clickable: ".upload",
+                error: function (file, errorMessage) {
+                    console.log(errorMessage);
+                },
+                sending: function (file, xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf_1.CSRF.csrfToken);
+                },
+                uploadprogress: function (file, progress) {
+                    uploadingFiles.notificationOf(file).map(function (_) { return _.progress = ~~progress; });
+                    scope.$applyAsync();
+                },
+                addedfile: function (file) {
                     console.log(file);
-                    scope.selectedFile = (scope.selectedFile == file) ? null : file;
-                };
-                //scope.sails = sails
-                function updateFileSystem() {
-                    router_1.default.fetch(router_1.routeTable.directoriesOfProject(utils_1.projectId)).onResponse(function (data) {
-                        scope.directoryContent = data;
-                        scope.$digest();
+                    uploadingFiles.pushFile(file);
+                },
+                success: function (file) {
+                    uploadingFiles.notificationOf(file).map(function (_) {
+                        _.msg = 'File "' + file.name + '" uploaded';
+                        _.progress = null;
+                        notifications_service_1.default.closeNotificationOnTimeout(_, 5000).then(function () { return scope.$applyAsync(); });
                     });
+                    uploadingFiles.pullFile(file);
+                    scope.$applyAsync();
+                    updateFileSystem();
                 }
-                var uploadingFiles = new FileUploadManager();
-                new dropzone(element[0], {
-                    url: router_1.routeTable.uploadToProject(utils_1.projectId).url,
-                    maxFilesize: 100,
-                    maxThumbnailFilesize: 5,
-                    clickable: ".upload",
-                    error: function (file, errorMessage) {
-                        console.log(errorMessage);
-                    },
-                    sending: function (file, xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf_1.CSRF.csrfToken);
-                    },
-                    uploadprogress: function (file, progress) {
-                        uploadingFiles.notificationOf(file).map(function (_) { return _.progress = ~~progress; });
-                        rootScope.$apply();
-                    },
-                    addedfile: function (file) {
-                        console.log(file);
-                        uploadingFiles.pushFile(file);
-                    },
-                    success: function (file) {
-                        uploadingFiles.notificationOf(file).map(function (_) {
-                            _.msg = 'File "' + file.name + '" uploaded';
-                            _.progress = null;
-                            alerts.removeAfter(_, 5000);
-                        });
-                        uploadingFiles.pullFile(file);
-                        rootScope.$apply();
-                        updateFileSystem();
-                    }
-                });
-                updateFileSystem();
-            }
-        };
-    }]);
+            });
+            updateFileSystem();
+        }
+    }); }]);
 
-},{"../../app.module":2,"../../router":52,"../../services/csrf":55,"../../utils":57,"./filesystem.html":22,"dropzone":72}],22:[function(require,module,exports){
+},{"../../app.module":2,"../../router":57,"../../services/csrf":60,"../../utils":62,"../notification-area/notifications.service":38,"./file-upload-manager.service":21,"./filesystem.html":23,"dropzone":77}],23:[function(require,module,exports){
 module.exports = "<div class=container-fluid><div class=row-fluid><div ng-repeat=\"record in directoryContent\" class=\"col-xs-4 col-sm-3 col-md-2\" directoryfile ng-class=\"(selectedFile == record) ? 'selected':''\" draggable=true ng-click=selectFile(record)></div></div></div><div class=transfer-buttons>You can also download, and upload files by dragging files from, and to the desktop. &nbsp;&nbsp;&nbsp;&nbsp; <a href={{selectedFile.downloadurl}} download={{selectedFile.filename}} ng-disabled=!selectedFile class=\"download btn\">Download File</a><div class=\"upload btn\">Upload File</div></div>";
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 var directoryFile = require("./directory-file.directive");
 var filesystem = require("./filesystem.directive");
 exports.imports = [directoryFile, filesystem];
 
-},{"./directory-file.directive":19,"./filesystem.directive":21}],24:[function(require,module,exports){
+},{"./directory-file.directive":19,"./filesystem.directive":22}],25:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 app.directive("elscope", function () { return ({
@@ -676,7 +683,7 @@ app.directive("elscope", function () { return ({
     }
 }); });
 
-},{"../../app.module":2}],25:[function(require,module,exports){
+},{"../../app.module":2}],26:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 var csrf_1 = require("../../services/csrf");
@@ -951,7 +958,7 @@ GraphController.$inject = ['$scope', '$element'];
 exports.GraphController = GraphController;
 app.controller("graphCtrl", GraphController);
 
-},{"../../../math":59,"../../app.module":2,"../../router":52,"../../services/connector-path-maker":54,"../../services/csrf":55}],26:[function(require,module,exports){
+},{"../../../math":64,"../../app.module":2,"../../router":57,"../../services/connector-path-maker":59,"../../services/csrf":60}],27:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 var mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
@@ -981,14 +988,14 @@ app.directive("graph", function () { return ({
     }
 }); });
 
-},{"../../app.module":2}],27:[function(require,module,exports){
+},{"../../app.module":2}],28:[function(require,module,exports){
 "use strict";
 var graph = require("./graph.directive");
 var graphCttrl = require("./graph.controller");
 var elementScope = require("./element-scope.directive");
 exports.imports = [graph, graphCttrl, elementScope];
 
-},{"./element-scope.directive":24,"./graph.controller":25,"./graph.directive":26}],28:[function(require,module,exports){
+},{"./element-scope.directive":25,"./graph.controller":26,"./graph.directive":27}],29:[function(require,module,exports){
 "use strict";
 var minimap = require("./minimap");
 var connector = require("./connector");
@@ -999,16 +1006,17 @@ var workspace = require("./workspace");
 var popupArea = require("./popup-area");
 var filesystem = require("./filesystem");
 var chatArea = require("./chat-area");
-exports.imports = [minimap, connector, component, graph, componentPopup, workspace, popupArea, filesystem, chatArea];
+var notificationArea = require("./notification-area");
+exports.imports = [minimap, connector, component, graph, componentPopup, workspace, popupArea, filesystem, chatArea, notificationArea];
 
-},{"./chat-area":5,"./component":8,"./connector":15,"./create-component-popup":18,"./filesystem":23,"./graph":27,"./minimap":29,"./popup-area":34,"./workspace":37}],29:[function(require,module,exports){
+},{"./chat-area":5,"./component":8,"./connector":15,"./create-component-popup":18,"./filesystem":24,"./graph":28,"./minimap":30,"./notification-area":35,"./popup-area":39,"./workspace":42}],30:[function(require,module,exports){
 "use strict";
 var minimap = require("./minimap.directive");
 var miniComponent = require("./mini-component.directive");
 var miniConnector = require("./mini-connector-directive");
 exports.imports = [minimap, miniComponent, miniConnector];
 
-},{"./mini-component.directive":30,"./mini-connector-directive":31,"./minimap.directive":32}],30:[function(require,module,exports){
+},{"./mini-component.directive":31,"./mini-connector-directive":32,"./minimap.directive":33}],31:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 app.directive("minicomponent", function () {
@@ -1039,7 +1047,7 @@ app.directive("minicomponent", function () {
     };
 });
 
-},{"../../app.module":2}],31:[function(require,module,exports){
+},{"../../app.module":2}],32:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 var connector_path_maker_1 = require("../../services/connector-path-maker");
@@ -1071,7 +1079,7 @@ app.directive("miniconnector", function () {
     };
 });
 
-},{"../../app.module":2,"../../services/connector-path-maker":54}],32:[function(require,module,exports){
+},{"../../app.module":2,"../../services/connector-path-maker":59}],33:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 var angular = require("angular");
@@ -1220,15 +1228,81 @@ app.directive("minimap", function () { return ({
     }
 }); });
 
-},{"../../../math":59,"../../app.module":2,"./minimap.html":33,"angular":71}],33:[function(require,module,exports){
+},{"../../../math":64,"../../app.module":2,"./minimap.html":34,"angular":76}],34:[function(require,module,exports){
 module.exports = "<svg touch-action=none><g class=mini-edges ng-style=\"{transform: transform, strokeWidth:1.5/scale}\"><path miniconnector ng-repeat=\"edge in visualData.connections\"></path></g></svg><div class=minimap-nodes ng-style=\"{transform: transform}\"><div minicomponent ng-repeat=\"data in visualData.components track by data.id\" ng-style=\"{transform:'translate(' + data.position.x + 'px, ' + data.position.y + 'px)', width:offsetWidth, height:offsetHeight, borderWidth:1/scale}\" ng-switch on=data.type class=\"{{data.type}}-component mini-component\"></div><div class=viewbox></div></div>";
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
+"use strict";
+var notificationArea = require("./notification-area.component");
+exports.imports = [notificationArea];
+
+},{"./notification-area.component":36}],36:[function(require,module,exports){
+"use strict";
+var app = require("../../app.module");
+var notifications_service_1 = require("./notifications.service");
+var ChatAreaController = (function () {
+    function ChatAreaController() {
+        this.chatMsg = "";
+    }
+    Object.defineProperty(ChatAreaController.prototype, "notifications", {
+        get: function () {
+            return notifications_service_1.default.notifications;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ChatAreaController.prototype.closeNotification = function (index) {
+        notifications_service_1.default.notifications.splice(index, 1);
+    };
+    return ChatAreaController;
+}());
+app.component("notification-area", {
+    controller: ChatAreaController,
+    controllerAs: "ctrl",
+    template: require("./notification-area.html"),
+});
+
+},{"../../app.module":2,"./notification-area.html":37,"./notifications.service":38}],37:[function(require,module,exports){
+module.exports = "<div><alert ng-repeat=\"notification in ctrl.notifications\" type={{notification.type}} class=repeated-item close=notification.closeNotification($index)>{{notification.msg}}<div class=\"progress progress-striped active\" ng-if=notification.progress><div class=progress-bar role=progressbar aria-valuenow={{notification.progress}} aria-valuemin=0 aria-valuemax=100 style=\"width: {{notification.progress}}%\"><span>{{notification.progress}}%</span></div></div></alert></div>";
+
+},{}],38:[function(require,module,exports){
+"use strict";
+var NotificationCloseTimeout = (function () {
+    function NotificationCloseTimeout(callback, timeout) {
+        var _this = this;
+        this.doneCallback = [];
+        this.timer = setTimeout(function () { callback(); _this.doneCallback.forEach(function (_) { return _(); }); }, timeout);
+    }
+    NotificationCloseTimeout.prototype.stop = function () { clearTimeout(this.timer); };
+    NotificationCloseTimeout.prototype.then = function (callback) { this.doneCallback.push(callback); };
+    return NotificationCloseTimeout;
+}());
+var NotificationService = (function () {
+    function NotificationService() {
+        this.notifications = [];
+    }
+    NotificationService.prototype.pushNotification = function (notification) {
+        this.notifications.push(notification);
+    };
+    NotificationService.prototype.closeNotification = function (notification) {
+        this.notifications.splice(this.notifications.indexOf(notification), 1);
+    };
+    NotificationService.prototype.closeNotificationOnTimeout = function (notification, timeoutInMillis) {
+        var _this = this;
+        return new NotificationCloseTimeout(function () { return _this.closeNotification(notification); }, timeoutInMillis);
+    };
+    return NotificationService;
+}());
+exports.NotificationService = NotificationService;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = new NotificationService();
+
+},{}],39:[function(require,module,exports){
 "use strict";
 var popupArea = require("./popup-area.directive");
 exports.imports = [popupArea];
 
-},{"./popup-area.directive":35}],35:[function(require,module,exports){
+},{"./popup-area.directive":40}],40:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 app.directive("popupArea", function () { return ({
@@ -1267,15 +1341,15 @@ app.directive("popupArea", function () { return ({
     }
 }); });
 
-},{"../../app.module":2,"./popup-area.html":36}],36:[function(require,module,exports){
+},{"../../app.module":2,"./popup-area.html":41}],41:[function(require,module,exports){
 module.exports = "<div create-component-popup class=\"create-component-popup dropdown open\"></div><div ng-if=sel.open class=\"selectpopup dropdown open\" ng-style=\"{transform:sel.transform, MsTransform:sel.transform}\"><ul class=dropdown-menu><li ng-repeat=\"c in options[sel.data.exec][sel.name]\"><a ng-click=graphCtrl.selectSelection(c)><span ng-bind=c></span></a></li></ul></div><div class=edgepopup ng-repeat=\"c in edgePopups track by c.index\" ng-style=\"{transform:c.transform, MsTransform:c.transform}\"><div class=content ng-class=\"(c.y < 120)?'bottom':'top'\"><div>Remove the connection?</div><button class=\"btn btn-sm btn-success\" ng-click=EdgePopupRemovePipe(c.id)>Remove</button> <button class=\"btn btn-sm btn-primary\" ng-click=EdgePopupClose()>No</button></div></div>";
 
-},{}],37:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 var workspace = require("./workspace.directive");
 exports.imports = [workspace];
 
-},{"./workspace.directive":38}],38:[function(require,module,exports){
+},{"./workspace.directive":43}],43:[function(require,module,exports){
 "use strict";
 var app = require("../../app.module");
 app.directive("workspace", ['$document', function ($document) {
@@ -1352,10 +1426,10 @@ app.directive("workspace", ['$document', function ($document) {
         };
     }]);
 
-},{"../../app.module":2,"./workspace.html":39}],39:[function(require,module,exports){
+},{"../../app.module":2,"./workspace.html":44}],44:[function(require,module,exports){
 module.exports = "<div class=nodes><div component ng-repeat=\"data in visualData.components track by data.id\" data-node-id={{::data.id}} class=\"{{::data.type}}-component component\"></div></div>";
 
-},{}],40:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 var socket_service_1 = require("../socket.service");
@@ -1431,7 +1505,7 @@ function macroCtrlFunction(scope, modal, alerts) {
     };
 }
 
-},{"../app.module":2,"../modals/edit-macro.modal":48,"../modals/new-macro.modal":49,"../services/alerts":53,"../services/csrf":55,"../socket.service":56,"../utils":57}],41:[function(require,module,exports){
+},{"../app.module":2,"../modals/edit-macro.modal":53,"../modals/new-macro.modal":54,"../services/alerts":58,"../services/csrf":60,"../socket.service":61,"../utils":62}],46:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 var utils_1 = require("../utils");
@@ -1439,11 +1513,11 @@ var socket_service_1 = require("../socket.service");
 var router_1 = require("../router");
 var welcomeUserModal = require("../modals/welcome-user.modal");
 var projectCreationModal = require("../modals/project-creation.modal");
+var notifications_service_1 = require("../components/notification-area/notifications.service");
 var csrf_1 = require("../services/csrf");
-app.controller('shellProject', ['$scope', 'alerts', '$modal', '$timeout', shellProjectController]);
-function shellProjectController($scope, alerts, modal, $timeout) {
+app.controller('shellProject', ['$scope', '$modal', '$timeout', shellProjectController]);
+function shellProjectController($scope, modal, $timeout) {
     var visualData = {};
-    $scope.alerts = alerts;
     $scope.filesystem = 0;
     $scope.graphData = visualData;
     $scope.implementedCommands = [];
@@ -1644,12 +1718,16 @@ function shellProjectController($scope, alerts, modal, $timeout) {
     function debugData(data) {
         console.log(data);
         if (data.alert) {
-            alerts.addAlert({ type: 'danger', msg: data.message });
+            var notification = { type: 'danger', msg: data.message };
+            notifications_service_1.default.pushNotification(notification);
+            notifications_service_1.default.closeNotificationOnTimeout(notification, 5000);
             $scope.$digest();
         }
         else if (data.status == 500 && data.errors) {
             data.errors.forEach(function (message) {
-                alerts.addAlert({ type: 'danger', msg: message });
+                var notification = { type: 'danger', msg: message };
+                notifications_service_1.default.pushNotification(notification);
+                notifications_service_1.default.closeNotificationOnTimeout(notification, 5000);
             });
         }
     }
@@ -1775,7 +1853,7 @@ function shellProjectController($scope, alerts, modal, $timeout) {
 }
 ;
 
-},{"../app.module":2,"../modals/project-creation.modal":50,"../modals/welcome-user.modal":51,"../router":52,"../services/csrf":55,"../socket.service":56,"../utils":57}],42:[function(require,module,exports){
+},{"../app.module":2,"../components/notification-area/notifications.service":38,"../modals/project-creation.modal":55,"../modals/welcome-user.modal":56,"../router":57,"../services/csrf":60,"../socket.service":61,"../utils":62}],47:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 app.directive("connectorsLayer", function () { return ({
@@ -1785,10 +1863,10 @@ app.directive("connectorsLayer", function () { return ({
     template: require("./connectors-layer.html"),
 }); });
 
-},{"../app.module":2,"./connectors-layer.html":43}],43:[function(require,module,exports){
+},{"../app.module":2,"./connectors-layer.html":48}],48:[function(require,module,exports){
 module.exports = "<svg touch-action=none><g class=edges><path class=emptyEdge></path><path connector ng-repeat=\"edge in visualData.connections\" class=back></path><path connector ng-repeat=\"edge in visualData.connections\"></path></g></svg>";
 
-},{}],44:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 app.directive("mousetrap", [function () { return ({
@@ -1801,7 +1879,7 @@ app.directive("mousetrap", [function () { return ({
         }
     }); }]);
 
-},{"../app.module":2}],45:[function(require,module,exports){
+},{"../app.module":2}],50:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 app.directive("parameterField", ['$timeout', function ($timeout) {
@@ -1826,7 +1904,7 @@ app.directive("parameterField", ['$timeout', function ($timeout) {
         };
     }]);
 
-},{"../app.module":2}],46:[function(require,module,exports){
+},{"../app.module":2}],51:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 var socket_service_1 = require("../socket.service");
@@ -1857,7 +1935,7 @@ app.directive("terminal", [function () {
         };
     }]);
 
-},{"../app.module":2,"../socket.service":56}],47:[function(require,module,exports){
+},{"../app.module":2,"../socket.service":61}],52:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 app.directive("tip", [function () {
@@ -1876,7 +1954,7 @@ app.directive("tip", [function () {
         };
     }]);
 
-},{"../app.module":2}],48:[function(require,module,exports){
+},{"../app.module":2}],53:[function(require,module,exports){
 "use strict";
 function modalController(form) {
     return ["$scope", "$modalInstance", modalControllerFunction];
@@ -1909,7 +1987,7 @@ function showModalFunction(modalservice, macro) {
 }
 exports.showModal = showModalFunction;
 
-},{}],49:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 var modalController = ["$scope", "$modalInstance", modalControllerFunction];
 function modalControllerFunction($scope, $modalInstance) {
@@ -1931,7 +2009,7 @@ function showModalFunction(modalservice) {
 }
 exports.showModal = showModalFunction;
 
-},{}],50:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 var modalController = ["$scope", "$modalInstance", modalControllerFunction];
 function modalControllerFunction($scope, $modalInstance) {
@@ -1951,7 +2029,7 @@ function showModalFunction(modalservice) {
 }
 exports.showModal = showModalFunction;
 
-},{}],51:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 var modalController = ["$scope", "$modalInstance", modalControllerFunction];
 function modalControllerFunction($scope, $modalInstance) {
@@ -1972,7 +2050,7 @@ function showModalFunction(modalservice) {
 }
 exports.showModal = showModalFunction;
 
-},{}],52:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 var routes_model_1 = require("../../routes/routes.model");
 var socket_service_1 = require("../socket.service");
@@ -2090,7 +2168,7 @@ var Network = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = new Network();
 
-},{"../../routes/route-table":62,"../../routes/routes.model":63,"../services/csrf":55,"../socket.service":56}],53:[function(require,module,exports){
+},{"../../routes/route-table":67,"../../routes/routes.model":68,"../services/csrf":60,"../socket.service":61}],58:[function(require,module,exports){
 "use strict";
 var app = require("../app.module");
 var serviceDeclaration = ["$timeout", alertService];
@@ -2123,7 +2201,7 @@ function alertService($timeout) {
     };
 }
 
-},{"../app.module":2}],54:[function(require,module,exports){
+},{"../app.module":2}],59:[function(require,module,exports){
 "use strict";
 var pathModes;
 (function (pathModes) {
@@ -2183,7 +2261,7 @@ var ConnectorPathMaker = (function () {
 }());
 exports.ConnectorPathMaker = ConnectorPathMaker;
 
-},{}],55:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 var socket_service_1 = require("../socket.service");
 console.log("SocketService.sailsSocket.get csrfToken");
@@ -2217,7 +2295,7 @@ CSRF.csrfToken = null;
 CSRF.waitingToken = [];
 exports.CSRF = CSRF;
 
-},{"../socket.service":56}],56:[function(require,module,exports){
+},{"../socket.service":61}],61:[function(require,module,exports){
 /// <reference path="../../node_modules/@types/socket.io-client/index.d.ts" />
 "use strict";
 var SocketService = (function () {
@@ -2249,12 +2327,12 @@ var SocketService = (function () {
 SocketService.m_socket = io();
 exports.SocketService = SocketService;
 
-},{}],57:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 exports.pathArray = window["pathArray"] = window.location.pathname.split('/');
 exports.projectId = window["projId"] = exports.pathArray[exports.pathArray.length - 1];
 
-},{}],58:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 /**
  * this class is responsible to show the boundary of the selected components
@@ -2339,7 +2417,7 @@ var Boundary = (function () {
 }());
 exports.Boundary = Boundary;
 
-},{}],59:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 var boundary_class_1 = require("./boundary.class");
 exports.Boundary = boundary_class_1.Boundary;
@@ -2348,7 +2426,7 @@ exports.Rectangle = rectangle_class_1.Rectangle;
 var view_transform_class_1 = require("./view-transform.class");
 exports.ViewTransform = view_transform_class_1.ViewTransform;
 
-},{"./boundary.class":58,"./rectangle.class":60,"./view-transform.class":61}],60:[function(require,module,exports){
+},{"./boundary.class":63,"./rectangle.class":65,"./view-transform.class":66}],65:[function(require,module,exports){
 "use strict";
 /**
   A rectanglular area
@@ -2413,7 +2491,7 @@ var Rectangle = (function () {
 }());
 exports.Rectangle = Rectangle;
 
-},{}],61:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 /**
  * ViewTransform class
@@ -2483,7 +2561,7 @@ var ViewTransform = (function () {
 }());
 exports.ViewTransform = ViewTransform;
 
-},{}],62:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 var routes_model_1 = require("./routes.model");
 var RouteTable = (function () {
@@ -2503,7 +2581,7 @@ exports.RouteTable = RouteTable;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = new RouteTable();
 
-},{"./routes.model":63}],63:[function(require,module,exports){
+},{"./routes.model":68}],68:[function(require,module,exports){
 "use strict";
 var Method;
 (function (Method) {
@@ -2525,7 +2603,7 @@ var Route = (function () {
 }());
 exports.Route = Route;
 
-},{}],64:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -6666,11 +6744,11 @@ angular.module('ngAnimate', [], function initAngularHelpers() {
 
 })(window, window.angular);
 
-},{}],65:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 require('./angular-animate');
 module.exports = 'ngAnimate';
 
-},{"./angular-animate":64}],66:[function(require,module,exports){
+},{"./angular-animate":69}],71:[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -14368,17 +14446,17 @@ angular.module('ui.bootstrap.datepickerPopup').run(function() {!angular.$$csp().
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow,[uib-popover-html-popup].popover.top-left > .arrow,[uib-popover-html-popup].popover.top-right > .arrow,[uib-popover-html-popup].popover.bottom-left > .arrow,[uib-popover-html-popup].popover.bottom-right > .arrow,[uib-popover-html-popup].popover.left-top > .arrow,[uib-popover-html-popup].popover.left-bottom > .arrow,[uib-popover-html-popup].popover.right-top > .arrow,[uib-popover-html-popup].popover.right-bottom > .arrow,[uib-popover-template-popup].popover.top-left > .arrow,[uib-popover-template-popup].popover.top-right > .arrow,[uib-popover-template-popup].popover.bottom-left > .arrow,[uib-popover-template-popup].popover.bottom-right > .arrow,[uib-popover-template-popup].popover.left-top > .arrow,[uib-popover-template-popup].popover.left-bottom > .arrow,[uib-popover-template-popup].popover.right-top > .arrow,[uib-popover-template-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-html-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],67:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 require('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":66}],68:[function(require,module,exports){
+},{"./dist/ui-bootstrap-tpls":71}],73:[function(require,module,exports){
 require('./src/ui-layout');
 module.exports = 'ui.layout';
 
 
-},{"./src/ui-layout":69}],69:[function(require,module,exports){
+},{"./src/ui-layout":74}],74:[function(require,module,exports){
 'use strict';
 
 /**
@@ -15494,7 +15572,7 @@ angular.module('ui.layout', [])
   })
 ;
 
-},{}],70:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -47263,11 +47341,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],71:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":70}],72:[function(require,module,exports){
+},{"./angular":75}],77:[function(require,module,exports){
 
 /*
  *
@@ -49036,7 +49114,7 @@ module.exports = angular;
 
 }).call(this);
 
-},{}],73:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 /*global define:false */
 /**
  * Copyright 2016 Craig Campbell
