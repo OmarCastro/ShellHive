@@ -1,15 +1,17 @@
-var parser = require('../../lib/parser/parser.js')
-var chai = require('chai');
-var expect = chai.expect;
-var should = chai.should();
+const parser = require('../../lib/parser/parser.js')
+const graphlib = require('../../lib/graph')
+const parserinit = require('../../lib/parser/utils/init.js')
+const chai = require('chai');
+const expect = chai.expect;
+const should = chai.should();
+const Connection        = graphlib.Connection
+const Macro             = graphlib.Macro
+const Component  	      = graphlib.Component
+const FileComponent     = graphlib.FileComponent
+const CommandComponent  = graphlib.CommandComponent
+const MacroComponent    = graphlib.MacroComponent
+const IndexedGraph      = graphlib.IndexedGraph
 
-var Connection        = parser.Connection
-var Macro             = parser.Macro
-var Component  	      = parser.Component
-var FileComponent     = parser.FileComponent
-var CommandComponent  = parser.CommandComponent
-var MacroComponent    = parser.MacroComponent
-var IndexedGraph      = parser.IndexedGraph
 
 describe('parser.js test', function(){
   describe('createComponentDinamicText', function(){

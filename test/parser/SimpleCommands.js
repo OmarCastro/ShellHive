@@ -1,15 +1,16 @@
-var parser = require('../../lib/parser/parser.js')
-var chai = require('chai');
-var expect = chai.expect;
-var should = chai.should();
-
-var Connection = parser.Connection
-var Component  = parser.Component
-
+const parser = require('../../lib/parser/parser.js')
+const graphlib = require('../../lib/graph')
+const parserinit = require('../../lib/parser/utils/init.js')
+const chai = require('chai');
+const expect = chai.expect;
+const should = chai.should();
+const Connection = graphlib.Connection;
+const Component  = graphlib.Component;
+const Graph = graphlib.Graph;
 
 
 function shouldBeAGraph(commandResult){
-  commandResult.should.be.an.instanceof(parser.Graph)
+  commandResult.should.be.an.instanceof(Graph)
   commandResult.components.forEach(function(component){
     component.should.be.an.instanceof(Component)
   });  
@@ -289,7 +290,7 @@ describe('command test', function(){
 
       graph.components.should.have.length(1)
       graph.connections.should.be.empty
-      graph.components[0].should.have.properties({
+      graph.components[0].parameters.should.have.properties({
         "set1":"man",
         "set2":"woman"
       })
