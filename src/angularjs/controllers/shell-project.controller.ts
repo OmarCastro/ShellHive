@@ -271,10 +271,9 @@ console.log("subscribe project!!")
     $scope.$digest();
   });
 
-
   io.socket.on('chat', function (data) {
     $scope.chatMessages.push(data)
-    $scope.$digest();
+    $scope.$applyAsync();
   });
 
   io.socket.on('updateMacroList', function (graphs) {

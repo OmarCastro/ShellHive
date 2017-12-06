@@ -130,10 +130,14 @@ var CollaborationService = module.exports = {
   chat: function(req,res){
     var socket = req.socket;
     var data = req.body.data;
-    data.sender = socket.collabData.name;
-    data.color = socket.collabData.color;
+    var response = {
+      text: data,
+      sender: socket.collabData.name,
+      color: socket.collabData.color
+    }
     sails.log("chat to project "+socket.projectId + " -- " + JSON.stringify(data));
-    sails.io.sockets.in(project_room(socket.projectId)).emit('chat',data);
+    sails.io.sockets.in(project_room(socket.projectId)).emit('chat',response);
+    
     res.json("message sent");
   },
 
@@ -147,7 +151,7 @@ var CollaborationService = module.exports = {
     var io = sails.io;
     sails.log('broadcasting message -- '+req.body.message.type);
 
-    socket.broadcast.to(project_room(req.body.id)).emit('action',req.body.message);
+    socket.broadcast.emit('action',req.body.message);
     // Send a JSON response
     res.json("action sent");
   },
